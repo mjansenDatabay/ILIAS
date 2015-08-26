@@ -159,6 +159,8 @@ class ilTinyMCE extends ilRTE
 				'ilimgupload'
 			));
 		}
+		// @todo: Remove when ilimgupload plugin works
+		parent::removePlugin('ilimgupload');
 
 		if(version_compare($this->version, '4.0.0') < 0)
 		{
