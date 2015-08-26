@@ -314,7 +314,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		}
 
 		// questiontext
-		$question = new ilTextAreaInputGUI($this->lng->txt("question"), "question");
+		/*$question = new ilTextAreaInputGUI($this->lng->txt("question"), "question");
 		$question->setValue($this->object->prepareTextareaOutput($this->object->getQuestion()));
 		$question->setRequired(TRUE);
 		$question->setRows(10);
@@ -336,7 +336,43 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		{
 			$question->setRteTags(self::getSelfAssessmentTags());
 			$question->setUseTagsForRteOnly(false);
+		}*/
+		$question = new ilTextAreaInputGUI($this->lng->txt("question"), 'question');
+		$question->setValue($this->object->prepareTextareaOutput($this->object->getQuestion()));
+		$question->setRequired(true);
+		$question->setCols(50);
+		$question->setRows(15);
+		$question->setUseRte(true);
+		$question->addPlugin('latex');
+		$question->addButton('latex');
+		$question->addButton('pastelatex');
+		$question->addPlugin('ilfrmquote');
+
+		//$oPostGUI->addPlugin('code'); 
+		if($_GET['action'] == 'showreply' || $_GET['action'] == 'ready_showreply')
+		{
+			$question->addButton('ilFrmQuoteAjaxCall');
 		}
+		$question->removePlugin('advlink');
+		$question->setRTERootBlockElement('');
+		$question->usePurifier(true);
+		$question->disableButtons(array(
+			'charmap',
+			'undo',
+			'redo',
+			'justifyleft',
+			'justifycenter',
+			'justifyright',
+			'justifyfull',
+			'anchor',
+			'fullscreen',
+			'cut',
+			'copy',
+			'paste',
+			'pastetext',
+			'formatselect'
+		));
+		$question->setRTESupport($this->object->getId(), 'qpl', 'assessment', 'tpl.tinymce_test.html', false, '3.4.7');
 		$form->addItem($question);
 
 //		$tpl = new ilTemplate("tpl.il_as_qpl_cloze_gap_button_code.html", TRUE, TRUE, "Modules/TestQuestionPool");
@@ -402,6 +438,25 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		$cloze_text->setInfo($this->lng->txt("close_text_hint"));
 		$cloze_text->setRows( 10 );
 		$cloze_text->setCols( 80 );
+		$cloze_text->removePlugin('advlink');
+		$cloze_text->setRTERootBlockElement('');
+		$cloze_text->usePurifier(true);
+		$cloze_text->disableButtons(array(
+			'charmap',
+			'undo',
+			'redo',
+			'justifyleft',
+			'justifycenter',
+			'justifyright',
+			'justifyfull',
+			'anchor',
+			'fullscreen',
+			'cut',
+			'copy',
+			'paste',
+			'pastetext',
+			'formatselect'
+		));
 		if (!$this->object->getSelfAssessmentEditingMode())
 		{
 			if( $this->object->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT )
@@ -419,7 +474,42 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 			$cloze_text->setRteTags(self::getSelfAssessmentTags());
 			$cloze_text->setUseTagsForRteOnly(false);
 		}
-		$cloze_text->setRTESupport($this->object->getId(), "qpl", "assessment");
+		$cloze_text->setRTESupport($this->object->getId(), 'qpl', 'assessment', 'tpl.tinymce_test.html', false, '3.4.7');
+		/*$cloze_text = new ilTextAreaInputGUI($this->lng->txt("cloze_text"), 'cloze_text');
+		$cloze_text->setRequired(true);
+		$cloze_text->setCols(50);
+		$cloze_text->setRows(15);
+		$cloze_text->setUseRte(true);
+		$cloze_text->addPlugin('latex');
+		$cloze_text->addButton('latex');
+		$cloze_text->addButton('pastelatex');
+		$cloze_text->addPlugin('ilfrmquote');
+		$cloze_text->setValue($this->applyIndizesToGapText($this->object->getClozeText()));
+		//$oPostGUI->addPlugin('code'); 
+		if($_GET['action'] == 'showreply' || $_GET['action'] == 'ready_showreply')
+		{
+			$cloze_text->addButton('ilFrmQuoteAjaxCall');
+		}
+		$cloze_text->removePlugin('advlink');
+		$cloze_text->setRTERootBlockElement('');
+		$cloze_text->usePurifier(true);
+		$cloze_text->disableButtons(array(
+			'charmap',
+			'undo',
+			'redo',
+			'justifyleft',
+			'justifycenter',
+			'justifyright',
+			'justifyfull',
+			'anchor',
+			'fullscreen',
+			'cut',
+			'copy',
+			'paste',
+			'pastetext',
+			'formatselect'
+		));
+		$cloze_text->setRTESupport($this->object->getId(), 'qpl', 'assessment', 'tpl.tinymce_test.html', false, '3.4.7');*/
 		$form->addItem($cloze_text);
 
 		$tpl = new ilTemplate("tpl.il_as_qpl_cloze_gap_button_code.html", TRUE, TRUE, "Modules/TestQuestionPool");

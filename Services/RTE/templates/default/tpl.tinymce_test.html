@@ -1,0 +1,65 @@
+<!-- BEGIN tinymce -->
+<script language="javascript" type="text/javascript" src="{JAVASCRIPT_LOCATION}"></script>
+<script language="javascript" type="text/javascript"><!-- BEGIN obj_id -->
+	var obj_id = '{OBJ_ID}';
+	var obj_type = '{OBJ_TYPE}';<!-- END obj_id -->
+	var client_id = '{CLIENT_ID}';
+	var session_id = '{SESSION_ID}';
+
+function ilTinyMceInitCallback(ed) {
+	// Add hook for onContextMenu so that Insert Image can be removed
+	<!-- BEGIN remove_img_context_menu_item -->
+	<!-- END remove_img_context_menu_item -->
+}
+
+
+var _ilTinyMceInitCallbackRegistry = function()
+{
+	this.callbacks = [];
+};
+
+_ilTinyMceInitCallbackRegistry.prototype = {
+
+	addCallback: function(callback)
+				 {
+					 this.callbacks.push(callback);
+				 },
+
+	callCallbacks: function()
+				   {
+					   for(var i = 0; i < this.callbacks.length; i++)
+					   {
+						   this.callbacks[i]();
+					   }
+				   }
+};
+
+var ilTinyMceInitCallbackRegistry = new _ilTinyMceInitCallbackRegistry();
+
+tinymce.init({
+	selector : "textarea:not(.noRTEditor)",
+	language : "{LANG}",
+	theme    : "modern",
+	plugins  : "{ADDITIONAL_PLUGINS}",
+	block_formats : "{BLOCKFORMATS}",
+	toolbar1 : "{BUTTONS_1}",
+	toolbar2 : "{BUTTONS_2}",
+	toolbar3 : "{BUTTONS_3}",
+	font_size_style_values : "8pt,10pt,12pt,14pt,18pt,24pt,36pt",
+	valid_elements : "{VALID_ELEMENTS}",
+	<!-- BEGIN formelements -->
+	extended_valid_elements : "form[name|id|action|method|enctype|accept-charset|onsubmit|onreset|target],input[id|name|type|value|size|maxlength|checked|accept|s rc|width|height|disabled|readonly|tabindex|accessk ey|onfocus|onblur|onchange|onselect],textarea[id|name|rows|cols|disabled|readonly|tabindex|acces skey|onfocus|onblur|onchange|onselect],option[name|id|value],select[id|name|type|value|size|maxlength|checked|accept|s rc|width|height|disabled|readonly|tabindex|accessk ey|onfocus|onblur|onchange|onselect|length|options |selectedIndex]",
+	<!-- END formelements -->
+	entities : "60,lt,62,gt,38,amp",
+	content_css : "{STYLESHEET_LOCATION}",
+	insertdatetime_dateformat : "%d.%m.%Y",
+	insertdatetime_timeformat : "%H:%M:%S",
+	fontsize_formats : "8pt,10pt,12pt,14pt,18pt,24pt,36pt",
+	fix_list_elements : true,
+	init_instance_callback : "ilTinyMceInitCallbackRegistry.callCallbacks",
+	<!-- BEGIN forced_root_block -->forced_root_block : '{FORCED_ROOT_BLOCK}',<!-- END forced_root_block -->
+
+});
+</script>
+<!-- END tinymce -->
+
