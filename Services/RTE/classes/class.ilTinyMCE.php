@@ -17,7 +17,9 @@ class ilTinyMCE extends ilRTE
 	protected $mode = 'textareas';
 	protected $version = ''; // set default version here
 	protected $vd = ''; // version directory suffix
-
+	protected $path     = "";
+	protected $file     = "";
+	
 	/**
 	 * @var bool
 	 */
@@ -38,22 +40,51 @@ class ilTinyMCE extends ilRTE
 		{
 			$a_version = '3.5.11';
 		}
-
-		parent::__construct($a_version);
+		$a_version = "4.2.4"; // @todo: Remove
+		parent::__construct($a_version);				
 
 		switch($a_version)
 		{
-			case '3.4.7':
-			case '3.5.11':
+			case "4.2.4":
+				require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
+				iljQueryUtil::initjQuery();
+				$this->file    = 'tinymce.min.js';
 				$this->version = $a_version;
-				$this->vd      = '_' . str_replace('.', '_', $a_version);
+				$this->vd      = "_" . str_replace(".", "_", $a_version);
+				break;
+
+			case "3.4.7":
+			case "3.5.11":
+				$this->file    = 'tiny_mce.js';
+				$this->version = $a_version;
+				$this->vd = '_'.str_replace('.', '_', $a_version);
 				break;
 
 			default:
 				// unknown/unsupported version?
 				break;
 		}
-
+		if(version_compare($this->version, '4.0.0') >= 0)
+		{
+			$this->plugins = array(
+				"layer",
+				"table",
+				"save",
+				"emoticons",
+				"insertdatetime",
+				"preview",
+				"searchreplace",
+				"print",
+				"contextmenu",
+				"paste",
+				"directionality",
+				"fullscreen",
+				"nonbreaking",
+				"noneditable"
+			);
+		}
+		else
+		{
 		$this->plugins = array(
 			'xhtmlxtras',
 			'style',
@@ -76,7 +107,7 @@ class ilTinyMCE extends ilRTE
 			'noneditable',
 			'style'
 		);
-
+		}
 		$this->setStyleSelect(false);
 		$this->addInternalTinyMCEImageManager();
 	}
@@ -113,7 +144,7 @@ class ilTinyMCE extends ilRTE
 	/**
 	 * @param array $tags
 	 */
-	protected function handleImagePluginsBeforeRendering(array $tags)
+	protected function handlePluginsBeforeRendering(array $tags)
 	{
 		if(!in_array('img', $tags))
 		{
@@ -126,6 +157,19 @@ class ilTinyMCE extends ilRTE
 				'image',
 				'ilimgupload'
 			));
+		}
+
+		if(version_compare($this->version, '4.0.0') < 0)
+		{
+			parent::removePlugin('code');
+			parent::removePlugin('hr');
+			parent::removePlugin('link');
+			parent::removePlugin('anchor');
+			parent::removePlugin('emoticons');
+		}
+		else
+		{
+			parent::removePlugin('emotions');
 		}
 	}
 	
@@ -201,7 +245,7 @@ class ilTinyMCE extends ilRTE
 			$tpl = new ilTemplate(($cfg_template === null ? "tpl.tinymce.html" : $cfg_template), true, true, "Services/RTE");
 			$this->handleImgContextMenuItem($tpl);
 			$tags = ilObjAdvancedEditing::_getUsedHTMLTags($a_module);
-			$this->handleImagePluginsBeforeRendering($tags);
+			$this->handlePluginsBeforeRendering($tags);
 			if ($allowFormElements)
 			{
 				$tpl->touchBlock("formelements");
@@ -213,7 +257,7 @@ class ilTinyMCE extends ilRTE
 				$tpl->parseCurrentBlock();
 			}
 			$tpl->setCurrentBlock("tinymce");
-			$tpl->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/tiny_mce.js");
+			$tpl->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/".$this->file);
 			include_once "./Services/Object/classes/class.ilObject.php";
 			$tpl->setVariable("OBJ_ID", $obj_id);                   
 			$tpl->setVariable("OBJ_TYPE", $obj_type);
@@ -227,9 +271,9 @@ class ilTinyMCE extends ilRTE
 					   . ','.$this->_buildAdvancedTableButtonsFromHTMLTags($tags)
 					   . ($this->getStyleSelect() ? ',styleselect' : '');
 			$buttons_3 = $this->_buildAdvancedButtonsFromHTMLTags(3, $tags);
-			$tpl->setVariable('BUTTONS_1', self::removeRedundantSeparators($buttons_1));
-			$tpl->setVariable('BUTTONS_2', self::removeRedundantSeparators($buttons_2));
-			$tpl->setVariable('BUTTONS_3', self::removeRedundantSeparators($buttons_3));
+			$tpl->setVariable('BUTTONS_1', self::removeRedundantSeparators($buttons_1, $this->version));
+			$tpl->setVariable('BUTTONS_2', self::removeRedundantSeparators($buttons_2, $this->version));
+			$tpl->setVariable('BUTTONS_3', self::removeRedundantSeparators($buttons_3, $this->version));
 			
 			$tpl->setVariable("ADDITIONAL_PLUGINS", join(",", $this->plugins));
 			include_once "./Services/Utilities/classes/class.ilUtil.php";
@@ -264,12 +308,12 @@ class ilTinyMCE extends ilRTE
 	 */
 	public function addCustomRTESupport($obj_id, $obj_type, array $tags)
 	{
-		$this->handleImagePluginsBeforeRendering($tags);
+		$this->handlePluginsBeforeRendering($tags);
 		include_once "./Services/UICore/classes/class.ilTemplate.php";
 		$tpl = new ilTemplate("tpl.tinymce.html", true, true, "Services/RTE");
 		$this->handleImgContextMenuItem($tpl);
 		$tpl->setCurrentBlock("tinymce");
-		$tpl->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/tiny_mce.js");
+		$tpl->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/".$this->file);
 		include_once "./Services/Object/classes/class.ilObject.php";
 		$tpl->setVariable("OBJ_ID", $obj_id);
 		$tpl->setVariable("OBJ_TYPE", $obj_type);
@@ -284,9 +328,9 @@ class ilTinyMCE extends ilRTE
 				   . ','.$this->_buildAdvancedTableButtonsFromHTMLTags($tags)
 				   . ($this->getStyleSelect() ? ',styleselect' : '');
 		$buttons_3 = $this->_buildAdvancedButtonsFromHTMLTags(3, $tags);
-		$tpl->setVariable('BUTTONS_1', self::removeRedundantSeparators($buttons_1));
-		$tpl->setVariable('BUTTONS_2', self::removeRedundantSeparators($buttons_2));
-		$tpl->setVariable('BUTTONS_3', self::removeRedundantSeparators($buttons_3));		
+		$tpl->setVariable('BUTTONS_1', self::removeRedundantSeparators($buttons_1, $this->version));
+		$tpl->setVariable('BUTTONS_2', self::removeRedundantSeparators($buttons_2, $this->version));
+		$tpl->setVariable('BUTTONS_3', self::removeRedundantSeparators($buttons_3, $this->version));		
 		
 		$tpl->setVariable("ADDITIONAL_PLUGINS", join(",", $this->plugins));
 		include_once "./Services/Utilities/classes/class.ilUtil.php";
@@ -314,7 +358,7 @@ class ilTinyMCE extends ilRTE
 		$template = new ilTemplate("tpl.usereditor.html", true, true, "Services/RTE");
 		$this->handleImgContextMenuItem($template);
 		$template->setCurrentBlock("tinymce");
-		$template->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/tiny_mce.js");
+		$template->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/".$this->file);
 		include_once "./Services/Object/classes/class.ilObject.php";
 		$template->setVariable("SELECTOR", $editor_selector);
 		$template->setVariable("BLOCKFORMATS", "");
@@ -392,6 +436,10 @@ class ilTinyMCE extends ilRTE
 		}
 		if (in_array("code", $a_html_tags))
 		{
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				$this->addPlugin('code');
+			}
 			array_push($blockformats, "code");
 		}
 		if (in_array("h1", $a_html_tags))
@@ -457,7 +505,14 @@ class ilTinyMCE extends ilRTE
 			}
 			if (count($theme_advanced_buttons))
 			{
-				array_push($theme_advanced_buttons, "separator");
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					array_push($theme_advanced_buttons, "|");
+				}
+				else
+				{
+					array_push($theme_advanced_buttons, "separator");
+				}
 			}
 			if (in_array("p", $a_html_tags))
 			{
@@ -465,7 +520,14 @@ class ilTinyMCE extends ilRTE
 				array_push($theme_advanced_buttons, "justifycenter");
 				array_push($theme_advanced_buttons, "justifyright");
 				array_push($theme_advanced_buttons, "justifyfull");
-				array_push($theme_advanced_buttons, "separator");
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					array_push($theme_advanced_buttons, "|");
+				}
+				else
+				{
+					array_push($theme_advanced_buttons, "separator");
+				}
 			}
 			if (strlen(ilTinyMCE::_buildAdvancedBlockformatsFromHTMLTags($a_html_tags)))
 			{
@@ -474,16 +536,41 @@ class ilTinyMCE extends ilRTE
 			if (in_array("hr", $a_html_tags))
 			{
 				array_push($theme_advanced_buttons, "hr");
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					$this->addPlugin('hr');
+				}
 			}
 			array_push($theme_advanced_buttons, "removeformat");
-			array_push($theme_advanced_buttons, "separator");
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				array_push($theme_advanced_buttons, "|");
+			}
+			else
+			{
+				array_push($theme_advanced_buttons, "separator");
+			}
 			if (in_array("sub", $a_html_tags))
 			{
-				array_push($theme_advanced_buttons, "sub");
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					array_push($theme_advanced_buttons, "subscript");
+				}
+				else
+				{
+					array_push($theme_advanced_buttons, "sub");
+				}
 			}
 			if (in_array("sup", $a_html_tags))
 			{
-				array_push($theme_advanced_buttons, "sup");
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					array_push($theme_advanced_buttons, "superscript");
+				}
+				else
+				{
+					array_push($theme_advanced_buttons, "sup");
+				}
 			}
 			if (in_array("font", $a_html_tags))
 			{
@@ -499,7 +586,14 @@ class ilTinyMCE extends ilRTE
 			{
 				array_push($theme_advanced_buttons, "numlist");
 			}
-			array_push($theme_advanced_buttons, "separator");
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				array_push($theme_advanced_buttons, "|");
+			}
+			else
+			{
+				array_push($theme_advanced_buttons, "separator");
+			}
 			if (in_array("cite", $a_html_tags))
 			{
 				array_push($theme_advanced_buttons, "cite");
@@ -527,35 +621,63 @@ class ilTinyMCE extends ilRTE
 			}
 			if (in_array("img", $a_html_tags))
 			{
-				//array_push($theme_advanced_buttons, "advimage");
 				array_push($theme_advanced_buttons, "image");
 				array_push($theme_advanced_buttons, "ibrowser");
 				array_push($theme_advanced_buttons, "ilimgupload");
 			}
 			if (in_array("a", $a_html_tags))
 			{
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					$this->addPlugin('link');
+					$this->addPlugin('anchor');
+				}
 				array_push($theme_advanced_buttons, "link");
 				array_push($theme_advanced_buttons, "unlink");
 				array_push($theme_advanced_buttons, "anchor");
 			}
-			array_push($theme_advanced_buttons, "separator");
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				array_push($theme_advanced_buttons, "|");
+			}
+			else
+			{
+				array_push($theme_advanced_buttons, "separator");
+			}
 			array_push($theme_advanced_buttons, "undo");
 			array_push($theme_advanced_buttons, "redo");
 			
 			if(is_array($this->buttons) && count($this->buttons))
 			{
-				array_push($theme_advanced_buttons, "separator");
+				if(version_compare($this->version, '4.0.0') >= 0)
+				{
+					array_push($theme_advanced_buttons, "|");
+				}
+				else
+				{
+					array_push($theme_advanced_buttons, "separator");
+				}
 				foreach($this->buttons as $button)
 				{
 					array_push($theme_advanced_buttons, $button);
 				}
 			}
-			
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				$this->addPlugin('code');
+			}
 			array_push($theme_advanced_buttons, "code");
 			array_push($theme_advanced_buttons, "fullscreen");
 			
 			// Changed in elba2 branch, adopted change for 4.2.x due to manits bug #8147
-			array_push($theme_advanced_buttons, "pasteword");
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				array_push($theme_advanced_buttons, "pastetext");
+			}
+			else
+			{
+				array_push($theme_advanced_buttons, "pasteword");
+			}
 		}
 		else if($a_buttons_section == 2)
 		{
@@ -625,11 +747,25 @@ class ilTinyMCE extends ilRTE
 		}
 		if (in_array("sub", $a_html_tags))
 		{
-			array_push($theme_advanced_buttons, "sub");
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				array_push($theme_advanced_buttons, "subscript");
+			}
+			else
+			{
+				array_push($theme_advanced_buttons, "sub");
+			}
 		}
 		if (in_array("sup", $a_html_tags))
 		{
-			array_push($theme_advanced_buttons, "sup");
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				array_push($theme_advanced_buttons, "superscript");
+			}
+			else
+			{
+				array_push($theme_advanced_buttons, "sup");
+			}
 		}
 		if (in_array("font", $a_html_tags))
 		{
@@ -671,13 +807,17 @@ class ilTinyMCE extends ilRTE
 		}
 		if (in_array("img", $a_html_tags))
 		{
-			//array_push($theme_advanced_buttons, "advimage");
 			array_push($theme_advanced_buttons, "image");
 			array_push($theme_advanced_buttons, "ibrowser");
 			array_push($theme_advanced_buttons, "ilimgupload");
 		}
 		if (in_array("a", $a_html_tags))
 		{
+			if(version_compare($this->version, '4.0.0') >= 0)
+			{
+				$this->addPlugin('link');
+				$this->addPlugin('anchor');
+			}
 			array_push($theme_advanced_buttons, "link");
 			array_push($theme_advanced_buttons, "unlink");
 			array_push($theme_advanced_buttons, "anchor");
@@ -1202,13 +1342,23 @@ class ilTinyMCE extends ilRTE
 	 * @param   string $a_string A string
 	 * @return  string
 	 */
-	public static function removeRedundantSeparators($a_string)
+	public static function removeRedundantSeparators($a_string, $version = '')
 	{
-		while(strpos($a_string, 'separator,separator') !== false)
+		if(version_compare($version, '4.0.0') >= 0)
 		{
-			$a_string = str_replace('separator,separator', 'separator', $a_string);
+			while(strpos($a_string, 'separator,separator') !== false)
+			{
+				$a_string = str_replace('separator,separator', 'separator', $a_string);
+			}
 		}
-		
+		else
+		{
+			while(strpos($a_string, '|,|') !== false)
+			{
+				$a_string = str_replace('|,|', '|', $a_string);
+			}
+		}
+
 		while(strpos($a_string, ',,') !== false)
 		{
 			$a_string = str_replace(',,', ',', $a_string);
