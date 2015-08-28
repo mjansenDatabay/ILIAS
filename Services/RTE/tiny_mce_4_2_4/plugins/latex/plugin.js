@@ -83,12 +83,16 @@
 
 				var onLatexCodeChanged = function() {
 					//preview.innerHtml('x'); // This causes an error when called from onPostRender event
-					preview.innerHtml('\\(' + this.getEl().value + '\\)');
-					typewatcher(function() {
-						if (typeof MathJax != 'undefined') {
-							MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
-						}
-					}, 500);
+					if (this.getEl().value) {
+						preview.innerHtml('\\(' + this.getEl().value + '\\)');
+						typewatcher(function() {
+							if (typeof MathJax != 'undefined') {
+								MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+							}
+						}, 500);
+					} else {
+						preview.innerHtml('');
+					}
 				};
 
 				textbox.on('keyup', function() {
