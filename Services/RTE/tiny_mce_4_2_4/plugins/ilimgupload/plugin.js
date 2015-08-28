@@ -191,12 +191,6 @@
 			height = dom.getAttrib(imgElm, 'height');
 			align  = dom.getAttrib(imgElm, 'align');
 
-			// @todo handle
-			var parameters = {
-				obj_id:   obj_id,
-				obj_type: obj_type,
-			};
-
 			if (imgElm.nodeName == 'IMG' && !imgElm.getAttribute('data-mce-object') && !imgElm.getAttribute('data-mce-placeholder')) {
 				data = {
 					src: dom.getAttrib(imgElm, 'src'),
@@ -210,6 +204,13 @@
 				imgElm = null;
 			}
 
+			// @todo handle
+			var parameters = {
+				obj_id:   obj_id,
+				obj_type: obj_type,
+				update: imgElm ? 1 : 0
+			};
+
 			// General settings shared between simple and advanced dialogs
 			var simpleFormItems = [];
 
@@ -221,7 +222,7 @@
 				name: 'src',
 				type: 'textbox',
 				label: editor.editorManager.i18n.translate('src'),
-				autofocus: true,
+				autofocus: imgElm !== null,
 				onchange: srcChange
 			});
 			simpleFormItems.push({
@@ -339,12 +340,10 @@
 								label:     editor.editorManager.i18n.translate('upload_image_from_local_fs_desc')
 							},
 							{
-								name: 'src',
+								name: 'img_file',
 								type: 'filepicker',
 								filetype: 'image',
-								label:  editor.editorManager.i18n.translate('image_select'),
-								autofocus: true,
-								onchange: srcChange
+								label:  editor.editorManager.i18n.translate('image_select')
 							}
 						]
 					},
@@ -355,6 +354,11 @@
 						items: simpleFormItems
 					}
 				],
+				onPostRender: function() {
+					var id = "#" + this.find('#img_file')[0]._id;
+					var fu = $(id).find("input");
+					fu.attr("type", "file").removeClass("mce-textbox").parent().removeClass("mce-combobox");
+				},
 				onsubmit: onSubmitForm
 			});
 		}
