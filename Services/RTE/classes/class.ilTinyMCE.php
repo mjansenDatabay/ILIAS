@@ -36,6 +36,8 @@ class ilTinyMCE extends ilRTE
 	 */
 	public function __construct($a_version = '')
 	{
+		ilUtil::includeMathjax();
+
 		if(!$a_version)
 		{
 			$a_version = '3.5.11';
@@ -624,7 +626,10 @@ class ilTinyMCE extends ilRTE
 			{
 				array_push($theme_advanced_buttons, "image");
 				array_push($theme_advanced_buttons, "ibrowser");
-				array_push($theme_advanced_buttons, "ilimgupload");
+				if(version_compare($this->version, '4.0.0') < 0)
+				{
+					array_push($theme_advanced_buttons, "ilimgupload");
+				}
 			}
 			if (in_array("a", $a_html_tags))
 			{
@@ -810,7 +815,10 @@ class ilTinyMCE extends ilRTE
 		{
 			array_push($theme_advanced_buttons, "image");
 			array_push($theme_advanced_buttons, "ibrowser");
-			array_push($theme_advanced_buttons, "ilimgupload");
+			if(version_compare($this->version, '4.0.0') < 0)
+			{
+				array_push($theme_advanced_buttons, "ilimgupload");
+			}
 		}
 		if (in_array("a", $a_html_tags))
 		{
