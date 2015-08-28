@@ -1,99 +1,396 @@
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+/* Copyright (c) 1998-2014 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-(function() {
+(function () {
 	tinymce.PluginManager.requireLangPack('ilimgupload');
 
-	tinymce.create('tinymce.plugins.ilImgUpload', {
-		/**
-		 * Initializes the plugin, this will be executed after the plugin has been created.
-		 * This call is done before the editor instance has finished it's initialization so use the onInit event
-		 * of the editor instance to intercept that event.
-		 *
-		 * @param {tinymce.Editor} ed Editor instance that the plugin is initialized in.
-		 * @param {string} url Absolute URL to where the plugin is located.
-		 */
-		init : function(ed, url) {
-			var t = this;
+	tinymce.PluginManager.add('ilimgupload', function (editor, baseurl) {
+		function getImageSize(url, callback) {
+			var img = document.createElement('img');
 
-			ed.addCommand('ilimgupload', function() {
-				var src = "", alt = "", width = "", height = "", align = "", vspace = "", hspace = "", border = "";
-				var elm = ed.selection.getNode();
-				if ((elm != null) && (elm.nodeName.toLowerCase() == 'img'))
-				{
-					src = elm.getAttribute('src') ? elm.getAttribute('src') : "";
-					alt = elm.getAttribute('alt') ? elm.getAttribute('alt') : "";
-					width = elm.getAttribute('width') ? elm.getAttribute('width') : "";
-					height = elm.getAttribute('height') ? elm.getAttribute('height') : "";
-					align = elm.getAttribute('align') ? elm.getAttribute('align') : "";
-					vspace = elm.getAttribute('vspace') ? elm.getAttribute('vspace') : "";
-					hspace = elm.getAttribute('hspace') ? elm.getAttribute('hspace') : "";
-					border = elm.getAttribute('border') ? elm.getAttribute('border') : "";
+			function done(width, height) {
+				if (img.parentNode) {
+					img.parentNode.removeChild(img);
 				}
 
-				var parameters = new String();
-				parameters += "?obj_id=" + obj_id;
-				parameters += "&obj_type=" + obj_type;
-				if (src.length > 0) {
-					parameters += "&update=1";
+				callback({width: width, height: height});
+			}
+
+			img.onload = function() {
+				done(img.clientWidth, img.clientHeight);
+			};
+
+			img.onerror = function() {
+				done();
+			};
+
+			var style = img.style;
+			style.visibility = 'hidden';
+			style.position = 'fixed';
+			style.bottom = style.left = 0;
+			style.width = style.height = 'auto';
+
+			document.body.appendChild(img);
+			img.src = url;
+		}
+
+		function showDialog() {
+			var win, data = {}, dom = editor.dom, imgElm = editor.selection.getNode();
+			var width, height, align, imageDimensions = editor.settings.image_dimensions !== false;
+
+			function recalcSize() {
+				var widthCtrl, heightCtrl, newWidth, newHeight;
+
+				widthCtrl = win.find('#width')[0];
+				heightCtrl = win.find('#height')[0];
+
+				if (!widthCtrl || !heightCtrl) {
+					return;
 				}
 
-				ed.windowManager.open({
-					file : url + '/imgupload.php' + parameters,
-					width : 600,
-					height : 400,
-					ui : true
-				}, {
-					plugin_url : url, // Plugin absolute URL
-					src : src,
-					alt : alt,
-					width : width,
-					height : height,
-					align : align,
-					vspace : vspace,
-					hspace : hspace,
-					border: border
+				newWidth = widthCtrl.value();
+				newHeight = heightCtrl.value();
+
+				if (win.find('#constrain')[0].checked() && width && height && newWidth && newHeight) {
+					if (width != newWidth) {
+						newHeight = Math.round((newWidth / width) * newHeight);
+						heightCtrl.value(newHeight);
+					} else {
+						newWidth = Math.round((newHeight / height) * newWidth);
+						widthCtrl.value(newWidth);
+					}
+				}
+
+				width = newWidth;
+				height = newHeight;
+			}
+
+			function onSubmitForm() {
+				function waitLoad(imgElm) {
+					function selectImage() {
+						imgElm.onload = imgElm.onerror = null;
+
+						if (editor.selection) {
+							editor.selection.select(imgElm);
+							editor.nodeChanged();
+						}
+					}
+
+					imgElm.onload = function() {
+						if (!data.width && !data.height && imageDimensions) {
+							dom.setAttribs(imgElm, {
+								width: imgElm.clientWidth,
+								height: imgElm.clientHeight
+							});
+						}
+
+						selectImage();
+					};
+
+					imgElm.onerror = selectImage;
+				}
+
+				updateStyle();
+				recalcSize();
+
+				data = tinymce.extend(data, win.toJSON());
+
+				if (!data.alt) {
+					data.alt = '';
+				}
+
+				if (data.width === '') {
+					data.width = null;
+				}
+
+				if (data.height === '') {
+					data.height = null;
+				}
+
+				if (data.align === '') {
+					data.align = null;
+				}
+
+				if (!data.style) {
+					data.style = null;
+				}
+
+				// Setup new data excluding style properties
+				data = {
+					src: data.src,
+					alt: data.alt,
+					width: data.width,
+					height: data.height,
+					align: data.align,
+					style: data.style,
+					"class": data["class"]
+				};
+
+				editor.undoManager.transact(function() {
+					if (!data.src) {
+						if (imgElm) {
+							dom.remove(imgElm);
+							editor.focus();
+							editor.nodeChanged();
+						}
+
+						return;
+					}
+
+					if (!imgElm) {
+						data.id = '__mcenew';
+						editor.focus();
+						editor.selection.setContent(dom.createHTML('img', data));
+						imgElm = dom.get('__mcenew');
+						dom.setAttrib(imgElm, 'id', null);
+					} else {
+						dom.setAttribs(imgElm, data);
+					}
+
+					waitLoad(imgElm);
+				});
+			}
+
+			function removePixelSuffix(value) {
+				if (value) {
+					value = value.replace(/px$/, '');
+				}
+
+				return value;
+			}
+
+			function srcChange(e) {
+				var meta = e.meta || {};
+
+				tinymce.each(meta, function(value, key) {
+					win.find('#' + key).value(value);
+				});
+
+				if (!meta.width && !meta.height) {
+					var srcURL = this.value(),
+						absoluteURLPattern = new RegExp('^(?:[a-z]+:)?//', 'i'),
+						baseURL = editor.settings.document_base_url;
+
+					//Pattern test the src url and make sure we haven't already prepended the url
+					if (baseURL && !absoluteURLPattern.test(srcURL) && srcURL.substring(0, baseURL.length) !== baseURL) {
+						this.value(baseURL + srcURL);
+					}
+
+					getImageSize(this.value(), function(data) {
+						if (data.width && data.height && imageDimensions) {
+							width = data.width;
+							height = data.height;
+
+							win.find('#width').value(width);
+							win.find('#height').value(height);
+						}
+					});
+				}
+			}
+
+			width  = dom.getAttrib(imgElm, 'width');
+			height = dom.getAttrib(imgElm, 'height');
+			align  = dom.getAttrib(imgElm, 'align');
+
+			// @todo handle
+			var parameters = {
+				obj_id:   obj_id,
+				obj_type: obj_type,
+			};
+
+			if (imgElm.nodeName == 'IMG' && !imgElm.getAttribute('data-mce-object') && !imgElm.getAttribute('data-mce-placeholder')) {
+				data = {
+					src: dom.getAttrib(imgElm, 'src'),
+					alt: dom.getAttrib(imgElm, 'alt'),
+					"class": dom.getAttrib(imgElm, 'class'),
+					width:  width,
+					height: height,
+					align:  align
+				};
+			} else {
+				imgElm = null;
+			}
+
+			// General settings shared between simple and advanced dialogs
+			var simpleFormItems = [];
+
+			simpleFormItems.push({
+				type:      'label',
+				label:     editor.editorManager.i18n.translate('upload_image_from_url_desc')
+			});
+			simpleFormItems.push({
+				name: 'src',
+				type: 'textbox',
+				label: editor.editorManager.i18n.translate('src'),
+				autofocus: true,
+				onchange: srcChange
+			});
+			simpleFormItems.push({
+				name: 'alt',
+				type: 'textbox',
+				label: editor.editorManager.i18n.translate('image_alt')
+			});
+			simpleFormItems.push({
+				type:      'container',
+				label:     editor.editorManager.i18n.translate('dimensions'),
+				layout:    'flex',
+				direction: 'row',
+				align:     'center',
+				spacing:   5,
+				items:     [
+					{name: 'width', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: editor.editorManager.i18n.translate('width')},
+					{type: 'label', text: 'x'},
+					{name: 'height', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: editor.editorManager.i18n.translate('height')},
+					{name: 'constrain', type: 'checkbox', checked: true, text: editor.editorManager.i18n.translate('constrain_proportions')}
+				]
+			});
+
+			simpleFormItems.push({
+				name:      'style',
+				hidden:    true,
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				onchange: updateStyle
+			});
+			simpleFormItems.push({
+				name:      'hspace',
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				label:     editor.editorManager.i18n.translate('hspace'),
+				onchange: updateStyle
+			});
+
+			simpleFormItems.push({
+				name:      'vspace',
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				label:     editor.editorManager.i18n.translate('vspace'),
+				onchange: updateStyle
+			});
+
+			simpleFormItems.push({
+				name:      'border',
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				label:     editor.editorManager.i18n.translate('border'),
+				onchange: updateStyle
+			});
+
+			var alignList = [];
+			tinymce.each(['baseline', 'top', 'middle', 'bottom', 'text-top', 'text-bottom', 'left', 'right'], function(type) {
+				alignList.push({
+					text:  editor.editorManager.i18n.translate('align_' + type.replace(/-/, '')),
+					value: type
 				});
 			});
 
-			// Register example button
-			ed.addButton('ilimgupload', {
-				title : 'ilimgupload.title',
-				cmd : 'ilimgupload',
-				image : url + '/images/img_upload.png'
+			simpleFormItems.push({
+				name:      'align',
+				type:      'listbox',
+				label:     editor.editorManager.i18n.translate('align'),
+				values:    alignList
 			});
 
-			ed.onNodeChange.add(function(ed, cm, n, co) {
-				cm.setActive('ilimgupload', n.nodeName == 'IMG' && !n.name);
-			});
+			function updateStyle() {
+				function addPixelSuffix(value) {
+					if (value.length > 0 && /^[0-9]+$/.test(value)) {
+						value += 'px';
+					}
 
-			ed.plugins.contextmenu.onContextMenu.add(function(th, menu, event) {
-				if (event && event.nodeName && event.nodeName == 'IMG') {
-					menu.add({
-						title : 'ilimgupload.edit_image',
-						icon : 'image',
-						cmd : 'ilimgupload'
-					});
-				} else {
-					menu.add({
-						title : 'ilimgupload.title',
-						icon : 'image',
-						cmd : 'ilimgupload'
-					});
+					return value;
 				}
-			});
-		},
 
-		getInfo : function() {
-			return {
-				longname : 'ilImgUpload Plugin',
-				author : 'Databay AG',
-				authorurl : 'http://www.databay.de',
-				infourl : 'http://www.databay.de',
-				version : tinymce.majorVersion + "." + tinymce.minorVersion
-			};
+				var data = win.toJSON();
+				var css = dom.parseStyle(data.style);
+
+				delete css.margin;
+				css['margin-top'] = css['margin-bottom'] = addPixelSuffix(data.vspace);
+				css['margin-left'] = css['margin-right'] = addPixelSuffix(data.hspace);
+				css['border-width'] = addPixelSuffix(data.border);
+
+				win.find('#style').value(dom.serializeStyle(dom.parseStyle(dom.serializeStyle(css))));
+			}
+
+			if (imgElm) {
+				data.hspace = removePixelSuffix(imgElm.style.marginLeft || imgElm.style.marginRight);
+				data.vspace = removePixelSuffix(imgElm.style.marginTop || imgElm.style.marginBottom);
+				data.border = removePixelSuffix(imgElm.style.borderWidth);
+				data.style  = editor.dom.serializeStyle(editor.dom.parseStyle(editor.dom.getAttrib(imgElm, 'style')));
+				data.align  = imgElm.align;
+			}
+
+			win = editor.windowManager.open({
+				title: editor.editorManager.i18n.translate('title'),
+				close_previous: true,
+				resizable: true,
+				maximizable: true,
+				data: data,
+				bodyType: 'tabpanel',
+				body: [
+					{
+						title: editor.editorManager.i18n.translate('upload_image_from_local_fs'),
+						type: 'form',
+						items: [
+							{
+								type:      'label',
+								label:     editor.editorManager.i18n.translate('upload_image_from_local_fs_desc')
+							},
+							{
+								name: 'src',
+								type: 'filepicker',
+								filetype: 'image',
+								label:  editor.editorManager.i18n.translate('image_select'),
+								autofocus: true,
+								onchange: srcChange
+							}
+						]
+					},
+					{
+						title: editor.editorManager.i18n.translate('upload_image_from_url'),
+						type: 'form',
+						pack: 'start',
+						items: simpleFormItems
+					}
+				],
+				onsubmit: onSubmitForm
+			});
 		}
+
+		editor.addButton('ilimgupload', {
+			tooltip: editor.editorManager.i18n.translate('title'),
+			image:  baseurl + '/images/img_upload.png',
+			onclick: showDialog,
+			onPostRender: function() {
+				var ctrl = this;
+
+				editor.on('NodeChange', function(e) {
+					ctrl.active(e.element.nodeName == 'IMG');
+				});
+			}
+		});
+
+		//http://www.tinymce.com/forum/viewtopic.php?pid=116109#p116109
+		//http://stackoverflow.com/questions/17195112/customizing-context-menu-in-tinymce-4-0
+		//https://github.com/gtraxx/tinymce-plugin-youtube/blob/master/js/youtube.js
+		/*editor.plugins.contextmenu.onContextMenu.add(function(th, menu, event) {
+		 alert("x");
+		 if (event && event.nodeName && event.nodeName == 'IMG') {
+		 menu.add({
+		 title : 'ilimgupload.edit_image',
+		 icon : 'image',
+		 cmd : 'ilimgupload'
+		 });
+		 } else {
+		 menu.add({
+		 title : 'ilimgupload.title',
+		 icon : 'image',
+		 cmd : 'ilimgupload'
+		 });
+		 }
+		 });*/
 	});
 
-	// Register plugin
-	tinymce.PluginManager.add('ilimgupload', tinymce.plugins.ilImgUpload);
 })();
