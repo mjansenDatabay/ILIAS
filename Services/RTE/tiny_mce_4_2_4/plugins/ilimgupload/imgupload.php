@@ -6,6 +6,9 @@ chdir('../../../../../');
 require_once 'Services/Init/classes/class.ilInitialisation.php';
 ilInitialisation::initILIAS();
 
+require_once 'Services/FileUpload/classes/class.ilFileUploadUtil.php';
+require_once 'Services/Utilities/classes/class.ilUtil.php';
+
 /**
  * @var $ilIliasIniFile ilIniFile
  * @var $lng ilLanguage
@@ -14,7 +17,7 @@ ilInitialisation::initILIAS();
  */
 global $ilIliasIniFile, $lng, $ilUser, $https;
 
-$lng->loadLanguageModule("form");
+$lng->loadLanguageModule('form');
 
 $htdocs = $ilIliasIniFile->readVariable('server', 'absolute_path') . '/';
 $weburl = $ilIliasIniFile->readVariable('server', 'absolute_path') . '/';
@@ -37,25 +40,12 @@ $tinyMCE_DOC_url  = $installpath;
 // allowed extentions for uploaded image files
 $tinyMCE_valid_imgs = array('gif', 'jpg', 'jpeg', 'png');
 
-// allow upload in image library
-$tinyMCE_upload_allowed = true;
+$response = new stdClass();
+$response->success = false;
+$response->form = new stdClass();
+$response->form->errors = new stdClass();
+$response->data = new stdClass();
 
-// allow delete in image library
-$tinyMCE_img_delete_allowed = false;
-
-$errors = new stdClass();
-$errors->general = array();
-$errors->fields = array();
-
-include_once 'webservice/soap/include/inc.soap_functions.php';
-$mobs        = ilSoapFunctions::getMobsOfObject(session_id() . '::' . CLIENT_ID, $_GET['obj_type'] . ':html', (int)$_GET['obj_id']);
-$preview     = '';
-$mob_details = array();
-$img         = isset($_POST['imglist']) ? $_POST['imglist'] : '';
-$_root       = $installpath;
-
-// upload images
-$uploadedFile = false;
 if(isset($_FILES['img_file']) && is_array($_FILES['img_file']))
 {
 	// remove trailing '/'
@@ -68,36 +58,36 @@ if(isset($_FILES['img_file']) && is_array($_FILES['img_file']))
 	switch ($error)
 	{
 		case UPLOAD_ERR_INI_SIZE:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt('form_msg_file_size_exceeds'));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt('form_msg_file_size_exceeds'));
 			break;
 
 		case UPLOAD_ERR_FORM_SIZE:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_size_exceeds"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_size_exceeds"));
 			break;
 
 		case UPLOAD_ERR_PARTIAL:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_partially_uploaded"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_partially_uploaded"));
 			break;
 
 		case UPLOAD_ERR_NO_FILE:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_no_upload"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_no_upload"));
 			break;
 
 		case UPLOAD_ERR_NO_TMP_DIR:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_missing_tmp_dir"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_missing_tmp_dir"));
 			break;
 
 		case UPLOAD_ERR_CANT_WRITE:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_cannot_write_to_disk"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_cannot_write_to_disk"));
 			break;
 
 		case UPLOAD_ERR_EXTENSION:
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_upload_stopped_ext"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_upload_stopped_ext"));
 			break;
 	}
 	
 	// check suffixes
-	if(!$errors->fields && !$errors->general)
+	if(!$response->form->errors->img_file)
 	{
 		$finfo = pathinfo($_FILES['img_file']['name']);
 		require_once 'Services/Utilities/classes/class.ilMimeTypeUtil.php';
@@ -108,114 +98,42 @@ if(isset($_FILES['img_file']) && is_array($_FILES['img_file']))
 			'image/png'
 		)))
 		{
-			$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_wrong_file_type"));
+			$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_wrong_file_type"));
 		}
 	}
 
-	// virus handling
-	if(!$errors->fields && !$errors->general)
+	if(!$response->form->errors->img_file)
 	{
 		if($_FILES['img_file']["tmp_name"] != "")
 		{
 			$vir = ilUtil::virusHandling($_FILES['img_file']["tmp_name"], $_FILES['img_file']["name"]);
 			if($vir[0] == false)
 			{
-				$errors->fields[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_virus_found")."<br />".$vir[1]);
+				$response->form->errors->img_file[] = array('name' => 'img_file', 'message' => $lng->txt("form_msg_file_virus_found")."<br />".$vir[1]);
 			}
 		}
 	}
 
-	if(!$errors->fields && !$errors->general)
+	if(!$response->form->errors->img_file)
 	{
-		include_once 'webservice/soap/include/inc.soap_functions.php';
+		require_once 'webservice/soap/include/inc.soap_functions.php';
 		$safefilename = preg_replace('/[^a-zA-z0-9_\.]/', '', $_FILES['img_file']['name']);
 		$media_object = ilSoapFunctions::saveTempFileAsMediaObject(session_id() . '::' . CLIENT_ID, $safefilename, $_FILES['img_file']['tmp_name']);
 		if(file_exists($iliasAbsolutePath . $iliasMobPath . 'mm_' . $media_object->getId() . '/' . $media_object->getTitle()))
 		{
 			// only save usage if the file was uploaded
 			$media_object->_saveUsage($media_object->getId(), $_GET['obj_type'] . ':html', (int)$_GET['obj_id']);
-			
-			// Append file to array of existings mobs of this context (obj_type and obj_id)
-			$mobs[$media_object->getId()] = $media_object->getId();
-	
-			$uploadedFile   = $media_object->getId();
-			$_GET['update'] = 1;
+			$uploadedFile      = $media_object->getId();
+			$response->success = true;
 		}
 	}
 }
-
-$tpl = new ilTemplate(dirname(__FILE__) . "/tpl.img_upload.html", true, true);
-
-$tpl->setVariable("OBJ_ID", (int)$_GET["obj_id"]);
-$tpl->setVariable("OBJ_TYPE", $_GET["obj_type"]);
-$tpl->setVariable("VALUE_UPDATE", (int)$_GET["update"]);
-$tpl->setVariable("ILIAS_INST_PATH", $iliasHttpPath);
-$tpl->setVariable("TXT_MAX_SIZE", ilUtil::getFileSizeInfo());
-$tpl->setVariable(
-	"TXT_ALLOWED_FILE_EXTENSIONS",
-	$lng->txt("file_allowed_suffixes")." ".
-	implode(', ', array_map(create_function('$value', 'return ".".$value;'), $tinyMCE_valid_imgs))
-);
-
-if($ilUser->getLanguage() == 'de')
-{
-	$tpl->touchBlock('validation_engine_lang_de');
-}
 else
 {
-	$tpl->touchBlock('validation_engine_lang_default');
+	$response->success = true;
+	$response->data->max_file_size_info = ilUtil::getMaxFileSize();
+	$response->data->max_file_size      = ilFileUploadUtil::getFileSizeInfo();
 }
 
-if($_GET["update"] == 1)
-{
-	$tpl->setVariable("IMG_FROM_URL_TAB_DESC", "{#ilimgupload.edit_image}");
-	$tpl->setVariable("IMG_FROM_URL_DESC", "{#ilimgupload.edit_image_desc}");
-	$tpl->setVariable("INSERT_COMMAND", "{#ilimgupload.insert}");
-}
-else
-{
-	$tpl->setVariable("IMG_FROM_URL_TAB_DESC", "{#ilimgupload.upload_image_from_url}");
-	$tpl->setVariable("IMG_FROM_URL_DESC", "{#ilimgupload.upload_image_from_url_desc}");
-	$tpl->setVariable("INSERT_COMMAND", "{#ilimgupload.insert}");
-}
-
-$mob_details = array();
-foreach($mobs as $mob)
-{
-	$mobdir = $iliasAbsolutePath . $iliasMobPath . 'mm_' . $mob . '/';
-	$d      = @dir($mobdir);
-	if($d)
-	{
-		$i = 0;
-		while(false !== ($entry = $d->read()))
-		{
-			$ext = strtolower(substr(strrchr($entry, '.'), 1));
-			if(is_file($mobdir . $entry) && in_array($ext, $tinyMCE_valid_imgs))
-			{
-				$mob_details[$uploadedFile]['file_name'] = $entry;
-				$mob_details[$uploadedFile]['file_dir']  = $mobdir;
-				$mob_details[$uploadedFile]['http_dir']  = $iliasHttpPath . $iliasMobPath . 'mm_' . $mob . '/';
-			}
-		}
-		$d->close();
-	}
-}
-if($errors->fields || $errors->general)
-{
-	foreach($errors->fields as $field)
-	{
-		$tpl->setCurrentBlock('errors');
-		$tpl->setVariable('ERRORS_FIELDNAME', $field['name']);
-		$tpl->setVariable('ERRORS_MESSAGE', $field['message']);
-		$tpl->parseCurrentBlock();
-	}
-}
-else if($uploadedFile && $mob_details[$uploadedFile])
-{
-	$img_size = getimagesize($mob_details[$uploadedFile]['file_dir'] . $mob_details[$uploadedFile]['file_name']);
-	$tpl->setVariable('UPLOADED_FILE_WIDTH', (int)$img_size[0]);
-	$tpl->setVariable('UPLOADED_FILE_HEIGHT', (int)$img_size[1]);
-	$tpl->setVariable('UPLOADED_FILE_SRC', $mob_details[$uploadedFile]['http_dir'] . $mob_details[$uploadedFile]['file_name']);
-}
-
-$tpl->show();
+echo json_encode($response);
+exit();

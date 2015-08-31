@@ -65,6 +65,35 @@
 			}
 
 			function onSubmitForm() {
+				var fd = new FormData();
+				fd.append("img_file", "");
+				fd.append("obj_type", parameters.obj_type);
+				fd.append("obj_id", parameters.obj_id);
+
+				$.ajax({
+					url: baseurl + '/imgupload.php',
+					type: 'POST',
+					xhr: function() {
+						var myXhr = $.ajaxSettings.xhr();
+						if(myXhr.upload){
+							myXhr.upload.addEventListener('progress', function() {
+
+							}, false);
+						}
+						return myXhr;
+					},
+					success: function() {
+
+					},
+					data: fd,
+					cache: false,
+					contentType: false,
+					processData: false
+				});
+
+				return;// todo remove
+
+
 				function waitLoad(imgElm) {
 					function selectImage() {
 						imgElm.onload = imgElm.onerror = null;
@@ -185,6 +214,11 @@
 						}
 					});
 				}
+				if (this.value() != "") {
+					$("#previewsrc").html($(['<img class="thumb" src="', this.value(), '"/>'].join("")).css({height: "100px", width: "auto"}));
+				} else {
+					$("#previewsrc").html("");
+				}
 			}
 
 			width  = dom.getAttrib(imgElm, 'width');
@@ -224,6 +258,11 @@
 				label: editor.editorManager.i18n.translate('src'),
 				autofocus: imgElm !== null,
 				onchange: srcChange
+			});
+			simpleFormItems.push({
+				id: 'previewsrc',
+				type: 'panel',
+				minHeight: 150
 			});
 			simpleFormItems.push({
 				name: 'alt',
@@ -344,6 +383,11 @@
 								type: 'filepicker',
 								filetype: 'image',
 								label:  editor.editorManager.i18n.translate('image_select')
+							},
+							{
+								id: 'previewfile',
+								type: 'panel',
+								minHeight: 150
 							}
 						]
 					},
@@ -355,9 +399,38 @@
 					}
 				],
 				onPostRender: function() {
-					var id = "#" + this.find('#img_file')[0]._id;
+					var w = this;
+					var id = "#" + w.find('#img_file')[0]._id;
 					var fu = $(id).find("input");
-					fu.attr("type", "file").removeClass("mce-textbox").parent().removeClass("mce-combobox");
+					fu.attr("type", "file") // Maybe issues in IE 6/7/8
+						.attr("accept", "image/*")
+						.attr("size", "")
+						.removeClass("mce-textbox")
+						.parent().removeClass("mce-combobox");
+
+					(function() {
+						if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+							return;
+						}
+
+						fu.on("change", function(e) {
+							var files = e.target.files;
+
+							if (files.length == 0) {
+								$("#previewfile").html("");
+							}
+
+							for (var i = 0, f; f = files[i]; i++) {
+								var reader = new FileReader();
+								reader.onload = (function(file) {
+									return function (e) {
+										$("#previewfile").html($(['<img class="thumb" src="', e.target.result, '" title="', escape(file.name), '"/>'].join("")).css({height: "100px", width: "auto"}));
+									};
+								})(f);
+								reader.readAsDataURL(f);
+							}
+						});
+					})();
 				},
 				onsubmit: onSubmitForm
 			});
