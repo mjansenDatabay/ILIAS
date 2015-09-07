@@ -8,6 +8,7 @@ ilInitialisation::initILIAS();
 
 require_once 'Services/FileUpload/classes/class.ilFileUploadUtil.php';
 require_once 'Services/Utilities/classes/class.ilUtil.php';
+require_once 'Services/UIComponent/ProgressBar/classes/class.ilProgressBar.php';
 
 /**
  * @var $ilIliasIniFile ilIniFile
@@ -127,12 +128,23 @@ if(isset($_FILES['img_file']) && is_array($_FILES['img_file']))
 			$response->success = true;
 		}
 	}
+
+	$response->files = $_FILES;
 }
 else
 {
+	$progressbar_id = md5(rand());
+	$progressbar    = ilProgressBar::getInstance();
+	$progressbar->setId($progressbar_id);
+	$progressbar->setAnimated(true);
+	$progressbar->setCurrent(0);
+
+	$response->data->max_file_size_info = ilUtil::getFileSizeInfo();
+	$response->data->max_file_size      = ilFileUploadUtil::getMaxFileSize();
+	$response->data->progressbar        = $progressbar->render();
+	$response->data->progressbar_id     = $progressbar_id;
+
 	$response->success = true;
-	$response->data->max_file_size_info = ilUtil::getMaxFileSize();
-	$response->data->max_file_size      = ilFileUploadUtil::getFileSizeInfo();
 }
 
 echo json_encode($response);
