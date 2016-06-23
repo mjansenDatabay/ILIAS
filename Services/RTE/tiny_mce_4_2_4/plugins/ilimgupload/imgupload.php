@@ -126,6 +126,7 @@ if(isset($_FILES['img_file']) && is_array($_FILES['img_file']))
 			$media_object->_saveUsage($media_object->getId(), $_GET['obj_type'] . ':html', (int)$_GET['obj_id']);
 			$uploadedFile      = $media_object->getId();
 			$response->success = true;
+			$response->src     = $iliasMobPath . 'mm_' . $media_object->getId() . '/' . $media_object->getTitle();
 		}
 	}
 
