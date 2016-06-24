@@ -42,12 +42,12 @@ class ilTinyMCE extends ilRTE
 		{
 			$a_version = '3.5.11';
 		}
-		$a_version = "4.2.4"; // @todo: Remove
+		$a_version = "4.3.13"; // @todo: Remove
 		parent::__construct($a_version);				
 
 		switch($a_version)
 		{
-			case "4.2.4":
+			case "4.3.13":
 				require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
 				iljQueryUtil::initjQuery();
 				$this->file    = 'tinymce.min.js';

@@ -1,0 +1,473 @@
+/* Copyright (c) 1998-2014 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+(function () {
+	tinymce.PluginManager.requireLangPack('ilimgupload');
+
+	tinymce.PluginManager.add('ilimgupload', function (editor, baseurl) {
+		function getImageSize(url, callback) {
+			var img = document.createElement('img');
+
+			function done(width, height) {
+				if (img.parentNode) {
+					img.parentNode.removeChild(img);
+				}
+
+				callback({width: width, height: height});
+			}
+
+			img.onload = function() {
+				done(img.clientWidth, img.clientHeight);
+			};
+
+			img.onerror = function() {
+				done();
+			};
+
+			var style = img.style;
+			style.visibility = 'hidden';
+			style.position = 'fixed';
+			style.bottom = style.left = 0;
+			style.width = style.height = 'auto';
+
+			document.body.appendChild(img);
+			img.src = url;
+		}
+
+		function showDialog() {
+			var win, data = {}, dom = editor.dom, imgElm = editor.selection.getNode();
+			var width, height, align, imageDimensions = editor.settings.image_dimensions !== false;
+
+			function recalcSize() {
+				var widthCtrl, heightCtrl, newWidth, newHeight;
+
+				widthCtrl = win.find('#width')[0];
+				heightCtrl = win.find('#height')[0];
+
+				if (!widthCtrl || !heightCtrl) {
+					return;
+				}
+
+				newWidth = widthCtrl.value();
+				newHeight = heightCtrl.value();
+
+				if (win.find('#constrain')[0].checked() && width && height && newWidth && newHeight) {
+					if (width != newWidth) {
+						newHeight = Math.round((newWidth / width) * newHeight);
+						heightCtrl.value(newHeight);
+					} else {
+						newWidth = Math.round((newHeight / height) * newWidth);
+						widthCtrl.value(newWidth);
+					}
+				}
+
+				width = newWidth;
+				height = newHeight;
+			}
+
+			function onSubmitForm() {
+				var fd = new FormData();
+				fd.append("img_file", "");
+				fd.append("obj_type", parameters.obj_type);
+				fd.append("obj_id", parameters.obj_id);
+
+				$.ajax({
+					url: baseurl + '/imgupload.php',
+					type: 'POST',
+					xhr: function() {
+						var myXhr = $.ajaxSettings.xhr();
+						if(myXhr.upload){
+							myXhr.upload.addEventListener('progress', function() {
+
+							}, false);
+						}
+						return myXhr;
+					},
+					success: function() {
+
+					},
+					data: fd,
+					cache: false,
+					contentType: false,
+					processData: false
+				});
+
+				return;// todo remove
+
+
+				function waitLoad(imgElm) {
+					function selectImage() {
+						imgElm.onload = imgElm.onerror = null;
+
+						if (editor.selection) {
+							editor.selection.select(imgElm);
+							editor.nodeChanged();
+						}
+					}
+
+					imgElm.onload = function() {
+						if (!data.width && !data.height && imageDimensions) {
+							dom.setAttribs(imgElm, {
+								width: imgElm.clientWidth,
+								height: imgElm.clientHeight
+							});
+						}
+
+						selectImage();
+					};
+
+					imgElm.onerror = selectImage;
+				}
+
+				updateStyle();
+				recalcSize();
+
+				data = tinymce.extend(data, win.toJSON());
+
+				if (!data.alt) {
+					data.alt = '';
+				}
+
+				if (data.width === '') {
+					data.width = null;
+				}
+
+				if (data.height === '') {
+					data.height = null;
+				}
+
+				if (data.align === '') {
+					data.align = null;
+				}
+
+				if (!data.style) {
+					data.style = null;
+				}
+
+				// Setup new data excluding style properties
+				data = {
+					src: data.src,
+					alt: data.alt,
+					width: data.width,
+					height: data.height,
+					align: data.align,
+					style: data.style,
+					"class": data["class"]
+				};
+
+				editor.undoManager.transact(function() {
+					if (!data.src) {
+						if (imgElm) {
+							dom.remove(imgElm);
+							editor.focus();
+							editor.nodeChanged();
+						}
+
+						return;
+					}
+
+					if (!imgElm) {
+						data.id = '__mcenew';
+						editor.focus();
+						editor.selection.setContent(dom.createHTML('img', data));
+						imgElm = dom.get('__mcenew');
+						dom.setAttrib(imgElm, 'id', null);
+					} else {
+						dom.setAttribs(imgElm, data);
+					}
+
+					waitLoad(imgElm);
+				});
+			}
+
+			function removePixelSuffix(value) {
+				if (value) {
+					value = value.replace(/px$/, '');
+				}
+
+				return value;
+			}
+
+			function srcChange(e) {
+				var meta = e.meta || {};
+
+				tinymce.each(meta, function(value, key) {
+					win.find('#' + key).value(value);
+				});
+
+				if (!meta.width && !meta.height) {
+					var srcURL = this.value(),
+						absoluteURLPattern = new RegExp('^(?:[a-z]+:)?//', 'i'),
+						baseURL = editor.settings.document_base_url;
+
+					//Pattern test the src url and make sure we haven't already prepended the url
+					if (baseURL && !absoluteURLPattern.test(srcURL) && srcURL.substring(0, baseURL.length) !== baseURL) {
+						this.value(baseURL + srcURL);
+					}
+
+					getImageSize(this.value(), function(data) {
+						if (data.width && data.height && imageDimensions) {
+							width = data.width;
+							height = data.height;
+
+							win.find('#width').value(width);
+							win.find('#height').value(height);
+						}
+					});
+				}
+				if (this.value() != "") {
+					$("#previewsrc").html($(['<img class="thumb" src="', this.value(), '"/>'].join("")).css({height: "100px", width: "auto"}));
+				} else {
+					$("#previewsrc").html("");
+				}
+			}
+
+			width  = dom.getAttrib(imgElm, 'width');
+			height = dom.getAttrib(imgElm, 'height');
+			align  = dom.getAttrib(imgElm, 'align');
+
+			if (imgElm.nodeName == 'IMG' && !imgElm.getAttribute('data-mce-object') && !imgElm.getAttribute('data-mce-placeholder')) {
+				data = {
+					src: dom.getAttrib(imgElm, 'src'),
+					alt: dom.getAttrib(imgElm, 'alt'),
+					"class": dom.getAttrib(imgElm, 'class'),
+					width:  width,
+					height: height,
+					align:  align
+				};
+			} else {
+				imgElm = null;
+			}
+
+			// @todo handle
+			var parameters = {
+				obj_id:   obj_id,
+				obj_type: obj_type,
+				update: imgElm ? 1 : 0
+			};
+
+			// General settings shared between simple and advanced dialogs
+			var simpleFormItems = [];
+
+			simpleFormItems.push({
+				type:      'label',
+				label:     editor.editorManager.i18n.translate('upload_image_from_url_desc')
+			});
+			simpleFormItems.push({
+				name: 'src',
+				type: 'textbox',
+				label: editor.editorManager.i18n.translate('src'),
+				autofocus: imgElm !== null,
+				onchange: srcChange
+			});
+			simpleFormItems.push({
+				id: 'previewsrc',
+				type: 'panel',
+				minHeight: 150
+			});
+			simpleFormItems.push({
+				name: 'alt',
+				type: 'textbox',
+				label: editor.editorManager.i18n.translate('image_alt')
+			});
+			simpleFormItems.push({
+				type:      'container',
+				label:     editor.editorManager.i18n.translate('dimensions'),
+				layout:    'flex',
+				direction: 'row',
+				align:     'center',
+				spacing:   5,
+				items:     [
+					{name: 'width', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: editor.editorManager.i18n.translate('width')},
+					{type: 'label', text: 'x'},
+					{name: 'height', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: editor.editorManager.i18n.translate('height')},
+					{name: 'constrain', type: 'checkbox', checked: true, text: editor.editorManager.i18n.translate('constrain_proportions')}
+				]
+			});
+
+			simpleFormItems.push({
+				name:      'style',
+				hidden:    true,
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				onchange: updateStyle
+			});
+			simpleFormItems.push({
+				name:      'hspace',
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				label:     editor.editorManager.i18n.translate('hspace'),
+				onchange: updateStyle
+			});
+
+			simpleFormItems.push({
+				name:      'vspace',
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				label:     editor.editorManager.i18n.translate('vspace'),
+				onchange: updateStyle
+			});
+
+			simpleFormItems.push({
+				name:      'border',
+				type:      'textbox',
+				maxLength: 5,
+				size:      3,
+				label:     editor.editorManager.i18n.translate('border'),
+				onchange: updateStyle
+			});
+
+			var alignList = [];
+			tinymce.each(['baseline', 'top', 'middle', 'bottom', 'text-top', 'text-bottom', 'left', 'right'], function(type) {
+				alignList.push({
+					text:  editor.editorManager.i18n.translate('align_' + type.replace(/-/, '')),
+					value: type
+				});
+			});
+
+			simpleFormItems.push({
+				name:      'align',
+				type:      'listbox',
+				label:     editor.editorManager.i18n.translate('align'),
+				values:    alignList
+			});
+
+			function updateStyle() {
+				function addPixelSuffix(value) {
+					if (value.length > 0 && /^[0-9]+$/.test(value)) {
+						value += 'px';
+					}
+
+					return value;
+				}
+
+				var data = win.toJSON();
+				var css = dom.parseStyle(data.style);
+
+				delete css.margin;
+				css['margin-top'] = css['margin-bottom'] = addPixelSuffix(data.vspace);
+				css['margin-left'] = css['margin-right'] = addPixelSuffix(data.hspace);
+				css['border-width'] = addPixelSuffix(data.border);
+
+				win.find('#style').value(dom.serializeStyle(dom.parseStyle(dom.serializeStyle(css))));
+			}
+
+			if (imgElm) {
+				data.hspace = removePixelSuffix(imgElm.style.marginLeft || imgElm.style.marginRight);
+				data.vspace = removePixelSuffix(imgElm.style.marginTop || imgElm.style.marginBottom);
+				data.border = removePixelSuffix(imgElm.style.borderWidth);
+				data.style  = editor.dom.serializeStyle(editor.dom.parseStyle(editor.dom.getAttrib(imgElm, 'style')));
+				data.align  = imgElm.align;
+			}
+
+			win = editor.windowManager.open({
+				title: editor.editorManager.i18n.translate('title'),
+				close_previous: true,
+				resizable: true,
+				maximizable: true,
+				data: data,
+				bodyType: 'tabpanel',
+				body: [
+					{
+						title: editor.editorManager.i18n.translate('upload_image_from_local_fs'),
+						type: 'form',
+						items: [
+							{
+								type:      'label',
+								label:     editor.editorManager.i18n.translate('upload_image_from_local_fs_desc')
+							},
+							{
+								name: 'img_file',
+								type: 'filepicker',
+								filetype: 'image',
+								label:  editor.editorManager.i18n.translate('image_select')
+							},
+							{
+								id: 'previewfile',
+								type: 'panel',
+								minHeight: 150
+							}
+						]
+					},
+					{
+						title: editor.editorManager.i18n.translate('upload_image_from_url'),
+						type: 'form',
+						pack: 'start',
+						items: simpleFormItems
+					}
+				],
+				onPostRender: function() {
+					var w = this;
+					var id = "#" + w.find('#img_file')[0]._id;
+					var fu = $(id).find("input");
+					fu.attr("type", "file") // Maybe issues in IE 6/7/8
+						.attr("accept", "image/*")
+						.attr("size", "")
+						.removeClass("mce-textbox")
+						.parent().removeClass("mce-combobox");
+
+					(function() {
+						if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+							return;
+						}
+
+						fu.on("change", function(e) {
+							var files = e.target.files;
+
+							if (files.length == 0) {
+								$("#previewfile").html("");
+							}
+
+							for (var i = 0, f; f = files[i]; i++) {
+								var reader = new FileReader();
+								reader.onload = (function(file) {
+									return function (e) {
+										$("#previewfile").html($(['<img class="thumb" src="', e.target.result, '" title="', escape(file.name), '"/>'].join("")).css({height: "100px", width: "auto"}));
+									};
+								})(f);
+								reader.readAsDataURL(f);
+							}
+						});
+					})();
+				},
+				onsubmit: onSubmitForm
+			});
+		}
+
+		editor.addButton('ilimgupload', {
+			tooltip: editor.editorManager.i18n.translate('title'),
+			image:  baseurl + '/images/img_upload.png',
+			onclick: showDialog,
+			onPostRender: function() {
+				var ctrl = this;
+
+				editor.on('NodeChange', function(e) {
+					ctrl.active(e.element.nodeName == 'IMG');
+				});
+			}
+		});
+
+		//http://www.tinymce.com/forum/viewtopic.php?pid=116109#p116109
+		//http://stackoverflow.com/questions/17195112/customizing-context-menu-in-tinymce-4-0
+		//https://github.com/gtraxx/tinymce-plugin-youtube/blob/master/js/youtube.js
+		/*editor.plugins.contextmenu.onContextMenu.add(function(th, menu, event) {
+		 alert("x");
+		 if (event && event.nodeName && event.nodeName == 'IMG') {
+		 menu.add({
+		 title : 'ilimgupload.edit_image',
+		 icon : 'image',
+		 cmd : 'ilimgupload'
+		 });
+		 } else {
+		 menu.add({
+		 title : 'ilimgupload.title',
+		 icon : 'image',
+		 cmd : 'ilimgupload'
+		 });
+		 }
+		 });*/
+	});
+
+})();
