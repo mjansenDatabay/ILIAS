@@ -173,6 +173,10 @@ class ilTinyMCE extends ilRTE
 		else
 		{
 			parent::removePlugin('emotions');
+			if(!in_array('table', $tags) || !in_array('td', $tags) || !in_array('tr', $tags))
+			{
+				parent::removePlugin('table');
+			}
 		}
 	}
 	

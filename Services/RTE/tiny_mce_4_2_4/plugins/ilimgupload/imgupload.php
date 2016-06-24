@@ -123,7 +123,7 @@ if(isset($_FILES['img_file']) && is_array($_FILES['img_file']))
 		if(file_exists($iliasAbsolutePath . $iliasMobPath . 'mm_' . $media_object->getId() . '/' . $media_object->getTitle()))
 		{
 			// only save usage if the file was uploaded
-			$media_object->_saveUsage($media_object->getId(), $_GET['obj_type'] . ':html', (int)$_GET['obj_id']);
+			$media_object->_saveUsage($media_object->getId(), $_POST['obj_type'] . ':html', (int)$_POST['obj_id']);
 			$uploadedFile      = $media_object->getId();
 			$response->success = true;
 			$response->src     = $iliasMobPath . 'mm_' . $media_object->getId() . '/' . $media_object->getTitle();
