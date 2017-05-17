@@ -43,12 +43,12 @@ class ilTinyMCE extends ilRTE
 		{
 			$a_version = '3.5.11';
 		}
-		$a_version = "4.3.13"; // @todo: Remove
+		$a_version = "4.6.1"; // @todo: Remove
 		parent::__construct($a_version);				
 
 		switch($a_version)
 		{
-			case "4.3.13":
+			case "4.6.1":
 				require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
 				iljQueryUtil::initjQuery();
 				$this->file    = 'tinymce.min.js';
@@ -71,7 +71,6 @@ class ilTinyMCE extends ilRTE
 		if(version_compare($this->version, '4.0.0') >= 0)
 		{
 			$this->plugins = array(
-				"layer",
 				"table",
 				"save",
 				"emoticons",
@@ -89,28 +88,28 @@ class ilTinyMCE extends ilRTE
 		}
 		else
 		{
-		$this->plugins = array(
-			'xhtmlxtras',
-			'style',
-			'layer',
-			'table',
-			'save',
-			'advhr',
-			'advlink',
-			'emotions',
-			'iespell',
-			'insertdatetime',
-			'preview',
-			'searchreplace',
-			'print',
-			'contextmenu',
-			'paste',
-			'directionality',
-			'fullscreen',
-			'nonbreaking',
-			'noneditable',
-			'style'
-		);
+			$this->plugins = array(
+				'xhtmlxtras',
+				'style',
+				'layer',
+				'table',
+				'save',
+				'advhr',
+				'advlink',
+				'emotions',
+				'iespell',
+				'insertdatetime',
+				'preview',
+				'searchreplace',
+				'print',
+				'contextmenu',
+				'paste',
+				'directionality',
+				'fullscreen',
+				'nonbreaking',
+				'noneditable',
+				'style'
+			);
 		}
 		$this->setStyleSelect(false);
 		$this->addInternalTinyMCEImageManager();
