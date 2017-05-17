@@ -17,9 +17,9 @@ class ilTinyMCE extends ilRTE
 	protected $mode = 'textareas';
 	protected $version = ''; // set default version here
 	protected $vd = ''; // version directory suffix
-	protected $path     = "";
-	protected $file     = "";
-	
+	protected $path     = '';
+	protected $file     = '';
+
 	/**
 	 * @var bool
 	 */
@@ -64,6 +64,7 @@ class ilTinyMCE extends ilRTE
 				// unknown/unsupported version?
 				break;
 		}
+
 		if(version_compare($this->version, '4.0.0') >= 0)
 		{
 			$this->plugins = array(
