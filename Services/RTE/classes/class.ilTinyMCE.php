@@ -36,7 +36,8 @@ class ilTinyMCE extends ilRTE
 	 */
 	public function __construct($a_version = '')
 	{
-		ilUtil::includeMathjax();
+		require_once './Services/MathJax/classes/class.ilMathJax.php';
+		ilMathJax::getInstance()->includeMathJax();
 
 		if(!$a_version)
 		{
