@@ -45,7 +45,8 @@
 		"mockery/mockery": "^1.2",
 		"phpunit/php-token-stream": "^3.0",
 		"phpdocumentor/reflection-docblock": "^3.3",
-		"friendsofphp/php-cs-fixer": "^2.15"
+		"friendsofphp/php-cs-fixer": "^2.15",
+		"phpstan/phpstan": "^0.11.4"
 	},
 	"autoload": {
 		"psr-4" : { "ILIAS\\" : "../../src" },
@@ -345,6 +346,16 @@
 			"approved-date": "2019-07-15"
 		},
 
+		"phpstan/phpstan": {
+			"source": "https://github.com/phpstan/phpstan",
+			"used_version": "0.11.4",
+			"added_by": "Michael Jansen <mjansen@databay.de>",
+			"wrapped_by": "",
+			"last_update": "",
+			"last_update_by": "",
+			"approved-by": "Jour Fixe",
+			"approved-date": ""
+		},
 		"patches": {
 			"tecnickcom/tcpdf": {
 				"ILIAS TCPDF Patches": "patches/tcpdf.patch"

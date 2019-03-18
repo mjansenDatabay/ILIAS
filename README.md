@@ -1,5 +1,6 @@
 [![Build Status](https://api.travis-ci.com/ILIAS-eLearning/ILIAS.svg?branch=trunk)](https://travis-ci.com/ILIAS-eLearning/ILIAS)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.2-8892BF.svg)](https://php.net/)
+[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true)](https://github.com/phpstan/phpstan)
 
 # ILIAS
 
