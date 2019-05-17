@@ -292,6 +292,18 @@ class ilInitialisation
 	 */
 	protected static function buildHTTPPath()
 	{
+// fau: httpPath - use the pre-defined http path if required by a script
+		if ($GLOBALS['USE_ILIAS_HTTP_PATH_FROM_INI'])
+		{
+			global $ilIliasIniFile;
+			$http_path = $ilIliasIniFile->readVariable("server","http_path");
+			if (!empty($http_path))
+			{
+				return define('ILIAS_HTTP_PATH',ilUtil::removeTrailingPathSeparators($http_path));
+			}
+		}
+// fau.
+
 		include_once './Services/Http/classes/class.ilHTTPS.php';
 		$https = new ilHTTPS();
 
@@ -371,6 +383,9 @@ class ilInitialisation
 			}
 		} elseif (!isset($_COOKIE['ilClientId'])) {
 			ilUtil::setCookie('ilClientId', $ilIliasIniFile->readVariable('clients','default'));
+// fau: shortRssLink - set default client when called from context without cookies
+			$_GET['client_id'] = $ilIliasIniFile->readVariable('clients','default');
+// fau.
 		}
 
 		if (!defined('IL_PHPUNIT_TEST') && ilContext::supportsPersistentSessions()) {
@@ -410,7 +425,10 @@ class ilInitialisation
 			self::abortAndDie("Fatal Error: ilInitialisation::initClientIniFile called without CLIENT_ID.");
 		}
 
-		$ini_file = "./".ILIAS_WEB_DIR."/".CLIENT_ID."/client.ini.php";
+// fau: customClientIni - read naming of the client.ini.php from the ilias.ini.php
+		$ini_file = $ilIliasIniFile->readVariable("clients","inifile");
+		$ini_file = "./".ILIAS_WEB_DIR."/".CLIENT_ID."/". (empty($ini_file) ? 'client.ini.php' : $ini_file);
+// fau.
 
 		// get settings from ini file
 		$ilClientIniFile = new ilIniFile($ini_file);		
@@ -940,6 +958,10 @@ class ilInitialisation
 			 "./Services/AccessControl/classes/class.ilAccess.php");
 		
 		require_once "./Services/Conditions/classes/class.ilConditionHandler.php";
+
+		// fim: [studycond] require ilStudyAccess
+		require_once "./Services/StudyData/classes/class.ilStudyAccess.php";
+		// fim.
 	}
 	
 	/**
@@ -1064,8 +1086,13 @@ class ilInitialisation
 		{
 			self::initClient();
 			self::initFileUploadService($GLOBALS["DIC"]);
-			self::initSession();
-			
+// fau: shortRssLink - prevent a logout of the user when private RSS link is opened in the same browser
+			if (ilContext::getType() != ilContext::CONTEXT_RSS &&  ilContext::getType() != ilContext::CONTEXT_RSS_AUTH)
+			{
+				self::initSession();
+			}
+// fau.
+
 			if (ilContext::hasUser())
 			{						
 				self::initUser();
@@ -1786,11 +1813,16 @@ class ilInitialisation
 			}
 			
 			$cmd = self::getCurrentCmd();
+// fau: rootAsLogin init user account when terms of service are only shown
+			// terms of service should are also presented to logged in users
+			// the initialized user account allows a correct main menu rendering
+
 			if(
-				$cmd == "showTermsOfService" || $cmd == "showClientList" || 
+				$cmd == "showClientList" ||
 				$cmd == 'showAccountMigration' || $cmd == 'migrateAccount' ||
 				$cmd == 'processCode' || $cmd == 'showLoginPage' || $cmd == 'doStandardAuthentication' || $cmd == 'doCasAuthentication'
 			)
+// fau.
 			{
 				ilLoggerFactory::getLogger('auth')->debug('Blocked authentication for cmd: ' . $cmd);
 				return true;
@@ -1835,6 +1867,13 @@ class ilInitialisation
 			return true;					
 		}
 		
+// fau: rootAsLogin - indicate that root folder is showing login form
+		if(ilCust::get('ilias_root_as_login') && strtolower($_REQUEST["baseClass"]) == "ilrepositorygui" && $_GET["ref_id"] == 1)
+		{
+			return true;
+		}
+// fau.
+
 		return false;
 	}
 	

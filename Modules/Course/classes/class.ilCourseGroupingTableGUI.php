@@ -32,8 +32,12 @@ class ilCourseGroupingTableGUI extends ilTable2GUI
 		$this->addColumn($this->lng->txt('description'), 'description');
 		$this->addColumn($this->lng->txt('unambiguousness'), 'unique');
 		$this->addColumn($this->lng->txt('groupings_assigned_obj_'.$type), 'assigned');
+
+// fau: limitSub - load crs language module and add column for registrations
+		$this->lng->loadLanguageModule('crs');
+		$this->addColumn($this->lng->txt('distinct_registrations'), 'registrations');
+// fau.
 		$this->addColumn('','');
-		
 		
 		$this->setTitle($this->lng->txt('groupings'));		
 
@@ -51,7 +55,9 @@ class ilCourseGroupingTableGUI extends ilTable2GUI
 	
 	protected function getItems($a_content_obj)
 	{
-		$items = ilObjCourseGrouping::_getVisibleGroupings($a_content_obj->getId());
+// fau: groupingSelector - use simplified getting of groupings (better performance)
+		$items = ilObjCourseGrouping::_getRelatedGroupings($a_content_obj->getId());
+// fau.
 
 		$data = array();
 		foreach($items as $grouping_id)
@@ -69,11 +75,23 @@ class ilCourseGroupingTableGUI extends ilTable2GUI
 			}
 
 			// Assigned items
+// fau: limitSub - get the unique registrations for all assigned items
+			$assigned_ids = array();
 			$assigned_items = $tmp_obj->getAssignedItems();
 			foreach($assigned_items as $condition)
 			{
+				$assigned_ids[] = $condition['target_obj_id'];
 				$data[$grouping_id]['assigned'][] = ilObject::_lookupTitle($condition['target_obj_id']);
 			}
+			if (!empty($assigned_ids))
+			{
+				$data[$grouping_id]['registrations'] = ilWaitingList::_countUniqueSubscribers($assigned_ids);
+			}
+			else
+			{
+				$data[$grouping_id]['registrations'] = 0;
+			}
+// fau.
 		}
 		
 		$this->setData($data);
@@ -106,6 +124,18 @@ class ilCourseGroupingTableGUI extends ilTable2GUI
 		$this->tpl->setVariable("EDIT_LINK",
 			$this->ctrl->getLinkTarget($this->parent_obj, 'edit'));		
 		$this->tpl->setVariable('TXT_EDIT',$this->lng->txt('edit'));
+	
+// fau: limitSub - count the subscribers and show link to add from waiting list
+		$this->tpl->setVariable('COUNT_WAITING_LIST', $a_set['registrations']);
+		if ($a_set['registrations'] > 0)
+		{
+			$this->tpl->setCurrentBlock('add_waiting_link');
+			$this->ctrl->setParameter($this->parent_obj, 'obj_id', $a_set["id"]);
+			$this->tpl->setVariable("TXT_ADD_WAITING_MEMBERS",$this->lng->txt('mem_fill_free_places'));
+			$this->tpl->setVariable("LINK_ADD_WAITING_MEMBERS",$this->ctrl->getLinkTarget($this->parent_obj,'addWaitingMembers'));
+			$this->tpl->parseCurrentBlock();
+		}
+// fau.
 	}
 }
 

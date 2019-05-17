@@ -554,7 +554,9 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		// hide previous results
 		if ($this->object->getNrOfTries() != 1)
 		{
-			if ($this->object->getUsePreviousAnswers() == 1)
+// fau: adoptPreviousSolutions - prevent a change when a random test without this checkbox is started
+			if ($this->object->getUsePreviousAnswers() == 1 && isset($_POST["chb_use_previous_answers"]))
+// fau.
 			{
 				if ($_POST["chb_use_previous_answers"])
 				{
@@ -879,7 +881,10 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		// redirect after test
 		$redirection_mode = $this->object->getRedirectionMode();
 		$redirection_url  = $this->object->getRedirectionUrl();
-		if( $redirection_url && $redirection_mode )
+
+        // fim: [exam] don't redirect here when final statement should be shown
+		if($redirection_url && $redirection_mode && !$this->object->getShowFinalStatement())
+        // fim.
 		{
 			if( $redirection_mode == REDIRECT_KIOSK )
 			{
@@ -1075,11 +1080,38 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 	*/
 	public function showFinalStatementCmd()
 	{
+		// fim: [exam] use redirection url at this page
+		$redirection_mode = $this->object->getRedirectionMode();
+		if($redirection_mode == REDIRECT_KIOSK)
+		{
+			if ($this->object->getKioskMode())
+			{
+				$redirection_url  = $this->object->getRedirectionUrl();
+			}
+		}
+		elseif ($redirection_mode)
+		{
+			$redirection_url  = $this->object->getRedirectionUrl();
+		}
+
 		$template = new ilTemplate("tpl.il_as_tst_final_statement.html", TRUE, TRUE, "Modules/Test");
+		if ( $redirection_url) {
+			$template->setCurrentBlock('redirect_button');
+			$template->setVariable("REDIRECT_URL", $redirection_url);
+			$template->setVariable("BUTTON_CONTINUE", $this->lng->txt("btn_next"));
+			$template->parseCurrentBlock();
+		}
+		else
+		{
+			$template->setCurrentBlock('submit_button');
+			$template->setVariable("BUTTON_CONTINUE", $this->lng->txt("btn_next"));
+			$template->parseCurrentBlock();
+		}
+
 		$this->ctrl->setParameter($this, "skipfinalstatement", 1);
 		$template->setVariable("FORMACTION", $this->ctrl->getFormAction($this, ilTestPlayerCommands::AFTER_TEST_PASS_FINISHED));
 		$template->setVariable("FINALSTATEMENT", $this->object->prepareTextareaOutput($this->object->getFinalStatement(), true));
-		$template->setVariable("BUTTON_CONTINUE", $this->lng->txt("btn_next"));
+		// fim.
 		$this->tpl->setVariable($this->getContentBlockName(), $template->get());
 	}
 	
@@ -1285,7 +1317,9 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 			$qstConfig->setIsUnchangedAnswerPossible($this->object->getMCScoring());
 		}
 
-		if( $qstConfig->isPreviousPassSolutionReuseAllowed() )
+// fau: adoptPreviousSolutions - prevent appearance of checkbox and message when the solution is deleted
+		if( false && $qstConfig->isPreviousPassSolutionReuseAllowed() )
+// fau.
 		{
 			$passIndex = $this->determineSolutionPassIndex($questionGui); // last pass having solution stored
 			if( $passIndex < $this->testSession->getPass() ) // it's the previous pass if current pass is higher
@@ -1879,6 +1913,17 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$this->tpl->addBlockFile(
 			$this->getContentBlockName(), 'adm_content', 'tpl.il_as_tst_output.html', 'Modules/Test'
 		);
+
+		// fim: [exam] prevent dragging of images into text boxes during test (would display the image name which could be a hint)
+
+		if (ilCust::get("tst_prevent_image_drag"))
+		{
+			require_once("Services/jQuery/classes/class.iljQueryUtil.php");
+			iljQueryUtil::initjQuery();
+			$this->tpl->addOnLoadCode("$('img').bind('dragstart', function(event) { event.preventDefault(); });");
+			$this->tpl->addOnLoadCode("$('a').bind('dragstart', function(event) { event.preventDefault(); });");
+		}
+		// fim.
 	}
 	
 	protected function populateKioskHead()
@@ -2769,8 +2814,6 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 // fau: testNav - new function populateNavWhenChangedModal
 	protected function populateNavWhenChangedModal()
 	{
-		return; // usibility fix: get rid of popup
-		
 		if (!empty($_SESSION['save_on_navigation_prevent_confirmation']))
 		{
 			return;
@@ -2826,7 +2869,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$this->tpl->parseCurrentBlock();
 	}
 // fau.
-		
+	
 	protected function populateNextLocksUnchangedModal()
 	{
 		require_once 'Modules/Test/classes/class.ilTestPlayerConfirmationModal.php';
@@ -2899,7 +2942,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		
 		return $_SESSION[self::FOLLOWUP_QST_LOCKS_PREVENT_CONFIRMATION_PARAM];
 	}
-		
+	
 // fau: testNav - new function populateQuestionEditControl
 	/**
 	 * Populate the navigation and saving control for editable questions

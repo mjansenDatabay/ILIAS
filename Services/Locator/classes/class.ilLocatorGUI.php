@@ -166,6 +166,13 @@ class ilLocatorGUI
 				{
 					continue;
 				}
+// fau: rootIsReduced - don't show the root folder in the locator
+
+				if ($row["type"] == "root" && ilCust::get("ilias_repository_cat_id"))
+				{
+					continue;
+				}
+// fau.
 
 				if ($row["title"] == "ILIAS" && $row["type"] == "root")
 				{

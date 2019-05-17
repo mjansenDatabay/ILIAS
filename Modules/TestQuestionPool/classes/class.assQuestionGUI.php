@@ -139,17 +139,17 @@ abstract class assQuestionGUI
 		
 		$this->navigationGUI = null;
 	}
-	
+
 	/**
 	 * this method can be overwritten per question type
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function hasInlineFeedback()
 	{
 		return false;
 	}
-	
+
 	public function addHeaderAction()
 	{
 		global $DIC; /* @var ILIAS\DI\Container $DIC */
@@ -157,51 +157,51 @@ abstract class assQuestionGUI
 		$DIC->ui()->mainTemplate()->setVariable(
 			"HEAD_ACTION", $this->getHeaderAction()
 		);
-		
+
 		$notesUrl = $this->ctrl->getLinkTargetByClass(
 			array("ilcommonactiondispatchergui", "ilnotegui"), "", "", true, false
 		);
-		
+
 		ilNoteGUI::initJavascript($notesUrl,IL_NOTE_PUBLIC, $DIC->ui()->mainTemplate());
-		
+
 		$redrawActionsUrl = $DIC->ctrl()->getLinkTarget($this, 'redrawHeaderAction', '', true);
 		$DIC->ui()->mainTemplate()->addOnLoadCode("il.Object.setRedrawAHUrl('$redrawActionsUrl');");
 	}
-	
+
 	public function redrawHeaderAction()
 	{
 		global $DIC; /* @var ILIAS\DI\Container $DIC */
 		echo $this->getHeaderAction() . $DIC->ui()->mainTemplate()->getOnLoadCodeForAsynch();
 		exit;
 	}
-	
+
 	public function getHeaderAction()
 	{
 		global $DIC; /* @var ILIAS\DI\Container $DIC */
 		/* @var ilObjectDataCache $ilObjDataCache */
 		$ilObjDataCache = $DIC['ilObjDataCache'];
-		
+
 		$parentObjType = $ilObjDataCache->lookupType($this->object->getObjId());
-		
+
 		$dispatcher = new ilCommonActionDispatcherGUI(
 			ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
 			$DIC->access(), $parentObjType, $_GET["ref_id"], $this->object->getObjId()
 		);
-		
+
 		$dispatcher->setSubObject("quest", $this->object->getId());
-		
+
 		$ha = $dispatcher->initHeaderAction();
 		$ha->enableComments(true, false);
-		
+
 		return $ha->getHeaderAction($DIC->ui()->mainTemplate());
 	}
-	
+
 	public function getNotesHTML()
 	{
 		$notesGUI = new ilNoteGUI($this->object->getObjId(), $this->object->getId(), 'quest');
 		$notesGUI->enablePublicNotes(true);
 		$notesGUI->enablePublicNotesDeletion(true);
-		
+
 		return $notesGUI->getNotesHTML();
 	}
 
@@ -609,6 +609,17 @@ abstract class assQuestionGUI
 		include_once("./Modules/TestQuestionPool/classes/class.ilAssQuestionPageGUI.php");
 		$page_gui = new ilAssQuestionPageGUI($this->object->getId());
 		$page_gui->setQuestionHTML(array($this->object->getId() => $html));
+		// fim: [media] use preview mode for page content in solution output
+		// this sets the mode for the limited media player
+		if (strtolower($_GET['cmdClass']) == 'iltestevaluationgui')
+		{
+			$page_gui->setOutputMode("preview");
+		}
+		else
+		{
+			$page_gui->setOutputMode("presentation");
+		}
+		// fim.
 		$presentation = $page_gui->presentation();
 		$presentation = preg_replace("/src=\"\\.\\//ims", "src=\"" . ILIAS_HTTP_PATH . "/", $presentation);
 		return $presentation;
@@ -659,7 +670,7 @@ abstract class assQuestionGUI
 			{
 				$html = $this->buildFocusAnchorHtml() .$html;
 			}
-			
+
 			$page_gui->setQuestionHTML(array($this->object->getId() => $html));
 		}
 
@@ -2443,7 +2454,7 @@ abstract class assQuestionGUI
 		$errors = $this->editQuestion(true); // TODO bheyser: editQuestion should be added to the abstract base class with a unified signature
 		return $this->editForm;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -2451,22 +2462,22 @@ abstract class assQuestionGUI
 	{
 		return '<div id="focus"></div>';
 	}
-	
+
 	public function isAnswerFreuqencyStatisticSupported()
 	{
 		return true;
 	}
-	
+
 	public function getSubQuestionsIndex()
 	{
 		return array(0);
 	}
-	
+
 	public function getAnswersFrequency($relevantAnswers, $questionIndex)
 	{
 		return array();
 	}
-	
+
 	/**
 	 * @param $parentGui
 	 * @param $parentCmd
@@ -2477,36 +2488,36 @@ abstract class assQuestionGUI
 	public function getAnswerFrequencyTableGUI($parentGui, $parentCmd, $relevantAnswers, $questionIndex)
 	{
 		require_once 'Modules/TestQuestionPool/classes/tables/class.ilAnswerFrequencyStatisticTableGUI.php';
-		
+
 		$table = new ilAnswerFrequencyStatisticTableGUI($parentGui, $parentCmd, $this->object);
 		$table->setQuestionIndex($questionIndex);
 		$table->setData($this->getAnswersFrequency($relevantAnswers, $questionIndex));
 		$table->initColumns();
-		
+
 		return $table;
 	}
-	
+
 	/**
 	 * @param ilPropertyFormGUI $form
 	 */
 	public function prepareReprintableCorrectionsForm(ilPropertyFormGUI $form)
 	{
-		
+
 	}
-	
+
 	/**
 	 * @param ilPropertyFormGUI $form
 	 */
 	public function populateCorrectionsFormProperties(ilPropertyFormGUI $form)
 	{
-		
+
 	}
-	
+
 	/**
 	 * @param ilPropertyFormGUI $form
 	 */
 	public function saveCorrectionsFormProperties(ilPropertyFormGUI $form)
 	{
-		
+
 	}
 }

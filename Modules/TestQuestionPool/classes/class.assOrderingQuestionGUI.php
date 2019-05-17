@@ -540,6 +540,12 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 	
 	function getPreview($show_question_only = FALSE, $showInlineFeedback = false)
 	{
+// fau: imageBox - init colorbox
+		include_once "./Services/jQuery/classes/class.iljQueryUtil.php";
+		iljQueryUtil::initjQuery();
+		iljQueryUtil::initColorbox();
+// fau.
+
 		if( $this->getPreviewSession() && $this->getPreviewSession()->hasParticipantSolution() )
 		{
 			$solutionOrderingElementList = unserialize(
@@ -579,6 +585,12 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 	public function getTestOutput($activeId, $pass, $isPostponed = FALSE, $userSolutionPost = FALSE, $inlineFeedback = false)
 	// hey.
 	{
+// fau: imageBox - init colorbox
+		include_once "./Services/jQuery/classes/class.iljQueryUtil.php";
+		iljQueryUtil::initjQuery();
+		iljQueryUtil::initColorbox();
+// fau.
+
 		// hey: prevPassSolutions - fixed variable type, makes phpstorm stop crying
 		$userSolutionPost = is_array($userSolutionPost) ? $userSolutionPost : array();
 		// hey.
@@ -904,7 +916,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		}
 		return $tpl;
 	}
-	
+
 	protected function getAnswerStatisticOrderingElementHtml(ilAssOrderingElement $element)
 	{
 		if($this->object->isImageOrderingType())
@@ -912,7 +924,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			$element->setImageThumbnailPrefix($this->object->getThumbPrefix());
 			$element->setImagePathWeb($this->object->getImagePathWeb());
 			$element->setImagePathFs($this->object->getImagePath());
-			
+
 			$src = $element->getPresentationImageUrl();
 			$alt = $element->getContent();
 			$content = "<img src='{$src}' alt='{$alt}' title='{$alt}'/>";
@@ -921,17 +933,17 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		{
 			$content = $element->getContent();
 		}
-		
+
 		return $content;
 	}
-	
+
 	protected function getAnswerStatisticOrderingVariantHtml(ilAssOrderingElementList $list)
 	{
 		$html = '<ul>';
-		
+
 		$lastIndent = 0;
 		$firstElem = true;
-		
+
 		foreach($list as $elem)
 		{
 			if($elem->getIndentation() > $lastIndent)
@@ -952,70 +964,70 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			}
 
 			$html .= $this->getAnswerStatisticOrderingElementHtml($elem);
-			
+
 			$firstElem = false;
 			$lastIndent = $elem->getIndentation();
 		}
-		
+
 		$html .= '</li>';
-		
+
 		for($i = $lastIndent; $i > 0; $i--)
 		{
 			$html .= '</ul></li>';
 		}
-		
+
 		$html .= '</ul>';
-		
+
 		return $html;
 	}
-	
+
 	public function getAnswersFrequency($relevantAnswers, $questionIndex)
 	{
 		$answersByActiveAndPass = array();
-		
+
 		foreach($relevantAnswers as $row)
 		{
 			$key = $row['active_fi'].':'.$row['pass'];
-			
+
 			if( !isset($answersByActiveAndPass[$key]) )
 			{
 				$answersByActiveAndPass[$key] = array();
 			}
-			
+
 			$answersByActiveAndPass[$key][$row['value1']] = $row['value2'];
 		}
-		
+
 		$solutionLists = array();
-		
+
 		foreach($answersByActiveAndPass as $indexedSolutions)
 		{
 			$solutionLists[] = $this->object->getSolutionOrderingElementList($indexedSolutions);
 		}
-		
+
 		/* @var ilAssOrderingElementList[] $answers */
 		$answers = array();
-		
+
 		foreach($solutionLists as $orderingElementList)
 		{
 			$hash = $orderingElementList->getHash();
-			
+
 			if( !isset($answers[$hash]) )
 			{
 				$variantHtml = $this->getAnswerStatisticOrderingVariantHtml(
 					$orderingElementList
 				);
-				
+
 				$answers[$hash] = array(
 					'answer' => $variantHtml, 'frequency' => 0
 				);
 			}
-			
+
 			$answers[$hash]['frequency']++;
 		}
-		
+
 		return array_values($answers);
 	}
-	
+
 	/**
 	 * @param ilPropertyFormGUI $form
 	 */
@@ -1024,7 +1036,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		$orderingInput = $form->getItemByPostVar(assOrderingQuestion::ORDERING_ELEMENT_FORM_FIELD_POSTVAR);
 		$orderingInput->prepareReprintable($this->object);
 	}
-	
+
 	/**
 	 * @param ilPropertyFormGUI $form
 	 */
@@ -1042,49 +1054,49 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		$header = new ilFormSectionHeaderGUI();
 		$header->setTitle($this->lng->txt('oq_header_ordering_elements'));
 		$form->addItem($header);
-		
+
 		$orderingElementInput = $this->object->buildNestedOrderingElementInputGui();
-		
+
 		$this->object->initOrderingElementAuthoringProperties($orderingElementInput);
-		
+
 		$orderingElementInput->setElementList( $this->object->getOrderingElementList() );
-		
+
 		$form->addItem($orderingElementInput);
 	}
-	
+
 	/**
 	 * @param ilPropertyFormGUI $form
 	 */
 	public function saveCorrectionsFormProperties(ilPropertyFormGUI $form)
 	{
 		$this->object->setPoints((float)$form->getInput('points'));
-		
+
 		$submittedElementList = $this->object->fetchSolutionListFromSubmittedForm($form);
-		
+
 		$curElementList = $this->object->getOrderingElementList();
-		
+
 		$newElementList = new ilAssOrderingElementList();
 		$newElementList->setQuestionId($this->object->getId());
-		
+
 		foreach($submittedElementList as $submittedElement)
 		{
 			if( !$curElementList->elementExistByRandomIdentifier($submittedElement->getRandomIdentifier()) )
 			{
 				continue;
 			}
-			
+
 			$curElement = $curElementList->getElementByRandomIdentifier($submittedElement->getRandomIdentifier());
-			
+
 			$curElement->setPosition($submittedElement->getPosition());
-				
+
 			if( $this->object->isOrderingTypeNested() )
 			{
 				$curElement->setIndentation($submittedElement->getIndentation());
 			}
-			
+
 			$newElementList->addElement($curElement);
 		}
-		
+
 		$this->object->setOrderingElementList($newElementList);
 	}
 }

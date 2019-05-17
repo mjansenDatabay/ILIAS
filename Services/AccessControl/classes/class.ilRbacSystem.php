@@ -74,8 +74,8 @@ class ilRbacSystem
 		self::$_paCache = null;
 		self::$_checkAccessOfUserCache = null;
 	}
-	
-	/**	
+
+	/**
 	* checkAccess represents the main method of the RBAC-system in ILIAS3 developers want to use
 	*  With this method you check the permissions a use may have due to its roles
 	*  on an specific object.
@@ -214,6 +214,17 @@ class ilRbacSystem
 		$operations = explode(",",$a_operations);
 		foreach ($operations as $operation)
 		{
+			// fim: [studycond] add check for studydata based access
+			// a grant overrules the rbac access
+			if ($operation == "read" or $operation == "visible")
+			{
+				if (ilStudyAccess::_checkAccess($a_ref_id, $a_user_id))
+				{
+					continue;
+				}
+			}
+			// fim.
+
 			if ($operation == "create")
 			{
 				if (empty($a_type))
@@ -325,7 +336,7 @@ class ilRbacSystem
 
 		$query = 'SELECT ops_id FROM rbac_operations '.
 			'WHERE operation = '.$ilDB->quote($a_operation,'text');
-		$res = $ilDB->query($query);		
+		$res = $ilDB->query($query);
 		while($row = $ilDB->fetchObject($res))
 		{
 			$ops_id = $row->ops_id;
@@ -429,10 +440,10 @@ class ilRbacSystem
 	{
 		include_once './Services/Container/classes/class.ilMemberViewSettings.php';
 		$settings = ilMemberViewSettings::getInstance();
-		
+
 		// disable member view
 		if(
-			isset($_GET['mv']) && 
+			isset($_GET['mv']) &&
 			$_GET['mv'] == 0
 		)
 		{
@@ -467,7 +478,7 @@ class ilRbacSystem
 			$this->mem_view['active'] = true;
 			$this->mem_view['items'] = $tree->getSubTreeIds($settings->getContainer());
 			$this->mem_view['items'] = array_merge($this->mem_view['items'],array($settings->getContainer()));
-			
+
 			include_once './Services/Membership/classes/class.ilParticipants.php';
 			$this->mem_view['role'] = ilParticipants::getDefaultMemberRole($settings->getContainer());
 			

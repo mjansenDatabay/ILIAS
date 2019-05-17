@@ -128,7 +128,23 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 	 */
 	protected $introduction;
 
-	/**
+// fau: testGradingMessage - define class variables
+/**
+*  Message for passed test
+*
+* @var string
+*/
+  var $mark_tst_passed;
+
+/**
+* Message for failed test
+*
+* @var string
+*/
+  var $mark_tst_failed;
+// fau.
+
+/**
 * Defines the mark schema
 *
 * @var ASS_MarkSchema
@@ -666,7 +682,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 		$this->testSequence = FALSE;
 		$this->mailnotification = 0;
 		$this->poolUsage = 1;
-		
+// fau: testGradingMessage - init messages
+		$this->mark_tst_passed = "";
+		$this->mark_tst_failed = "";
+// fau.
 		$this->ects_grades = array(
 			'A' => 90,
 			'B' => 65,
@@ -1214,6 +1233,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 		$result = array();
 		array_push($result, $this->getIntroduction());
 		array_push($result, $this->getFinalStatement());
+// fau: testGradingMessage - push mark messages to RTE content
+		array_push($result, $this->getMarkTstPassed());
+		array_push($result, $this->getMarkTstFailed());
+// fau.
 		return $result;
 	}
 	
@@ -1268,6 +1291,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 				'intro_enabled'              => array('integer', (int)$this->isIntroductionEnabled()),
 				'introduction'               => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getIntroduction(), 0)),
 				'finalstatement'             => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getFinalStatement(), 0)),
+// fau: testGradingMessage - save mark messages to db
+				'mark_tst_passed' 			 => array('text', $this->getMarkTstPassed()),
+				'mark_tst_failed'			 => array('text', $this->getMarkTstFailed()),
+// fau.
 				'showinfo'                   => array('integer', $this->getShowInfo()),
 				'forcejs'                    => array('integer', $this->getForceJS()),
 				'customstyle'                => array('text', $this->getCustomStyle()),
@@ -1391,6 +1418,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 						'intro_enabled'              => array('integer', (int)$this->isIntroductionEnabled()),
 						'introduction'               => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getIntroduction(), 0)),
 						'finalstatement'             => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getFinalStatement(), 0)),
+// fau: testGradingMessage - save mark messages to db
+						'mark_tst_passed'			 => array('text', $this->getMarkTstPassed()),
+						'mark_tst_failed'			 => array('text', $this->getMarkTstFailed()),
+// fau.
 						'showinfo'                   => array('integer', $this->getShowInfo()),
 						'forcejs'                    => array('integer', $this->getForceJS()),
 						'customstyle'                => array('text', $this->getCustomStyle()),
@@ -1916,6 +1947,10 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 			$this->setIntroduction(ilRTE::_replaceMediaObjectImageSrc($data->introduction, 1));
 			$this->setShowInfo($data->showinfo);
 			$this->setFinalStatement(ilRTE::_replaceMediaObjectImageSrc($data->finalstatement, 1));
+// fau: testGradingMessage - set mark messages from DB
+			$this->setMarkTstPassed($data->mark_tst_passed);
+			$this->setMarkTstFailed($data->mark_tst_failed);
+// fau.
 			$this->setForceJS($data->forcejs);
 			$this->setCustomStyle($data->customstyle);
 			$this->setShowFinalStatement($data->showfinalstatement);
@@ -2140,6 +2175,32 @@ function loadQuestions($active_id = "", $pass = NULL)
 		$this->_finalstatement = $a_statement;
 	}
 
+// fau: testGradingMessage - new functions setMarkTstPassed(), setMarkTstFailed
+	/**
+	* Set the mark message for passed tests
+	*
+	* @param 	string 	mark message (with placeholders)
+	* @see $mark_tst_passed
+	*/
+	public function setMarkTstPassed($a_mark = NULL)
+	{
+		$this->mark_tst_passed = $a_mark;
+	}
+	// fim.
+
+	/**
+	* Set the mark message for failed tests
+	*
+	* @param 	string 	mark message (with placeholders)
+	* @see $mark_tst_failed
+	*/
+	public function setMarkTstFailed($a_mark = NULL)
+	{
+		$this->mark_tst_failed = $a_mark;
+	}
+// fau.
+
+
 	/**
 	* Set whether the complete information page is shown or the required data only
 	*
@@ -2271,6 +2332,31 @@ function loadQuestions($active_id = "", $pass = NULL)
 	{
 		return (strlen($this->_finalstatement)) ? $this->_finalstatement : NULL;
 	}
+
+// fau: testGradingMessage - getMarkTstPassed() and getMarkTstFailed()
+	/**
+	* Gets the mark message for passed tests
+	*
+	* @return 	string 	mark message (with placeholders)
+	* @see $mark_tst_passed
+	*/
+	public function getMarkTstPassed()
+	{
+		return (strlen($this->mark_tst_passed)) ? $this->mark_tst_passed : NULL;
+	}
+
+	/**
+	* Gets the mark message for failes tests
+	*
+	* @return 	string 	mark message (with placeholders)
+	* @see $mark_tst_failed
+	*/
+	public function getMarkTstFailed()
+	{
+		return (strlen($this->mark_tst_failed)) ? $this->mark_tst_failed : NULL;
+	}
+// fau.
+
 
 	/**
 	* Gets whether the complete information page is shown or the required data only
@@ -2744,7 +2830,9 @@ function getAnswerFeedbackPoints()
 */
 	function getReportingDate()
 	{
-		return (strlen($this->reporting_date)) ? $this->reporting_date : NULL;
+        // fim: [bugfix] fix wrongly saved reporting date
+		return (strlen($this->reporting_date) and $this->reporting_date != '000000000000') ? $this->reporting_date : NULL;
+        // fim.
 	}
 
 /**
@@ -3606,6 +3694,12 @@ function getAnswerFeedbackPoints()
 
 		foreach ($activeIds as $active_id)
 		{
+			// fim: [media] remove limited media player usages
+			require_once ("./Services/MediaObjects/classes/class.ilLimitedMediaPlayerUsage.php");
+			ilLimitedMediaPlayerUsage::_deleteTestPassUsages($this->getId(), $usr_id);
+			// fim.
+
+
 			// remove file uploads
 			if (@is_dir(CLIENT_WEB_DIR . "/assessment/tst_" . $this->getTestId() . "/$active_id"))
 			{
@@ -4151,7 +4245,7 @@ function getAnswerFeedbackPoints()
 * @return object The database row of the tst_active table
 * @access	public
 */
-	public static function _getActiveIdOfUser($user_id = "", $test_id = "") 
+	public static function _getActiveIdOfUser($user_id = "", $test_id = "")
 	{
 		global $DIC;
 		$ilDB = $DIC['ilDB'];
@@ -5617,11 +5711,13 @@ function getAnswerFeedbackPoints()
 * @return array The available question pools
 * @access public
 */
-	function &getAvailableQuestionpools($use_object_id = false, $equal_points = false, $could_be_offline = false, $show_path = FALSE, $with_questioncount = FALSE, $permission = "read")
+// fau: testQuestionBrowserRoot - added parameter for root id to get available question pools
+	function &getAvailableQuestionpools($use_object_id = false, $equal_points = false, $could_be_offline = false, $show_path = FALSE, $with_questioncount = FALSE, $permission = "read", $root_id = 0)
 	{
 		include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
-		return ilObjQuestionPool::_getAvailableQuestionpools($use_object_id, $equal_points, $could_be_offline, $show_path, $with_questioncount, $permission);
+		return ilObjQuestionPool::_getAvailableQuestionpools($use_object_id, $equal_points, $could_be_offline, $show_path, $with_questioncount, $permission, "", $root_id);
 	}
+// fau.
 
 /**
 * Returns the estimated working time for the test calculated from the working time of the contained questions
@@ -6222,6 +6318,14 @@ function getAnswerFeedbackPoints()
 						$this->setEndingTimeEnabled(true);
 					}
 					break;
+// fau: testGradingMessage - get mark messages from XML
+				case "mark_tst_passed":
+					$this->setMarkTstPassed($metadata["entry"]);
+					break;
+				case "mark_tst_failed":
+					$this->setMarkTstFailed($metadata["entry"]);
+					break;
+// fau.
 				case "enable_examview":
 					$this->setEnableExamview($metadata["entry"]);
 					break;
@@ -6843,6 +6947,18 @@ function getAnswerFeedbackPoints()
 		}
 		$a_xml_writer->xmlEndTag("qtimetadata");
 
+// fau: testGradingMessage - write mark messages to XML
+		$a_xml_writer->xmlStartTag("qtimetadatafield");
+		$a_xml_writer->xmlElement("fieldlabel", NULL, "mark_tst_passed");
+		$a_xml_writer->xmlElement("fieldentry", NULL, $this->getMarkTstPassed());
+		$a_xml_writer->xmlEndTag("qtimetadatafield");
+
+		$a_xml_writer->xmlStartTag("qtimetadatafield");
+		$a_xml_writer->xmlElement("fieldlabel", NULL, "mark_tst_failed");
+		$a_xml_writer->xmlElement("fieldentry", NULL, $this->getMarkTstFailed());
+		$a_xml_writer->xmlEndTag("qtimetadatafield");
+// fau.
+
 		// add qti objectives
 		$a_xml_writer->xmlStartTag("objectives");
 		$this->addQTIMaterial($a_xml_writer, $this->getIntroduction());
@@ -7458,6 +7574,10 @@ function getAnswerFeedbackPoints()
 		$newObj->setIntroductionEnabled($this->isIntroductionEnabled());
 		$newObj->setIntroduction($this->getIntroduction());
 		$newObj->setFinalStatement($this->getFinalStatement());
+// fau: testGradingMessage - clone mark messages
+		$newObj->setMarkTstPassed($this->getMarkTstPassed());
+		$newObj->setMarkTstFailed($this->getMarkTstFailed());
+// fau.
 		$newObj->setShowInfo($this->getShowInfo());
 		$newObj->setForceJS($this->getForceJS());
 		$newObj->setCustomStyle($this->getCustomStyle());
@@ -7513,6 +7633,9 @@ function getAnswerFeedbackPoints()
 		$newObj->setOfferingQuestionHintsEnabled($this->isOfferingQuestionHintsEnabled());
 		$newObj->setSpecificAnswerFeedback($this->getSpecificAnswerFeedback());
 		$newObj->setObligationsEnabled($this->areObligationsEnabled());
+// fau: copyShowGradingStatus -copy the setting for showing the grading status
+		$newObj->setShowGradingStatusEnabled($this->isShowGradingStatusEnabled());
+// fau.
 		$newObj->saveToDb();
 		
 		// clone certificate
@@ -12076,7 +12199,12 @@ function getAnswerFeedbackPoints()
 		$ilDB = $DIC['ilDB'];
 
 		$times = array();
-		$result = $ilDB->query("SELECT tst_times.active_fi, tst_times.started FROM tst_times, tst_active WHERE tst_times.active_fi = tst_active.active_id ORDER BY tst_times.tstamp DESC");
+		// fim: [bugfix] add get starting times only for this test object
+		$result = $ilDB->queryF("SELECT tst_times.active_fi, tst_times.started FROM tst_times, tst_active WHERE tst_times.active_fi = tst_active.active_id AND tst_active.test_fi = %s ORDER BY tst_times.tstamp DESC",
+			array('integer'),
+			array($this->getTestId())
+		);
+		// fim.
 		while ($row = $ilDB->fetchAssoc($result))
 		{
 			$times[$row['active_fi']] = $row['started'];

@@ -129,6 +129,14 @@ class ilObject
 	var $add_dots;
 
 
+    // fim: [cust] variable for meta data identifiers
+	/**
+	 * Storage of meta data identifiers
+	 * @var array|null		catalog => entry
+	 */
+	protected $metaIdentifiers;
+	// fim.
+
 	/**
 	* Constructor
 	* @access	public
@@ -1004,6 +1012,84 @@ class ilObject
 		}
 	}
 
+
+	/**
+	 * fim: [soap] get all untrashed objects for an import id
+	 *
+	 * @param   string		import id
+	 * @param	string		matching mode ('exact', 'like', 'ilike')
+	 *						exact:	exact matching
+	 *						like:	pattern matching with % and _
+	 *						ilike:	case insensitive pattern matching
+	 * @return   array		arrays of object data (ref_id, obj_id, title, ...)
+	*/
+	static function _getUntrashedObjectsForImportId($a_import_id, $a_matching = 'exact')
+	{
+	    global $ilDB;
+
+		switch($a_matching)
+		{
+			case 'like':
+				$cond = $ilDB->like('d.import_id', 'text', $a_import_id, false);
+				break;
+
+			case 'ilike':
+				$cond = $ilDB->like('d.import_id', 'text', $a_import_id, true);
+				break;
+
+			case 'exact':
+			default:
+				$cond = 'd.import_id = '.$ilDB->quote($a_import_id, "text");
+				break;
+		}
+
+		$q = "SELECT r.ref_id, d.* "
+			." FROM object_data d "
+			." INNER JOIN object_reference r ON d.obj_id = r.obj_id "
+            ." INNER JOIN tree t ON r.ref_id = t.child "
+			." WHERE " . $cond
+			." AND t.tree = 1 "
+			." ORDER BY d.obj_id DESC";
+		$result = $ilDB->query($q);
+
+		$objects = array();
+		while ($row = $ilDB->fetchAssoc($result))
+		{
+			$objects[] = $row;
+		}
+
+		return $objects;
+	}
+	// fim.
+
+
+	/**
+	* fim: [univis] get import id for object id
+	*
+	* @param	int		$a_object_id		object id
+	* @return	string	id                  import_id
+	*/
+	public static function _getImportIdForObjectId($a_obj_id)
+	{
+		global $ilDB;
+
+		$ilDB->setLimit(1,0);
+		$q = "SELECT import_id FROM object_data WHERE obj_id = ".$ilDB->quote($a_obj_id, "integer").
+			" ORDER BY create_date DESC";
+		$obj_set = $ilDB->query($q);
+
+		if ($obj_rec = $ilDB->fetchAssoc($obj_set))
+		{
+			return $obj_rec["import_id"];
+		}
+		else
+		{
+			return '';
+		}
+	}
+	// fim.
+
+
 	/**
 	* get all reference ids of object
 	*
@@ -1643,6 +1729,13 @@ class ilObject
 			include_once("Services/Tracking/classes/class.ilLPObjSettings.php");
 			ilLPObjSettings::_deleteByObjId($this->getId());
 
+// fau: relativeLink - delete relative link if last reference is deleted
+			if ($this->referenced)
+			{
+				require_once("./Services/RelativeLink/classes/class.ilRelativeLink.php");
+				ilRelativeLink::deleteLink(ilRelativeLink::TYPE_REP_OBJECT, $this->getId());
+			}
+// fau.
 			$remove = true;
 		}
 		else
@@ -1839,7 +1932,7 @@ class ilObject
 	 * This method should renamed. Currently used in ilObjsurvey and ilObjTest
 	 * @deprecated since version 5.2
 	 * @static
-	 * 
+	 *
 	 * @param array $a_ref_ids
 	 * @param string $new_type
 	 * @param bool $show_path
@@ -1954,6 +2047,11 @@ class ilObject
 				// copy local roles
 				$rbacadmin->copyLocalRoles($this->getRefId(),$new_obj->getRefId());
 			}
+
+// fau: relativeLink - clone relative link
+		require_once("./Services/RelativeLink/classes/class.ilRelativeLink.php");
+		ilRelativeLink::cloneLink(ilRelativeLink::TYPE_REP_OBJECT, $this->getId(), $new_obj->getId());
+// fau.
 		}
 		else
 		{
@@ -2118,7 +2216,9 @@ class ilObject
 			$customIconFactory = $DIC['object.customicons.factory'];
 			$customIcon = $customIconFactory->getPresenterByObjId((int)$a_obj_id, (string)$a_type);
 			if ($customIcon->exists()) {
+// fau: legacyIcons - todo: add $a_size as parameter
 				$filename = $customIcon->getFullPath();
+// fau.
 				return $filename . '?tmp=' . filemtime($filename);
 			}
 		}
@@ -2351,7 +2451,31 @@ class ilObject
 		$rec  = $ilDB->fetchAssoc($set);
 		return $rec["create_date"];
 	}
-		
+
+
+
+	/**
+	 * fim: [cust] get a catalog entry from the meta data
+	 *
+	 * @param	string 	catalog name
+	 * @return	string	catalog entry
+	 */
+	function getMetaIdentifier($catalog)
+	{
+		if (!isset($this->metaIdentifiers))
+		{
+			$this->metaIdentifiers = array();
+			require_once("./Services/MetaData/classes/class.ilMDIdentifier.php");
+			$entries = ilMDIdentifier::_getEntriesForRbacObj($this->getId());
+			foreach ($entries as $entry)
+			{
+				$this->metaIdentifiers[$entry['catalog']] = $entry['entry'];
+			}
+		}
+		return $this->metaIdentifiers[$catalog];
+	}
+	// fim.
+
 	/**
 	 * Check if auto rating is active for parent group/course
 	 * 

@@ -129,6 +129,12 @@ class ilObjSurveyGUI extends ilObjectGUI
 		$next_class = $this->ctrl->getNextClass($this);
 		$this->ctrl->setReturn($this, "properties");
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation("output", "survey.css", "Modules/Survey"), "screen");
+// fau: surveyAsForm - activate a special css for the form mode
+		if ($this->object->getMetaIdentifier('FormMode'))
+		{
+			$this->tpl->addCustomCss(ilUtil::getStyleSheetLocation("output", "survey_form.css", "Modules/Survey"), "screen");
+		}
+// fau.
 		$this->prepareOutput();
 
 		$this->log->debug("next_class= $next_class");
@@ -788,6 +794,8 @@ class ilObjSurveyGUI extends ilObjectGUI
 							if(!$hide_codes || !$hide_anon)
 							{
 								$current = $this->object->getAnonymize();
+// fau: surveyCaptcha - save the captcha option for anonymization
+								$captcha = (bool)$_POST["captcha"];
 
 								// get current setting if property is hidden
 								if(!$hide_codes)
@@ -812,7 +820,11 @@ class ilObjSurveyGUI extends ilObjectGUI
 								// parse incoming values
 								if (!$anon)
 								{
-									if (!$codes)
+									if ($captcha)
+									{
+										$this->object->setAnonymize(ilObjSurvey::ANONYMIZE_CAPTCHA);
+									}
+									elseif (!$codes)
 									{
 										$this->object->setAnonymize(ilObjSurvey::ANONYMIZE_OFF);
 									}
@@ -823,7 +835,11 @@ class ilObjSurveyGUI extends ilObjectGUI
 								}
 								else
 								{
-									if ($codes)
+									if ($captcha)
+									{
+										$this->object->setAnonymize(ilObjSurvey::ANONYMIZE_CAPTCHA);
+									}
+									elseif ($codes)
 									{
 										$this->object->setAnonymize(ilObjSurvey::ANONYMIZE_ON);
 									}
@@ -834,7 +850,7 @@ class ilObjSurveyGUI extends ilObjectGUI
 
 									$this->object->setAnonymousUserList($_POST["anon_list"]);
 								}
-
+// fau.
 								// if settings were changed get rid of existing code
 								unset($_SESSION["anonymous_id"][$this->object->getId()]);
 							}
@@ -1068,7 +1084,14 @@ class ilObjSurveyGUI extends ilObjectGUI
 			if (ilObjSurvey::_hasDatasets($this->object->getSurveyId()))
 			{
 				$codes->setDisabled(true);				
-			}			
+			}
+
+// fau: surveyCaptcha - add captcha option to anonymizations
+			$captcha = new ilCheckboxInputGUI($this->lng->txt("anonymize_with_captcha"), "captcha");
+			$captcha->setInfo($this->lng->txt("anonymize_with_captcha_info"));
+			$captcha->setChecked($this->object->getAnonymize() == ilObjSurvey::ANONYMIZE_CAPTCHA);
+			$form->addItem($captcha);
+// fau.
 		}
 		
 		
@@ -1099,12 +1122,12 @@ class ilObjSurveyGUI extends ilObjectGUI
 		$mail_confirm = new ilCheckboxInputGUI($this->lng->txt("svy_results_mail_confirm"), "mail_confirm");
 		$mail_confirm->setInfo($this->lng->txt("svy_results_mail_confirm_info"));
 		$mail_confirm->setChecked($this->object->hasMailConfirmation());
-		$form->addItem($mail_confirm);		
+		$form->addItem($mail_confirm);
 
 			$mail_own = new ilCheckboxInputGUI($this->lng->txt("svy_results_mail_own"), "mail_own");
 			$mail_own->setInfo($this->lng->txt("svy_results_mail_own_info"));
 			$mail_own->setChecked($this->object->hasMailOwnResults());
-			$mail_confirm->addSubItem($mail_own);		
+			$mail_confirm->addSubItem($mail_own);
 		
 		// final statement
 		$finalstatement = new ilTextAreaInputGUI($this->lng->txt("outro"), "outro");
@@ -1715,6 +1738,10 @@ class ilObjSurveyGUI extends ilObjectGUI
 				$this->tpl->setVariable("TXT_TEMPLATE", $this->lng->txt("svy_settings_template"));
 				$this->tpl->parseCurrentBlock();
 			}
+
+			// fim: [help] add create info
+			$this->showTypeHelptext();
+			// fim.
 		}
 		
 		// display form to correct errors
@@ -1879,7 +1906,10 @@ class ilObjSurveyGUI extends ilObjectGUI
 
 		// already finished?
 		if(!$this->object->get360Mode() &&
-				($survey_started === 1 &&											// survey finished
+				($survey_started === 1 && // survey finished
+// fau: surveyAsForm - allow to take multiple times
+                 !$this->object->isAllowedToTakeMultipleSurveys() &&
+// fau.
 				!(!$this->object->isAccessibleWithoutCode() && !$anonymous_code && $ilUser->getId() == ANONYMOUS_USER_ID)))	// not code accessible an no anonymous code and anonymous user (see #0020333)
 		{
 			ilUtil::sendInfo($this->lng->txt("already_completed_survey"));
@@ -1969,7 +1999,13 @@ class ilObjSurveyGUI extends ilObjectGUI
 					elseif ($survey_started === FALSE)
 					{
 						$big_button = array("start", $this->lng->txt("start_survey"));
-					}																
+					}
+// fau: surveyAsForm - show start button if survey is finished
+					elseif ($this->object->isAllowedToTakeMultipleSurveys())
+                    {
+                        $big_button = array("start", $this->lng->txt("start_survey"));
+                    }
+// fau.
 				}
 				// 360°
 				else
@@ -2080,18 +2116,55 @@ class ilObjSurveyGUI extends ilObjectGUI
 		}
 		
 		if($big_button)
-		{			
-			$ilToolbar->setFormAction($this->ctrl->getFormAction($output_gui, "infoScreen"));
-			
-			include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
-			$button = ilSubmitButton::getInstance();
-			$button->setCaption($big_button[1], false);
-			$button->setCommand($big_button[0]);
-			$button->setPrimary(true);
-			$ilToolbar->addButtonInstance($button);		
-			
-			$ilToolbar->setCloseFormTag(false);
-			$info->setOpenFormTag(false);
+		{
+// fau: surveyAsForm - rename the start button
+			if ($big_button[0] == 'start' and $this->object->getMetaIdentifier('StartButton'))
+			{
+				$big_button[1] =  $this->object->getMetaIdentifier('StartButton');
+			}
+// fau.
+
+// fau: surveyCaptcha - generate captcha
+			if ($this->object->getAnonymize() == ilObjSurvey::ANONYMIZE_CAPTCHA and $ilUser->getId() == ANONYMOUS_USER_ID)
+			{
+				global $lng;
+				$lng->loadLanguageModule('cptch');
+
+				include_once("./Services/Captcha/classes/class.ilSecurImageUtil.php");
+				$tpl = new ilTemplate("tpl.prop_captchainput.html", true, true, "Services/Captcha");
+				$tpl->setVariable("IMAGE_SCRIPT", ilSecurImageUtil::getImageScript());
+				$tpl->setVariable("POST_VAR", "captcha");
+				$tpl->setVariable('CAPTCHA_ID', "captcha");
+				$tpl->setVariable('AUDIO_SCRIPT', ilSecurImageUtil::getAudioScript());
+				$tpl->setVariable('SRC_RELOAD', ilSecurImageUtil::getDirectory() . '/images/refresh.png');
+
+				$tpl->setVariable('TXT_CAPTCHA_ALT', $lng->txt('captcha_alt_txt'));
+				$tpl->setVariable('TXT_RELOAD', $lng->txt('captcha_code_reload'));
+				$tpl->setVariable('TXT_CAPTCHA_AUDIO_TITLE', $lng->txt('captcha_audio_title'));
+				$tpl->setVariable('TXT_CONSTR_PROP', $lng->txt('cont_constrain_proportions'));
+				$tpl->setVariable('TXT_CAPTCHA_INFO', $lng->txt('captcha_code_info'));
+
+
+				$info->setFormAction($this->ctrl->getFormAction($output_gui, "infoScreen"));
+				$captcha_submit =
+					$tpl->get()
+					.'<p><input type="submit" class="btn btn-primary" name="cmd['.$big_button[0].']" value="'.$big_button[1].'" /></p><hr />';
+			}
+			else
+			{
+				$ilToolbar->setFormAction($this->ctrl->getFormAction($output_gui, "infoScreen"));
+
+				include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
+				$button = ilSubmitButton::getInstance();
+				$button->setCaption($big_button[1], false);
+				$button->setCommand($big_button[0]);
+				$button->setPrimary(true);
+				$ilToolbar->addButtonInstance($button);
+
+				$ilToolbar->setCloseFormTag(false);
+				$info->setOpenFormTag(false);
+			}
+// fau.
 		}
 		/* #12016
 		else
@@ -2099,19 +2172,21 @@ class ilObjSurveyGUI extends ilObjectGUI
 			$info->setFormAction($this->ctrl->getFormAction($output_gui, "infoScreen"));
 		}
 		*/
-		
+
+// fau: surveyCaptcha - include captcha
 		if (strlen($this->object->getIntroduction()))
 		{
 			$introduction = $this->object->getIntroduction();
 			$info->addSection($this->lng->txt("introduction"));
 			$info->addProperty("", $this->object->prepareTextareaOutput($introduction).
-				"<br />".$info->getHiddenToggleButton());
+				$captcha_submit."<br />".$info->getHiddenToggleButton());
 		}
 		else
 		{
 			$info->addSection("");
-			$info->addProperty("", $info->getHiddenToggleButton());
+			$info->addProperty("", $captcha_submit.$info->getHiddenToggleButton());
 		}
+// fau.
 
 		$info->hideFurtherSections(false);
 						
@@ -2501,11 +2576,11 @@ class ilObjSurveyGUI extends ilObjectGUI
 	{
 		$access = $GLOBALS['DIC']->access();
 		return $access->checkRbacOrPositionPermissionAccess(
-			$a_rbac_permission, 
-			$a_position_permission, 
+			$a_rbac_permission,
+			$a_position_permission,
 			$this->object->getRefId()
 		);
 	}
-} 
+}
 
 ?>

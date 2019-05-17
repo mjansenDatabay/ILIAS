@@ -88,6 +88,12 @@ class ilTestScoring
 					$this->recalculatePasses( $userdata, $active_id );
 				}
 				assQuestion::_updateTestResultCache($active_id);
+
+// fau: provideRecalc - also update the learning progress
+				/** @var  ilTestEvaluationUserData $userdata */
+				include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
+				ilLPStatusWrapper::_updateStatus($this->test->getId(), $userdata->getUserID());
+// fau.
 			}
 		}
 	}
@@ -105,6 +111,9 @@ class ilTestScoring
 			{
 				$this->recalculatePass( $passdata, $active_id, $pass );
 				$this->addRecalculatedPassByActive($active_id, $pass);
+// fau: provideRecalc - always update the test pass result (manual scoring may be refreshed)
+				assQuestion::_updateTestPassResults($active_id, $pass, true);
+// fau.
 			}
 		}
 	}

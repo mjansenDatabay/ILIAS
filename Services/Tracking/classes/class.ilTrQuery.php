@@ -276,7 +276,6 @@ class ilTrQuery
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		
 		$fields = array("usr_data.usr_id", "login", "active");
 		$udf = self::buildColumns($fields, $a_additional_fields);
 		
@@ -398,6 +397,11 @@ class ilTrQuery
 			unset($all_public);
 		}
 
+		// fim: [studydata] include studydata class
+		require_once('Services/StudyData/classes/class.ilStudyData.php');
+		// fim.
+
+
 		foreach($a_result["set"] as $idx => $row)
 		{
 			// add udf data
@@ -405,6 +409,13 @@ class ilTrQuery
 			{
 				$a_result["set"][$idx] = $row = array_merge($row, $udf[$row["usr_id"]]);
 			}
+
+			// fim: [studydata] get studydata if allowed
+			if (!$check_agreement or in_array($row["usr_id"], $agreements))
+			{
+				$a_result["set"][$idx]['studydata'] = ilStudyData::_getStudyDataText($row["usr_id"]);
+			}
+			// fim.
 
 			// remove all private data - if active agreement and agreement not given by user
 			if(sizeof($a_privacy_fields) && $a_check_agreement && !in_array($row["usr_id"], $agreements))
@@ -1255,6 +1266,11 @@ class ilTrQuery
 
 					switch($field)
 					{
+						// fim: [studydata] don't get the studydata directly from user table
+						case "studydata":
+							break;
+						// fim.
+
 						case 'org_units':
 							break;
 						
@@ -1843,7 +1859,6 @@ class ilTrQuery
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		
 		$res = array();
 		
 		// blogs in workspace?
@@ -1872,7 +1887,6 @@ class ilTrQuery
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		
 		$res = array();
 		
 		$sql = "SELECT od.obj_id".

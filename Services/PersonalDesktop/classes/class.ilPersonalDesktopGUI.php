@@ -644,7 +644,8 @@ class ilPersonalDesktopGUI
 			$this->ctrl->redirectByClass("ilportfoliorepositorygui", $cmd);
 		}
 	}
-	
+
+
 	/**
 	 * workaround for menu in calendar only
 	 */

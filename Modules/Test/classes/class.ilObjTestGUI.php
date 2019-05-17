@@ -551,7 +551,9 @@ class ilObjTestGUI extends ilObjectGUI
 
 				$page_gui->setHeader($question->getTitle());
 				$page_gui->setFileDownloadLink($this->ctrl->getLinkTarget($this, "downloadFile"));
-				$page_gui->setFullscreenLink($this->ctrl->getLinkTarget($this, "fullscreen"));
+                // fim: [bugfix] fix fullscreen link in question page view
+				// $page_gui->setFullscreenLink($this->ctrl->getLinkTarget($this, "fullscreen"));
+                // fim.
 				$page_gui->setSourcecodeDownloadScript($this->ctrl->getLinkTarget($this));
 				$page_gui->setPresentationTitle($question->getTitle() . ' ['. $this->lng->txt('question_id_short') . ': ' . $question->getId()  . ']');
 				$ret =& $this->ctrl->forwardCommand($page_gui);
@@ -590,7 +592,19 @@ class ilObjTestGUI extends ilObjectGUI
 				$forwarder->setTestObj($this->object);
 				$forwarder->forward();
 				break;
-				
+
+			// fim: [exam] handle commands for my campus
+			case 'iltestmycampusgui':
+				global $ilTabs;
+				$this->prepareOutput();
+				$ilTabs->activateTab('export');
+				include_once './Modules/Test/classes/class.ilTestMyCampusGUI.php';
+				$new_gui = new ilTestMyCampusGUI($this->object);
+				$this->ctrl->forwardCommand($new_gui);
+				break;
+			// fim.
+
+
 			case 'ilassspecfeedbackpagegui':
 				require_once "./Modules/TestQuestionPool/classes/feedback/class.ilAssSpecFeedbackPageGUI.php";
 				$pg_gui = new ilAssSpecFeedbackPageGUI((int) $_GET["feedback_id"]);
@@ -921,12 +935,15 @@ class ilObjTestGUI extends ilObjectGUI
 	*/
 	protected function importFileObject($parent_id = null, $a_catch_errors = true)
 	{
+		//fim: [bugfix] set new type parameter before form is initialized
+		$this->ctrl->setParameter($this, "new_type", $this->type);
 		$form = $this->initImportForm($_REQUEST["new_type"]);
 		if($form->checkInput())
 		{
 			$this->ctrl->setParameter($this, "new_type", $this->type);
 			$this->uploadTstObject();
 		}
+		// fim.
 
 		// display form to correct errors
 		$form->setValuesByPost();
@@ -1194,7 +1211,9 @@ class ilObjTestGUI extends ilObjectGUI
 		// create new questionpool object
 		$newObj = new ilObjTest(0, true);
 		// set type of questionpool object
-		$newObj->setType($_GET["new_type"]);
+		// fim: [bugfix] use the fixed type 'tst' for a new test
+		$newObj->setType('tst');
+		// fim.
 		// set title of questionpool object to "dummy"
 		$newObj->setTitle("dummy");
 		// set description of questionpool object
@@ -1273,12 +1292,23 @@ class ilObjTestGUI extends ilObjectGUI
 		
 		
 		// delete import directory
+		// fim: [bugfix] cleanup import subdirectory
+		unset($_SESSION["tst_import_subdir"]);
+		// fim.
 		ilUtil::delDir(ilObjTest::_getImportDirectory());
 
 		ilUtil::sendSuccess($this->lng->txt("object_imported"), true);
 		ilUtil::redirect("ilias.php?ref_id=".$newObj->getRefId()."&baseClass=ilObjTestGUI");
 	}
-	
+
+	// fim: [bugfix] cleanup import sub directoy
+	function cancelImportObject()
+	{
+		unset($_SESSION["qpl_import_subdir"]);
+		$this->cancelObject();
+	}
+	// fim.
+
 	/**
 	* display status information or report errors messages
 	* in case of error
@@ -2296,7 +2326,7 @@ class ilObjTestGUI extends ilObjectGUI
 		
 		$this->tpl->setCurrentBlock("adm_content");
 		$this->tpl->setVariable("ACTION_QUESTION_FORM", $this->ctrl->getFormAction($this));
-		$this->tpl->setVariable('QUESTIONBROWSER', $table_gui->getHTML());	
+		$this->tpl->setVariable('QUESTIONBROWSER', $table_gui->getHTML());
 		$this->tpl->parseCurrentBlock();
 	}
 	
@@ -2404,6 +2434,485 @@ class ilObjTestGUI extends ilObjectGUI
 		}
 		$this->ctrl->redirect($this, "participants");
 	}
+
+ /**
+	* Creates the output of the test participants
+	*
+	* @access	public
+	*/
+	function participantsObject()
+	{
+		global $ilAccess, $ilToolbar, $lng;
+		
+		$this->getParticipantsSubTabs();
+		
+		if (!$ilAccess->checkAccess("write", "", $this->ref_id)) 
+		{
+			// allow only write access
+			ilUtil::sendInfo($this->lng->txt("cannot_edit_test"), true);
+			$this->ctrl->redirect($this, "infoScreen");
+		}
+		
+		if( $this->testQuestionSetConfigFactory->getQuestionSetConfig()->areDepenciesBroken() )
+		{
+			ilUtil::sendFailure(
+					$this->testQuestionSetConfigFactory->getQuestionSetConfig()->getDepenciesBrokenMessage($this->lng)
+			);
+		}
+		elseif( $this->testQuestionSetConfigFactory->getQuestionSetConfig()->areDepenciesInVulnerableState() )
+		{
+			ilUtil::sendInfo(
+					$this->testQuestionSetConfigFactory->getQuestionSetConfig()->getDepenciesInVulnerableStateMessage($this->lng)
+			);
+		}
+
+		if ($this->object->getFixedParticipants())
+		{
+			// search button
+			include_once './Services/Search/classes/class.ilRepositorySearchGUI.php';
+			ilRepositorySearchGUI::fillAutoCompleteToolbar(
+				$this,
+				$ilToolbar,
+				array(
+					'auto_complete_name'	=> $lng->txt('user'),
+					'submit_name'			=> $lng->txt('add')
+				)
+			);
+
+			$ilToolbar->addSeparator();
+			$search_btn = ilLinkButton::getInstance();
+			$search_btn->setCaption('tst_search_users');
+			$search_btn->setUrl($this->ctrl->getLinkTargetByClass('ilRepositorySearchGUI','start'));
+			$ilToolbar->addButtonInstance($search_btn);
+			require_once  'Services/UIComponent/Button/classes/class.ilLinkButton.php';
+
+			$participants =& $this->object->getInvitedUsers();
+			// fim: [exam] show actual starting time instead of flag in particilants list
+			$times = $this->object->getStartingTimeOfParticipants();
+			// fim.
+			$rows = array();
+			$unfinished_passes = false;
+			foreach ($participants as $data)
+			{
+				$maxpass = $this->object->_getMaxPass($data["active_id"]);
+				if (!is_null($maxpass))
+				{
+					$maxpass += 1;
+				}
+				$access = "";
+				if (strlen($data["active_id"]))
+				{
+					$last_access = $this->object->_getLastAccess($data["active_id"]);
+					$access = $last_access;
+				}
+				$this->ctrl->setParameterByClass('iltestevaluationgui', 'active_id', $data['active_id']);
+				
+				if ($data['active_id'] == null) // if no active id is set, user is invitee not participant...
+				{
+					if ( strlen($data["firstname"].$data["lastname"]) == 0 )
+					{
+						$fullname = $lng->txt("deleted_user");
+					}
+					else if($this->object->getAnonymity())
+					{
+					 	$fullname = $lng->txt('anonymous');
+					}
+					else
+					{
+						$fullname = trim($data["lastname"] . ", " . $data["firstname"] . " " . $data["title"]);
+					}
+				} else {
+					include_once "./Modules/Test/classes/class.ilObjTestAccess.php";
+					$fullname = ilObjTestAccess::_getParticipantData($data['active_id']);
+				}
+				
+				$unfinished_pass_data = 0;
+				if($data["unfinished_passes"] == 1)
+				{
+					$unfinished_pass_data = 1;
+					$unfinished_passes = true;
+				}
+				
+				array_push($rows, array(
+					'usr_id' => $data["usr_id"],
+					'active_id' => $data['active_id'],
+					'login' => $data["login"],
+					'clientip' => $data["clientip"],
+					'firstname' => $data["firstname"],
+					'lastname' => $data["lastname"],
+					'name' => $fullname,
+					// fim: [exam] show actual starting time instead of flag in particilants list
+					'started' => $times[$data["active_id"]],
+					// fim.
+					'unfinished' => $unfinished_pass_data,
+					'finished' => ($data["test_finished"] == 1) ? 1 : 0,
+					'access' => $access,
+					'maxpass' => $maxpass,
+					'result' => $this->ctrl->getLinkTargetByClass('iltestevaluationgui', 'outParticipantsResultsOverview'),
+					'finish_link' => $this->ctrl->getLinkTargetByClass('iltestevaluationgui', 'finishTestPassForSingleUser')
+				));
+			}
+			include_once "./Modules/Test/classes/tables/class.ilTestFixedParticipantsTableGUI.php";
+			$table_gui = new ilTestFixedParticipantsTableGUI( $this, 'participants',
+					$this->testQuestionSetConfigFactory->getQuestionSetConfig()->areDepenciesBroken(),
+					$this->object->getAnonymity(), count($rows)
+			);
+			$table_gui->setFilterCommand('fpSetFilter');
+			$table_gui->setResetCommand('fpResetFiler');
+			$rows = $this->applyFilterCriteria($rows);
+			$table_gui->setData($rows);
+			$this->tpl->setVariable('ADM_CONTENT', $table_gui->getHTML());
+
+			if(count($rows) > 0)
+			{
+				$ilToolbar->addSeparator();
+				$delete_all_results_btn = ilLinkButton::getInstance();
+				$delete_all_results_btn->setCaption('delete_all_user_data');
+				$delete_all_results_btn->setUrl($this->ctrl->getLinkTarget($this, 'deleteAllUserResults'));
+				$ilToolbar->addButtonInstance($delete_all_results_btn);
+			}
+			$this->addFinishAllPassesButton($unfinished_passes, $ilToolbar);
+		}
+		else
+		{
+			$participants =& $this->object->getTestParticipants();
+			// fim: [exam] show actual starting time instead of flag in particilants list
+			$times = $this->object->getStartingTimeOfParticipants();
+			// fim.
+			$rows = array();
+			$unfinished_passes = false;
+
+			foreach ($participants as $data)
+			{
+				$maxpass = $this->object->_getMaxPass($data["active_id"]);
+				if (!is_null($maxpass))
+				{
+					$maxpass += 1;
+				}
+				$access = "";
+				if (strlen($data["active_id"]))
+				{
+					$last_access = $this->object->_getLastAccess($data["active_id"]);
+					$access = $last_access;
+				}
+				$this->ctrl->setParameterByClass('iltestevaluationgui', 'active_id', $data['active_id']);
+
+				$unfinished_pass_data = 0;
+				if($data["unfinished_passes"] == 1)
+				{
+					$unfinished_pass_data = 1;
+					$unfinished_passes = true;
+				}
+				
+				include_once "./Modules/Test/classes/class.ilObjTestAccess.php";
+				$fullname = ilObjTestAccess::_getParticipantData($data['active_id']);
+				array_push($rows, array(
+					'usr_id' 		=> $data["active_id"],
+					'active_id'		=> $data['active_id'],
+					'login'			=> $data["login"],
+					'name'			=> $fullname,
+					'firstname'		=> $data["firstname"],
+					'lastname'		=> $data["lastname"],
+					// fim: [exam] show actual starting time instead of flag in particilants list
+					'started'		=> $times[$data["active_id"]],
+					// fim.
+					'unfinished'	=> $unfinished_pass_data,
+					'finished'		=> ($data["test_finished"] == 1) ? 1 : 0,
+					'access'		=> $access,
+					'maxpass'		=> $maxpass,
+					'result'		=> $this->ctrl->getLinkTargetByClass('iltestevaluationgui', 'outParticipantsResultsOverview'),
+					'finish_link'	=> $this->ctrl->getLinkTargetByClass('iltestevaluationgui', 'finishTestPassForSingleUser')
+				));
+			}
+			include_once "./Modules/Test/classes/tables/class.ilTestParticipantsTableGUI.php";
+			$table_gui = new ilTestParticipantsTableGUI( $this, 'participants',
+					$this->testQuestionSetConfigFactory->getQuestionSetConfig()->areDepenciesBroken(),
+					$this->object->getAnonymity(), count($rows)
+			);
+
+			if(count($rows) > 0)
+			{
+				require_once  'Services/UIComponent/Button/classes/class.ilLinkButton.php';
+				$delete_all_results_btn = ilLinkButton::getInstance();
+				$delete_all_results_btn->setCaption('delete_all_user_data');
+				$delete_all_results_btn->setUrl($this->ctrl->getLinkTarget($this, 'deleteAllUserResults'));
+				$ilToolbar->addStickyItem($delete_all_results_btn);
+			}
+
+			$this->addFinishAllPassesButton($unfinished_passes, $ilToolbar);
+
+			$table_gui->setFilterCommand('npSetFilter');
+			$table_gui->setResetCommand('npResetFilter');
+			$rows = $this->applyFilterCriteria($rows);
+			$table_gui->setData($rows);
+			$this->tpl->setVariable('ADM_CONTENT', $table_gui->getHTML());
+		}
+	}
+	
+	public function timingOverviewObject()
+	{
+		$this->getParticipantsSubTabs();
+
+		include_once "./Modules/Test/classes/tables/class.ilTimingOverviewTableGUI.php";
+		$table_gui = new ilTimingOverviewTableGUI($this, 'timingOverview');
+		
+		$participants =& $this->object->getTestParticipants();#
+		$times = $this->object->getStartingTimeOfParticipants();
+		$addons = $this->object->getTimeExtensionsOfParticipants();
+
+		$tbl_data = array();
+		foreach ($participants as $participant)
+		{
+			// fim: [exam] show only particioants with additional
+			if ($addons[$participant['active_id']] <= 0)
+			{
+				continue;
+			}
+			// fim.
+
+			$tblRow = array();
+			
+			$started = "";
+			if ($times[$participant['active_id']])
+			{
+				$started = $this->lng->txt('tst_started').': '.ilDatePresentation::formatDate(new ilDateTime($times[$participant['active_id']], IL_CAL_DATETIME));
+				$tblRow['started'] = $started;
+			}
+			else
+			{
+				$tblRow['started'] = '';
+			}
+			
+			if ($addons[$participant['active_id']] > 0)
+			{
+				$tblRow['extratime'] = $addons[$participant['active_id']];
+			}
+
+			$tblRow['login'] = $participant['login'];
+
+			if ($this->object->getAnonymity())
+			{
+				$tblRow['name'] = $this->lng->txt("anonymous");
+			}
+			else
+			{
+				$tblRow['name'] = $participant['lastname'] . ', ' . $participant['firstname'];
+			}
+
+			$tbl_data[] = $tblRow;
+		}
+		$table_gui->setData($tbl_data);
+		
+		$this->tpl->setContent($table_gui->getHTML());
+	}
+	
+
+
+
+// fau: sendSimpleResults - new function sendSimpleResultsToParticipantsObject()
+	/**
+	* Show confirmation screen to send the results messages to the participants as e-mail
+	 */
+	function sendSimpleResultsToParticipantsObject()
+	{
+		global $ilDB;
+
+		if (count($_POST["chbUser"]) == 0)
+		{
+			ilUtil::sendInfo($this->lng->txt("select_one_user"), TRUE);
+			$this->ctrl->redirect($this, "participants");
+		}
+
+		include_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+        $c_gui = new ilConfirmationGUI();
+        $c_gui->setFormAction($this->ctrl->getFormAction($this));
+        $c_gui->setHeaderText($this->lng->txt('send_simple_results_to_participants_confirm'));
+        $c_gui->setCancel($this->lng->txt('cancel'), 'participants');
+        $c_gui->setConfirm($this->lng->txt('confirm'), 'sendSimpleResultsToParticipantsConfirmed');
+
+        include_once('Modules/Test/classes/class.ilTestParticipantData.php');
+        $parData = new ilTestParticipantData($ilDB, $this->lng);
+        $parData->load($this->object->getTestId());
+
+        foreach ($_POST["chbUser"] as $active_id)
+		{
+			if ($this->object->getFixedParticipants())
+			{
+				$active_id = $parData->getActiveIdByUserId($active_id);
+			}
+			$uname = $parData->getFormatedFullnameByActiveId($active_id);
+			$c_gui->addItem('chbUser[]', $active_id, $uname);
+	    }
+
+		$this->tpl->setVariable("ADM_CONTENT", $c_gui->getHTML());
+
+       	return true;
+	}
+// fau.
+
+// fau: sendSimpleResults - new function confirmSimpleResultsToParticipants()
+	/**
+	 * Actually send the result messages to the participants (confirmation is done)
+	 * The e-mails are not sent directly but distributes via SOAP function of a confighred installation
+	 * This allows to send the e-mails from the exam instance and distribute them in the lms instance
+	 * Students will get the e-mail in ilias if haven't configured a forwarding
+	*/
+	function sendSimpleResultsToParticipantsConfirmedObject()
+	{
+	    global $ilDB, $lng;
+
+		if (count($_POST["chbUser"]) == 0)
+		{
+			ilUtil::sendInfo($this->lng->txt("select_one_user"), TRUE);
+			$this->ctrl->redirect($this, "participants");
+		}
+
+		// init remote notification
+		if (ilCust::get('tst_notify_remote'))
+		{
+			include_once 'Services/WebServices/SOAP/classes/class.ilRemoteIliasClient.php';
+			$soap_client = ilRemoteIliasClient::_getInstance();
+			if (!$soap_sid = $soap_client->login())
+			{
+				ilUtil::sendInfo($this->lng->txt("ilias_remote_soap_login_failed"), TRUE);
+				$this->ctrl->redirect($this, "participants");
+			}
+	    }
+
+		$parData = new ilTestParticipantData($ilDB, $this->lng);
+		$parData->load($this->object->getTestId());
+
+		$sent = array();
+		$failed = array();
+        foreach ($_POST["chbUser"] as $key => $active_id)
+		{
+			$user_id = $parData->getUserIdByActiveId($active_id);
+			$uname = $parData->getFormatedFullnameByActiveId($active_id);
+			$user = new ilObjUser($user_id);
+
+			$gradingMessageBuilder = new ilTestGradingMessageBuilder($lng, $this->object);
+			$gradingMessageBuilder->setActiveId($active_id);
+			$gradingMessageBuilder->buildMessage();
+			$message = $gradingMessageBuilder->buildGradingMarkMsg();
+
+            // create a new factory because the session is a sigleton in it
+            $factory = new ilTestSessionFactory($this->object);
+            $session = $factory->getSession($active_id);
+			$timestamp = $session->getSubmittedTimestamp();
+			if (!$timestamp)
+			{
+				$timestamp = $this->object->_getLastAccess($active_id);
+			}
+			$time = strftime("%d.%m.%Y %H:%M",ilUtil::date_mysql2time($timestamp));
+
+			$subject = sprintf(str_replace('\n', "\n", $lng->txt('send_simple_results_subject')),
+						$this->object->getTitle(),
+						$time);
+
+			// make breaks to newlines
+			$message = str_replace('<br />', "\n", $message);
+			$message = preg_replace('/<a.*href="([^"]*)".*>(.*)<\/a>/','$2 ($1)', $message);
+			$message = strip_tags($message);
+			$message = htmlspecialchars_decode($message, ENT_QUOTES);
+
+			$body = sprintf(str_replace('\n', "\n", $lng->txt('send_simple_results_body')),
+						$message,
+                        $uname,
+						$user->getMatriculation(),
+						$time);
+
+			if (ilCust::get('tst_notify_remote'))
+			{
+	            // send as mail in remote platform
+
+				$success = $soap_client->call('sendUserMail', array (
+					$soap_sid,				// session id
+					$user->getLogin(),      // to
+					"",                     // cc
+					"",                     // bcc
+					"anonymous",    		// sender
+					$subject,               // subject
+					$body,                  // message
+					"",                     // attachments (imploded with ',')
+					"system",               // type (imploded with ',')
+					0                       // use placholders
+				));
+
+				if (!$success)
+				{
+					if ($user->getEmail())
+					{
+						$success = $soap_client->call('sendUserMail', array (
+							$soap_sid,				// session id
+							$user->getEmail(),      // to
+							"",                     // cc
+							"",                     // bcc
+							"anonymous",    		// sender
+							$subject,               // subject
+							$body,                  // message
+							"",                     // attachments (imploded with ',')
+							"system",               // type (imploded with ',')
+							0                       // use placholders
+						));
+
+					}
+				}
+
+				if ($success)
+				{
+	                $sent[] = $uname;
+				}
+				else
+				{
+	                $failed[] = $uname;
+	            }
+			}
+			else
+			{
+				// send as mail in local platform
+				$mail = new ilMail(ANONYMOUS_USER_ID);
+				$error = $mail->sendMail(
+					$user->getLogin(), 		// to
+					"", 					// cc
+					"", 					// bcc
+					$subject, 				// subject
+					$body, 					// message
+					array(), 				// attachments
+					array('system') 		// type
+				);
+
+				if ($error)
+				{
+	                $failed[] = $uname;
+				}
+				else
+				{
+	                $sent[] = $uname;
+	            }
+			}
+		}
+
+		// close remote notification
+		if (ilCust::get('tst_notify_remote'))
+		{
+			$soap_client->logout();
+	    }
+
+		if (count($failed))
+		{
+	        ilUtil::sendFailure(sprintf($this->lng->txt("send_simple_results_to_participants_failed"),
+					implode(', ', $failed)), true);
+	    }
+		if (count($sent))
+		{
+	        ilUtil::sendSuccess(sprintf($this->lng->txt("send_simple_results_to_participants_success"),
+					implode(', ', $sent)), true);
+	    }
+
+		$this->ctrl->redirect($this, "participants");
+	}
+// fau.
+
 	
 	/**
 	* Print tab to create a print of all questions with points and solutions
@@ -2439,7 +2948,16 @@ class ilObjTestGUI extends ilObjectGUI
 			$template->parseCurrentBlock();
 
 			$template->setCurrentBlock("navigation_buttons");
-			$template->setVariable("BUTTON_PRINT", $this->lng->txt("print"));
+            // fim: [exam] add page breaks button
+            $this->ctrl->setParameter($this, "break", "none");
+            $template->setVariable("HREF_PRINT", $this->ctrl->getLinkTarget($this, "print"));
+            $template->setVariable("BUTTON_PRINT", $this->lng->txt("print"));
+
+            $this->ctrl->setParameter($this, "break", "questions");
+            $template->setVariable("HREF_PRINT_PAGEBREAKS", $this->ctrl->getLinkTarget($this, "print"));
+            $template->setVariable("BUTTON_PRINT_PAGEBREAKS", $this->lng->txt("print_pagebreaks"));
+            $this->ctrl->setParameter($this, "break", "");
+            // fim.
 			$template->parseCurrentBlock();
 		}
         // prepare generation before contents are processed (for mathjax)
@@ -2450,7 +2968,7 @@ class ilObjTestGUI extends ilObjectGUI
 
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation("output", "test_print.css", "Modules/Test"), "print");
 		
-		global $DIC;		
+		global $DIC;
 		$ilUser = $DIC['ilUser'];
 		$print_date = mktime(date("H"), date("i"), date("s"), date("m")  , date("d"), date("Y"));
 		$max_points= 0;
@@ -2469,6 +2987,12 @@ class ilObjTestGUI extends ilObjectGUI
 		foreach ($this->object->questions as $question) 
 		{		
 			$template->setCurrentBlock("question");
+			// fim: [exam] handle page breaks
+			if ($_GET['break'] == 'questions')
+			{
+				$template->setVariable("STYLE_PRINT_PAGEBREAKS", "page-break-before:always;");
+			}
+			// fim.
 			$question_gui = $this->object->createQuestionGUI("", $question);
 			
 			if( $isPdfDeliveryRequest )
@@ -2489,6 +3013,13 @@ class ilObjTestGUI extends ilObjectGUI
 			$counter ++;
 			$max_points += $question_gui->object->getMaximumPoints();
 		}
+
+		// fim: [exam] handle page breaks
+		if ($_GET['break'])
+		{
+			$template->touchBlock('print');
+		}
+		// fim.
 
 		$template->setVariable("TITLE", ilUtil::prepareFormOutput($this->object->getTitle()));
 		$template->setVariable("PRINT_TEST", ilUtil::prepareFormOutput($this->lng->txt("tst_print")));
@@ -2593,13 +3124,24 @@ class ilObjTestGUI extends ilObjectGUI
 			$template->parseCurrentBlock();
 
 			$template->setCurrentBlock("navigation_buttons");
+
+			// fim: [exam] add page breaks button
+			$this->ctrl->setParameter($this, "break", "none");
+			$template->setVariable("HREF_PRINT", $this->ctrl->getLinkTarget($this, "print"));
 			$template->setVariable("BUTTON_PRINT", $this->lng->txt("print"));
+
+			$this->ctrl->setParameter($this, "break", "questions");
+			$template->setVariable("HREF_PRINT_PAGEBREAKS", $this->ctrl->getLinkTarget($this, "print"));
+			$template->setVariable("BUTTON_PRINT_PAGEBREAKS", $this->lng->txt("print_pagebreaks"));
+			$this->ctrl->setParameter($this, "break", "");
+			// fim.
+
 			$template->parseCurrentBlock();
 			
 			
 			$this->tpl->setVariable("PRINT_CONTENT", $template->get());
 		}
-	}	
+	}
 
 	/**
 	 * Displays the settings page for test defaults
@@ -2924,7 +3466,9 @@ class ilObjTestGUI extends ilObjectGUI
 							{
 								$checked_previous_answers = TRUE;
 							}
-							$info->addPropertyCheckbox($this->lng->txt("tst_use_previous_answers"), "chb_use_previous_answers", 1, $this->lng->txt("tst_use_previous_answers_user"), $checked_previous_answers);
+// fau: adoptPreviousSolutions - new checkbox label on info screen
+							$info->addPropertyCheckbox($this->lng->txt("tst_use_previous_answers"), "chb_use_previous_answers", 1, $this->lng->txt("tst_use_previous_answers_authorized"), $checked_previous_answers);
+// fau.
 						}
 					}
 				}

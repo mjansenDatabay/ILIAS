@@ -244,25 +244,25 @@ class ilObjExercise extends ilObject
 	 	$new_obj->saveData();
 	 	$new_obj->setPassNr($this->getPassNr());
 	 	$new_obj->setShowSubmissions($this->getShowSubmissions());
-	 	$new_obj->setCompletionBySubmission($this->isCompletionBySubmissionEnabled());	 
+	 	$new_obj->setCompletionBySubmission($this->isCompletionBySubmissionEnabled());
 		$new_obj->setTutorFeedback($this->getTutorFeedback());
 		$new_obj->setCertificateVisibility($this->getCertificateVisibility());
 	 	$new_obj->update();
 
 		$new_obj->saveCertificateVisibility($this->getCertificateVisibility());
-	 	
+
 		// Copy criteria catalogues
 		$crit_cat_map = array();
 		include_once("./Modules/Exercise/classes/class.ilExcCriteriaCatalogue.php");
 		foreach(ilExcCriteriaCatalogue::getInstancesByParentId($this->getId()) as $crit_cat)
 		{
 			$new_id = $crit_cat->cloneObject($new_obj->getId());
-			$crit_cat_map[$crit_cat->getId()] = $new_id;			
+			$crit_cat_map[$crit_cat->getId()] = $new_id;
 		}
-			
+
 		// Copy assignments
 		include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-		ilExAssignment::cloneAssignmentsOfExercise($this->getId(), $new_obj->getId(), $crit_cat_map);	
+		ilExAssignment::cloneAssignmentsOfExercise($this->getId(), $new_obj->getId(), $crit_cat_map);
 		
 		// Copy learning progress settings
 		include_once('Services/Tracking/classes/class.ilLPObjSettings.php');
@@ -521,8 +521,14 @@ class ilObjExercise extends ilObject
 		{
 			$passed_all_mandatory = false;
 		}
-		
-		if ($this->getPassMode() != "nr")
+
+// fau: exManCalc - respect take existing status in "manual" mode
+		if ($this->getPassMode() == "man")
+		{
+			$overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
+		}
+		elseif ($this->getPassMode() != "nr")
+// fau.
 		{
 //echo "5";
 			$overall_stat = "notgraded";
@@ -604,6 +610,11 @@ class ilObjExercise extends ilObject
 	 */
 	function exportGradesExcel()
 	{
+
+// fau: exGradesExport - check whether matriculation can be exported
+		$full_data = ilCust::extendedUserDataAccess();
+// fau.
+
 		include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
 		$ass_data = ilExAssignment::getInstancesByExercise($this->getId());
 		
@@ -617,40 +628,60 @@ class ilObjExercise extends ilObject
 		//
 		
 		// header row
-		$row = $cnt = 1;
-		$excel->setCell($row, 0, $this->lng->txt("name"));		
+// fau: exGradesExport - add extra fields to header
+		$row = 1;
+		$col = 0;
+		$excel->setCell($row, $col++, $this->lng->txt("login"));
+		$excel->setCell($row, $col++, $this->lng->txt("name"));
+		if ($full_data)
+		{
+			$excel->setCell($row, $col++, $this->lng->txt("matriculation"));
+		}
+		$ass_cnt = 1;
 		foreach ($ass_data as $ass)
 		{
-			$excel->setCell($row, $cnt++, $cnt-1);		
+			$excel->setCell($row, $col++, $ass_cnt++);
 		}
-		$excel->setCell($row, $cnt++, $this->lng->txt("exc_total_exc"));
-		$excel->setCell($row, $cnt++, $this->lng->txt("exc_mark"));
-		$excel->setCell($row++, $cnt, $this->lng->txt("exc_comment_for_learner"));
-		$excel->setBold("A1:".$excel->getColumnCoord($cnt)."1");
+		$excel->setCell($row, $col++, $this->lng->txt("exc_total_exc"));
+		$excel->setCell($row, $col++, $this->lng->txt("exc_mark"));
+		$excel->setCell($row++, $col, $this->lng->txt("exc_comment_for_learner"));
+		$excel->setBold("A1:".$excel->getColumnCoord($col)."1");
+// fau.
 		
 		// data rows
 		$mem_obj = new ilExerciseMembers($this);
-		
+
 		$filtered_members = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
 			'etit_submissions_grades',
 			'edit_submissions_grades',
 			$this->getRefId(),
 			(array) $mem_obj->getMembers()
 		);
-		
+
 		foreach((array) $filtered_members as $user_id)
 		{
-			$mems[$user_id] = ilObjUser::_lookupName($user_id);
+// fau: exGradesExport - get all user fields
+			$mems[$user_id] = ilObjUser::_lookupFields($user_id);
+// fau.
 		}
 		$mems = ilUtil::sortArray($mems, "lastname", "asc", false, true);
-		
+
 		include_once 'Services/Tracking/classes/class.ilLPMarks.php';
 		foreach ($mems as $user_id => $d)
 		{
+// fau: exGradesExport - add extra fields to row
 			$col = 0;
 
+			// login
+			$excel->setCell($row, $col++, $d["login"]);
 			// name
 			$excel->setCell($row, $col++, $d["lastname"].", ".$d["firstname"]." [".$d["login"]."]");
+			// matriculation
+			if ($full_data)
+			{
+				$excel->setCell($row, $col++, $d["matriculation"]);
+			}
+// fau.
 
 			reset($ass_data);
 			foreach ($ass_data as $ass)
@@ -677,24 +708,44 @@ class ilObjExercise extends ilObject
 		$excel->addSheet($this->lng->txt("exc_mark"));
 		
 		// header row
-		$row = $cnt = 1;
-		$excel->setCell($row, 0, $this->lng->txt("name"));		
+// fau: exGradesExport -  add extra fields to header
+		$row = 1;
+		$cnt = 0;
+		$excel->setCell($row, $cnt++, $this->lng->txt("login"));
+		$excel->setCell($row, $cnt++, $this->lng->txt("name"));
+		if ($full_data)
+		{
+			$excel->setCell($row, $cnt++, $this->lng->txt("matriculation"));
+		}
+		$ass_cnt = 1;
 		foreach ($ass_data as $ass)
 		{
-			$excel->setCell($row, $cnt++, $cnt-1);		
+			$excel->setCell($row, $cnt++, $ass_cnt++);
 		}
 		$excel->setCell($row++, $cnt++, $this->lng->txt("exc_total_exc"));
 		$excel->setBold("A1:".$excel->getColumnCoord($cnt)."1");
+// fau.
 		
-		// data rows		
+		// data rows
 		reset($mems);
 		foreach ($mems as $user_id => $d)
 		{
 			$col = 0;
-			
-			// name			
-			$d = ilObjUser::_lookupName($user_id);
+
+// fau: exGradesExport - add extra fields to row
+			// login
+			$excel->setCell($row, $col++, $d["login"]);
+			// name
+// fau: exGradesExport - get all user fields
+			$mems[$user_id] = ilObjUser::_lookupFields($user_id);
+// fau.
 			$excel->setCell($row, $col++, $d["lastname"].", ".$d["firstname"]." [".$d["login"]."]");
+			// matriculation
+			if ($full_data)
+			{
+				$excel->setCell($row, $col++, $d["matriculation"]);
+			}
+// fau.
 
 			reset($ass_data);
 			foreach ($ass_data as $ass)

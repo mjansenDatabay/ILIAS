@@ -219,11 +219,14 @@ class ilMainMenuGUI {
 		{
 			foreach ($languages as $lang_key) {
 				$base = substr($_SERVER["REQUEST_URI"], strrpos($_SERVER["REQUEST_URI"], "/") + 1);
-				$base = preg_replace("/&*lang=[a-z]{2}&*/", "", $base);
-				$link = ilUtil::appendUrlParameterString(
-					$base,
-					"lang=" . $lang_key
-				);
+				// fim: [bugfix] better replacement of lang parameter
+				// needed because this language selection is also presented by ilStartupGUI
+				$link = preg_replace("/(&*)lang=[a-z]{2}(&*)/", "$1lang=".$lang_key."$2", $base);
+				if (strpos($link, 'lang=') === false) {
+					$link = ilUtil::appendUrlParameterString($link,
+						"lang=".$lang_key);
+				}
+				// fim.
 				$link = str_replace("?&", "?", $link);
 
 				$gr_list->addEntry($lng->_lookupEntry($lang_key, "meta", "meta_l_" . $lang_key), $link);
@@ -313,13 +316,20 @@ class ilMainMenuGUI {
 				: "";
 
 			// login stuff
-			if ($GLOBALS['DIC']['ilUser']->getId() == ANONYMOUS_USER_ID) {
-				if (ilRegistrationSettings::_lookupRegistrationType() != IL_REG_DISABLED) {
-					$this->tpl->setCurrentBlock("registration_link");
-					$this->tpl->setVariable("TXT_REGISTER", $lng->txt("register"));
-					$this->tpl->setVariable("LINK_REGISTER", $link_dir . "register.php?client_id=" . rawurlencode(CLIENT_ID) . "&lang=" . $ilUser->getCurrentLanguage());
-					$this->tpl->parseCurrentBlock();
+			if ($GLOBALS['DIC']['ilUser']->getId() == ANONYMOUS_USER_ID)
+			{
+// fau: rootAsLogin - don't show standard registration link, if the root is the login page
+				if (!ilCust::get('ilias_root_as_login'))
+				{
+					if (ilRegistrationSettings::_lookupRegistrationType() != IL_REG_DISABLED)
+					{
+						$this->tpl->setCurrentBlock("registration_link");
+						$this->tpl->setVariable("TXT_REGISTER",$lng->txt("register"));
+						$this->tpl->setVariable("LINK_REGISTER", $link_dir."register.php?client_id=".rawurlencode(CLIENT_ID)."&lang=".$ilUser->getCurrentLanguage());
+						$this->tpl->parseCurrentBlock();
+					}
 				}
+// fau.
 
 				// language selection
 				$selection = self::getLanguageSelection();
@@ -328,10 +338,19 @@ class ilMainMenuGUI {
 					$this->tpl->setVariable("LANG_SELECT", $selection);
 				}
 
-				$this->tpl->setCurrentBlock("userisanonymous");
-				$this->tpl->setVariable("TXT_NOT_LOGGED_IN", $lng->txt("not_logged_in"));
-				$this->tpl->setVariable("TXT_LOGIN", $lng->txt("log_in"));
 
+// fau: rootAsLogin - don't show standard login link if the root is the login page
+
+				if (!ilCust::get('ilias_root_as_login')
+					or (!empty($_GET['ref_id']) and $_GET['ref_id'] != 1)
+					or !empty($_GET['wsp_id'])
+					or !empty($_GET['prt_id'])
+				)
+
+				{
+					$this->tpl->setCurrentBlock("userisanonymous");
+					$this->tpl->setVariable("TXT_NOT_LOGGED_IN", $lng->txt("not_logged_in"));
+					$this->tpl->setVariable("TXT_LOGIN", $lng->txt("log_in"));
 				// #13058
 				$target_str = ($this->getLoginTargetPar() != "")
 					? $this->getLoginTargetPar()
@@ -341,11 +360,16 @@ class ilMainMenuGUI {
 					$link_dir . "login.php?target=" . $target_str . "&client_id=" . rawurlencode(CLIENT_ID) . "&cmd=force_login&lang=" . $ilUser->getCurrentLanguage()
 				);
 				$this->tpl->parseCurrentBlock();
+				}
+// fau.
 			} else {
 				$this->renderOnScreenNotifications($ilUser, $main_tpl, $lng);
 
 				$this->tpl->setCurrentBlock("userisloggedin");
 				$this->tpl->setVariable("TXT_LOGIN_AS", $lng->txt("login_as"));
+// fau: wcag - add title
+				$this->tpl->setVariable("USER_MENU_TITLE", $lng->txt("user_menu"));
+// fau.
 				$user_img_src = $ilUser->getPersonalPicturePath("small", true);
 				$user_img_alt = $ilUser->getFullname();
 				$this->tpl->setVariable("USER_IMG", ilUtil::img($user_img_src, $user_img_alt));
@@ -354,7 +378,9 @@ class ilMainMenuGUI {
 				$this->tpl->setVariable("USR_LINK_SETTINGS", "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSettings");
 				$this->tpl->setVariable("USR_TXT_SETTINGS", $lng->txt("personal_settings"));
 				$this->tpl->setVariable("TXT_LOGOUT2", $lng->txt("logout"));
-				$this->tpl->setVariable("LINK_LOGOUT2", $link_dir . "logout.php?lang=" . $ilUser->getCurrentLanguage());
+// fau: samlAuth - use different logout link if authentified by SSO
+				$this->tpl->setVariable("LINK_LOGOUT2", ilUserUtil::_getLogoutLink());
+// fau.
 				$this->tpl->setVariable("USERNAME", $ilUser->getFullname());
 				$this->tpl->setVariable("LOGIN", $ilUser->getLogin());
 				$this->tpl->setVariable("MATRICULATION", $ilUser->getMatriculation());
@@ -393,10 +419,32 @@ class ilMainMenuGUI {
 		if ($this->getMode() == self::MODE_FULL) {
 			// $this->tpl->setVariable("TXT_LOGOUT", $lng->txt("logout"));
 			$this->tpl->setVariable("HEADER_URL", $this->getHeaderURL());
+// fau: wcag -  add title
+			$this->tpl->setVariable("HEADER_URL_TITLE", $lng->txt('to_home'));
+// fau.
 			$this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
 			$this->tpl->setVariable("HEADER_ICON_RESPONSIVE", ilUtil::getImagePath("HeaderIconResponsive.svg"));
 		}
 
+		// fim: [layout] don't show links in reduced mode
+
+		if (ilCust::get('ilias_footer_type') != 'exam')
+		{
+			if($this->getMode() == self::MODE_FULL)
+			{
+				$this->tpl->touchBlock('header_top_links');
+			}
+			elseif (!$this->topbar_back_url)
+			{
+				$this->tpl->setCurrentBlock('header_top_logo');
+				$this->tpl->setVariable('TOPBAR_LOGO_URL', $this->getHeaderURL());
+				$this->tpl->parseCurrentBlock();
+			}
+
+		}
+		// fim.
+
+		include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
 
 		$this->tpl->setVariable("TXT_MAIN_MENU", $lng->txt("main_menu"));
 
@@ -428,6 +476,368 @@ class ilMainMenuGUI {
 			$this->addToolbarTooltip("sb_mail", "mm_tb_mail");
 			$a_tpl->parseCurrentBlock();
 		}
+	}
+
+
+	/**
+	 * desc
+	 *
+	 * @param
+	 * @return
+	 */
+	function renderMainMenuListEntries($a_tpl, $a_call_get = true)
+	{
+		$lng = $this->lng;
+		$tree = $this->tree;
+		$ilAccess = $this->access;
+
+// fau: rootAsLogin - show root login link on specific pages (if not logged in)
+
+		if (ilCust::get('ilias_root_as_login') and ($this->user->isAnonymous()))
+		{
+			$this->renderEntry($a_tpl, "login",
+				$lng->txt("to_home"),
+				ilUtil::_getRootLoginLink(),
+				$this->target);
+		}
+// fau.
+
+		// personal desktop
+		if ($GLOBALS['DIC']['ilUser']->getId() != ANONYMOUS_USER_ID)
+		{
+			$this->renderEntry($a_tpl, "desktop",
+				$lng->txt("personal_desktop"), "#");
+		}
+
+		// repository
+// fau: rootIsReduced - use different link for repository category, show always if readable
+
+		global $ilUser;
+		include_once './Services/Link/classes/class.ilLink.php';
+		if ($rep_id = ilCust::get("ilias_repository_cat_id"))
+		{
+			$nd = $tree->getNodeData($rep_id);
+			$nd_link = ilLink::_getStaticLink($rep_id,'cat',true);
+		}
+		else
+		{
+			$nd = $tree->getNodeData(ROOT_FOLDER_ID);
+			$nd_link = ilLink::_getStaticLink(1,'root',true);
+		}
+
+		/* @var ilAccessHandler $ilAccess */
+		if ($ilAccess->checkAccess('read','' , $nd['ref_id'], $nd['type'], $nd['obj_id']))
+		{
+			if(!$ilUser->getId() or $this->user->getId() == ANONYMOUS_USER_ID)
+			{
+				$title = $nd["title"] . $lng->txt("repository_public_suffix");
+				$this->renderEntry($a_tpl, "public", $title, $nd_link);
+			}
+			else
+			{
+				$title = $nd["title"];
+				$this->renderEntry($a_tpl, "repository", $title, $nd_link);
+			}
+		}
+// fau.
+
+		// administration
+		if(ilMainMenuGUI::_checkAdministrationPermission())
+		{
+			$this->renderDropDown($a_tpl, "administration");
+		}
+
+		if ($a_call_get)
+		{
+			return $a_tpl->get();
+		}
+
+		return "";
+	}
+
+	/**
+	 * Render main menu entry
+	 *
+	 * @param
+	 * @return
+	 */
+	function renderEntry($a_tpl, $a_id, $a_txt, $a_script, $a_target = "_top")
+	{
+		$lng = $this->lng;
+		$ilNavigationHistory = $this->nav_history;
+		$ilSetting = $this->settings;
+		$ilCtrl = $this->ctrl;
+	
+		$id = strtolower($a_id);
+		$id_up = strtoupper($a_id);
+		$a_tpl->setCurrentBlock("entry_".$id);
+
+		include_once("./Services/UIComponent/GroupedList/classes/class.ilGroupedListGUI.php");
+
+		// repository
+		if ($a_id == "repository")
+		{
+			$gl = new ilGroupedListGUI();
+			$gl->setAsDropDown(true);
+			
+			include_once("./Services/Link/classes/class.ilLink.php");
+			$icon = ilUtil::img(ilObject::_getIcon(ilObject::_lookupObjId(1), "tiny"));
+			
+// fau: rootIsReduced - respect the script parameter (may be cat instead of root)
+			// shorten the script
+
+			$rep_id = ilCust::get("ilias_repository_cat_id");
+			$icon = ilUtil::img(ilObject::_getIcon(ilObject::_lookupObjId($rep_id ? $rep_id : 1), "tiny"));
+			$gl->addEntry($icon." ".$a_txt." - ".$lng->txt("rep_main_page"), $a_script, "_top", "", "ilLVNavEnt");
+// fau.
+			
+			$items = $ilNavigationHistory->getItems();
+			reset($items);
+			$cnt = 0;
+			$first = true;
+
+			foreach($items as $k => $item)
+			{
+				if ($cnt >= 10) break;
+
+// fau: rootIsReduced - don't show the entry point in the history
+				if ( $item["ref_id"] != $rep_id and
+					(!isset($item["ref_id"]) || !isset($_GET["ref_id"]) ||
+					($item["ref_id"] != $_GET["ref_id"] || !$first))			// do not list current item
+				)
+// fau.
+				{
+					if ($cnt == 0)
+					{
+						$gl->addGroupHeader($lng->txt("last_visited"), "ilLVNavEnt");
+					}
+					$obj_id = ilObject::_lookupObjId($item["ref_id"]);
+					$cnt ++;
+					$icon = ilUtil::img(ilObject::_getIcon($obj_id, "tiny"));
+					$ititle = ilUtil::shortenText(strip_tags($item["title"]), 50, true); // #11023
+					$gl->addEntry($icon." ".$ititle, $item["link"],	"_top", "", "ilLVNavEnt");
+
+				}
+				$first = false;
+			}
+			
+			if ($cnt > 0)
+			{
+				$gl->addEntry("» ".$lng->txt("remove_entries"), "#", "",
+					"return il.MainMenu.removeLastVisitedItems('".
+					$ilCtrl->getLinkTargetByClass("ilnavigationhistorygui", "removeEntries", "", true)."');",
+					"ilLVNavEnt");
+			}
+
+			$a_tpl->setVariable("REP_EN_OV", $gl->getHTML());
+		}
+		
+		// desktop
+		if ($a_id == "desktop")
+		{
+			$gl = new ilGroupedListGUI();
+			$gl->setAsDropDown(true);
+			
+			// overview
+			$gl->addEntry($lng->txt("overview"),
+				"ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems",
+				"_top", "", "", "mm_pd_sel_items", ilHelp::getMainMenuTooltip("mm_pd_sel_items"),
+					"left center", "right center", false);
+
+			require_once 'Services/PersonalDesktop/ItemsBlock/classes/class.ilPDSelectedItemsBlockViewSettings.php';
+			$pdItemsViewSettings = new ilPDSelectedItemsBlockViewSettings($GLOBALS['DIC']->user());
+
+			// my groups and courses, if both is available
+			if($pdItemsViewSettings->allViewsEnabled())
+			{
+				$gl->addEntry($lng->txt("my_courses_groups"),
+					"ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToMemberships",
+					"_top", "", "", "mm_pd_crs_grp", ilHelp::getMainMenuTooltip("mm_pd_crs_grp"),
+					"left center", "right center", false);
+			}
+			
+			// bookmarks
+			if (!$ilSetting->get("disable_bookmarks"))
+			{
+				$gl->addEntry($lng->txt("bookmarks"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToBookmarks",
+					"_top", "", "", "mm_pd_bookm", ilHelp::getMainMenuTooltip("mm_pd_bookm"),
+					"left center", "right center", false);
+			}
+			
+			// private notes
+			if (!$ilSetting->get("disable_notes") || !$ilSetting->get("disable_comments"))
+			{
+				$lng->loadLanguageModule("notes");
+				$t = $lng->txt("notes");
+				$c = "jumpToNotes";
+				if (!$ilSetting->get("disable_notes") && !$ilSetting->get("disable_comments"))
+				{
+					$t = $lng->txt("notes_and_comments");
+				}
+				if ($ilSetting->get("disable_notes"))
+				{
+					$t = $lng->txt("notes_comments");
+					$c = "jumpToComments";
+				}
+				$gl->addEntry($t, "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=".$c,
+					"_top", "", "", "mm_pd_notes", ilHelp::getMainMenuTooltip("mm_pd_notes"),
+					"left center", "right center", false);
+			}
+
+			// news
+			if ($ilSetting->get("block_activated_news"))
+			{
+				$gl->addEntry($lng->txt("news"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToNews",
+					"_top", "", "", "mm_pd_news", ilHelp::getMainMenuTooltip("mm_pd_news"),
+					"left center", "right center", false);
+			}
+
+			// overview is always active
+			$gl->addSeparator();
+			
+			$separator = false;
+
+            if($ilSetting->get("enable_my_staff") and ilMyStaffAccess::getInstance()->hasCurrentUserAccessToMyStaff() == true)
+            {
+                // my staff
+                $gl->addEntry($lng->txt("my_staff"), "ilias.php?baseClass=" . ilPersonalDesktopGUI::class . "&cmd=" . ilPersonalDesktopGUI::CMD_JUMP_TO_MY_STAFF,
+                    "_top", "", "", "mm_pd_mst", ilHelp::getMainMenuTooltip("mm_pd_mst"),
+                    "left center", "right center", false);
+                $separator = true;
+            }
+
+			if(!$ilSetting->get("disable_personal_workspace"))
+			{
+				// workspace
+				$gl->addEntry($lng->txt("personal_workspace"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToWorkspace",
+					"_top", "", "", "mm_pd_wsp", ilHelp::getMainMenuTooltip("mm_pd_wsp"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+
+
+			// portfolio
+			if ($ilSetting->get('user_portfolios'))
+			{
+				$gl->addEntry($lng->txt("portfolio"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToPortfolio",
+					"_top", "", "", "mm_pd_port", ilHelp::getMainMenuTooltip("mm_pd_port"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+			
+			// skills
+			$skmg_set = new ilSetting("skmg");
+			if ($skmg_set->get("enable_skmg"))
+			{
+				$gl->addEntry($lng->txt("skills"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSkills",
+					"_top", "", "", "mm_pd_skill", ilHelp::getMainMenuTooltip("mm_pd_skill"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+
+			require_once 'Services/Badge/classes/class.ilBadgeHandler.php';
+			if(ilBadgeHandler::getInstance()->isActive())
+			{
+				$gl->addEntry($lng->txt('obj_bdga'),
+					'ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToBadges', '_top'
+					, "", "", "mm_pd_contacts", ilHelp::getMainMenuTooltip("mm_pd_badges"),
+					"left center", "right center", false);
+
+				$separator = true;
+			}
+
+
+			// Learning Progress
+			include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
+			if (ilObjUserTracking::_enabledLearningProgress() &&
+				(ilObjUserTracking::_hasLearningProgressOtherUsers() ||
+				ilObjUserTracking::_hasLearningProgressLearner()))
+			{
+				//$ilTabs->addTarget("learning_progress", $this->ctrl->getLinkTargetByClass("ilLearningProgressGUI"));
+				$gl->addEntry($lng->txt("learning_progress"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToLP",
+					"_top", "", "", "mm_pd_lp", ilHelp::getMainMenuTooltip("mm_pd_lp"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+
+			if($separator)
+			{
+				$gl->addSeparator();
+			}
+			
+			$separator = false;
+			
+			// calendar
+			include_once('./Services/Calendar/classes/class.ilCalendarSettings.php');
+			$settings = ilCalendarSettings::_getInstance();
+			if($settings->isEnabled())
+			{
+				$gl->addEntry($lng->txt("calendar"), "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToCalendar",
+					"_top", "", "", "mm_pd_cal", ilHelp::getMainMenuTooltip("mm_pd_cal"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+
+			// mail
+			if($this->mail)
+			{
+				$gl->addEntry($lng->txt('mail'), 'ilias.php?baseClass=ilMailGUI', '_top',
+					"", "", "mm_pd_mail", ilHelp::getMainMenuTooltip("mm_pd_mail"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+
+			// contacts
+			require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystem.php';
+			if(ilBuddySystem::getInstance()->isEnabled())
+			{
+				$gl->addEntry($lng->txt('mail_addressbook'),
+					'ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToContacts', '_top'
+					, "", "", "mm_pd_contacts", ilHelp::getMainMenuTooltip("mm_pd_contacts"),
+					"left center", "right center", false);
+				
+				$separator = true;
+			}
+
+
+			$a_tpl->setVariable("DESK_CONT_OV", $gl->getHTML());
+		}
+
+		$a_tpl->setVariable("TXT_".$id_up, $a_txt);
+		$a_tpl->setVariable("SCRIPT_".$id_up, $a_script);
+		$a_tpl->setVariable("TARGET_".$id_up, $a_target);
+		if ($this->active == $a_id || ($this->active == "" && $a_id == "repository"))
+		{
+			$a_tpl->setVariable("SEL", '<span class="ilAccHidden">('.$lng->txt("stat_selected").')</span>');
+		}
+
+		if($a_id == "repository")
+		{
+			include_once("./Services/Accessibility/classes/class.ilAccessKey.php");
+			if (ilAccessKey::getKey(ilAccessKey::LAST_VISITED) != "")
+			{
+				$a_tpl->setVariable("ACC_KEY_REPOSITORY", 'accesskey="'.
+					ilAccessKey::getKey(ilAccessKey::LAST_VISITED).'"');
+			}
+		}
+		if($a_id == "desktop")
+		{
+			include_once("./Services/Accessibility/classes/class.ilAccessKey.php");
+			if (ilAccessKey::getKey(ilAccessKey::PERSONAL_DESKTOP) != "")
+			{
+				$a_tpl->setVariable("ACC_KEY_DESKTOP", 'accesskey="'.
+					ilAccessKey::getKey(ilAccessKey::PERSONAL_DESKTOP).'"');
+			}
+		}
+
+		
+		$a_tpl->parseCurrentBlock();
 	}
 
 
@@ -501,9 +911,15 @@ class ilMainMenuGUI {
 		$main_tpl = $this->main_tpl;
 
 		// screen id
-		if ((defined("OH_REF_ID") && OH_REF_ID > 0) || DEVMODE == 1) {
-			if ($ilHelp->getScreenId() != "") {
-				if ($this->getMode() == self::MODE_FULL) {
+		// fim: [help] make showing of ids independent from author mode
+
+		if (ilCust::get("help_show_ids"))
+		// fim.
+		{
+			if ($ilHelp->getScreenId() != "")
+			{
+				if($this->getMode() == self::MODE_FULL)
+				{
 					$this->tpl->setCurrentBlock("screen_id");
 					$this->tpl->setVariable("SCREEN_ID", $ilHelp->getScreenId());
 					$this->tpl->parseCurrentBlock();
@@ -513,8 +929,10 @@ class ilMainMenuGUI {
 
 		$help_active = false;
 
+/* fau: MainMenuHelp - help menu is moved to main menu plugin
 		$helpl = new ilGroupedListGUI();
 		$helpl->setAsDropDown(true, true);
+fau. */
 
 		if ($ilHelp->hasSections()) {
 			$help_active = true;
@@ -532,7 +950,9 @@ class ilMainMenuGUI {
 				"help_tr", $lng->txt("help_open_online_help"), "",
 				"bottom center", "top center", false
 			);
+/* fau: MainMenuHelp - help menu is moved to main menu plugin
 			$helpl->addEntry("<span>&nbsp;</span> " . $lng->txt("help_topcis"), "#", "", "il.Help.listHelp(event, false);");
+fau. */
 		}
 
 		$module_id = (int)$ilSetting->get("help_module");
@@ -548,15 +968,18 @@ class ilMainMenuGUI {
 				"help_tt", $lng->txt("help_toggle_tooltips"), "",
 				"bottom center", "top center", false
 			);
+/* fau: MainMenuHelp - help menu is moved to main menu plugin
 			$helpl->addEntry('<span id="help_tt_switch_on" class="glyphicon glyphicon-ok"></span> ' . $lng->txt("help_tooltips"), "#", "", "return il.Help.switchTooltips(event);");
+fau. */
 		}
 
 		if ($help_active && $ilHelp->hasSections()) {
+/* fau: MainMenuHelp - help menu is moved to main menu plugin
 			$this->tpl->setCurrentBlock("help");
 			$this->tpl->setVariable("TXT_HELP", $lng->txt("help"));
 			$this->tpl->setVariable("HELP_CLICK", "il.Help.listHelp(event, false);");
 			$this->tpl->parseCurrentBlock();
-
+fau. */
 			$this->addToolbarTooltip("mm_help", "mm_tb_help");
 
 

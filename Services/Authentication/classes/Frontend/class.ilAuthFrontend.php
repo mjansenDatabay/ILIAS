@@ -250,7 +250,9 @@ class ilAuthFrontend
 			$this->getLogger()->info('Authentication failed for inactive user with id and too may login attempts: ' . $this->getStatus()->getAuthenticatedUserId());
 			$this->getStatus()->setStatus(ilAuthStatus::STATUS_AUTHENTICATION_FAILED);
 			$this->getStatus()->setAuthenticatedUserId(0);
-			$this->getStatus()->setReason('err_inactive_login_attempts');
+// fau: loginFailed - use same message for exceeded login attempts as with wrong password (security)
+			$this->getStatus()->setReason('auth_err_login_attempts_deactivation');
+// fau.
 			return false;
 		}
 
@@ -259,7 +261,24 @@ class ilAuthFrontend
 			$this->getLogger()->info('Authentication failed for inactive user with id: ' . $this->getStatus()->getAuthenticatedUserId());
 			$this->getStatus()->setStatus(ilAuthStatus::STATUS_AUTHENTICATION_FAILED);
 			$this->getStatus()->setAuthenticatedUserId(0);
-			$this->getStatus()->setReason('err_inactive');
+
+// fau: loginFailed - get separate reason when login is deactivated due to long inactive time
+			$check = new ilDateTime(time(),IL_CAL_UNIX);
+			$check->increment(IL_CAL_YEAR, -1);
+			$last = new ilDateTime($user->getLastLogin(),IL_CAL_DATETIME);
+			if (ilDate::_before($last, $check))
+			{
+				$this->getStatus()->setReason('err_inactive_too_long');
+			}
+			elseif (!$user->getLastLogin())
+			{
+				$this->getStatus()->setReason('err_inactive_new');
+			}
+			else
+			{
+				$this->getStatus()->setReason('err_inactive_set');
+			}
+// fau.
 			return false;
 		}
 		
@@ -279,7 +298,9 @@ class ilAuthFrontend
 				$this->getStatus()->setStatus(ilAuthStatus::STATUS_AUTHENTICATION_FAILED);
 				$this->getStatus()->setAuthenticatedUserId(0);
 			}
-			$this->getStatus()->setReason('time_limit_reached');
+// fau: loginFailed - get a better time limit message
+			$this->getStatus()->setReason('err_inactive_time_limit');
+// fau.
 			return false;
 		}
 		
@@ -354,6 +375,14 @@ class ilAuthFrontend
 		// reset counter for failed logins
 		ilObjUser::_resetLoginAttempts($user->getId());				
 
+// fau: idmData - apply IDM data at login
+		include_once "Services/Idm/classes/class.ilIdmData.php";
+		$idmData = new ilIdmData();
+		if ($idmData->read($user->getLogin()) || $idmData->read($user->getExternalAccount()))
+		{
+			$idmData->applyToUser($user,'update');
+		}
+// fau.
 
 		$this->getLogger()->info('Successfully authenticated: ' . ilObjUser::_lookupLogin($this->getStatus()->getAuthenticatedUserId()));
 		$this->getAuthSession()->setAuthenticated(true, $this->getStatus()->getAuthenticatedUserId());
@@ -372,6 +401,10 @@ class ilAuthFrontend
 			', server:' . $_SERVER['SERVER_ADDR'] . ':' . $_SERVER['SERVER_PORT']
 		);
 
+// fau: loginLog - write the auth log
+		$this->writeAuthLog('login', $user->getLogin());
+// fau.
+
 		// finally raise event 
 		global $DIC;
 
@@ -386,7 +419,42 @@ class ilAuthFrontend
 		return true;
 		
 	}
-	
+
+
+// fau: loginLog - new function writeAuthLog()
+	/**
+	 * Write an authentication log to the table ut_auth
+	 * @param string	$a_action	e.g. 'login'
+	 * @param string 	$a_username
+	 */
+	protected function writeAuthLog($a_action, $a_username = null)
+	{
+		global $DIC;
+		$ilDB = $DIC->database();
+
+		if (empty($a_username) or $a_username == 'anonymous')
+		{
+			return;
+		}
+
+		$date = getdate();
+		$auth_id = $ilDB->nextId('ut_auth');
+		$ilDB->insert('ut_auth', array (
+				'auth_id' => array ('integer', $auth_id),
+				'auth_time' => array ('timestamp', date('Y-m-d H:i:s', time())),
+				'auth_year' => array ('integer', $date['year']),
+				'auth_month' => array ('integer', $date['mon']),
+				'auth_day' => array ('integer', $date['mday']),
+				'auth_action' => array ('text', $a_action),
+				'auth_mode' => array ('text', $this->getCredentials()->getAuthMode()),
+				'username' => array ('text', $a_username),
+				'remote_addr' => array ('text', $_SERVER['REMOTE_ADDR']),
+				'server_addr' => array ('text', $_SERVER['SERVER_ADDR'])
+			)
+		);
+	}
+// fau.
+
 	/**
 	 * Check activation
 	 * @param ilObjUser $user

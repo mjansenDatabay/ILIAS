@@ -1801,6 +1801,17 @@ return;
 		// ensure no cache hit, if included files/media objects have been changed
 		$params["incl_elements_date"] = $this->obj->getLastUpdateOfIncludedElements();
 
+// fau: imageBox - init colorbox and add parameter to open fullscreen in box
+		if ($this instanceof ilAssQuestionPageGUI)
+		{
+			iljQueryUtil::initColorbox();
+			$params["fullscreen_in_colorbox"] = true;
+		}
+		else
+		{
+			$params["fullscreen_in_colorbox"] = false;
+		}
+// fau.
 
 		// should be modularized
 		include_once("./Services/COPage/classes/class.ilPCSection.php");
@@ -1831,14 +1842,22 @@ return;
 			$this->log->debug("Calling XSLT, content: ".substr($content, 0, 100));
 			$args = array( '/_xml' => $content, '/_xsl' => $xsl );
 			$xh = xslt_create();
-			$output = xslt_process($xh, "arg:/_xml","arg:/_xsl", NULL, $args, $params);
-			
-			if (($this->getOutputMode() == "presentation" || $this->getOutputMode() == "preview")
-				&& !$this->getAbstractOnly()
-				&& $this->obj->old_nr == 0)
+// fau: fixPageXslErrorMessage - show a speaking error message when an xsl error occurs
+			try
 			{
-				$this->obj->writeRenderedContent($output, $md5);
+                $output = xslt_process($xh, "arg:/_xml","arg:/_xsl", NULL, $args, $params);
+                if (($this->getOutputMode() == "presentation" || $this->getOutputMode() == "preview")
+                    && !$this->getAbstractOnly()
+                    && $this->obj->old_nr == 0)
+                {
+                    $this->obj->writeRenderedContent($output, $md5);
+                }
+            }
+            catch (Exception $e)
+			{
+				ilUtil::sendFailure($this->lng->txt('page_xsl_error'), false);
 			}
+// fau.
 			xslt_free($xh);
 		}
 
@@ -1867,8 +1886,17 @@ return;
 			$output = $this->insertPageToc($output);
 		}
 
-		// insert advanced output trigger
-		$output = $this->insertAdvTrigger($output);
+// fau: shortRssLink - don't add special elements to abstract
+		if ($this->getAbstractOnly())
+		{
+			$output = $this->removeAdvTrigger($output);
+		}
+		else
+		{
+			// insert advanced output trigger
+			$output = $this->insertAdvTrigger($output);
+		}
+// fau.
 
 		// workaround for preventing template engine
 		// from hiding paragraph text that is enclosed
@@ -2869,7 +2897,26 @@ return;
 		
 		return $a_output;
 	}
-	
+
+// fau: shortRssLink - new function RemoveAdvTrigger
+	/**
+	 * Remove adv content trigger
+	 *
+	 * @param string $a_output output
+	 * @return string modified output
+	 */
+	function RemoveAdvTrigger($a_output)
+	{
+		global $lng;
+
+		$a_output = str_replace("{{{{{LV_show_adv}}}}}",
+			'', $a_output);
+		$a_output = str_replace("{{{{{LV_hide_adv}}}}}",
+			'', $a_output);
+
+		return $a_output;
+	}
+// fau.
 	
 	/**
 	 * Finalizing output processing. Maybe overwritten in derived
@@ -3471,7 +3518,7 @@ return;
 	* Get values for activation form
 	*/
 	function getActivationFormValues()
-	{		
+	{
 		$activation = "deactivated";
 		if ($this->getPageObject()->getActive())
 		{

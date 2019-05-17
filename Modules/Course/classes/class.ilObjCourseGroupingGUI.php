@@ -8,7 +8,8 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 *
 * @author your name <your email> 
 * @version $Id$
-* 
+*
+ * @ilCtrl_Calls ilObjCourseGroupingGUI: ilPropertyFormGUI
 */
 class ilObjCourseGroupingGUI
 {
@@ -47,7 +48,17 @@ class ilObjCourseGroupingGUI
 	
 	function executeCommand()
 	{
+// fau: groupingSelector - forward command to property form
 		global $DIC;
+		$class = $DIC->ctrl()->getNextClass($this);
+		switch($class)
+		{
+			case "ilpropertyformgui":
+				$form = $this->initForm(false);
+				$DIC->ctrl()->forwardCommand($form);
+				return;
+		}
+// fau.
 
 		$ilTabs = $DIC['ilTabs'];
 
@@ -97,6 +108,56 @@ class ilObjCourseGroupingGUI
 		$tpl->setContent($table->getHTML());
 	}
 
+// fau: limitSub - new function addWaitingMembers()
+	/**
+	 * Add waiting members to the grouped objects
+	 * this calls their handleAutoFill function()
+	 */
+	function addWaitingMembers()
+	{
+		/** @var ilAccessHandler $ilAccess */
+		global $lng, $ilAccess;
+
+		$sum = 0;
+		$message = "";
+		$grouping = new ilObjCourseGrouping((int) $_GET['obj_id']);
+
+		foreach($grouping->getAssignedItems() as $condition)
+		{
+			if ($ilAccess->checkAccess('write', '', $condition['target_ref_id'], $condition['target_type']))
+			{
+				if ($object = ilObjectFactory::getInstanceByRefId($condition['target_ref_id']))
+				{
+					// call manual auto fill
+					$added = $object->handleAutoFill(true);
+					if (!empty($added))
+					{
+						$list = "";
+						foreach ($added as $user_id)
+						{
+							$list .= ", " .ilObjUser::_lookupLogin($user_id);
+						}
+						$message .= "<br />" . $object->getTitle() . ': ' . $list;
+						$sum += count($added);
+					}
+				}
+			}
+		}
+
+		if ($sum == 0)
+		{
+			ilUtil::sendFailure($this->lng->txt('sub_no_member_added'));
+		}
+		else
+		{
+			ilUtil::sendSuccess(sprintf($lng->txt($sum == 1 ? 'sub_added_member' : 'sub_added_members'), $sum) . $message);
+
+		}
+
+		$this->listGroupings();
+	}
+// fau.
+
 	function askDeleteGrouping()
 	{
 		global $DIC;
@@ -117,6 +178,17 @@ class ilObjCourseGroupingGUI
 			
 			return false;
 		}
+// fau: groupingSelector - check if groupings can be deleted
+		foreach ($_POST['grouping'] as $grouping_id)
+		{
+			if (!$this->allItemsWritable($grouping_id))
+			{
+				ilUtil::sendFailure($this->lng->txt('groupings_assigned_obj_not_writable_'. $this->content_obj->getType()));
+				$this->listGroupings();
+				return false;
+			}
+		}
+// fau.
 
 		// display confirmation message
 		include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
@@ -147,6 +219,15 @@ class ilObjCourseGroupingGUI
 		{
 			$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->MESSAGE);
 		}
+// fau: groupingSelector - check if groupings can be deleted
+		foreach ($_POST['grouping'] as $grouping_id)
+		{
+            if (!$this->allItemsWritable($grouping_id))
+			{
+                $ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->MESSAGE);
+			}
+		}
+// fau.
 
 		foreach($_POST['grouping'] as $grouping_id)
 		{
@@ -160,7 +241,7 @@ class ilObjCourseGroupingGUI
 
 	function create($a_form = null)
 	{
-		global $DIC;	
+		global $DIC;
 
 		$ilErr = $DIC['ilErr'];
 		$ilAccess = $DIC['ilAccess'];
@@ -204,9 +285,20 @@ class ilObjCourseGroupingGUI
 		$uniq->setRequired(true);
 		$uniq->setOptions($options);
 		$form->addItem($uniq);
-				
+
+// fau: groupingSelector - add a repository picker to the form
+		$selector = new ilRepositorySelector2InputGUI($this->lng->txt('groupings_assigned_obj_'.$this->getContentType()), 'items',true);
+		/** @var ilRepositorySelectorExplorerGUI $explorer */
+		$explorer = $selector->explorer_gui;
+		$explorer->setSelectableTypes([$this->getContentType()]);
+		$explorer->setWriteRequired(true);
+		$selector->setInfo($this->lng->txt('groupings_assigned_obj_info_'.$this->getContentType()));
+		$form->addItem($selector);
+
 		if($a_create)
 		{
+			$title->setValue($this->lng->txt('groupings_of') . ': ' . $this->content_obj->getTitle());
+			$selector->setValue([$this->content_obj->getRefId()]);
 			$form->setTitle($this->lng->txt('crs_add_grouping'));
 			$form->addCommandButton('add', $this->lng->txt('btn_add'));
 		}
@@ -216,30 +308,20 @@ class ilObjCourseGroupingGUI
 			$title->setValue($grouping->getTitle());
 			$desc->setValue($grouping->getDescription());
 			$uniq->setValue($grouping->getUniqueField());
-					
-			$ass = new ilCustomInputGUI($this->lng->txt('groupings_assigned_obj_'.$this->getContentType()));
-			$form->addItem($ass);
-			
+
 			// assignments
 			$items = array();
 			foreach($grouping->getAssignedItems() as $cond_data)
 			{				
-				$items[] = ilObject::_lookupTitle($cond_data['target_obj_id']);
+				$items[] = $cond_data['target_ref_id'];
 			}
-			if(count($items))
-			{
-				$ass->setHtml(implode("<br />", $items));
-			}
-			else
-			{
-				$ass->setHtml($this->lng->txt('crs_grp_no_courses_assigned'));
-			}		 
+			$selector->setValue($items);
 			
 			$form->setTitle($this->lng->txt('edit_grouping'));
-			$form->addCommandButton('update', $this->lng->txt('save'));			
-			$form->addCommandButton('selectCourse', $this->lng->txt('grouping_change_assignment'));			
+			$form->addCommandButton('update', $this->lng->txt('save'));
 		}
-		
+// fau.
+
 		$form->addCommandButton('listGroupings', $this->lng->txt('cancel'));
 		
 		return $form;
@@ -256,6 +338,9 @@ class ilObjCourseGroupingGUI
 			
 			if($this->grp_obj->create($this->content_obj->getRefId(),$this->content_obj->getId()))
 			{
+// fau: groupingSelector - assign items when grouping is added
+				$this->assignItems($this->grp_obj, $_POST['items']);
+// fau.
 				ilUtil::sendSuccess($this->lng->txt('crs_grp_added_grouping'), true);
 			}
 			else
@@ -282,6 +367,14 @@ class ilObjCourseGroupingGUI
 		{
 			$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->MESSAGE);
 		}
+
+// fau: groupingSelector - check if all assigned objects are writeable
+		if (!$this->allItemsWritable($_REQUEST['obj_id']))
+		{
+			ilUtil::sendFailure($this->lng->txt('groupings_assigned_obj_not_writable_'. $this->content_obj->getType()), true);
+			$this->ctrl->redirect($this, 'listGroupings');
+		}
+// fau.
 		
 		if(!$a_form)
 		{
@@ -303,6 +396,12 @@ class ilObjCourseGroupingGUI
 		{
 			$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->MESSAGE);
 		}
+// fau: groupingSelector - check if all assigned objects are writeable
+		if (!$this->allItemsWritable($_REQUEST['obj_id']))
+		{
+			$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->MESSAGE);
+		}
+// fau.
 
 		$form = $this->initForm(false);
 		if($form->checkInput())
@@ -313,6 +412,9 @@ class ilObjCourseGroupingGUI
 			$tmp_grouping->setUniqueField($form->getInput('unique'));
 			$tmp_grouping->update();
 
+// fau: groupingSelector - assign items when grouping is updated
+			$this->assignItems($tmp_grouping, $_POST['items']);
+// fau.
 			ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
 			$this->ctrl->redirect($this, 'listGroupings');
 		}
@@ -320,6 +422,31 @@ class ilObjCourseGroupingGUI
 		$form->setValuesByPost();
 		$this->edit($form);
 	}
+
+// fau: groupingSelector - new function alItemsWritable()
+	/**
+	 * Cceck if all items of a grouping are writable
+	 * @param int $obj_id
+	 * @return bool
+	 */
+	protected function allItemsWritable($obj_id)
+	{
+		global $DIC;
+
+		$grouping = new ilObjCourseGrouping($obj_id);
+		foreach($grouping->getAssignedItems() as $cond_data)
+		{
+			$ref_id = $cond_data['target_ref_id'];
+
+			if (!ilObject::_isInTrash($ref_id) && !$DIC->access()->checkAccess('write', '', $ref_id))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+// fau.
+
 
 	function selectCourse()
 	{
@@ -408,6 +535,60 @@ class ilObjCourseGroupingGUI
 		
 		ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);		
 		$this->ctrl->redirect($this, 'edit');
-	}			
+	}
+
+// fau: groupingSelector - new function assignItems()
+	/**
+	 * Assign items to a grouping
+	 *
+	 * @param ilObjCourseGrouping $grpObj
+	 * @param int[] $ref_ids
+	 */
+	protected function assignItems(ilObjCourseGrouping $grpObj, $ref_ids = [])
+	{
+		global $DIC;
+
+		// delete all existing conditions
+		$condh = new ilConditionHandler();
+		$condh->deleteByObjId($grpObj->getId());
+
+		// create the new condition
+		$rejected = [];
+		foreach ($ref_ids as $ref_id)
+		{
+			$ref_id = (int) $ref_id;
+			$obj_id = ilObject::_lookupObjId($ref_id);
+			$type = ilObject::_lookupType($obj_id);
+
+			if ($type != $this->getContentType() || !$DIC->access()->checkAccess('write','',$ref_id))
+			{
+				$rejected[] = ilObject::_lookupTitle($obj_id);
+				continue;
+			}
+
+			$tmp_condh = new ilConditionHandler();
+			$tmp_condh->enableAutomaticValidation(false);
+
+			$tmp_condh->setTargetRefId($ref_id);
+			$tmp_condh->setTargetObjId($obj_id);
+			$tmp_condh->setTargetType($this->getContentType());
+			$tmp_condh->setTriggerRefId(0);
+			$tmp_condh->setTriggerObjId($grpObj->getId());
+			$tmp_condh->setTriggerType('crsg');
+			$tmp_condh->setOperator('not_member');
+			$tmp_condh->setValue($grpObj->getUniqueField());
+
+			if (!$tmp_condh->checkExists())
+			{
+				$tmp_condh->storeCondition();
+			}
+		}
+
+		if (!empty($rejected))
+		{
+			ilUtil::sendInfo($this->lng->txt('permission_denied_for').'<br />'. implode('<br />', $rejected), true);
+		}
+	}
+// fau.
 } // END class.ilObjCourseGrouping
 ?>

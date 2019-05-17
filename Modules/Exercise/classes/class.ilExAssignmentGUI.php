@@ -131,6 +131,17 @@ class ilExAssignmentGUI
 			}		
 		}
 
+// fau: exResTime - add info about result availability
+		if ($a_ass->getResultTime() > 0)
+		{
+			$tpl->setCurrentBlock("prop");
+			$tpl->setVariable("PROP", $lng->txt("exc_result_available_after"));
+			$tpl->setVariable("PROP_VAL",
+				ilDatePresentation::formatDate(new ilDateTime($a_ass->getResultTime(),IL_CAL_UNIX)));
+			$tpl->parseCurrentBlock();
+		}
+// fau.
+
 		$mand = "";
 		if ($a_ass->getMandatory())
 		{
@@ -139,8 +150,24 @@ class ilExAssignmentGUI
 		$tpl->setVariable("TITLE", $a_ass->getTitle().$mand);
 
 		// status icon
-		$stat = $a_ass->getMemberStatus()->getStatus();
-		$pic = $a_ass->getMemberStatus()->getStatusIcon();	
+// fau: exResTime - don't show the result status before the result time is reached
+		$stat = "not_attempted";
+		$pic = "scorm/not_attempted.svg";
+		if ((int) $a_ass->getResultTime() <= time())
+		{
+			$stat = $a_ass->getMemberStatus()->getStatus();
+			$pic = $a_ass->getMemberStatus()->getStatusIcon();
+		}
+		if ($stat != "passed" and $stat != "failed")
+		{
+			$submission = new ilExSubmission($a_ass, $this->user->getId());
+			if($submission->hasSubmitted())
+			{
+				$stat = "notgraded";
+				$pic = "scorm/running.svg";
+			}
+		}
+// fau.
 		$tpl->setVariable("IMG_STATUS", ilUtil::getImagePath($pic));
 		$tpl->setVariable("ALT_STATUS", $lng->txt("exc_".$stat));
 
@@ -200,7 +227,10 @@ class ilExAssignmentGUI
 		{
 			$inst = $a_ass->getInstruction();	
 			if(trim($inst))
-			{				
+			{
+// fau: exInstRte - process latex
+                $inst = ilUtil::prepareTextareaOutput($inst, true);
+// fau.
 				$a_info->addSection($lng->txt("exc_instruction"));
 
 				$is_html = (strlen($inst) != strlen(strip_tags($inst)));
@@ -456,8 +486,12 @@ class ilExAssignmentGUI
 		{
 			$show_global_feedback = ($last_sub && $a_ass->getFeedbackFile());
 		}
-
-		$this->addSubmissionFeedback($a_info, $a_ass, $submission->getFeedbackId(), $show_global_feedback);
+// fau: exResTime - show tutor feedback section after result time
+		if ((int) $a_ass->getResultTime() <= time())
+		{
+			$this->addSubmissionFeedback($a_info, $a_ass, $submission->getFeedbackId(), $show_global_feedback);
+		}
+// fau.
 
 	}
 	
@@ -484,7 +518,9 @@ class ilExAssignmentGUI
 			if ($lpcomment != "")
 			{
 				$a_info->addProperty($lng->txt("exc_comment"),
-					nl2br($lpcomment));
+					// fim: [bugfix] allow html special chars in comment
+					nl2br(ilUtil::prepareFormOutput($lpcomment)));
+					// fim.
 			}
 			if ($mark != "")
 			{

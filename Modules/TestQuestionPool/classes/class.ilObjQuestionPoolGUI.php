@@ -424,7 +424,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		global $DIC; /* @var ILIAS\DI\Container $DIC */
 		$DIC->ctrl()->redirectByClass('ilQuestionPoolExportGUI');
 	}
-	
+
 	/**
 	* download file
 	*/
@@ -718,7 +718,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 			// put the questionpool object in the administration tree
 			$newObj->putInTree($_GET["ref_id"]);
 			// get default permissions and set the permissions for the questionpool object
-			$newObj->setPermissions($_GET["ref_id"]);			
+			$newObj->setPermissions($_GET["ref_id"]);
 		}
 
 		if (is_file($_SESSION["qpl_import_dir"].'/'.$_SESSION["qpl_import_subdir"]."/manifest.xml"))
@@ -764,6 +764,9 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		}
 		
 		// delete import directory
+		// fim: [bugfix] cleanup import sub directoy
+		unset($_SESSION["qpl_import_subdir"]);
+		// fim.
 		include_once "./Services/Utilities/classes/class.ilUtil.php";
 		ilUtil::delDir(dirname(ilObjQuestionPool::_getImportDirectory()));
 
@@ -781,6 +784,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 	
 	function cancelImportObject()
 	{
+		// fim: [bugfix] cleanup import sub directoy
+		unset($_SESSION["qpl_import_subdir"]);
+		// fim.
+
 		if ($_POST["questions_only"] == 1)
 		{
 			$this->ctrl->redirect($this, "questions");
@@ -1043,10 +1050,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentImportFails.php';
 		$qsaImportFails = new ilAssQuestionSkillAssignmentImportFails($this->object->getId());
 		$qsaImportFails->deleteRegisteredImportFails();
-		
+
 		$this->ctrl->redirect($this, 'infoScreen');
 	}
-	
+
 	/**
 	* list questions of question pool
 	*/
@@ -1102,10 +1109,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 			$button = ilLinkButton::getInstance();
 			$button->setUrl($this->ctrl->getLinkTarget($this, 'renoveImportFails'));
 			$button->setCaption('ass_skl_import_fails_remove_btn');
-			
+
 			ilUtil::sendFailure($qsaImportFails->getFailedImportsMessage($this->lng).'<br />'.$button->render());
 		}
-		
+
 		require_once 'Services/Taxonomy/classes/class.ilObjTaxonomy.php';
 		$taxIds = ilObjTaxonomy::getUsageOfObject($this->object->getId());
 
@@ -1162,7 +1169,14 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 				$taxExp = new ilTaxonomyExplorerGUI(
 						$this, 'showNavTaxonomy', $taxId, 'ilobjquestionpoolgui', 'questions'
 				);
-				
+
+// fau: taxDesc - open the current taxonomy path
+				if ($_GET["tax_node"])
+				{
+					$taxExp->setPathOpen($_GET["tax_node"]);
+				}
+// fau.
+
 				if( !$taxExp->handleCommand() )
 				{
 					$this->tpl->setLeftContent($taxExp->getHTML()."&nbsp;");
@@ -1274,13 +1288,24 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		$mode->setOptions(array(
 			'overview'           => $this->lng->txt('overview'),
 			'detailed'           => $this->lng->txt('detailed_output_solutions'),
+            // fim: [exam] add option for detailed view with scoring
+            'detailed_scoring'   => $this->lng->txt('detailed_output_scoring'),
+            // fim.
 			'detailed_printview' => $this->lng->txt('detailed_output_printview')
 		));
 		$mode->setValue(ilUtil::stripSlashes($_POST['output']));
 		
 		$ilToolbar->setFormName('printviewOptions');
 		$ilToolbar->addInputItem($mode, true);
-		$ilToolbar->addFormButton($this->lng->txt('submit'), 'print');
+
+        // fim: [exam] add pagebreak option
+        require_once 'Services/Form/classes/class.ilCheckboxInputGUI.php';
+        $break = new ilCheckboxInputGUI( $this->lng->txt("print_pagebreaks"), 'pagebreak');
+        $break->setChecked($_POST['pagebreak']);
+        $ilToolbar->addInputItem($break, true);
+        // fim.
+
+        $ilToolbar->addFormButton($this->lng->txt('submit'), 'print');
 
 		include_once "./Modules/TestQuestionPool/classes/tables/class.ilQuestionPoolPrintViewTableGUI.php";
 		$table_gui = new ilQuestionPoolPrintViewTableGUI($this, 'print', $_POST['output']);

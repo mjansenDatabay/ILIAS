@@ -191,6 +191,17 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		return true;
 	}
 
+// fau: stornoBook - new function allowStorno()
+    /**
+     * Check if the object allows a storno
+     * @return bool
+     */
+	public function allowsStorno()
+    {
+        return $this->object->getUserStorno() || $this->checkPermissionBool('write');
+    }
+// fau.
+
 	protected function initCreationForms($a_new_type)
 	{
 		$forms = parent::initCreationForms($a_new_type);
@@ -292,7 +303,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$public = new ilCheckboxInputGUI($this->lng->txt("book_public_log"), "public");
 		$public->setInfo($this->lng->txt("book_public_log_info"));
 		$a_form->addItem($public);
-
+		
+// fau: stornoBook - add setting checkbox
+		$storno = new ilCheckboxInputGUI($this->lng->txt("book_user_storno"), "storno");
+		$storno->setInfo($this->lng->txt("book_user_storno_info"));
+		$a_form->addItem($storno);
+// fau.
+		
 		// presentation
 		$pres = new ilFormSectionHeaderGUI();
 		$pres->setTitle($this->lng->txt('obj_presentation'));
@@ -317,6 +334,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$a_values["period"] = $this->object->getReservationFilterPeriod();
 		$a_values["rmd"] = $this->object->getReminderStatus();
 		$a_values["rmd_day"] = $this->object->getReminderDay();
+// fau: stornoBook - load setting into form
+		$a_values['storno'] = $this->object->getUserStorno();
+// fau.
 	}
 
 	protected function updateCustom(ilPropertyFormGUI $a_form)
@@ -333,6 +353,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
 		// tile image
 		$obj_service->commonSettings()->legacyForm($a_form, $this->object)->saveTileImage();
+		
+// fau: stornoBook - save setting from form
+        $this->object->setUserStorno($a_form->getInput('storno'));
+// fau.
 
 		include_once './Services/Container/classes/class.ilContainer.php';
 		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
@@ -1724,7 +1748,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			{				
 				$obj = new ilBookingReservation($id);
 			
-				if (!$this->checkPermissionBool("write") && $obj->getUserId() != $ilUser->getId())
+// fau: stornoBook - check if storno is allowed
+				if (!$this->checkPermissionBool("write") && ($obj->getUserId() != $ilUser->getId() || !$this->object->getUserStorno()))
+// fau.
 				{
 					ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
 					$this->ctrl->redirect($this, 'log');

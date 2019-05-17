@@ -38,7 +38,12 @@ class ilTestExportRandomQuestionSet extends ilTestExport
 		);
 
 		$this->srcPoolDefList->loadDefinitions();
-		
+
+// fau: fixRandomTestExportPages - use the complete random question list
+//		ilObjTest::exportPagesXML() uses $this->questions
+//		ilObjTest::loadQuestions() loads only those of the current active_id of ilUser
+		$this->test_obj->questions = $this->getQuestionIds();
+// fau.
 		require_once 'Modules/Test/classes/class.ilTestRandomQuestionSetStagingPoolQuestionList.php';
 
 		$this->stagingPoolQuestionListByPoolId = array();
@@ -99,7 +104,16 @@ class ilTestExportRandomQuestionSet extends ilTestExport
 				'poolId' => $definition->getPoolId(),
 				'poolQuestCount' => $definition->getPoolQuestionCount(),
 				'questAmount' => $definition->getQuestionAmount(),
-				'position' => $definition->getSequencePosition()
+				'position' => $definition->getSequencePosition(),
+// fau: typeFilter - export type filter
+                'typeFilter' => implode(',',$definition->getTypeFilterAsTypeTags()),
+// fau.
+// fau: taxGroupFilter - export group filter
+				'GroupTaxId' => $definition->getMappedGroupTaxId(),
+// fau.
+// fau: randomSetOrder - export order
+				'orderBy' => $definition->getOrderBy()
+// fau.
 			);
 
 			// #21330

@@ -43,7 +43,10 @@ class ilObjSurvey extends ilObject
 	const ANONYMIZE_ON = 1; // anonymized, codes
 	const ANONYMIZE_FREEACCESS = 2; // anonymized, no codes
 	const ANONYMIZE_CODE_ALL = 3; // personalized, codes
-	
+// fau: surveyCaptcha - add captcha option
+	const ANONYMIZE_CAPTCHA = 4;
+// fau.
+
 	const QUESTIONTITLES_HIDDEN = 0;
 	const QUESTIONTITLES_VISIBLE = 1;
 
@@ -206,6 +209,10 @@ class ilObjSurvey extends ilObject
 	const RESULTS_SELF_EVAL_OWN = 1;
 	const RESULTS_SELF_EVAL_ALL = 2;
 	
+
+// fau: surveyAsForm - form mode settings
+	protected $formModeSettings = null;
+// fau.
 
 	/**
 	* Constructor
@@ -1063,6 +1070,9 @@ class ilObjSurvey extends ilObject
 			case self::ANONYMIZE_ON:
 			case self::ANONYMIZE_FREEACCESS:
 			case self::ANONYMIZE_CODE_ALL:
+// fau: surveyCaptcha - add captcha option
+			case self::ANONYMIZE_CAPTCHA:
+// fau.
 				$this->anonymize = $a_anonymize;
 				break;
 			default:
@@ -1088,8 +1098,11 @@ class ilObjSurvey extends ilObject
 	*/
 	function isAccessibleWithoutCode()
 	{
-		return ($this->getAnonymize() == self::ANONYMIZE_OFF || 
-			$this->getAnonymize() == self::ANONYMIZE_FREEACCESS);		
+// fau: surveyCaptcha - respect captcha option
+		return ($this->getAnonymize() == self::ANONYMIZE_OFF ||
+			$this->getAnonymize() == self::ANONYMIZE_FREEACCESS ||
+			$this->getAnonymize() == self::ANONYMIZE_CAPTCHA);
+//fau.
 	}
 	
 	/**
@@ -1099,9 +1112,31 @@ class ilObjSurvey extends ilObject
 	*/
 	function hasAnonymizedResults()
 	{
-		return ($this->getAnonymize() == self::ANONYMIZE_ON || 
-			$this->getAnonymize() == self::ANONYMIZE_FREEACCESS);
+// fau: surveyCaptcha - respect captcha option
+		return ($this->getAnonymize() == self::ANONYMIZE_ON ||
+			$this->getAnonymize() == self::ANONYMIZE_FREEACCESS ||
+			$this->getAnonymize() == self::ANONYMIZE_CAPTCHA);
+// fau.
 	}
+
+
+// fau: surveyAsForm allow the reuse of a survey in form mode
+    /**
+     * Checks if a user is allowed to take multiple survey
+     *
+     * @param int $userid user id of the user
+     * @return boolean TRUE if the user is allowed to take the survey more than once, FALSE otherwise
+     * @access public
+     */
+    function isAllowedToTakeMultipleSurveys()
+    {
+        if ($this->getMetaIdentifier('FormMode'))
+        {
+            return true;
+        }
+        return false;
+    }
+// fau.
 
 /**
 * Loads a survey object from a database
@@ -6076,7 +6111,22 @@ class ilObjSurvey extends ilObject
 	
 	public function getReminderEnd()
 	{
-		return $this->reminder_end;
+// fau: surveyReminderEnd - set default end to one month after start
+		if (isset($this->reminder_end))
+		{
+			return $this->reminder_end;
+		}
+		elseif ($this->reminder_start instanceof ilDate)
+		{
+			$end = clone $this->reminder_start;
+			$end->increment(IL_CAL_MONTH, 1);
+			return $end;
+		}
+		else
+		{
+			return null;
+		}
+// fau.
 	}
 	
 	public function setReminderEnd(ilDate $a_value = null)

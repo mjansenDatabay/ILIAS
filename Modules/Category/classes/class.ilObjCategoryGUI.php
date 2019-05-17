@@ -15,6 +15,9 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
 * @ilCtrl_Calls ilObjCategoryGUI: ilInfoScreenGUI, ilObjStyleSheetGUI, ilCommonActionDispatcherGUI, ilObjectTranslationGUI
 * @ilCtrl_Calls ilObjCategoryGUI: ilColumnGUI, ilObjectCopyGUI, ilUserTableGUI, ilDidacticTemplateGUI, ilExportGUI
 * @ilCtrl_Calls ilObjCategoryGUI: ilObjTaxonomyGUI, ilObjectMetaDataGUI, ilContainerNewsSettingsGUI
+* * fim: [univis] add UnivIS import to the control structure
+* @ilCtrl_Calls ilObjCategoryGUI: ilUnivisImportLecturesGUI
+* fim.
 *
 * @ingroup ModulesCategory
 */
@@ -77,6 +80,22 @@ class ilObjCategoryGUI extends ilContainerGUI
 					ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY,
 					true);
 		}
+
+// fau: rootIsReduced - set container appearance for reduced view mode
+		global $tree;
+		if (ilCust::get("ilias_repository_cat_id") && $this->ref_id)
+		{
+			if (ilCust::get("ilias_repository_cat_id") != $this->ref_id
+				and
+				!$tree->isGrandChild(
+					ilCust::get("ilias_repository_cat_id"),
+					$this->ref_id))
+			{
+				// flag for ilContainerGUI
+				$this->reduced_view_mode = true;
+			}
+		}
+// fau.
 	}
 
 	function executeCommand()
@@ -95,6 +114,15 @@ class ilObjCategoryGUI extends ilContainerGUI
 		
 		switch($next_class)
 		{
+	        // fim: [univis] call Univis Import GUI
+			case "ilunivisimportlecturesgui";
+				$this->prepareOutput();
+				include_once('./Services/UnivIS/classes/class.ilUnivisImportLecturesGUI.php');
+				$this->gui_obj = new ilUnivISImportLecturesGUI($this);
+				$ret =& $this->ctrl->forwardCommand($this->gui_obj);
+				break;
+			// fim.
+
 			case "ilobjusergui":
 				include_once('./Services/User/classes/class.ilObjUserGUI.php');
 				
@@ -785,7 +813,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		$bl->setInfo($this->lng->txt("cont_block_limit_info"));
 		$bl->setValue(ilContainer::_lookupContainerSetting($this->object->getId(), "block_limit"));
 		$form->addItem($bl);
-				
+		
 		// icon settings
 
 		// Edit ecs export settings

@@ -109,6 +109,20 @@ class ilPrivacySettings
 		return $this->export_learning_sequence;
 	}
 
+
+    /**
+     * fim: [privacy] check the general right for extended access to user data
+    */
+    public static function _checkExtendedAccess()
+    {
+        global $rbacsystem;
+
+        $privacy = self::_getInstance();
+        return $rbacsystem->checkAccess('export_member_data',$privacy->getPrivacySettingsRefId());
+    }
+    // fim.
+
+
 	/**
 	 * Check if a user has the permission to access approved user profile fields, course related user data and custom user data
 	 * @todo rename

@@ -210,6 +210,12 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
 				$this->testSequence->saveToDb();
 			}
 		}
+// fau: adoptPreviousSolutions - initially save all previous solutions as authorized
+		elseif (!$this->object->isRandomTest() && ilObjTest::_getUsePreviousAnswers($this->testSession->getActiveId(), true))
+        {
+            $this->adoptAllUserSolutionsFromPreviousPass();
+        }
+// fau.
 
 		$active_time_id = $this->object->startWorkingTime(
 			$this->testSession->getActiveId(), $this->testSession->getPass()
@@ -893,8 +899,34 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
 
 		$userSolutionAdopter->perform();
 	}
-	
-	abstract protected function populateQuestionOptionalMessage();
+
+// fau: adoptPreviousSolutions - new function adoptAllUserSolutionsFromPreviousPass()
+    /**
+     * Adopt all user solutions from a previous pass (not only for optional questions)
+     */
+    protected function adoptAllUserSolutionsFromPreviousPass()
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+        $ilUser = $DIC->user();
+
+        $assSettings = new ilSetting('assessment');
+        $isAssessmentLogEnabled = ilObjAssessmentFolder::_enabledAssessmentLogging();
+
+        $userSolutionAdopter = new ilAssQuestionUserSolutionAdopter($ilDB, $assSettings, $isAssessmentLogEnabled);
+        $userSolutionAdopter->setUserId($ilUser->getId());
+        $userSolutionAdopter->setActiveId($this->testSession->getActiveId());
+        $userSolutionAdopter->setTargetPass($this->testSequence->getPass());
+        $userSolutionAdopter->setQuestionIds($this->testSequence->getQuestionIds());
+        $userSolutionAdopter->perform();
+
+        assQuestion::_updateTestPassResults($this->testSession->getActiveId(), $this->testSequence->getPass(), true);
+        assQuestion::_updateTestResultCache($this->testSession->getActiveId());
+        ilLPStatusWrapper::_updateStatus($this->object->getId(), $ilUser->getId());
+    }
+// fau.
+
+    abstract protected function populateQuestionOptionalMessage();
 
 	protected function isOptionalQuestionAnsweringConfirmationRequired($sequenceKey)
 	{

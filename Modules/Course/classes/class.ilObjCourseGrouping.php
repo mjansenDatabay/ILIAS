@@ -362,12 +362,12 @@ class ilObjCourseGrouping
 			{
 				foreach($items as $condition_data)
 				{
-					if($ilAccess->checkAccess('write','',$condition_data['target_ref_id']))
-					{
-						$visible_groupings[] = $grouping_id;
-						break;
+						if($ilAccess->checkAccess('write','',$condition_data['target_ref_id']))
+						{
+							$visible_groupings[] = $grouping_id;
+							break;
+						}
 					}
-				}
 				
 			}				
 		}
@@ -391,7 +391,9 @@ class ilObjCourseGrouping
 		$condh = new ilConditionHandler();
 
 		// DELETE also original course if its the last
-		if($this->getCountAssignedCourses() == 2)
+// fau: limitSub - fix deassign
+		if($this->getCountAssignedItems() == 2)
+// fau.
 		{
 			$condh->deleteByObjId($this->getId());
 
@@ -476,6 +478,32 @@ class ilObjCourseGrouping
 		}
 		return $groupings ? $groupings : array();
 	}
+
+
+// fau: groupingSelector - new function getRelatedGroupings()
+	/**
+	 * Get all groupings to which the object is added
+	 * (not only the groupings created from this object)
+	 *
+	 * @param 	int     $a_obj_id
+	 * @return 	int[]   grouping ids
+	 */
+	public static function _getRelatedGroupings($a_obj_id)
+	{
+		$type = ilObject::_lookupType($a_obj_id);
+		$ref_id = current(ilObject::_getAllReferences($a_obj_id));
+		$grouping_ids = array();
+
+		foreach(ilConditionHandler::_getConditionsOfTarget($ref_id, $a_obj_id, $type) as $condition)
+		{
+			if($condition['operator'] == 'not_member')
+			{
+				$grouping_ids[] = $condition['trigger_obj_id'];
+			}
+		}
+		return $grouping_ids;
+	}
+// fau.
 
 	public static function _checkCondition($trigger_obj_id,$operator,$value,$a_usr_id = 0)
 	{

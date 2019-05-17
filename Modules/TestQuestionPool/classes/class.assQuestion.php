@@ -768,7 +768,7 @@ abstract class assQuestion
 	{
 		return $this->title;
 	}
-	
+
 	/**
 	 * returns the object title prepared to be used as a filename
 	 *
@@ -3553,22 +3553,22 @@ abstract class assQuestion
 	public function deductHintPointsFromReachedPoints(ilAssQuestionPreviewSession $previewSession, $reachedPoints)
 	{
 		global $DIC;
-	
+
 		$hintTracking = new ilAssQuestionPreviewHintTracking($DIC->database(), $previewSession);
 		$requestsStatisticData = $hintTracking->getRequestStatisticData();
 		$reachedPoints = $reachedPoints - $requestsStatisticData->getRequestsPoints();
-		
+
 		return $reachedPoints;
 	}
-	
+
 	public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession)
 	{
 		$reachedPoints = $this->calculateReachedPointsForSolution($previewSession->getParticipantsSolution());
 		$reachedPoints = $this->deductHintPointsFromReachedPoints($previewSession, $reachedPoints);
-		
+
 		return $this->ensureNonNegativePoints($reachedPoints);
 	}
-	
+
 	protected function ensureNonNegativePoints($points)
 	{
 		return $points > 0 ? $points : 0;
@@ -3867,9 +3867,12 @@ abstract class assQuestion
 					$username = ilObjTestAccess::_getParticipantData($active_id);
 					assQuestion::logAction(sprintf($lng->txtlng("assessment", "log_answer_changed_points", ilObjAssessmentFolder::_getLogLanguage()), $username, $old_points, $points, $ilUser->getFullname() . " (" . $ilUser->getLogin() . ")"), $active_id, $question_id);
 				}
+// fau: fixManScoringSuccessMessage - return TRUE for _setReachedPoints only if points are changed
+				return TRUE;
 			}
 
-			return TRUE;
+			return FALSE;
+// fau.
 		}
 		else
 		{

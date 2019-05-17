@@ -11,6 +11,9 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 * @version $Id$
 *
 * @ilCtrl_Calls ilObjUserGUI: ilLearningProgressGUI, ilObjectOwnershipManagementGUI
+* fim: [studydata]: studydata tab
+* @ilCtrl_Calls ilObjUserGUI: ilStudyDataGUI
+* fim.
 *
 * @ingroup ServicesUser
 */
@@ -112,6 +115,14 @@ class ilObjUserGUI extends ilObjectGUI
 
 		switch($next_class)
 		{
+			// fim: [studydata] show StudyDataGUI
+			case "ilstudydatagui":
+				include_once './Services/StudyData/classes/class.ilStudyDataGUI.php';
+				$new_gui = new ilStudyDataGUI($this->object);
+				$this->ctrl->forwardCommand($new_gui);
+				break;
+			// fim.
+
 			case "illearningprogressgui":
 				include_once './Services/Tracking/classes/class.ilLearningProgressGUI.php';
 				$new_gui = new ilLearningProgressGUI(ilLearningProgressGUI::LP_CONTEXT_USER_FOLDER,USER_FOLDER_ID,$this->object->getId());
@@ -206,6 +217,14 @@ class ilObjUserGUI extends ilObjectGUI
 			$this->tabs_gui->addTarget("properties",
 				$this->ctrl->getLinkTarget($this, "edit"), array("edit","","view"), get_class($this));
 		}
+
+		// fim: [studydata] add studydata tab
+		$this->lng->loadLanguageModule("registration");
+		$this->tabs_gui->addTarget('study_data',
+				$this->ctrl->getLinkTargetByClass('ilstudydatagui',''),
+							 '',
+							'ilstudydatagui');
+		// fim.
 
 		$this->tabs_gui->addTarget("role_assignment",
 			$this->ctrl->getLinkTarget($this, "roleassignment"), array("roleassignment"), get_class($this));
@@ -1681,6 +1700,13 @@ class ilObjUserGUI extends ilObjectGUI
 				$settings["require_matriculation"]);
 			$this->form_gui->addItem($mr);
 		}
+
+		// fim: [studydata] add row for studydata
+		include_once './Services/StudyData/classes/class.ilStudyData.php';
+		$stu = new ilCustomInputGUI($lng->txt("studydata"), "studydata");
+  		$stu->setHTML(nl2br(ilStudyData::_getStudyDataText($this->object->getId())));
+ 		$this->form_gui->addItem($stu);
+		// fim.
 
 		// client IP
 		$ip = new ilTextInputGUI($lng->txt("client_ip"), "client_ip");

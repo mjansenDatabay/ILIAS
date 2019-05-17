@@ -122,14 +122,28 @@ class ilExerciseManagementGUI
 		//$cmd = $ilCtrl->getCmd("listPublicSubmissions");
 		
 		switch($class)
-		{			
-			case "ilfilesystemgui":							
+		{
+// fau: exManCalc - call calculation GUI
+			case "ilexcalculategui":
+				include_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+				$calc_gui = new ilExCalculateGUI($this->exercise);
+				$ilTabs->activateTab("grades");
+				$this->ctrl->setReturn($this,'showGradesOverview');
+				$this->ctrl->forwardCommand($calc_gui);
+				break;
+// fau.
+
+			case "ilfilesystemgui":
 				$ilTabs->clearTargets();				
 				$ilTabs->setBackTarget($lng->txt("back"),
 					$ilCtrl->getLinkTarget($this, $this->getViewBack()));
-				
-				ilUtil::sendInfo($lng->txt("exc_fb_tutor_info"));
 
+// fau: exResTime - prevent sending of feedback file notification
+				if ((int) $this->assignment->getResultTime() <= time())
+				{
+					ilUtil::sendInfo($lng->txt("exc_fb_tutor_info"));
+				}
+// fau.
 				include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
 				$fstorage = new ilFSStorageExercise($this->exercise->getId(), $this->assignment->getId());
 				$fstorage->create();
@@ -161,11 +175,15 @@ class ilExerciseManagementGUI
 						$member_status = $this->assignment->getMemberStatus($user_id);
 						$member_status->setFeedback(true);
 						$member_status->update();
-					}	
-					
-					$this->exercise->sendFeedbackFileNotification($pcommand["name"], 
-						$noti_rec_ids, $this->assignment->getId());
-				}					 
+					}
+// fau: exResTime - prevent sending of feedback file notification
+					if ((int)$this->assignment->getResultTime() <= time())
+					{
+						$this->exercise->sendFeedbackFileNotification($pcommand["name"],
+							$noti_rec_ids, $this->assignment->getId());
+					}
+// fau.
+				}
 				$this->ctrl->forwardCommand($fs_gui);
 				break;
 				
@@ -511,6 +529,13 @@ class ilExerciseManagementGUI
 				$marks_obj->setComment(ilUtil::stripSlashes($v));
 				$marks_obj->setMark(ilUtil::stripSlashes($_POST["mark"][$k]));
 				$marks_obj->update();
+
+// fau: exManCalc - save the status in manual mode
+				if ($this->exercise->getPassMode() == "man")
+				{
+					ilExerciseMembers::_writeStatus($this->exercise->getId(), $k, $_POST["status"][$k]);
+				}
+// fau.
 			}
 		}
 		ilUtil::sendSuccess($lng->txt("exc_msg_saved_grades"), true);
@@ -1045,6 +1070,14 @@ class ilExerciseManagementGUI
 		{
 			$ilToolbar->addButton($lng->txt("exc_export_excel"),
 				$ilCtrl->getLinkTarget($this, "exportExcel"));
+
+// fau: exManCalc - add button to calculate the grades
+			if ($this->exercise->getPassMode() == "man")
+			{
+				$ilToolbar->addButton($lng->txt("exc_calculate_overall_results"),
+					$ilCtrl->getLinkTargetByClass("ilExCalculateGUI"));
+			}
+// fau.
 		}
 		
 		$this->ctrl->setParameter($this, "vw", self::VIEW_GRADES);
@@ -1370,10 +1403,10 @@ class ilExerciseManagementGUI
 				!in_array($user_id, $a_selected))
 			{
 				continue;
-			}
-
+			}	
+			
 			$data[-1][$user_id] = array(
-				"status" => ilUtil::stripSlashes($_POST["status"][$user_id])
+				"status" => ilUtil::stripSlashes($_POST["status"][$user_id])						
 			);
 
 			if (array_key_exists("mark", $_POST))
@@ -1487,7 +1520,9 @@ class ilExerciseManagementGUI
 					if(in_array($user_id, $all_members))
 					{
 						$member_status = $this->assignment->getMemberStatus($user_id);
-						$member_status->setComment(ilUtil::stripSlashes($comment));
+// fau: exFeedbackHtml - allow html special chars in comment
+						$member_status->setComment(ilUtil::stripSlashes($comment, false));
+// fau.
 						$member_status->setFeedback(true);
 						$member_status->update();
 						
@@ -1497,8 +1532,10 @@ class ilExerciseManagementGUI
 						}
 					}
 				}
-				
-				if(sizeof($reci_ids))
+
+// fau: exResTime - prevent sending of comment notification
+				if(sizeof($reci_ids) and (int) $this->assignment->getResultTime() <= time())
+// fau.
 				{
 					// send notification
 					$this->exercise->sendFeedbackFileNotification(null, $reci_ids, 

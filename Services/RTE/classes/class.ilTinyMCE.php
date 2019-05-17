@@ -291,7 +291,10 @@ class ilTinyMCE extends ilRTE
 		$tpl->setVariable("ADDITIONAL_PLUGINS", join(",", $this->plugins));
 		include_once "./Services/Utilities/classes/class.ilUtil.php";
 		//$tpl->setVariable("STYLESHEET_LOCATION", $this->getContentCSS());
-		$tpl->setVariable("STYLESHEET_LOCATION", ilUtil::getNewContentStyleSheetLocation());
+// fau: fixCustomRteStyle - use delos.css for custom RTE support (if setRTESupport is not called for ilTextAreaInput)
+// this is the case for editing success/failed messages and manual scoring in tests
+		$tpl->setVariable("STYLESHEET_LOCATION", ilUtil::getNewContentStyleSheetLocation() . "," . ilUtil::getStyleSheetLocation("output", "delos.css"));
+// fau.
 		$tpl->setVariable("LANG", $this->_getEditorLanguage());
 		
 		if($this->getRTERootBlockElement() !== null)
@@ -314,7 +317,9 @@ class ilTinyMCE extends ilRTE
 		$template = new ilTemplate("tpl.usereditor.html", true, true, "Services/RTE");
 		$this->handleImgContextMenuItem($template);
 		$template->setCurrentBlock("tinymce");
-		$template->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/tiny_mce.js");
+// fau: fixTinyInExam - used patched source script instead of minified one
+		$template->setVariable("JAVASCRIPT_LOCATION", "./Services/RTE/tiny_mce".$this->vd."/tiny_mce_src.js");
+// fau.
 		include_once "./Services/Object/classes/class.ilObject.php";
 		$template->setVariable("SELECTOR", $editor_selector);
 		$template->setVariable("BLOCKFORMATS", "");
@@ -1011,6 +1016,11 @@ class ilTinyMCE extends ilRTE
 				case "meta":
 					array_push($valid_elements, "meta[content|dir<ltr?rtl|http-equiv|lang|name|scheme]");
 					break;
+// fau: nobrElement - allow nobr as valid element
+				case "nobr":
+					array_push($valid_elements, "nobr[[class|clear<all?left?none?right|id|style|title]");
+					break;
+// fau.
 				case "noframes":
 					array_push($valid_elements, "noframes[class|dir<ltr?rtl|id|lang|onclick|ondblclick|onkeydown|onkeypress"
 						."|onkeyup|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|style"

@@ -77,6 +77,10 @@ class ilPersonalProfileGUI
 		
 		$next_class = $this->ctrl->getNextClass();
 
+		// fim: [privacy]
+		$this->alertProfileVisibility();
+		// fim.
+
 		switch($next_class)
 		{
 			case "ilpublicuserprofilegui":
@@ -105,6 +109,36 @@ class ilPersonalProfileGUI
 		}
 		return true;
 	}
+
+	/**
+	 * fim: [privacy] show a message about the visibility of the profile
+	 */
+	function alertProfileVisibility()
+	{
+		global $ilCtrl, $ilUser, $lng;
+
+		if ($portfolio_id = $this->getProfilePortfolio())
+		{
+		}
+		else
+		{
+			switch ($ilUser->prefs["public_profile"])
+			{
+				case "y":
+					ilUtil::sendInfo(
+						sprintf($lng->txt("usr_public_profile_logged_in_alert"),
+							$ilCtrl->getLinkTarget($this, "showPublicProfile")));
+					break;
+
+				case "g":
+					ilUtil::sendInfo(
+						sprintf($lng->txt("usr_public_profile_global_alert"),
+							$ilCtrl->getLinkTarget($this, "showPublicProfile")));
+					break;
+			}
+		}
+	}
+	// fim.
 
 
 	/**
@@ -1254,8 +1288,10 @@ class ilPersonalProfileGUI
 			"fax" => $ilUser->getFax(),
 			"email" => $ilUser->getEmail(),
 			"second_email" => $ilUser->getSecondEmail(),
-			"hobby" => $ilUser->getHobby(),
-			"matriculation" => $ilUser->getMatriculation()
+			"hobby" => $ilUser->getHobby()
+			// fim: [privacy] don't add matriculation to the public profile fields
+			// "matriculation" => $ilUser->getMatriculation(),
+			// fim.
 		);
 		
 		// location

@@ -981,7 +981,16 @@ class ilObjectCopyGUI
 		ilLoggerFactory::getLogger('obj')->debug('Source(s): '. print_r($this->getSources(),TRUE));
 		ilLoggerFactory::getLogger('obj')->debug('Target(s): '. print_r($this->getTargets(),TRUE));
 
-		ilUtil::sendInfo($this->lng->txt($this->getType().'_copy_threads_info'));
+// fau: copyBySoap - show info about sending an email when copying is finished
+		$info = $this->lng->txt($this->getType().'_copy_threads_info');
+
+		if(ilCust::get('ilias_copy_by_soap'))
+		{
+			$info.= '<br /><span class="small">'.$this->lng->txt('object_copy_with_mail_info').'</span>';
+		}
+		ilUtil::sendInfo($info);
+// fau.
+
 		include_once './Services/Object/classes/class.ilObjectCopySelectionTableGUI.php';
 		
 		$tpl->addJavaScript('./Services/CopyWizard/js/ilContainer.js');
@@ -1214,6 +1223,19 @@ class ilObjectCopyGUI
 		$progress->init();
 		$progress->setRedirectionUrl($ilCtrl->getParentReturn($this->parent_obj));
 
+
+// fau: copyBySoap - show in message if mail will be sent
+		global $DIC;
+		if ($DIC->ctrl()->getCmd() == 'copyContainerWithMail')
+		{
+			ilUtil::sendInfo($this->lng->txt("object_copy_in_progress_with_mail"));
+		}
+		else
+		{
+			ilUtil::sendInfo($this->lng->txt("object_copy_in_progress"));
+		}
+// fau.
+		
 		$tpl->setContent($progress->getHTML());
 	}
 
@@ -1236,8 +1258,14 @@ class ilObjectCopyGUI
 		echo json_encode($json);
 		exit;
 	}
-	
-	
+
+// 	fau: copyBySoap - wrapper function for command with mail
+	protected function copyContainerWithMail()
+	{
+		$this->copyContainerToTargets();
+	}
+// fau.
+
 	/**
 	 * Copy a container
 	 * @return 
@@ -1279,8 +1307,14 @@ class ilObjectCopyGUI
 		}
 
 		$options = $_POST['cp_options'] ? $_POST['cp_options'] : array();
-		
-		
+
+// fau: copyBySoap - add wizard option if mail should be sent
+		if ($ilCtrl->getCmd() == 'copyContainerWithMail')
+		{
+			$options[ilCopyWizardOptions::SEND_MAIL] = array('send');
+		}
+// fau.
+
 		ilLoggerFactory::getLogger('obj')->debug('Copy container (sources): '. print_r($this->getSources(),TRUE));
 		
 		$orig = ilObjectFactory::getInstanceByRefId($this->getFirstSource());

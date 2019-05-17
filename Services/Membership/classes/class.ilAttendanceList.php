@@ -58,6 +58,13 @@ class ilAttendanceList
 		$this->presets['name'] = array($DIC->language()->txt('name'), true);
 		$this->presets['login'] = array($DIC->language()->txt('login'), true);
 
+		// fim: [privacy] show email only with extended export rights
+		include_once('Services/PrivacySecurity/classes/class.ilPrivacySettings.php');
+		if (ilPrivacySettings::_checkExtendedAccess())
+		{
+			$this->presets['email'] = array($DIC->language()->txt('email'));
+		}
+		// fim.
 		
 		// add exportable fields
 		$this->readOrderedExportableFields();
@@ -699,7 +706,7 @@ class ilAttendanceList
 			}
 		}
 
-		$valid_user_ids = ilUtil::_sortIds(array_unique($valid_user_ids),'usr_data','lastname','usr_id');						
+		$valid_user_ids = ilUtil::_sortIds(array_unique($valid_user_ids),'usr_data','lastname','usr_id');
 		foreach($valid_user_ids as $user_id)
 		{
 			if($this->callback)

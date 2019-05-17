@@ -92,6 +92,14 @@ class ilObjSessionListGUI extends ilObjectListGUI
 	public function getTitle()
 	{
 		$app_info = $this->getAppointmentInfo();
+
+		// fim: [memsess] don't display the date if title exists
+//		if(strlen($this->title))
+//		{
+//			return $this->title;
+//		}
+		// fim.
+
 		$title = strlen($this->title) ? (': '.$this->title) : '';
 		return ilSessionAppointment::_appointmentToString($app_info['start'], $app_info['end'],$app_info['fullday']) . $title;
 	}
@@ -157,20 +165,23 @@ class ilObjSessionListGUI extends ilObjectListGUI
 		include_once './Modules/Session/classes/class.ilObjSession.php';
 		$session_data = new ilObjSession($this->obj_id, false);
 		include_once './Modules/Session/classes/class.ilSessionParticipants.php';
-		$part = ilSessionParticipants::getInstance($this->ref_id);
-
-		if($session_data->isRegistrationUserLimitEnabled()) {
-			if ($part->getCountMembers() <= $session_data->getRegistrationMaxUsers()) {
-				$props[] = array(
-					'alert' => false,
-					'property' => $this->lng->txt('sess_list_reg_limit_places'),
-					'value' => max(
-						0,
-						$session_data->getRegistrationMaxUsers() - $part->getCountMembers()
-					)
-				);
-			}
-		}
+// fim: [memsess] hide the wrongly calculated standard free places
+//      StudOn 5.3: the session registration with course registration does not yet add user to the new session role
+//		$part = ilSessionParticipants::getInstance($this->ref_id);
+//
+//		if($session_data->isRegistrationUserLimitEnabled()) {
+//			if ($part->getCountMembers() <= $session_data->getRegistrationMaxUsers()) {
+//				$props[] = array(
+//					'alert' => false,
+//					'property' => $this->lng->txt('sess_list_reg_limit_places'),
+//					'value' => max(
+//						0,
+//						$session_data->getRegistrationMaxUsers() - $part->getCountMembers()
+//					)
+//				);
+//			}
+//		}
+// fim.
 		
 		if($this->getDetailsLevel() == ilObjectListGUI::DETAILS_MINIMAL)
 		{
@@ -239,6 +250,47 @@ class ilObjSessionListGUI extends ilObjectListGUI
 			}
 		}
 
+		// fim: [memsess] display information about registered users and registration status
+		include_once('./Modules/Session/classes/class.ilObjSessionAccess.php');
+		if (ilObjSessionAccess::_lookupRegistration($this->obj_id, $this->ref_id))
+		{
+            $max_participants = ilObjSessionAccess::_lookupMaxParticipants($this->obj_id);
+            $registrations = ilObjSessionAccess::_lookupRegisteredUsers($this->obj_id);
+
+			$props[] = array(
+				'alert'		=> true,
+				'property'	=> $this->lng->txt("crs_subscription_event_registered"),
+				'value'		=>  $registrations,
+				'newline'	=> true);
+
+			if ($max_participants != 0)
+			{
+				$free = max($max_participants - $registrations, 0);
+
+				$props[] = array(
+					'alert'		=> true,
+					'property'	=> $this->lng->txt("crs_subscription_event_free"),
+					'value'		=> $free);
+			}
+			
+			global $ilUser;
+			if (ilObjSessionAccess::_lookupRegistered($ilUser->getId(), $this->obj_id))
+			{
+				$props[] = array(
+					'alert'		=> true,
+					'property'	=> $this->lng->txt("status"),
+					'value'		=> $this->lng->txt("event_registered"));
+			}
+			else
+			{
+				$props[] = array(
+					'alert'		=> true,
+					'property'	=> $this->lng->txt("status"),
+					'value'		=> $this->lng->txt("event_not_registered"));
+			}
+		}
+		// fim.
+
 		return $props;
 	}
 
@@ -275,6 +327,7 @@ class ilObjSessionListGUI extends ilObjectListGUI
 				'JOIN tree ON item_id = child '.
 				'WHERE event_id = '.$ilDB->quote($a_sess_id,'integer').' '.
 				'AND tree > 0';
+
 		$res = $ilDB->query($query);
 		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{

@@ -20,6 +20,10 @@ class ilLPObjSettings
 	var $obj_mode = null;
 	var $visits = null;
 
+// fau: lpQuestionsPercent -  class variable
+	var $questions_percent = null;
+// fau.
+
 	var $is_stored = false;
 		 	
 	const LP_MODE_DEACTIVATED = 0;
@@ -110,7 +114,7 @@ class ilLPObjSettings
 		,self::LP_MODE_VISITED_PAGES => array('ilLPStatusVisitedPages', 
 			'trac_mode_visited_pages', 'trac_mode_visited_pages_info') 
 		
-		,self::LP_MODE_CONTENT_VISITED => array('ilLPStatusContentVisited', 
+		,self::LP_MODE_CONTENT_VISITED => array('ilLPStatusContentVisited',
 			'trac_mode_content_visited', 'trac_mode_content_visited_info')
 		
 		,self::LP_MODE_COLLECTION_MOBS => array('ilLPStatusCollectionMobs', 
@@ -177,6 +181,18 @@ class ilLPObjSettings
 		$this->visits = $a_visits;
 	}
 
+// fau: lpQuestionsPercent - getter/setter
+    function getQuestionsPercent()
+    {
+        return (float) (!empty($this->questions_percent) ? $this->questions_percent : 100);
+    }
+
+    function setQuestionsPercent($a_percent)
+    {
+        $this->questions_percent = $a_percent;
+    }
+// fau.
+
 	function setMode($a_mode)
 	{		
 		$this->obj_mode = $a_mode;
@@ -207,7 +223,9 @@ class ilLPObjSettings
 			$this->obj_type = $row->obj_type;
 			$this->obj_mode = $row->u_mode;
 			$this->visits = $row->visits;
-
+// fau: lpQuestionsPercent - read questions percent
+			$this->questions_percent = $row->questions_percent;
+// fau.
 			return true;
 		}
 
@@ -225,6 +243,9 @@ class ilLPObjSettings
 			return $this->insert();
 		}
 		$query = "UPDATE ut_lp_settings SET u_mode = ".$ilDB->quote($this->getMode() ,'integer').", ".
+// fau: lpQuestionsPercent - update questions percent
+            "questions_percent = ".$ilDB->quote($this->getQuestionsPercent() ,'float').", ".
+// fau.
 			"visits = ".$ilDB->quote($this->getVisits() ,'integer')." ".
 			"WHERE obj_id = ".$ilDB->quote($this->getObjId() ,'integer');
 		$res = $ilDB->manipulate($query);
@@ -244,13 +265,16 @@ class ilLPObjSettings
 
 		$ilDB = $DIC['ilDB'];
 
-		$query = "INSERT INTO ut_lp_settings (obj_id,obj_type,u_mode,visits) ".
+// fau: lpQuestionsPercent - insert questions percent
+		$query = "INSERT INTO ut_lp_settings (obj_id,obj_type,u_mode,questions_percent,visits) ".
 			"VALUES(".
 			$ilDB->quote($this->getObjId() ,'integer').", ".
 			$ilDB->quote($this->getObjType(),'text').", ".
 			$ilDB->quote($this->getMode(),'integer').", ".
+            $ilDB->quote($this->getQuestionsPercent(), 'float').", ".
 			$ilDB->quote($this->getVisits(), 'integer').  // #12482
 			")";
+// fau.
 		$res = $ilDB->manipulate($query);
 		$this->__read();
 	
@@ -297,7 +321,24 @@ class ilLPObjSettings
 		}
 		return self::LP_DEFAULT_VISITS;
 	}
-	
+
+// fau: lpQuestionsPercent - lookup questions percent
+    static function _lookupQuestionsPercent($a_obj_id)
+    {
+        global $ilDB;
+
+        $query = "SELECT questions_percent FROM ut_lp_settings ".
+            "WHERE obj_id = ".$ilDB->quote($a_obj_id ,'integer');
+
+        $res = $ilDB->query($query);
+        while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
+        {
+            return (float) (!empty($row->questions_percent) ? $row->questions_percent : 100);
+        }
+        return 100;
+    }
+// fau.
+
 	public static function _lookupDBModeForObjects(array $a_obj_ids)
 	{
 		global $DIC;

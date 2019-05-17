@@ -20,6 +20,10 @@ class ilObjBookingPool extends ilObject
 	protected $reservation_period; // [int]
 	protected $reminder_status = 0; // [int]
 	protected $reminder_day = 1; // [int]
+	
+// fau: stornoBook - add property
+    protected $user_storno = true; // [int]
+// fau.
 
 	const TYPE_FIX_SCHEDULE = 1;
 	const TYPE_NO_SCHEDULE = 2;
@@ -51,6 +55,9 @@ class ilObjBookingPool extends ilObject
 			"ovlimit" => array("integer", $this->getOverallLimit()),
 			"reminder_status" => array("integer", $this->getReminderStatus()),
 			"reminder_day" => array("integer", $this->getReminderDay()),
+// fau: stornoBook - add db field
+            "user_storno" => array("integer", $this->getUserStorno()),
+// fau.
 			"rsv_filter_period" => array("integer", $this->getReservationFilterPeriod())
 		);
 		
@@ -116,6 +123,9 @@ class ilObjBookingPool extends ilObject
 			$this->setOverallLimit($row['ovlimit']);
 			$this->setReminderStatus($row['reminder_status']);
 			$this->setReminderDay($row['reminder_day']);
+// fau: stornoBook - read value
+			$this->setUserStorno(($row['user_storno']));
+// fau.
 			$this->setReservationFilterPeriod($row['rsv_filter_period']);
 		}
 	}
@@ -224,7 +234,11 @@ class ilObjBookingPool extends ilObject
 		$new_obj->setOverallLimit($this->getOverallLimit());
 		$new_obj->setReminderStatus($this->getReminderStatus());
 		$new_obj->setReminderDay($this->getReminderDay());
-
+		
+// fau: stornoBook - clone value
+		$new_obj->setUserStorno($this->getUserStorno());
+// fau.
+		
 		$smap = null;
 		if($this->getScheduleType() == self::TYPE_FIX_SCHEDULE)
 		{			
@@ -307,7 +321,7 @@ class ilObjBookingPool extends ilObject
 	/**
 	 * Set reminder status
 	 *
-	 * @param int $a_val reminder status	
+	 * @param int $a_val reminder status
 	 */
 	function setReminderStatus($a_val)
 	{
@@ -410,8 +424,29 @@ class ilObjBookingPool extends ilObject
 	{
 		return $this->reservation_period;
 	}
-	
-	
+
+// fau: stornoBook - setter/getter
+    /**
+     * Set the storno by user option
+     * @param $a_value
+     */
+	public function setUserStorno($a_value)
+    {
+     $this->user_storno = (bool) $a_value;
+    }
+
+
+    /**
+     * Get the user storno option
+     * @param $a_value
+     * @return bool
+     */
+    public function getUserStorno()
+    {
+        return (bool) $this->user_storno;
+    }
+// fau.
+
 	//
 	// advanced metadata
 	// 

@@ -137,7 +137,20 @@ class ilStartUpGUI
 		$this->ctrl->setCmd("");
 		$this->executeCommand();
 	}
-	
+
+// fau: rootAsLogin - new function jumpToUsernameAssistance()
+	/**
+	* jump to username assistance
+	*/
+	function jumpToUsernameAssistance()
+	{
+		$this->ctrl->setCmdClass("ilpasswordassistancegui");
+		$this->ctrl->setCmd("showUsernameAssistanceForm");
+		$this->executeCommand();
+	}
+// fau.
+
+
 	/**
 	 * Show login page or redirect to startup page if user is not authenticated.
 	 */
@@ -191,8 +204,26 @@ class ilStartUpGUI
 		$this->logger->debug('No valid session -> show login');
 		$this->showLoginPage();
 	}
-	
-	
+
+// fau: rootAsLogin - new function shownRootPage
+	/**
+	 * Show the repository root page without redirection
+	 * @throws ilCtrlException
+	 */
+	protected function showRootPage()
+	{
+		global $DIC;
+
+		$_GET['ref_id'] = ROOT_FOLDER_ID;
+
+		$ilCtrl = $DIC->ctrl();
+		$ilCtrl->initBaseClass('ilrepositorygui');
+		$ilCtrl->getCallStructure('ilrepositorygui');
+		$ilCtrl->setCmd('frameset');
+		$ilCtrl->callBaseClass();
+	}
+// fau.
+
 	/**
 	 * @todo check for forced authentication like ecs, ...
 	 * Show login page
@@ -200,7 +231,34 @@ class ilStartUpGUI
 	protected function showLoginPage(ilPropertyFormGUI $form = null)
 	{
 		global $tpl, $ilSetting;
-		
+
+// fau: rootAsLogin - show the root page instead of the login page
+
+		if (ilCust::get('ilias_root_as_login'))
+		{
+			global $DIC;
+			/** @var ilAuthSession $authSession */
+			$ilAuthSession = $DIC['ilAuthSession'];
+			$ilAccess = $DIC->access();
+
+			// check expired session and send message
+			if($ilAuthSession->isExpired())
+			{
+				$ilAuthSession->logout();
+				$ilAuthSession->init();
+				$ilAuthSession->setAuthenticated(true, ANONYMOUS_USER_ID);
+				ilInitialisation::initUserAccount();
+				ilUtil::sendFailure($GLOBALS['lng']->txt('auth_err_expired'));
+			}
+
+			if ($ilAccess->checkAccess("read", "", ROOT_FOLDER_ID))
+			{
+				$this->showRootPage();
+				return;
+			}
+		}
+// fau.
+
 		$this->getLogger()->debug('Showing login page');
 
 		$frontend = new ilAuthFrontendCredentialsApache($this->httpRequest, $this->ctrl);
@@ -978,7 +1036,19 @@ class ilStartUpGUI
 					return $GLOBALS['ilCtrl']->redirect($this, 'showAccountMigration');
 
 				case ilAuthStatus::STATUS_AUTHENTICATION_FAILED:
-					ilUtil::sendFailure($status->getTranslatedReason());
+// fau: loginFailed - add contact and sso message
+					$message = $status->getTranslatedReason();
+					$message .= '<p class="small">'.$this->lng->txt('err_inactive_contact').'</p>';
+					if ($GLOBALS['DIC']['ilSetting']->get("shib_active"))
+					{
+						if (ilObjUser::_checkExternalAuthAccount('shibboleth', $credentials->getUsername()))
+						{
+							$message .= '<p class="small">'.$this->lng->txt('err_inactive_sso').'</p>';
+						}
+					}
+
+					ilUtil::sendFailure($message);
+// fau.
 					return $this->showLoginPage($form);
 			}
 			
@@ -1592,6 +1662,20 @@ class ilStartUpGUI
 			ilUtil::redirect('saml.php?action=logout&logout_url=' . urlencode(ILIAS_HTTP_PATH . '/login.php'));
 		}
 
+// fau: rootAsLogin - show the root page instead of the logout page
+		global $DIC;
+		$ilAccess = $DIC->access();
+		if (ilCust::get('ilias_root_as_login') && $ilAccess->checkAccess("read", "", ROOT_FOLDER_ID))
+		{
+			$GLOBALS['DIC']['ilAuthSession']->init();
+			$GLOBALS['DIC']['ilAuthSession']->setAuthenticated(true, ANONYMOUS_USER_ID);
+			ilInitialisation::initUserAccount();
+			ilUtil::sendSuccess($lng->txt("logout_text"));
+			$this->showRootPage();
+			return;
+		}
+// fau.
+
 		//instantiate logout template
 		self::initStartUpTemplate("tpl.logout.html");
 		
@@ -1835,6 +1919,11 @@ class ilStartUpGUI
 	 */
 	protected function getAcceptance()
 	{
+		// fim: [layout] use standard main menu, but don't show links
+		global $ilMainMenu;
+		$ilMainMenu->showLogoOnly(true);
+		// fim.
+
 		$this->showTermsOfService();
 	}
 
@@ -1874,6 +1963,12 @@ class ilStartUpGUI
 				$this->mainTemplate->setVariable('ACCEPT_CHECKBOX', ilUtil::formCheckbox(0, 'status', 'accepted'));
 				$this->mainTemplate->setVariable('ACCEPT_TERMS_OF_SERVICE', $this->lng->txt('accept_usr_agreement'));
 				$this->mainTemplate->setVariable('TXT_SUBMIT', $this->lng->txt('submit'));
+
+				// fim: [layout] added cancel button for terms of service
+				require_once "Services/User/classes/class.ilUserUtil.php";
+				$this->mainTemplate->setVariable('URL_CANCEL', ilUserUtil::_getLogoutLink());
+				$this->mainTemplate->setVariable('TXT_CANCEL', $lng->txt('cancel'));
+				// fim.
 			}
 
 			$this->mainTemplate->setPermanentLink('usr', null, 'agreement');
@@ -1958,6 +2053,14 @@ class ilStartUpGUI
 
 		$t_arr = explode("_", $a_target);
 		$type = $t_arr[0];
+
+		// fim: [cust] don't check goto for studon targets
+		// fim: [univis] don't check goto for univis targets
+		if ($type == "studon" or $type == "univis")
+		{
+			return true;
+		}
+		// fim.
 
 		if ($type == "git")
 		{
@@ -2140,12 +2243,15 @@ class ilStartUpGUI
 		}	
 
 		try {
-			$oRegSettings = new \ilRegistrationSettings();
-
+// fau: regCodes - get settings instance after hash verification (code my be injected)
 			$usr_id = \ilObjUser::_verifyRegistrationHash(trim($_GET['rh']));
 			/** @var \ilObjUser $user */
 			$user = \ilObjectFactory::getInstanceByObjId($usr_id);
 			$user->setActive(true);
+
+			$oRegSettings = ilRegistrationSettings::getInstance();
+// fau.
+
 			$password = '';
 			if ($oRegSettings->passwordGenerationEnabled()) {
 				$passwords = \ilUtil::generatePasswords(1);
@@ -2220,11 +2326,17 @@ class ilStartUpGUI
 		// framework is needed for language selection
 		include_once("./Services/UICore/classes/class.ilUIFramework.php");
 		ilUIFramework::init();
-		
-		$tpl->addBlockfile('CONTENT', 'content', 'tpl.startup_screen.html', 'Services/Init');
-		$tpl->setVariable('HEADER_ICON', ilUtil::getImagePath('HeaderIcon.svg'));
-		$tpl->setVariable("HEADER_ICON_RESPONSIVE", ilUtil::getImagePath("HeaderIconResponsive.svg"));
 
+		// fim: [layout] use customized startup template with added standard main menu
+		global $ilMainMenu;
+		$tpl->addBlockfile('CONTENT', 'content', 'tpl.startup_screen.html', 'Services/Init');
+		$tpl->setCurrentBlock('menu_block');
+		$tpl->setVariable("MAINMENU", $ilMainMenu->getHTML());
+		$tpl->setVariable("MAINMENU_SPACER", $ilMainMenu->getSpacerClass());
+		$tpl->parseCurrentBlock();
+		// fim.
+
+		/* fim: [layout] don't show back or logout link (main menu is presented)
 		if($a_show_back)
 		{
 			// #13400
@@ -2251,6 +2363,7 @@ class ilStartUpGUI
 			$tpl->setVariable('LINK_URL', ILIAS_HTTP_PATH . '/logout.php');
 			$tpl->parseCurrentBlock();
 		}
+		fim. */
 
 		if(is_array($a_tmpl))
 		{
@@ -2263,6 +2376,7 @@ class ilStartUpGUI
 			$template_dir  = 'Services/Init';
 		}
 
+		/* fim: [layout] header title and language selection is set by standard main menu
 		//Header Title
 		include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
 		$header_top_title = ilObjSystemFolder::_getHeaderTitle();
@@ -2282,6 +2396,7 @@ class ilStartUpGUI
 			$tpl->setVariable("LANG_SELECT", $selection);
 			$tpl->parseCurrentBlock();
 		}
+		fim. */
 
 		$tpl->addBlockFile('STARTUP_CONTENT', 'startup_content', $template_file, $template_dir);
 	}

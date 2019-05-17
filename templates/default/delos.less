@@ -1,6 +1,7 @@
 //out: delos.css, sourcemap: true, compress: true
 
-@import "less/font.less";
+// fau: last-change 2019-05-17 #18
+@import "less/fau-font.less";   // fim: use fau font.
  /* rtl-review is this font safe for RTL languages? */
 
  /* rtl-review */
@@ -372,8 +373,8 @@ body{
 }
 
 div#minheight {
-	height: 180px;
-	clear: both;
+    min-height: 130px;   // fim: changed to footer size
+	clear:both;
 	}
 
 div.ilFrame {
@@ -426,10 +427,12 @@ div.ilFrame {
 	float: left;
 	position: absolute;
 	padding: 5px;
-	margin-left: 15px;
+    padding-top: 25px;                                        // fim: move below treeview icon
+    margin-left: -15px;                                       // fim: move to the left
 	overflow: auto;
-	background-color: @il-secondary-container-bg;
-	border-right: 3px solid lighten(@mid-gray, 33%);
+	background-color: white;                                  // fim: white background
+	// border-right: 3px solid lighten(@mid-gray, 33%);       // fim: no border
+    box-shadow: -3px 0px 3px lighten(@mid-gray, 66%) inset;   // fim: added shadow
 	z-index: 100;
 	position: fixed;
 	top: @il-header-height;
@@ -680,6 +683,7 @@ body#tinymce {
 }
 
 div#mainspacekeeper {
+  margin-bottom: 10px; // fim: added margin above footer
 }
 
 div#mainscrolldiv {
@@ -1078,7 +1082,7 @@ h3.ilHeader {
 	display: inline;
 	font-size: @font-size-h3;
 	color: lighten(@mid-gray,30%);
-	text-transform: uppercase;
+	//text-transform: uppercase;  		// fim: no uppercase.
 }
 
 #headerimage {
@@ -1130,12 +1134,14 @@ div.ilHeaderDesc {
 	font-size: 90%;
 	padding: 0;
 	color: lighten(@text-color, 25%);
+	font-family: 'roboto-light';		// fim: use fau font.
 	font-weight: 300;
 }
 
 div.ilHeaderAlert {
 	font-size: 90%;
 	padding: 0;
+	font-family: 'roboto-light';	// fim: use fau font.
 	font-weight: 300;
 	color: @brand-warning;
 }
@@ -1219,61 +1225,93 @@ div.il_Footer {
 	font-size: 90%;
 	text-align: center;
 }
-
+// fim: changed footer completely
 footer.ilFooter {
 	position: absolute;
 	left: 0;
 	right: 0;
 	bottom: -1px !important;
-	font-size: 0.9em;
-	height: 70px;
-	margin: 0 auto;
-	padding: 20px 0 0;
+	font-size: 0.8em;
+    min-height: 130px;
+    margin: 0 auto;
+    padding: 20px 0 0 0;
 	text-align: left;
-	background-color: @il-footer-bg-color;
-	color: @il-footer-color;
-	@media only screen and (max-width: @grid-float-breakpoint-max) {
-		height: auto;
-	}
-	div.ilFooterContainer {
-		color: @il-footer-color;
-		//float: left;
+	color: #f0f0f0;
+
+    background-color: transparent;
+    background-image: url("images/studon/fau-sign.png"), radial-gradient(ellipse at center center , lighten(#036,15%) 0%, #036 100%);
+    background-repeat: no-repeat;
+    background-attachment: scroll, scroll;
+    background-position: 90% 30%, 0% 0%;
+    background-clip: border-box, border-box;
+    background-origin: padding-box, padding-box;
+    background-size: auto auto, auto auto;
+
+	.ilFooterContainer {
+        float: left;
 		line-height: 1.75;
-		padding: 0 15px;
+		padding: 20px 50px 0px 0px;
+        height: 100px;
+
+        &.info {
+          padding: 5px 0px 0px 0px;
+        }
+        &.right {
+          float: right;
+          text-align: right;
+          padding: 63px 0px 0px 0px;
+        }
 	}
-	a.permalink_label,
-	div.ilFooterContainer > a {
-		color: @il-footer-color;
+    a {
+        color: #f0f0f0;
 		white-space: nowrap;
-		&:hover {
-			color: @il-footer-color;
+	}
+    .dropdown-menu a {
+      color: @text-color;
+    }
+
+    .ilFooterLogo {
+      height: 35px;
+    }
+
+	div.ilPermalinkContainer {
+		margin: 0px;
+		display:inline;
+	}
+
+	div.ilPermalinkContainer .small {
+		font-size: 70%;
+	}
+
+	div.ilPermalinkContainer .il_adv_sel {
+		font-size: 100%;
+	}
+
+	div.ilPermalinkContainer #current_perma_link {
+		color: @text-color;
+		width: 100px;
+		height: 20px;
+		font-size: 90%;
+		float: right;
+		margin-left: 3px;
+		background-color: white;
+		+ .btn-group {
+			vertical-align: top;
 		}
 	}
-	a.permalink_label {
-		> span.glyphicon {
-			@media only screen and (max-width: @grid-float-breakpoint-max) {
-				display: inline;
-			}
-		}
+
+	div.ilPermalinkContainer a {
+		font-size: 1em;
 	}
-	.ilPermalinkContainer {
-		width: auto;
-		> label {
-			display: table-cell;
-			vertical-align: middle;
-			padding-right: 5px;
-			@media only screen and (max-width: @grid-float-breakpoint-max) {
-				padding-right: 0;
-				width: 24px;
-			}
-		}
-		padding-right: 5px;
-		line-height: 22px;
-		@media only screen and (max-width: @grid-float-breakpoint-max) {
-			padding-right: 0;
-		}
-	}
+
+	.ilFooterDevmode {
+      clear: both;
+      a {
+        color: @text-color;
+      }
+    }
 }
+// fim.
 
 [dir="rtl"] footer.ilFooter {
 	text-align: right;

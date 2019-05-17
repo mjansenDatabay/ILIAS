@@ -44,7 +44,15 @@ class ilSessionStatistics
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		
+
+        // fim: [performance] don't write seesion statistics for fixed handling
+        global $ilSetting;
+        if ($ilSetting->get('session_handling_type') == ilSession::SESSION_HANDLING_FIXED)
+        {
+            return;
+        }
+        // fim.
+
 		if(!$a_user_id || !$a_session_id || !self::isActive())
 		{
 			return;
@@ -75,6 +83,19 @@ class ilSessionStatistics
 	 */
 	public static function closeRawEntry($a_session_id, $a_context = null, $a_expired_at = null)
 	{
+		global $DIC;
+		
+		$ilDB = $DIC['ilDB'];
+		
+		// fim: [performance] don't write seesion statistics for fixed handling
+		$ilSetting = $DIC['ilSetting'];
+		if ($ilSetting->get('session_handling_type') == ilSession::SESSION_HANDLING_FIXED)
+		{
+			return;
+		}
+		// fim.
+
+
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
@@ -278,7 +299,15 @@ class ilSessionStatistics
      * @param integer $a_now
 	 */
 	public static function aggretateRaw($a_now)
-	{								
+	{
+        // fim: [performance] don't write seesion statistics for fixed handling
+        global $ilSetting;
+        if ($ilSetting->get('session_handling_type') == ilSession::SESSION_HANDLING_FIXED)
+        {
+            return;
+        }
+        // fim.
+
 		if(!self::isActive())
 		{
 			return;

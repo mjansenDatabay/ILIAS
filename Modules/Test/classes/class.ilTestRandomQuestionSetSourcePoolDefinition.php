@@ -35,29 +35,38 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	
 	// fau: taxFilter/typeFilter - new class variables
 	#private $originalFilterTaxId = null;
-	
+
 	#private $originalFilterTaxNodeId = null;
 
 	#private $mappedFilterTaxId = null;
 
 	#private $mappedFilterTaxNodeId = null;
-	
+
 	/**
 	 * @var array taxId => [nodeId, ...]
 	 */
 	private $originalTaxonomyFilter = array();
-	
+
 	/**
 	 * @var array taxId => [nodeId, ...]
 	 */
 	private $mappedTaxonomyFilter = array();
-	
+
 	/**
 	 * @var array
 	 */
 	private $typeFilter = array();
 	// fau.
 	// fau.
+
+// fau: taxGroupFilter - new class variables
+	private $originalGroupTaxId = null;
+	private $mappedGroupTaxId = null;
+// fau.
+
+// fau: randomSetOrder - new class variable
+	private $orderBy = null;
+// fau.
 
 	private $questionAmount = null;
 	
@@ -128,7 +137,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		return $this->originalTaxonomyFilter;
 	}
-	
+
 	/**
 	 * set the original taxonomy filter condition
 	 * @param  array taxId => [nodeId, ...]
@@ -137,7 +146,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		$this->originalTaxonomyFilter = $filter;
 	}
-	
+
 	/**
 	 * get the original taxonomy filter for insert into the database
 	 * @return null|string		serialized taxonomy filter
@@ -147,7 +156,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 		// TODO-RND2017: migrate to separate table for common selections by e.g. statistics
 		return empty($this->originalTaxonomyFilter) ? null : serialize($this->originalTaxonomyFilter);
 	}
-	
+
 	/**
 	 * get the original taxonomy filter from database value
 	 * @param null|string		serialized taxonomy filter
@@ -157,7 +166,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 		// TODO-RND2017: migrate to separate table for common selections by e.g. statistics
 		$this->originalTaxonomyFilter = empty($value) ? array() : unserialize($value);
 	}
-	
+
 	/**
 	 * get the mapped taxonomy filter conditions
 	 * @return 	array	taxId => [nodeId, ...]
@@ -166,7 +175,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		return $this->mappedTaxonomyFilter;
 	}
-	
+
 	/**
 	 * set the original taxonomy filter condition
 	 * @param array 	taxId => [nodeId, ...]
@@ -175,7 +184,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		$this->mappedTaxonomyFilter = $filter;
 	}
-	
+
 	/**
 	 * get the original taxonomy filter for insert into the database
 	 * @return null|string		serialized taxonomy filter
@@ -184,7 +193,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		return empty($this->mappedTaxonomyFilter) ? null : serialize($this->mappedTaxonomyFilter);
 	}
-	
+
 	/**
 	 * get the original taxonomy filter from database value
 	 * @param null|string		serialized taxonomy filter
@@ -193,8 +202,8 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		$this->mappedTaxonomyFilter = empty($value) ? array() : unserialize($value);
 	}
-	
-	
+
+
 	/**
 	 * set the mapped taxonomy filter from original by applying a keys map
 	 * @param ilQuestionPoolDuplicatedTaxonomiesKeysMap $taxonomiesKeysMap
@@ -212,17 +221,17 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 			$this->mappedTaxonomyFilter[$taxonomiesKeysMap->getMappedTaxonomyId($taxId)] = $mappedNodeIds;
 		}
 	}
-	
+
 	public function setTypeFilter($typeFilter = array())
 	{
 		$this->typeFilter = $typeFilter;
 	}
-	
+
 	public function getTypeFilter()
 	{
 		return $this->typeFilter;
 	}
-	
+
 	/**
 	 * get the question type filter for insert into the database
 	 * @return null|string		serialized type filter
@@ -231,7 +240,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		return empty($this->typeFilter) ? null : serialize($this->typeFilter);
 	}
-	
+
 	/**
 	 * get the question type filter from database value
 	 * @param null|string		serialized type filter
@@ -240,6 +249,55 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	{
 		$this->typeFilter = empty($value) ? array() : unserialize($value);
 	}
+
+// fau: typeFilter - new functions to set/get filter by type tags
+    /**
+     * Get the type filter asa list of type tags
+     * @return string[]
+     */
+	public function getTypeFilterAsTypeTags()
+    {
+        $map = array();
+        foreach (ilObjQuestionPool::_getQuestionTypes(true) as $trans => $row)
+        {
+            $map[$row['question_type_id']] = $row['type_tag'];
+        }
+
+        $tags = array();
+        foreach($this->typeFilter as $type_id)
+        {
+            if (isset($map[$type_id]))
+            {
+                $tags[] = $map[$type_id];
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Set the type filter from a list of type tags
+     * @param string
+     */
+    public function setTypeFilterFromTypeTags($tags)
+    {
+        $map = array();
+        foreach (ilObjQuestionPool::_getQuestionTypes(true) as $trans => $row)
+        {
+            $map[$row['type_tag']] = $row['question_type_id'];
+        }
+
+        $this->typeFilter = array();
+        foreach($tags as $type_tag)
+        {
+            if (isset($map[$type_tag]))
+            {
+                $this->typeFilter[] = $map[$type_tag];
+            }
+        }
+    }
+// fau.
+
 	/*
 	public function setOriginalFilterTaxId($originalFilterTaxId)
 	{
@@ -282,6 +340,49 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 	}
 	*/
 	// fau.
+
+// fau: taxGroupFilter - setters and getters
+	public function setOriginalGroupTaxId($originalGroupTaxId)
+	{
+		$this->originalGroupTaxId = $originalGroupTaxId;
+	}
+
+	public function getOriginalGroupTaxId()
+	{
+		return $this->originalGroupTaxId;
+	}
+
+	public function setMappedGroupTaxId($mappedGroupTaxId)
+	{
+		$this->mappedGroupTaxId = $mappedGroupTaxId;
+	}
+
+	public function getMappedGroupTaxId()
+	{
+		return $this->mappedGroupTaxId;
+	}
+// fau.
+
+// fau: randomSetOrder - setters and getters
+
+	/**
+	 * Set the field to ordder a random set
+	 * @param string|null $orderBy		'title', 'description', 'random'
+	 */
+	public function setOrderBy($orderBy)
+	{
+		$this->orderBy = $orderBy;
+	}
+
+	/**
+	 * Set the field to ordder a random set
+	 * @return string|null 		'title' or 'description'
+	 */
+	public function getOrderBy()
+	{
+		return $this->orderBy;
+	}
+// fau.
 
 	public function setQuestionAmount($questionAmount)
 	{
@@ -328,6 +429,13 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 				case 'mapped_tax_filter':	$this->setMappedTaxonomyFilterFromDbValue($value);		break;
 				case 'type_filter':			$this->setTypeFilterFromDbValue($value);	break;
 				// fau.
+// fau: taxGroupFilter - read from db
+				case 'origin_group_tax_fi':	$this->setOriginalGroupTaxId($value);	break;
+				case 'mapped_group_tax_fi': $this->setMappedGroupTaxId(($value));	break;
+// fau.
+// fau: randomSetOrder - read from db
+				case 'order_by':			$this->setOrderBy($value);		break;
+// fau.
 				case 'quest_amount':		$this->setQuestionAmount($value);			break;
 				case 'sequence_pos':		$this->setSequencePosition($value);			break;
 			}
@@ -399,6 +507,13 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 				'mapped_tax_filter' => array('text', $this->getMappedTaxonomyFilterForDbValue()),
 				'type_filter' => array('text', $this->getTypeFilterForDbValue()),
 				// fau.
+// fau: taxGroupFilter - update in db
+				'origin_group_tax_fi' => array('integer', $this->getOriginalGroupTaxId()),
+				'mapped_group_tax_fi' => array('integer', $this->getMappedGroupTaxId()),
+// fau.
+// fau: randomSetOrder - update in db
+				'order_by' => array('text', $this->getOrderBy()),
+// fau.
 				'quest_amount' => array('integer', $this->getQuestionAmount()),
 				'sequence_pos' => array('integer', $this->getSequencePosition())
 			),
@@ -431,6 +546,13 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 				'mapped_tax_filter' => array('text', $this->getMappedTaxonomyFilterForDbValue()),
 				'type_filter' => array('text', $this->getTypeFilterForDbValue()),
 				// fau.
+// fau: taxGroupFilter - insert in db
+				'origin_group_tax_fi' => array('integer', $this->getOriginalGroupTaxId()),
+				'mapped_group_tax_fi' => array('integer', $this->getMappedGroupTaxId()),
+// fau.
+// fau: randomSetOrder - update in db
+			'order_by' => array('text', $this->getOrderBy()),
+// fau.
 				'quest_amount' => array('integer', $this->getQuestionAmount()),
 				'sequence_pos' => array('integer', $this->getSequencePosition())
 		));

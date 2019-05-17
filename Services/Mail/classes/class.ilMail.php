@@ -232,7 +232,19 @@ class ilMail
 			return false;
 		}
 
-		return (bool)$this->soap_enabled;
+
+// fau: mailBySoap - use an customizing switch to enable Mails being sent by SOAP
+
+
+		if (ilCust::get('mail_by_soap'))
+		{
+			return (bool) $this->soap_enabled;
+		}
+		else
+		{
+			return false;
+		}
+// fau.
 	}
 
 	/**
@@ -986,7 +998,7 @@ class ilMail
 						|| $tmp_mail_options->getIncomingType() == ilMailOptions::INCOMING_EMAIL
 						|| $tmp_mail_options->getIncomingType() == ilMailOptions::INCOMING_BOTH)
 					{
-						$newEmailAddresses = ilMailOptions::getExternalEmailsByUser($tmp_user, $tmp_mail_options); 
+						$newEmailAddresses = ilMailOptions::getExternalEmailsByUser($tmp_user, $tmp_mail_options);
 						$as_email = array_unique(array_merge($newEmailAddresses, $as_email));
 
 						if ($tmp_mail_options->getIncomingType() == ilMailOptions::INCOMING_EMAIL) {
@@ -1634,12 +1646,21 @@ class ilMail
 		{
 			return $lang->txt('mail_salutation_anonymous') . ',';
 		}
-
-		return
-			$lang->txt('mail_salutation_' . $gender) . ' ' .
-			($name['title'] ? $name['title'] . ' ' : '') .
-			($name['firstname'] ? $name['firstname'] . ' ' : '') .
-			$name['lastname'] . ',';
+// fau: genderSalutation - use gender specific salutation in German
+		elseif ($gender != 'n' and $lang->getLangKey() == 'de')
+		{
+			return $lang->txt('mail_salutation_'.$gender).' '.
+				($name['title'] ? $name['title'].' ' : '').
+				$name['lastname'].',';
+		}
+		else
+		{
+			return $lang->txt('mail_salutation_'.$gender).' '.
+				($name['title'] ? $name['title'].' ' : '').
+				($name['firstname'] ? $name['firstname'].' ' : '').
+				$name['lastname'].',';
+		}
+// fau.
 	}
 
 	/**

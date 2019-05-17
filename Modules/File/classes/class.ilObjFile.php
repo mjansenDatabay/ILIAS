@@ -253,31 +253,66 @@ class ilObjFile extends ilObject2 {
 	}
 
 
-	/**
-	 * @param int $a_version
-	 *
-	 * @return string
-	 */
-	public function getDirectory($a_version = 0) {
-		$version_subdir = "";
+    /**
+     * @param int $a_version
+     *
+     * @return string
+     */
+    public function getDirectory($a_version = 0) {
+        $version_subdir = "";
 
-		if ($a_version) {
-			// BEGIN WebDAV Avoid double slash before version subdirectory
-			$version_subdir = sprintf("%03d", $a_version);
-			// END WebDAV Avoid  double slash before version subdirectory
-		}
+        if ($a_version) {
+            // BEGIN WebDAV Avoid double slash before version subdirectory
+            $version_subdir = sprintf("%03d", $a_version);
+            // END WebDAV Avoid  double slash before version subdirectory
+        }
 
-		if (!is_object($this->file_storage)) {
-			$this->initFileStorage();
-		}
+        if (!is_object($this->file_storage)) {
+            $this->initFileStorage();
+        }
 
-		$str = $this->file_storage->getAbsolutePath() . '/' . $version_subdir;
+        $str = $this->file_storage->getAbsolutePath() . '/' . $version_subdir;
 
-		return $str;
-	}
+        return $str;
+    }
+
+// fau: fixFileVersionDir - workaround for mantis #22761
+    /**
+     * @param int $a_version
+     *
+     * @return string
+     */
+    public function getDirectoryWithFallback($a_version = 0) {
+
+        $version_subdir = "";
+
+        if ($a_version) {
+            // BEGIN WebDAV Avoid double slash before version subdirectory
+            $version_subdir = sprintf("%03d", $a_version);
+            $version_subdir2 = sprintf("%03d", $a_version+1);
+            // END WebDAV Avoid  double slash before version subdirectory
+        }
+
+        if (!is_object($this->file_storage)) {
+            $this->initFileStorage();
+        }
+
+        $str = $this->file_storage->getAbsolutePath() . '/' . $version_subdir;
 
 
-	function createDirectory() {
+        if (!is_dir($str))
+        {
+            $str2 = $this->file_storage->getAbsolutePath() . '/' . $version_subdir2;
+            if (is_dir($str2))
+            {
+                return $str2;
+            }
+        }
+        return $str;
+    }
+// fau.
+
+    function createDirectory() {
 		ilUtil::makeDirParents($this->getDirectory());
 	}
 
@@ -622,7 +657,9 @@ class ilObjFile extends ilObject2 {
 	// END PATCH WebDAV Encapsulate file access in ilObjFile class.
 	function getFile($a_hist_entry_id = null) {
 		if (is_null($a_hist_entry_id)) {
-			$file = $this->getDirectory($this->getVersion()) . "/" . $this->getFileName();
+// fau: fixFileVersionDir - workaround for mantis #22761
+			$file = $this->getDirectoryWithFallback($this->getVersion()) . "/" . $this->getFileName();
+// fau.
 		} else {
 			require_once("./Services/History/classes/class.ilHistory.php");
 			$entry = ilHistory::_getEntryByHistoryID($a_hist_entry_id);
@@ -632,7 +669,9 @@ class ilObjFile extends ilObject2 {
 			}
 
 			$data = $this->parseInfoParams($entry);
-			$file = $this->getDirectory($data["version"]) . "/" . $data["filename"];
+// fau: fixFileVersionDir - workaround for mantis #22761
+			$file = $this->getDirectoryWithFallback($data["version"]) . "/" . $data["filename"];
+// fau.
 		}
 
 		return $file;
@@ -734,7 +773,9 @@ class ilObjFile extends ilObject2 {
 	 */
 	function determineFileSize($a_hist_entry_id = null) {
 		if (is_null($a_hist_entry_id)) {
-			$file = $this->getDirectory($this->getVersion()) . "/" . $this->getFileName();
+// fau: fixFileVersionDir - workaround for mantis #22761
+			$file = $this->getDirectoryWithFallback($this->getVersion()) . "/" . $this->getFileName();
+// fau.
 		} else {
 			require_once("./Services/History/classes/class.ilHistory.php");
 			$entry = ilHistory::_getEntryByHistoryID($a_hist_entry_id);
@@ -744,7 +785,9 @@ class ilObjFile extends ilObject2 {
 			}
 
 			$data = $this->parseInfoParams($entry);
-			$file = $this->getDirectory($data["version"]) . "/" . $data["filename"];
+// fau: fixFileVersionDir - workaround for mantis #22761
+			$file = $this->getDirectoryWithFallback($data["version"]) . "/" . $data["filename"];
+// fau.
 		}
 		if (is_file($file)) {
 			$this->setFileSize(filesize($file));
@@ -759,11 +802,15 @@ class ilObjFile extends ilObject2 {
 	 */
 	public function sendFile($a_hist_entry_id = null) {
 		if (is_null($a_hist_entry_id)) {
-			$file = $this->getDirectory($this->getVersion()) . "/" . $this->getFileName();
+// fau: fixFileVersionDir - workaround for mantis #22761
+			$file = $this->getDirectoryWithFallback($this->getVersion()) . "/" . $this->getFileName();
+// fau.
 		} else {
 			$entry = ilHistory::_getEntryByHistoryID($a_hist_entry_id);
 			$data = $this->parseInfoParams($entry);
-			$file = $this->getDirectory($data["version"]) . "/" . $data["filename"];
+// fau: fixFileVersionDir - workaround for mantis #22761
+			$file = $this->getDirectoryWithFallback($data["version"]) . "/" . $data["filename"];
+// fau.
 		}
 
 		$file = ilFileUtils::getValidFilename($file);
@@ -965,8 +1012,9 @@ class ilObjFile extends ilObject2 {
 	function export($a_target_dir) {
 		$subdir = "il_" . IL_INST_ID . "_file_" . $this->getId();
 		ilUtil::makeDir($a_target_dir . "/objects/" . $subdir);
-
-		$filedir = $this->getDirectory($this->getVersion());
+// fau: fixFileVersionDir - workaround for mantis #22761
+		$filedir = $this->getDirectoryWithFallback($this->getVersion());
+// fau.
 
 		if (@!is_dir($filedir)) {
 			$filedir = $this->getDirectory();

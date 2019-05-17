@@ -198,7 +198,7 @@ class ilObjSystemFolder extends ilObject
 	{
 		$ilDB = $this->db;
 		$ilUser = $this->user;
-		
+
 		$id = ilObjSystemFolder::_getId();
 
 		$q = "SELECT title,description FROM object_translation ".

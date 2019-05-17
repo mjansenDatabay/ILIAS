@@ -440,7 +440,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 			$cssClass = ( $this->hasCorrectSolution($active_id, $pass) ?
 				ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_CORRECT : ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_WRONG
 			);
-			
+
 			$solutiontemplate->setVariable("ILC_FB_CSS_CLASS", $cssClass);
 			$solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback , true ));
 		}
@@ -463,7 +463,14 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 	
 	function getPreview($show_question_only = FALSE, $showInlineFeedback = false)
 	{
+// fau: imageBox - init colorbox
+		include_once "./Services/jQuery/classes/class.iljQueryUtil.php";
+		iljQueryUtil::initjQuery();
+		iljQueryUtil::initColorbox();
+// fau.
+
 		$user_solution = is_object($this->getPreviewSession()) ? (array)$this->getPreviewSession()->getParticipantsSolution() : array();
+
 		// shuffle output
 		$keys = $this->getChoiceKeys();
 
@@ -567,13 +574,19 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 	function getTestOutput(
 		$active_id, 
 		// hey: prevPassSolutions - will be always available from now on
-		$pass, 
+		$pass,
 		// hey.
 		$is_postponed = FALSE, 
 		$use_post_solutions = FALSE, 
 		$show_feedback = FALSE
 	)
 	{
+// fau: imageBox - init colorbox
+		include_once "./Services/jQuery/classes/class.iljQueryUtil.php";
+		iljQueryUtil::initjQuery();
+		iljQueryUtil::initColorbox();
+// fau.
+
 		// shuffle output
 		$keys = $this->getChoiceKeys();
 
@@ -855,10 +868,12 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 	{
 		// Delete all existing answers and create new answers from the form data
 		$this->object->flushAnswers();
+// fau: fixScMcAnswerLatex - keep latex code when switching answer types
 		if ($this->object->isSingleline)
 		{
 			foreach ($_POST['choice']['answer'] as $index => $answertext)
 			{
+				$answertext = preg_replace('/<span class="latex">(.*)<\/span>/','[tex]$1[/tex]', $answertext);
 				$answertext = ilUtil::secureString($answertext);
 				
 				$picturefile    = $_POST['choice']['imagename'][$index];
@@ -892,6 +907,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 			foreach ($_POST['choice']['answer'] as $index => $answer)
 			{
 				$answertext = $answer;
+				$answertext = preg_replace('/\[tex\](.*)\[\/tex\]/','<span class="latex">$1</span>', $answertext);
 				$this->object->addAnswer( $answertext,
 										  $_POST['choice']['points'][$index],
 										  $_POST['choice']['points_unchecked'][$index],
@@ -899,6 +915,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 				);
 			}
 		}
+// fau.
 	}
 
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
