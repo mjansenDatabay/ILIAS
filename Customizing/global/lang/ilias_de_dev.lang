@@ -249,7 +249,7 @@ common#:#relative_link_label#:#Relativer Link
 common#:#relative_link_create#:#Link erzeugen
 common#:#relative_link_description#:#Dieser Link eignet sich für die interne Verlinkung in Kursvorlagen. Er ist beim Kopieren in der Kopie identisch. Beim Klicken wird ein Nutzer zum nächstgelegenen Ziel geleitet. Bitte beachten Sie, dass diese Funktion beim Export in andere ILIAS-Plattformen nicht verfügbar ist.
 common#:#relative_link_not_found#:#Das Linkziel zum Code %s wurde nicht gefunden!
-common#:#repository_public_suffix#:# (öffentlich)
+common#:#repository_public#:#Angebote (öffentlich)
 common#:#role_unbreak_permissions#:#Unterbrechungen löschen
 common#:#role_unbreak_permissions_desc#:#Alle lokalen Zugriffsregelungen für diese Rolle werden gelöscht. Zusammen mit "Vorhandene Objekte ändern" und "Rechte schützen" können damit die Rechteeinstellungen für alle Objekte erzwungen werden.
 common#:#rpl_warning#:#Die Registrierung startet zeitgleich mit anderen für über %s Plätze. Dadurch ist mit erhöhter Systemlast zu rechnen. Bitte wählen Sie, wenn möglich, einen anderen Zeitpunkt.

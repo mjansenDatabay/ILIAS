@@ -2,6 +2,8 @@
 /* Copyright (c) 1998-2012mk ILIAS open source, Extended GPL, see docs/LICENSE */
 
 include_once("./setup/classes/class.ilDBConnections.php");
+require_once('Customizing/classes/class.ilCust.php');
+
 
 /**
 * Setup class
@@ -756,6 +758,12 @@ class ilSetup
 			$this->error = get_class($this).": ".$this->client->getError();
 			$_SESSION["ClientId"] = "";
 			return false;
+		}
+		else
+		{
+// fau: customSettings init the customization in setup (needed for reloading the mainmenu definition)
+			ilCust::getInstance()->loadSettings($this->client->ini);
+// fau.
 		}
 
 		$_SESSION["ClientId"] = $a_client_id;

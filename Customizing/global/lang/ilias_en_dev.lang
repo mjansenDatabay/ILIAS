@@ -276,7 +276,7 @@ common#:#relative_link_label#:#Relative Link
 common#:#relative_link_create#:#Create Link
 common#:#relative_link_description#:#This link can be used for internal linking course templates. It will look the same when the object is copied. A user clicking this link will be led to the nearest target. Please note that this function is not available in other ILIAS installations.
 common#:#relative_link_not_found#:#The link target for code %s was not found!
-common#:#repository_public_suffix#:# (public)
+common#:#repository_public#:#Repository (public)
 common#:#role_unbreak_permissions#:#delete interruptions
 common#:#role_unbreak_permissions_desc#:#All local permission rules for this role will be deleted. Together with "change created objects" and "protect permissions" you can force the permission settings for all objects.
 common#:#rpl_warning#:#The registration starts at the same time with others for over %s places. This may cause high system load. Please choose a different time, if possible.

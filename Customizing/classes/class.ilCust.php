@@ -51,13 +51,20 @@ class ilCust
 
 
 	/**
-	 * Lazy loading of the settings when they are neaded
+	 * Lazy loading of the settings when they are needed
+	 * Force a loading if ini file is given as parameter (for use in setup)
+	 * @param ilIniFile  $ilClientIniFile
 	 */
-	private function loadSettings()
+	public function loadSettings($ilClientIniFile = null)
 	{
 		global $DIC;
 
-		if (!$this->client_settings_loaded)
+		if ($ilClientIniFile instanceof ilIniFile)
+		{
+			$this->client_settings = $ilClientIniFile->readGroup("customize");
+			$this->client_settings_loaded = true;
+		}
+		elseif (!$this->client_settings_loaded)
 		{
 			// read the client settings if available
 			if (isset($DIC) && $DIC->offsetExists('ilClientIniFile'))
@@ -106,7 +113,7 @@ class ilCust
 	 * Get an instance of the object
 	 * @return self
 	 */
-	private static function getInstance()
+	public static function getInstance()
 	{
 		if (!isset(self::$instance)) {
 			self::$instance = new self;

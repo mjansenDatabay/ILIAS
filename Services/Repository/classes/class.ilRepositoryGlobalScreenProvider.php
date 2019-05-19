@@ -44,15 +44,31 @@ class ilRepositoryGlobalScreenProvider extends AbstractStaticMainMenuProvider {
 	 */
 	public function getStaticTopItems(): array {
 		$dic = $this->dic;
-
-		return [$this->mainmenu->topParentItem($this->getTopItem())
+		
+// fau: rootIsReduced - adapt repository link
+		// Home Page
+		$startItem = $this->mainmenu->topLinkItem($this->if->identifier('repository_public'))
+			->withTitle($this->dic->language()->txt("repository_public"))
+			->withAction('goto.php?target=cat_'. ilCust::get('ilias_repository_cat_id'))
+			->withPosition(1)
+			->withVisibilityCallable(
+				function () use ($dic) {
+					return (bool)($dic->user()->getId() == ANONYMOUS_USER_ID &&
+						$dic->access()->checkAccess('visible', '', ilCust::get('ilias_repository_cat_id')));
+				}
+			);
+		
+		
+		return [$startItem, $this->mainmenu->topParentItem($this->getTopItem())
 			        ->withTitle($this->dic->language()->txt("repository"))
 			        ->withPosition(2)
 			        ->withVisibilityCallable(
 				        function () use ($dic) {
-					        return (bool)($dic->access()->checkAccess('visible', '', ROOT_FOLDER_ID));
+					        return (bool)($dic->user()->getId() != ANONYMOUS_USER_ID &&
+					        	$dic->access()->checkAccess('visible', '', ilCust::get('ilias_repository_cat_id')));
 				        }
 			        )];
+// fau.
 	}
 
 
@@ -64,19 +80,34 @@ class ilRepositoryGlobalScreenProvider extends AbstractStaticMainMenuProvider {
 
 		$title = function () use ($dic): string {
 			try {
-				$nd = $dic['tree']->getNodeData(ROOT_FOLDER_ID);
+// fau: rootIsReduced - adapt repository title
+				if ($rep_id = ilCust::get("ilias_repository_cat_id")) {
+					$nd = $dic['tree']->getNodeData($rep_id);
+				}
+				else {
+					$nd = $dic['tree']->getNodeData(ROOT_FOLDER_ID);
+				}
+
 				$title = ($nd["title"] === "ILIAS" ? $dic->language()->txt("repository") : $nd["title"]);
-				$icon = ilUtil::img(ilObject::_getIcon(ilObject::_lookupObjId(1), "tiny"));
+				$icon = ilUtil::img(ilObject::_getIcon(ilObject::_lookupObjId($rep_id ? $rep_id : 1), "tiny"));
 			} catch (InvalidArgumentException $e) {
 				return "";
 			}
 
-			return $title . " - " . $dic->language()->txt("rep_main_page");
+			return $icon . $title . " - " . $dic->language()->txt("rep_main_page");
+// fau.
 		};
 
 		$action = function (): string {
 			try {
-				$static_link = ilLink::_getStaticLink(1, 'root', true);
+// fau: rootIsReduced - adapt repository link
+				if ($rep_id = ilCust::get("ilias_repository_cat_id")) {
+					$static_link = ilLink::_getStaticLink($rep_id, 'cat', true);
+				}
+				else {
+					$static_link = ilLink::_getStaticLink(1, 'root', true);
+				}
+// fau.
 			} catch (InvalidArgumentException $e) {
 				return "";
 			}
@@ -105,6 +136,11 @@ class ilRepositoryGlobalScreenProvider extends AbstractStaticMainMenuProvider {
 					break;
 				}
 
+// fau: rootIsReduced - don't repeat repository link in history
+				if ($item["ref_id"] == ilCust::get("ilias_repository_cat_id")) {
+					continue;
+				}
+// fau.
 				if (!isset($item["ref_id"]) || !isset($_GET["ref_id"])
 					|| ($item["ref_id"] != $_GET["ref_id"] || !$first)
 				)            // do not list current item

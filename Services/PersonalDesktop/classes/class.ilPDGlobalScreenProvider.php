@@ -40,8 +40,20 @@ class ilPDGlobalScreenProvider extends AbstractStaticMainMenuProvider {
 	public function getStaticTopItems(): array {
 		$dic = $this->dic;
 
+// fau: rootAsLogin - add home link to the main menu (for anonymous)
+		// Home Page
+		$startItem = $this->mainmenu->topLinkItem($this->if->identifier('home'))
+			->withTitle($this->dic->language()->txt("to_home"))
+			->withAction('goto.php?target=root_1')
+			->withPosition(0)
+			->withVisibilityCallable(
+				function () use ($dic) {
+					return (bool)($dic->user()->getId() == ANONYMOUS_USER_ID);
+				}
+			);
+		
 		// Personal Desktop TopParentItem
-		return [$this->mainmenu->topParentItem($this->getTopItem())
+		return [$startItem, $this->mainmenu->topParentItem($this->getTopItem())
 			        ->withTitle($this->dic->language()->txt("personal_desktop"))
 			        ->withPosition(1)
 			        ->withVisibilityCallable(
@@ -49,6 +61,7 @@ class ilPDGlobalScreenProvider extends AbstractStaticMainMenuProvider {
 					        return (bool)($dic->user()->getId() != ANONYMOUS_USER_ID);
 				        }
 			        )];
+// fau.
 	}
 
 
