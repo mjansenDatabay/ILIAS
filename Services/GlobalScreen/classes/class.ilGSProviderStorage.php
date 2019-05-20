@@ -1,4 +1,7 @@
 <?php
+//fau: mainMenuHelp - require ilHelpGlobalScreenProvider (not autoloaded)
+require_once('Services/Help/classes/class.ilHelpGlobalScreenProvider.php');
+// fau.
 
 /**
  * Class ilGSProviderStorage

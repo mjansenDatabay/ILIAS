@@ -94,9 +94,17 @@ class ilMMTopParentItemRenderer extends BaseTypeRenderer {
 		$href = ($child instanceof hasAction) ? $child->getAction() : "#";
 		$tooltip = ilHelp::getMainMenuTooltip($identifier);
 		$a_id = "mm_" . $identifier;
+		
+// fau: mainMenuHelp - convert javascript link to onclick attribute
+		if (substr($href, 0,11) == 'javascript:') {
+			$onclick = substr($href,11);
+			$href = "#";
+		}
+
 		$gl->addEntry(
-			$child->getTitle(), $href, $target, "", "", $a_id, $tooltip, "left center", "right center", false
+			$child->getTitle(), $href, $target, $onclick, "", $a_id, $tooltip, "left center", "right center", false
 		);
+// fau.
 	}
 
 

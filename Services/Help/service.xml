@@ -4,6 +4,11 @@
 	<baseclasses>
 		<baseclass name="ilHelpGUI" dir="classes" />
 	</baseclasses>
+	<!-- fau: mainMenuHelp - add main menu provider -->
+	<gsproviders>
+		<gsprovider purpose="mainmenu" class_name="ilHelpGlobalScreenProvider" />
+	</gsproviders>
+	<!-- fau. -->
 	<objects>
 		<object id="hlps" class_name="HelpSettings" dir="classes"
 			checkbox="0" inherit="0" translate="sys" rbac="1" system="1" administration="1">
