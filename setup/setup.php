@@ -40,6 +40,11 @@ if (ini_get('session.save_handler') != 'files') {
 
 chdir("..");
 define('IL_INITIAL_WD', getcwd());
+
+// fau: setupErrors - show errors in setup
+ini_set('display_errors', true);
+// fau.
+
 require_once "./setup/include/inc.setup_header.php";
 
 $setup = new ilSetupGUI();
