@@ -494,7 +494,7 @@ class ilObjCourseGrouping
 		$ref_id = current(ilObject::_getAllReferences($a_obj_id));
 		$grouping_ids = array();
 
-		foreach(ilConditionHandler::_getConditionsOfTarget($ref_id, $a_obj_id, $type) as $condition)
+		foreach(ilConditionHandler::_getPersistedConditionsOfTarget($ref_id, $a_obj_id, $type) as $condition)
 		{
 			if($condition['operator'] == 'not_member')
 			{
