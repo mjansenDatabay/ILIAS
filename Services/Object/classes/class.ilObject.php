@@ -2216,9 +2216,7 @@ class ilObject
 			$customIconFactory = $DIC['object.customicons.factory'];
 			$customIcon = $customIconFactory->getPresenterByObjId((int)$a_obj_id, (string)$a_type);
 			if ($customIcon->exists()) {
-// fau: legacyIcons - todo: add $a_size as parameter
 				$filename = $customIcon->getFullPath();
-// fau.
 				return $filename . '?tmp=' . filemtime($filename);
 			}
 		}
