@@ -1964,11 +1964,11 @@ class ilStartUpGUI
 				$this->mainTemplate->setVariable('ACCEPT_TERMS_OF_SERVICE', $this->lng->txt('accept_usr_agreement'));
 				$this->mainTemplate->setVariable('TXT_SUBMIT', $this->lng->txt('submit'));
 
-				// fim: [layout] added cancel button for terms of service
+// fau: cancelTos - added cancel button for terms of service
 				require_once "Services/User/classes/class.ilUserUtil.php";
 				$this->mainTemplate->setVariable('URL_CANCEL', ilUserUtil::_getLogoutLink());
-				$this->mainTemplate->setVariable('TXT_CANCEL', $lng->txt('cancel'));
-				// fim.
+				$this->mainTemplate->setVariable('TXT_CANCEL', $this->lng->txt('cancel'));
+// fau.
 			}
 
 			$this->mainTemplate->setPermanentLink('usr', null, 'agreement');

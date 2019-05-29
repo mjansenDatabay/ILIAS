@@ -68,7 +68,6 @@ class ilAccountRegistrationGUI
 			$this->registration_settings->getAllowCodes());
 
 		$this->termsOfServiceEvaluation = $DIC['tos.document.evaluator'];
-			$this->registration_settings->getAllowCodes());
 
 		if ($this->code_enabled)
 		{
@@ -391,19 +390,22 @@ class ilAccountRegistrationGUI
 		}
 
 		$this->form->addCommandButton("saveForm", $lng->txt("register"));
-		// fim: [layout] add cancel button
+// fau: regCodes - add cancel button
 		$this->form->addCommandButton("cancelForm", $lng->txt("cancel"));
-		// fim.
+// fau.
 	}
 
+// fau: regCodes - new function cancelForm()
 	/**
-	 * fim: [layout] action for cancel button
+	 * Cancel the account registration and unset the registration code
 	 */
 	public function cancelForm()
 	{
-		ilUtil::redirect("index.php");
+		global $DIC;
+		unset($_SESSION['ilAccountRegistrationGUI:code']);
+		$DIC->ctrl()->redirectToURL('index.php');
 	}
-	// fim.
+// fau.
 
 
 
