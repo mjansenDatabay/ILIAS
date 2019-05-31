@@ -619,8 +619,8 @@ abstract class assQuestionGUI
 		{
 			$page_gui->setOutputMode("presentation");
 		}
+		$presentation = $page_gui->presentation($page_gui->getOutputMode());
 		// fim.
-		$presentation = $page_gui->presentation();
 		$presentation = preg_replace("/src=\"\\.\\//ims", "src=\"" . ILIAS_HTTP_PATH . "/", $presentation);
 		return $presentation;
 	}
