@@ -1275,13 +1275,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		}
 
 // fau: fairSub - validate activation and subscription times
-		if(($this->getActivationType() == IL_CRS_ACTIVATION_LIMITED) && $this->getSubscriptionLimitationType() == IL_CRS_SUBSCRIPTION_LIMITED &&
+		if(!$this->getActivationUnlimitedStatus() && $this->getSubscriptionLimitationType() == IL_CRS_SUBSCRIPTION_LIMITED &&
 			($this->getSubscriptionStart() < $this->getActivationStart() || $this->getSubscriptionEnd() > $this->getActivationEnd()))
 		{
 			$this->appendMessage($this->lng->txt("sub_time_not_in_activation_time"));
 		}
 
-		if(($this->getActivationType() == IL_CRS_ACTIVATION_LIMITED) &&
+		if(!$this->getActivationUnlimitedStatus() &&
 			$this->getActivationEnd() < $this->getActivationStart() + $this->getSubscriptionMinFairSeconds())
 		{
 			$this->appendMessage(sprintf($this->lng->txt("sub_fair_activation_min_minutes"), ceil($this->getSubscriptionMinFairSeconds() / 60)));
@@ -2562,10 +2562,9 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 			FROM crs_settings s
 			INNER JOIN object_reference r ON r.obj_id = s.obj_id
 			WHERE r.deleted IS NULL
-			AND (s.activation_type = 1
-				OR (s.activation_type = 2
-					AND s.activation_start <= UNIX_TIMESTAMP()
-					AND s.activation_end >= UNIX_TIMESTAMP()))
+			AND s.activation_type > 0
+			AND (s.activation_start IS NULL OR s.activation_start <= UNIX_TIMESTAMP())
+			AND (s.activation_end IS NULL OR s.activation_end >= UNIX_TIMESTAMP())
 			AND s.sub_mem_limit > 0
 			AND s.sub_max_members > 0
 			AND s.sub_auto_fill > 0

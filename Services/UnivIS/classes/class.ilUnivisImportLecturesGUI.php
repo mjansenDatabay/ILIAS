@@ -1360,7 +1360,6 @@ class ilUnivisImportLecturesGUI extends ilWizardGUI
 			// activation
 			if ($cond['set_activation'])
 			{
-				$crs->setActivationType((bool) $cond['activation_type'] ? IL_CRS_ACTIVATION_LIMITED : IL_CRS_ACTIVATION_UNLIMITED);
 				$crs->setOfflineStatus(!(bool) $cond['activation_online']);
 
 				$crs->setActivationStart($this->values->getSessionValue('conditions_form','access_start', time()));

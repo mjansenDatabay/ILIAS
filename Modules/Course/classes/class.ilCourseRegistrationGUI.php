@@ -94,7 +94,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
             default:
                 $checkCmd = '';
         }
-		if(!$GLOBALS['DIC']['ilAccess']->checkAccess('join', $checkCmd, $this->getRefId()))
+		if(!$DIC->access()->checkAccess('join', $checkCmd, $this->getRefId()))
  		{
 			$this->ctrl->setReturn($this->parent_gui,'infoScreen');
 			$this->ctrl->returnToParent($this);

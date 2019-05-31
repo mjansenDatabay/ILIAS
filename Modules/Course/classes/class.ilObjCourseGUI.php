@@ -1282,7 +1282,7 @@ class ilObjCourseGUI extends ilContainerGUI
 						$fair_message = $this->lng->txt("sub_fair_to_sub_end");
 					}
 				}
-				elseif ($this->object->getActivationType() == IL_CRS_ACTIVATION_LIMITED)
+				elseif (!$this->object->getActivationUnlimitedStatus())
 				{
 					if ($this->object->getSubscriptionFair() < $this->object->getActivationStart() + $this->object->getSubscriptionMinFairSeconds())
 					{
