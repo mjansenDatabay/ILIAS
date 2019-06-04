@@ -171,8 +171,10 @@ class ilTestParticipantsTableGUI extends ilTable2GUI
 		{
 			$this->addColumn($this->lng->txt("clientip"),'clientip', '');
 		}
-		
-		$this->addColumn($this->lng->txt("tst_started"),'started', '');
+
+// fau: showStartingTime - use started_time for sorting
+		$this->addColumn($this->lng->txt("tst_started"),'started_time', '');
+// fau.
 		$this->addColumn($this->lng->txt("tst_nr_of_tries_of_user"),'tries', '');
 		
 		$this->addColumn($this->lng->txt("unfinished_passes"),'unfinished', '');
@@ -263,9 +265,9 @@ class ilTestParticipantsTableGUI extends ilTable2GUI
 		$this->tpl->setVariable("LOGIN", $data['login']);
 		$this->tpl->setVariable("FULLNAME", $data['name']);
 		
-		// fim: [exam] show actual starting time instead of flag in particilants list
-		$this->tpl->setVariable("STARTED", ($data['started']) ? ilDatePresentation::formatDate(new ilDateTime($data['started'], IL_CAL_DATETIME)) : '');
-		// fim.
+// fau: showStartingTime - show actual starting time instead of icon in participants list
+		$this->tpl->setVariable("STARTED", ($data['started_time']) ? ilDatePresentation::formatDate(new ilDateTime($data['started_time'], IL_CAL_DATETIME)) : '');
+// fau.
 		$this->tpl->setVariable("TRIES", $this->fetchTriesValue($data));
 		$this->tpl->setVariable("UNFINISHED_PASSES", $this->buildUnfinishedPassesStatusString($data));
 		
