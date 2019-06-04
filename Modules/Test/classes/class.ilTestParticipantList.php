@@ -292,6 +292,9 @@ class ilTestParticipantList implements Iterator
 	{
 		$rows = array();
 		
+// fau: showStartingTime - get starting time of all participants
+		$times = $this->getTestObj()->getStartingTimeOfParticipants();
+// fau.
 		foreach($this as $participant)
 		{
 			$row = array(
@@ -303,6 +306,9 @@ class ilTestParticipantList implements Iterator
 				'lastname' => $participant->getLastname(),
 				'name' => $this->buildFullname($participant),
 				'started' => ($participant->getActiveId() > 0) ? 1 : 0,
+// fau: showStartingTime - add started_time to the data row of a participant
+				'started_time' => $times[$participant->getActiveId()],
+// fau.
 				'unfinished' => $participant->hasUnfinishedPasses() ? 1 : 0,
 				'finished' => $participant->isTestFinished() ? 1 : 0,
 				'access' => $this->lookupLastAccess($participant->getActiveId()),
