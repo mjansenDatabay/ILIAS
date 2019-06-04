@@ -195,11 +195,6 @@ class ilTestParticipantsTableGUI extends ilTable2GUI
 			$this->addMultiCommand('saveClientIp', $this->lng->txt('save'));
 			$this->addMultiCommand('removeParticipants', $this->lng->txt('remove_as_participant'));
 		}
-		
-// fau: sendSimpleResults - add command to send simple results to participants
-		$this->addMultiCommand('sendSimpleResultsToParticipants', $this->lng->txt('send_simple_results_to_participants'));
-// fau.
-	
 	}
 	
 	public function initFilter()
