@@ -256,15 +256,14 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
 				);
 			}
 
-				if($update_participant)
-				{
+			if($update_participant)
+			{
 
-					$changed_ids[] = $active_id;
-					
-					ilLPStatusWrapper::_updateStatus(
-						$this->object->getId(), ilObjTestAccess::_getParticipantId($active_id)
-					);
-				}
+				$changed_ids[] = $active_id;
+				
+				ilLPStatusWrapper::_updateStatus(
+					$this->object->getId(), ilObjTestAccess::_getParticipantId($active_id)
+				);
 			}
 		}
 
@@ -278,7 +277,7 @@ class ilTestScoringByQuestionsGUI extends ilTestScoringGUI
 			}
 			else
 			{
-				$changed_names[] = $lng->txt('anonymous');
+				$changed_names[] = $DIC->language()->txt('anonymous');
 			}
 		}
 
