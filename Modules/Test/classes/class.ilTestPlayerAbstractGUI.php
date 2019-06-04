@@ -882,10 +882,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		// redirect after test
 		$redirection_mode = $this->object->getRedirectionMode();
 		$redirection_url  = $this->object->getRedirectionUrl();
-
-        // fim: [exam] don't redirect here when final statement should be shown
-		if($redirection_url && $redirection_mode && !$this->object->getShowFinalStatement())
-        // fim.
+		if( $redirection_url && $redirection_mode )
 		{
 			if( $redirection_mode == REDIRECT_KIOSK )
 			{
@@ -1081,38 +1078,11 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 	*/
 	public function showFinalStatementCmd()
 	{
-		// fim: [exam] use redirection url at this page
-		$redirection_mode = $this->object->getRedirectionMode();
-		if($redirection_mode == REDIRECT_KIOSK)
-		{
-			if ($this->object->getKioskMode())
-			{
-				$redirection_url  = $this->object->getRedirectionUrl();
-			}
-		}
-		elseif ($redirection_mode)
-		{
-			$redirection_url  = $this->object->getRedirectionUrl();
-		}
-
 		$template = new ilTemplate("tpl.il_as_tst_final_statement.html", TRUE, TRUE, "Modules/Test");
-		if ( $redirection_url) {
-			$template->setCurrentBlock('redirect_button');
-			$template->setVariable("REDIRECT_URL", $redirection_url);
-			$template->setVariable("BUTTON_CONTINUE", $this->lng->txt("btn_next"));
-			$template->parseCurrentBlock();
-		}
-		else
-		{
-			$template->setCurrentBlock('submit_button');
-			$template->setVariable("BUTTON_CONTINUE", $this->lng->txt("btn_next"));
-			$template->parseCurrentBlock();
-		}
-
 		$this->ctrl->setParameter($this, "skipfinalstatement", 1);
 		$template->setVariable("FORMACTION", $this->ctrl->getFormAction($this, ilTestPlayerCommands::AFTER_TEST_PASS_FINISHED));
 		$template->setVariable("FINALSTATEMENT", $this->object->prepareTextareaOutput($this->object->getFinalStatement(), true));
-		// fim.
+		$template->setVariable("BUTTON_CONTINUE", $this->lng->txt("btn_next"));
 		$this->tpl->setVariable($this->getContentBlockName(), $template->get());
 	}
 	
@@ -2815,6 +2785,8 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 // fau: testNav - new function populateNavWhenChangedModal
 	protected function populateNavWhenChangedModal()
 	{
+		return; // usibility fix: get rid of popup
+		
 		if (!empty($_SESSION['save_on_navigation_prevent_confirmation']))
 		{
 			return;
