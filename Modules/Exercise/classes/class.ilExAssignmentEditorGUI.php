@@ -374,18 +374,6 @@ class ilExAssignmentEditorGUI
 			}
 		}
 
-// fau: exResTime - property elements for result time
-		// result time y/n
-		$result_time_cb = new ilCheckboxInputGUI($lng->txt("exc_result_time"), "result_time_cb");
-		$result_time_cb->setInfo($lng->txt('exc_result_time_info'));
-		$form->addItem($result_time_cb);
-
-		// result time
-		$result_time = new ilDateTimeInputGUI("", "result_time");
-		$result_time->setShowTime(true);
-		$result_time_cb->addSubItem($result_time);
-// fau.
-
 		// mandatory
 		$cb = new ilCheckboxInputGUI($lng->txt("exc_mandatory"), "mandatory");
 		$cb->setInfo($lng->txt("exc_mandatory_info"));
@@ -444,8 +432,19 @@ class ilExAssignmentEditorGUI
 		$deadline2->setInfo($lng->txt("exc_deadline_extended_info"));
 		$deadline2->setShowTime(true);
 		$deadline->addSubItem($deadline2);
-
-
+		
+// fau: exResTime - property elements for result time
+		// result time y/n
+		$result_time_cb = new ilCheckboxInputGUI($lng->txt("exc_result_time"), "result_time_cb");
+		$result_time_cb->setInfo($lng->txt('exc_result_time_info'));
+		$form->addItem($result_time_cb);
+		
+		// result time
+		$result_time = new ilDateTimeInputGUI($lng->txt("date"), "result_time");
+		$result_time->setShowTime(true);
+		$result_time_cb->addSubItem($result_time);
+// fau.
+		
 		// submit reminder
 		$rmd_submit = new ilCheckboxInputGUI($this->lng->txt("exc_reminder_submit_setting"), "rmd_submit_status");
 
