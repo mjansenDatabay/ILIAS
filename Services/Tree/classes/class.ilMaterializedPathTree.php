@@ -539,7 +539,7 @@ class ilMaterializedPathTree implements ilTreeImplementation
 	{
 		global $DIC;
 
-		$ilDB = $DIC['ilDB'];
+		$ilDB = $DIC->database();
 		
 		// This is an optimization without the temporary tables become too big for our system.
 		// The idea is to use a subquery to join and filter the trees, and only the result
@@ -552,7 +552,7 @@ class ilMaterializedPathTree implements ilTreeImplementation
 				" AND t1." . $this->getTree()->getTreePk() . " = " . $ilDB->quote($this->getTree()->getTreeId(), 'integer');
 		
 		$res = $ilDB->query($query);
-		if ($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		if ($row = $ilDB->fetchObject($res))
 		{
 			$path = $row->path;
 		}
@@ -573,7 +573,7 @@ class ilMaterializedPathTree implements ilTreeImplementation
 
  		$res = $ilDB->query($query);
 		$nodes = array();
-		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
+		while ($row = $ilDB->fetchObject($res))
 		{
 			#$nodes[$row->child]['lft'] = $row->lft;
 			#$nodes[$row->child]['rgt'] = $row->rgt;
