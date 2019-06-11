@@ -89,7 +89,7 @@ class ilMailExplorer extends ilTreeExplorerGUI
         }
 
         $this->ctrl->setParameterByClass('ilMailFolderGUI', 'mobj_id', $a_node['child']);
-        $href = $this->ctrl->getLinkTargetByClass('ilMailFolderGUI');
+        $href = $this->ctrl->getLinkTargetByClass('ilMailFolderGUI', '', '', false, false);
         $this->ctrl->clearParametersByClass('ilMailFolderGUI');
 
         return $href;
@@ -107,5 +107,51 @@ class ilMailExplorer extends ilTreeExplorerGUI
         }
 
         return false;
+    }
+
+    /**
+     * Get Tree UI
+     *
+     * @return \ILIAS\UI\Component\Tree\Tree|object
+     */
+    public function getTreeComponent()
+    {
+        $f = $this->ui->factory();
+        /** @var ilTree $tree */
+        $tree = $this->getTree();
+
+        $subtree  = $tree->getChilds($tree->readRootId());
+        $data     = $subtree;
+
+        $tree = $f->tree()
+                  ->expandable($this)
+                  ->withData($data)
+                  ->withHighlightOnNodeClick(true);
+
+        return $tree;
+    }
+
+    /**
+     * @param $factory
+     * @param $node
+     * @return mixed
+     */
+    protected function createNode(
+        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        $node
+    ) {
+        global $DIC;
+
+        $path = $this->getNodeIcon($node);
+
+        $icon = $DIC->ui()
+            ->factory()
+            ->symbol()
+            ->icon()
+            ->custom($path, 'something');
+
+        $simple = $factory->simple($this->getNodeContent($node), $icon);
+
+        return $simple;
     }
 }

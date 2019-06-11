@@ -384,22 +384,31 @@ abstract class ilTreeExplorerGUI extends ilExplorerBaseGUI  implements \ILIAS\UI
 		return $this->getChildsOfNode($node["child"]);
 	}
 
+	protected function createNode(
+		\ILIAS\UI\Component\Tree\Node\Factory $factory,
+		$node
+	) {
+		return $factory->simple($this->getNodeContent($node));
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public function build(\ILIAS\UI\Component\Tree\Node\Factory $factory,
 						  $a_node, $environment = null ) : \ILIAS\UI\Component\Tree\Node\Node
 	{
-		$node = $factory->simple($this->getNodeContent($a_node));
+		$node = $this->createNode($factory, $a_node);
 
 		$href = $this->getNodeHref($a_node);
+
 		if ($href)
 		{
 			$node = $node->withAdditionalOnLoadCode( function($id) use ($href) {
-				return "$('#$id').on('click', function(event) {
+				$js = "$('#$id').find('.node-label').on('click', function(event) {
 							window.location = '{$href}';
 							return false;
 					});";
+				return $js;
 			});
 		}
 
