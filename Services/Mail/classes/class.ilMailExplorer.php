@@ -9,6 +9,9 @@
  */
 class ilMailExplorer extends ilTreeExplorerGUI
 {
+    /** @var ilObjMail */
+    private $parentObject;
+
     /** @var \ilLanguage */
     protected $lng;
 
@@ -28,9 +31,10 @@ class ilMailExplorer extends ilTreeExplorerGUI
     {
         global $DIC;
 
-        $this->lng         = $DIC->language();
-        $this->ctrl        = $DIC->ctrl();
-        $this->httpRequest = $DIC->http()->request();
+        $this->lng          = $DIC->language();
+        $this->ctrl         = $DIC->ctrl();
+        $this->httpRequest  = $DIC->http()->request();
+        $this->parentObject = $a_parent_obj;
 
         $this->tree = new ilTree($a_user_id);
         $this->tree->setTableNames('mail_tree', 'mail_obj_data');
@@ -148,7 +152,7 @@ class ilMailExplorer extends ilTreeExplorerGUI
             ->factory()
             ->symbol()
             ->icon()
-            ->custom($path, 'something');
+            ->custom($path, $this->parentObject->getTitle());
 
         $simple = $factory->simple($this->getNodeContent($node), $icon);
 

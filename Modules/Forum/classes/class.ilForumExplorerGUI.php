@@ -5,7 +5,7 @@
  * Class ilForumExplorerGUI
  * @author Michael Jansen <mjansen@databay.de>
  */
-class ilForumExplorerGUI extends ilExplorerBaseGUI
+class ilForumExplorerGUI extends ilTreeExplorerGUI
 {
     /**
      * @var string
@@ -58,13 +58,15 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     /**
      * {@inheritdoc}
      */
-    public function __construct($a_expl_id, $a_parent_obj, $a_parent_cmd)
+    public function __construct($a_expl_id, $a_parent_obj, $a_parent_cmd, $threadId)
     {
         global $DIC;
 
-        parent::__construct($a_expl_id, $a_parent_obj, $a_parent_cmd);
+        $this->tree    = new ilTree($threadId);
 
-        $this->setSkipRootNode(false);
+        parent::__construct($a_expl_id, $a_parent_obj, $a_parent_cmd, $this->tree);
+
+        $this->setSkipRootNode(true);
         $this->setAjax(true);
 
         $this->tpl  = $DIC->ui()->mainTemplate();
@@ -88,7 +90,10 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     public function setThread($thread)
     {
         $this->thread    = $thread;
-        $this->root_node = $thread->getFirstPostNode();
+        $ilForumPost     = $thread->getFirstPostNode();
+        $this->root_node = $ilForumPost;
+
+//        $this->tree->setRootId():
 
         $this->setNodeOpen($this->root_node->getId());
 
@@ -304,11 +309,11 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     /**
      * {@inheritdoc}
      */
-    public function getHTML()
+    public function getHTML($new = false)
     {
         $this->preloadChildren();
 
-        $html = parent::getHTML();
+        $html = parent::getHTML($new);
 
         $this->tpl->addOnLoadCode('il.ForumExplorer.init(' . json_encode(array(
                 'selectors' => array(
@@ -320,5 +325,44 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
         $this->tpl->addJavascript($this->js_explorer_frm_path);
 
         return $html;
+    }
+
+    /**
+     * Get Tree UI
+     *
+     * @return \ILIAS\UI\Component\Tree\Tree|object
+     */
+    public function getTreeComponent()
+    {
+        $f = $this->ui->factory();
+
+        $data = array(
+//            $tree->getNodeData($readRootId)
+            $this->getRootNode()
+        );
+
+        $tree = $f->tree()->expandable($this)
+                  ->withData($data)
+                  ->withHighlightOnNodeClick(true);
+
+        return $tree;
+    }
+
+    protected function createNode(
+        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        $node
+    ) {
+        global $DIC;
+        $path = $this->getNodeIcon($node);
+
+        $icon = $DIC->ui()
+                    ->factory()
+                    ->symbol()
+                    ->icon()
+                    ->custom($path, 'something');
+
+        $simple = $factory->simple($this->getNodeContent($node), $icon);
+
+        return $simple;
     }
 }

@@ -2528,7 +2528,12 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         }
 
         if ($this->isHierarchicalView()) {
-            $exp = new ilForumExplorerGUI('frm_exp_' . $this->objCurrentTopic->getId(), $this, 'viewThread');
+            $exp = new ilForumExplorerGUI(
+                'frm_exp_' . $this->objCurrentTopic->getId(),
+                $this,
+                'viewThread',
+                $this->objCurrentTopic->getFrmObjId()
+            );
             $exp->setThread($this->objCurrentTopic);
             $exp->handleCommand();
         }
@@ -3205,7 +3210,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $tblThr->setData($result);
             $moveThreadTemplate->setVariable('THREADS_TABLE', $tblThr->getHTML());
 
-            $moveThreadTemplate->setVariable('FRM_SELECTION_TREE', $exp->getHTML());
+            $moveThreadTemplate->setVariable('FRM_SELECTION_TREE', $exp->getHTML(true));
             $moveThreadTemplate->setVariable('CMD_SUBMIT', 'performMoveThreads');
             $moveThreadTemplate->setVariable('TXT_SUBMIT', $this->lng->txt('move'));
             $moveThreadTemplate->setVariable('FORMACTION', $this->ctrl->getFormAction($this, 'performMoveThreads'));
