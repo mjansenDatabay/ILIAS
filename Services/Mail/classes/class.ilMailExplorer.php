@@ -310,7 +310,7 @@ class ilMailExplorer implements TreeRecursion
      *
      * @return mixed node object/array
      */
-    function getRootNode()
+    private function getRootNode()
     {
         if (!isset($this->root_node_data)) {
             $this->root_node_data =  $this->tree->getNodeData($this->getRootId());
