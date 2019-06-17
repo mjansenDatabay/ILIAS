@@ -192,8 +192,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
 
         $href = $this->getNodeHref($record);
 
-        if ($href)
-        {
+        if ($href) {
             $node = $node->withAdditionalOnLoadCode( function($id) use ($href) {
                 $js = "$('#$id').find('.node-label').on('click', function(event) {
                             window.location = '{$href}';
@@ -203,8 +202,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
             });
         }
 
-        if ($this->isNodeOpen($record["child"]))
-        {
+        if ($this->isNodeOpen($record["child"])) {
             $node = $node->withExpanded(true);
         }
         //$node = $node->withHighlighted(true);
@@ -233,16 +231,16 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      */
     public function handleCommand()
     {
-        if ($_GET["exp_cmd"] != "" &&
-            $_GET["exp_cont"] == $this->getContainerId()
-        ) {
-            $cmd = $_GET["exp_cmd"];
-            if (in_array($cmd, array("openNode", "closeNode", "getNodeAsync"))) {
-                $this->$cmd();
-            }
-
-            return true;
-        }
+//        if ($_GET["exp_cmd"] != "" &&
+//            $_GET["exp_cont"] == $this->getContainerId()
+//        ) {
+//            $cmd = $_GET["exp_cmd"];
+//            if (in_array($cmd, array("openNode", "closeNode", "getNodeAsync"))) {
+//                $this->$cmd();
+//            }
+//
+//            return true;
+//        }
         return false;
     }
 
@@ -286,9 +284,9 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
             return array();
         }
 
-        $wl = $this->getTypeWhiteList();
-        if (is_array($wl) && count($wl) > 0) {
-            $childs = $this->tree->getChildsByTypeFilter($a_parent_node_id, $wl, $this->getOrderField());
+        $whitelist = $this->getTypeWhiteList();
+        if (is_array($whitelist) && count($whitelist) > 0) {
+            $childs = $this->tree->getChildsByTypeFilter($a_parent_node_id, $whitelist, $this->getOrderField());
         }
         else {
             $childs = $this->tree->getChilds($a_parent_node_id, $this->getOrderField());
@@ -345,22 +343,22 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     private function preloadChilds()
     {
         $subtree = $this->tree->getSubTree($this->getRootNode());
-        foreach ($subtree as $s) {
-            $wl = $this->getTypeWhiteList();
-            if (is_array($wl) && count($wl) > 0 && !in_array($s["type"], $wl)) {
+        foreach ($subtree as $subNode) {
+            $whitelist = $this->getTypeWhiteList();
+            if (is_array($whitelist) && count($whitelist) > 0 && !in_array($subNode["type"], $whitelist)) {
                 continue;
             }
-            $bl = $this->getTypeBlackList();
-            if (is_array($bl) && count($bl) > 0 && in_array($s["type"], $bl)) {
+            $blacklist = $this->getTypeBlackList();
+            if (is_array($blacklist) && count($blacklist) > 0 && in_array($subNode["type"], $blacklist)) {
                 continue;
             }
-            $this->childs[$s["parent"]][] = $s;
-            $this->all_childs[$s["child"]] = $s;
+            $this->childs[$subNode["parent"]][] = $subNode;
+            $this->all_childs[$subNode["child"]] = $subNode;
         }
 
         if ($this->order_field != "") {
-            foreach ($this->childs as $k => $childs) {
-                $this->childs[$k] = ilUtil::sortArray(
+            foreach ($this->childs as $key => $childs) {
+                $this->childs[$key] = ilUtil::sortArray(
                     $childs,
                     $this->order_field,
                     "asc",
@@ -380,13 +378,13 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
             );
 
             $prev = false;
-            foreach ($this->all_childs as $k => $c) {
+            foreach ($this->all_childs as $key => $children) {
                 if ($prev) {
-                    $this->all_childs[$prev]["next_node_id"] = $k;
+                    $this->all_childs[$prev]["next_node_id"] = $key;
                 }
-                $this->all_childs[$k]["prev_node_id"] = $prev;
-                $this->all_childs[$k]["next_node_id"] = false;
-                $prev = $k;
+                $this->all_childs[$key]["prev_node_id"] = $prev;
+                $this->all_childs[$key]["next_node_id"] = false;
+                $prev = $key;
             }
         }
 
