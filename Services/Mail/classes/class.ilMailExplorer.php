@@ -138,7 +138,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         if ($this->isNodeOpen($record["child"])) {
             $node = $node->withExpanded(true);
         }
-        //$node = $node->withHighlighted(true);
 
         return $node;
     }
