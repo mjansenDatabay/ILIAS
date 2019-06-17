@@ -48,9 +48,9 @@ class ilMailExplorer implements TreeRecursion
     /** @var \Psr\Http\Message\ServerRequestInterface */
     private $httpRequest;
 
-    private $order_field = "";
+    private $order_field = '';
 
-    private $search_term = "";
+    private $search_term = '';
 
     private $childs = array();
 
