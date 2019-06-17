@@ -76,7 +76,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         $this->tree->setTableNames('mail_tree', 'mail_obj_data');
     }
 
-    function getNodeContent(array $node)
+    private function getNodeContent(array $node)
     {
         $content = $node['title'];
 
@@ -89,7 +89,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $content;
     }
 
-    function getNodeIcon(array $node)
+    private function getNodeIcon(array $node)
     {
         if ($node['child'] == $this->getNodeId($this->getRootNode())) {
             $icon = ilUtil::getImagePath('icon_mail.svg');
@@ -105,7 +105,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $icon;
     }
 
-    function getNodeIconAlt(array $node)
+    private function getNodeIconAlt(array $node)
     {
         $text = $this->lng->txt('icon') . ' ' . $this->lng->txt($node['m_type']);
 
@@ -116,7 +116,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $text;
     }
 
-    function getNodeHref(array $node)
+    private function getNodeHref(array $node)
     {
         if ($node['child'] == $this->getNodeId($this->getRootNode())) {
             $node['child'] = 0;
