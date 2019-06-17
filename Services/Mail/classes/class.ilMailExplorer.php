@@ -129,7 +129,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $href;
     }
 
-    function isNodeHighlighted(array $node)
+    private function isNodeHighlighted(array $node)
     {
         $folderId = (int) ($this->httpRequest->getQueryParams()['mobj_id'] ?? 0);
 
