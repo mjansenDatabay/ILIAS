@@ -1,6 +1,9 @@
 <?php
 /* Copyright (c) 1998-2012 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+use ILIAS\UI\Component\Tree\Node\Factory;
+use ILIAS\UI\Component\Tree\Node\Node;
+
 /**
  * Class Mail Explorer
  * class for explorer view for mailboxes
@@ -114,13 +117,17 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      * The renderer will provide the $factory-parameter which is the UI-factory
      * for nodes, as well as the (unspecified) $environment as configured at the Tree.
      * $record is the data the node should be build for.
-     * @return \ILIAS\UI\Component\Tree\Node
+     *
+     * @param Factory $factory
+     * @param         $record
+     * @param null    $environment
+     * @return Node
      */
     public function build(
-        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        Factory $factory,
         $record,
         $environment = null
-    ) : \ILIAS\UI\Component\Tree\Node\Node {
+    ) : Node {
         $node = $this->createNode($factory, $record);
 
         $href = $this->getNodeHref($record);
@@ -172,7 +179,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      * @return mixed
      */
     private function createNode(
-        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        Factory $factory,
         $node
     ) {
         global $DIC;
