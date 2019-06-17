@@ -60,10 +60,9 @@ class ilMailExplorer implements TreeRecursion
     /**
      * ilMailExplorer constructor.
      * @param $parentObject
-     * @param $parenteCommand
      * @param $userId
      */
-    public function __construct($parentObject, $parenteCommand, $userId)
+    public function __construct($parentObject, $userId)
     {
         global $DIC;
 

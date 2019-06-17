@@ -33,7 +33,7 @@ class ilMailGlobalScreenToolProvider extends AbstractDynamicToolProvider
 
 		$baseClass = (string) ($this->dic->http()->request()->getQueryParams()['baseClass'] ?? '');
 		if (strtolower($baseClass) === 'ilmailgui') {
-			$exp = new ilMailExplorer(new ilMailGUI(), 'showExplorer', $this->dic->user()->getId());
+			$exp = new ilMailExplorer(new ilMailGUI(), $this->dic->user()->getId());
 
             $tools[] = $factory
                 ->tool($identification('Mail|Tree'))
