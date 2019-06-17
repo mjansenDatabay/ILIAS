@@ -35,10 +35,6 @@ class ilMailExplorer implements TreeRecursion
     /** @var array */
     private $custom_open_nodes = array();
 
-    private $type_white_list = array();
-
-    private $type_black_list = array();
-
     /** @var \ilLanguage */
     private $lng;
 
@@ -206,25 +202,7 @@ class ilMailExplorer implements TreeRecursion
             return array();
         }
 
-        $whitelist = $this->type_white_list;
-        if (is_array($whitelist) && count($whitelist) > 0) {
-            $childs = $this->tree->getChildsByTypeFilter($parentNodeId, $whitelist, $this->order_field);
-        }
-        else {
-            $childs = $this->tree->getChilds($parentNodeId, $this->order_field);
-        }
-
-        // apply black list filter
-        $blacklist = $this->type_black_list;
-        if (is_array($blacklist) && count($blacklist) > 0) {
-            $blacklistChildren = array();
-            foreach($childs as $key => $child) {
-                if (!in_array($child['type'], $blacklist) && $this->matches($child)) {
-                    $blacklistChildren[$key] = $child;
-                }
-            }
-            return $blacklistChildren;
-        }
+        $childs = $this->tree->getChilds($parentNodeId, $this->order_field);
 
         $finalChildren = [];
         foreach($childs as $key => $child) {
@@ -265,14 +243,6 @@ class ilMailExplorer implements TreeRecursion
     {
         $subtree = $this->tree->getSubTree($this->getRootNode());
         foreach ($subtree as $subNode) {
-            $whitelist = $this->type_white_list;
-            if (is_array($whitelist) && count($whitelist) > 0 && !in_array($subNode['type'], $whitelist)) {
-                continue;
-            }
-            $blacklist = $this->type_black_list;
-            if (is_array($blacklist) && count($blacklist) > 0 && in_array($subNode['type'], $blacklist)) {
-                continue;
-            }
             $this->childs[$subNode['parent']][] = $subNode;
             $this->all_childs[$subNode['child']] = $subNode;
         }
