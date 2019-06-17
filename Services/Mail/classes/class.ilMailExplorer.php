@@ -164,16 +164,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      */
     public function handleCommand()
     {
-//        if ($_GET["exp_cmd"] != "" &&
-//            $_GET["exp_cont"] == $this->getContainerId()
-//        ) {
-//            $cmd = $_GET["exp_cmd"];
-//            if (in_array($cmd, array("openNode", "closeNode", "getNodeAsync"))) {
-//                $this->$cmd();
-//            }
-//
-//            return true;
-//        }
         return false;
     }
 
