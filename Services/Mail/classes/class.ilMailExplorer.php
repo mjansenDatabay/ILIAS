@@ -47,6 +47,15 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
 
     private $search_term = "";
 
+    private $childs = array();
+
+    private $all_childs = array();
+
+    private $preloaded = false;
+
+    private $order_field_numeric = false;
+
+
     /**
      * ilMailExplorer constructor.
      * @param $a_parent_obj
@@ -157,30 +166,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     }
 
     /**
-     * @param $factory
-     * @param $node
-     * @return mixed
-     */
-    protected function createNode(
-        \ILIAS\UI\Component\Tree\Node\Factory $factory,
-        $node
-    ) {
-        global $DIC;
-
-        $path = $this->getNodeIcon($node);
-
-        $icon = $DIC->ui()
-            ->factory()
-            ->symbol()
-            ->icon()
-            ->custom($path, 'a');
-
-        $simple = $factory->simple($this->getNodeContent($node), $icon);
-
-        return $simple;
-    }
-
-    /**
      * Get a list of records (that list can also be empty).
      * Each record will be relayed to $this->build to retrieve a Node.
      * Also, each record will be asked for Sub-Nodes using this function.
@@ -198,8 +183,11 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      * $record is the data the node should be build for.
      * @return \ILIAS\UI\Component\Tree\Node
      */
-    public function build(\ILIAS\UI\Component\Tree\Node\Factory $factory, $record, $environment = null) : \ILIAS\UI\Component\Tree\Node\Node
-    {
+    public function build(
+        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        $record,
+        $environment = null
+    ) : \ILIAS\UI\Component\Tree\Node\Node {
         $node = $this->createNode($factory, $record);
 
         $href = $this->getNodeHref($record);
@@ -229,15 +217,59 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      *
      * @return string html
      */
-    public function getHTML($new = false)
+    public function getHTML()
     {
-        if ($this->getPreloadChilds())
-        {
+        if ($this->getPreloadChilds()) {
             $this->preloadChilds();
         }
 
         return $this->render();
     }
+
+    /**
+     * Handle explorer internal command.
+     *
+     * @return boolean true, if an internal command has been performed.
+     */
+    public function handleCommand()
+    {
+        if ($_GET["exp_cmd"] != "" &&
+            $_GET["exp_cont"] == $this->getContainerId()
+        ) {
+            $cmd = $_GET["exp_cmd"];
+            if (in_array($cmd, array("openNode", "closeNode", "getNodeAsync"))) {
+                $this->$cmd();
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $factory
+     * @param $node
+     * @return mixed
+     */
+    private function createNode(
+        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        $node
+    ) {
+        global $DIC;
+
+        $path = $this->getNodeIcon($node);
+
+        $icon = $DIC->ui()
+                    ->factory()
+                    ->symbol()
+                    ->icon()
+                    ->custom($path, 'a');
+
+        $simple = $factory->simple($this->getNodeContent($node), $icon);
+
+        return $simple;
+    }
+
 
     /**
      * Get childs of node
@@ -247,50 +279,41 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      */
     private function getChildsOfNode($a_parent_node_id)
     {
-        if ($this->preloaded && $this->getSearchTerm() == "")
-        {
-            if (is_array($this->childs[$a_parent_node_id]))
-            {
+        if ($this->preloaded && $this->getSearchTerm() == "") {
+            if (is_array($this->childs[$a_parent_node_id])) {
                 return $this->childs[$a_parent_node_id];
             }
             return array();
         }
 
         $wl = $this->getTypeWhiteList();
-        if (is_array($wl) && count($wl) > 0)
-        {
+        if (is_array($wl) && count($wl) > 0) {
             $childs = $this->tree->getChildsByTypeFilter($a_parent_node_id, $wl, $this->getOrderField());
         }
-        else
-        {
+        else {
             $childs = $this->tree->getChilds($a_parent_node_id, $this->getOrderField());
         }
 
         // apply black list filter
-        $bl = $this->getTypeBlackList();
-        if (is_array($bl) && count($bl) > 0)
-        {
-            $bl_childs = array();
-            foreach($childs as $k => $c)
-            {
-                if (!in_array($c["type"], $bl) && $this->matches($c))
-                {
-                    $bl_childs[$k] = $c;
+        $blacklist = $this->getTypeBlackList();
+        if (is_array($blacklist) && count($blacklist) > 0) {
+            $blacklistChildren = array();
+            foreach($childs as $key => $child) {
+                if (!in_array($child["type"], $blacklist) && $this->matches($child)) {
+                    $blacklistChildren[$key] = $child;
                 }
             }
-            return $bl_childs;
+            return $blacklistChildren;
         }
 
-        $final_childs = [];
-        foreach($childs as $k => $c)
-        {
-            if ($this->matches($c))
-            {
-                $final_childs[$k] = $c;
+        $finalChildren = [];
+        foreach($childs as $key => $child) {
+            if ($this->matches($child)) {
+                $finalChildren[$key] = $child;
             }
         }
 
-        return $final_childs;
+        return $finalChildren;
     }
 
     /**
@@ -322,40 +345,43 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     private function preloadChilds()
     {
         $subtree = $this->tree->getSubTree($this->getRootNode());
-        foreach ($subtree as $s)
-        {
+        foreach ($subtree as $s) {
             $wl = $this->getTypeWhiteList();
-            if (is_array($wl) && count($wl) > 0 && !in_array($s["type"], $wl))
-            {
+            if (is_array($wl) && count($wl) > 0 && !in_array($s["type"], $wl)) {
                 continue;
             }
             $bl = $this->getTypeBlackList();
-            if (is_array($bl) && count($bl) > 0 && in_array($s["type"], $bl))
-            {
+            if (is_array($bl) && count($bl) > 0 && in_array($s["type"], $bl)) {
                 continue;
             }
             $this->childs[$s["parent"]][] = $s;
             $this->all_childs[$s["child"]] = $s;
         }
 
-        if ($this->order_field != "")
-        {
-            foreach ($this->childs as $k => $childs)
-            {
-                $this->childs[$k] = ilUtil::sortArray($childs, $this->order_field, "asc", $this->order_field_numeric);
+        if ($this->order_field != "") {
+            foreach ($this->childs as $k => $childs) {
+                $this->childs[$k] = ilUtil::sortArray(
+                    $childs,
+                    $this->order_field,
+                    "asc",
+                    $this->order_field_numeric
+                );
             }
         }
 
         // sort childs and store prev/next reference
-        if ($this->order_field == "")
-        {
-            $this->all_childs =
-                ilUtil::sortArray($this->all_childs, "lft", "asc", true, true);
+        if ($this->order_field == "") {
+            $this->all_childs = ilUtil::sortArray(
+                $this->all_childs,
+                "lft",
+                "asc",
+                true,
+                true
+            );
+
             $prev = false;
-            foreach ($this->all_childs as $k => $c)
-            {
-                if ($prev)
-                {
+            foreach ($this->all_childs as $k => $c) {
+                if ($prev) {
                     $this->all_childs[$prev]["next_node_id"] = $k;
                 }
                 $this->all_childs[$k]["prev_node_id"] = $prev;
@@ -399,8 +425,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      */
     function getRootNode()
     {
-        if (!isset($this->root_node_data))
-        {
+        if (!isset($this->root_node_data)) {
             $this->root_node_data =  $this->tree->getNodeData($this->getRootId());
         }
         return $this->root_node_data;
@@ -412,27 +437,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $this->root_id
             ? $this->root_id
             : $this->tree->readRootId();
-    }
-
-    /**
-     * Handle explorer internal command.
-     *
-     * @return boolean true, if an internal command has been performed.
-     */
-    public function handleCommand()
-    {
-        if ($_GET["exp_cmd"] != "" &&
-            $_GET["exp_cont"] == $this->getContainerId())
-        {
-            $cmd = $_GET["exp_cmd"];
-            if (in_array($cmd, array("openNode", "closeNode", "getNodeAsync")))
-            {
-                $this->$cmd();
-            }
-
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -461,11 +465,11 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      * @param array
      * @return bool
      */
-    protected function matches($node): bool
+    private function matches($node): bool
     {
         if ($this->getSearchTerm() == "" ||
-            is_int(stripos($this->getNodeContent($node), $this->getSearchTerm())))
-        {
+            is_int(stripos($this->getNodeContent($node), $this->getSearchTerm()))
+        ) {
             return true;
         }
         return false;
@@ -475,6 +479,4 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     {
         return $this->search_term;
     }
-
-
 }
