@@ -3,6 +3,7 @@
 
 use ILIAS\UI\Component\Tree\Node\Factory;
 use ILIAS\UI\Component\Tree\Node\Node;
+use ILIAS\UI\Component\Tree\Tree;
 
 /**
  * Class Mail Explorer
@@ -82,7 +83,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     /**
      * Get Tree UI
      *
-     * @return \ILIAS\UI\Component\Tree\Tree|object
+     * @return Tree|object
      */
     public function getTreeComponent()
     {
@@ -244,9 +245,8 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
 
     /**
      * Get all open nodes
-     *
      * @param
-     * @return
+     * @return bool
      */
     private function isNodeOpen($nodeId)
     {
