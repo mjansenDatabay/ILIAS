@@ -7,19 +7,45 @@
  * @author  Stefan Meyer <meyer@leifos.com>
  * @version $Id$
  */
-class ilMailExplorer extends ilTreeExplorerGUI
+class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
 {
-    /** @var ilObjMail */
+    /** @var ilMailGUI */
     private $parentObject;
 
+    /** @var  */
+    private $preload_childs;
+
+    /** @var \ILIAS\DI\UIServices */
+    private $ui;
+
+    /** @var ilTree */
+    private $tree;
+
+    /** @var  */
+    private $root_id;
+
+    /** @var array */
+    private $open_nodes = array();
+
+    /** @var array */
+    private $custom_open_nodes = array();
+
+    private $type_white_list = array();
+
+    private $type_black_list = array();
+
     /** @var \ilLanguage */
-    protected $lng;
+    private $lng;
 
     /** @var \ilCtrl */
-    protected $ctrl;
+    private $ctrl;
 
     /** @var \Psr\Http\Message\ServerRequestInterface */
     private $httpRequest;
+
+    private $order_field = "";
+
+    private $search_term = "";
 
     /**
      * ilMailExplorer constructor.
@@ -35,15 +61,10 @@ class ilMailExplorer extends ilTreeExplorerGUI
         $this->ctrl         = $DIC->ctrl();
         $this->httpRequest  = $DIC->http()->request();
         $this->parentObject = $a_parent_obj;
+        $this->ui           = $DIC->ui();
 
         $this->tree = new ilTree($a_user_id);
         $this->tree->setTableNames('mail_tree', 'mail_obj_data');
-
-        parent::__construct('mail_exp', $a_parent_obj, $a_parent_cmd, $this->tree);
-
-        $this->setSkipRootNode(true);
-        $this->setAjax(false);
-        $this->setOrderField('title,m_type');
     }
 
     function getNodeContent($a_node)
@@ -122,7 +143,7 @@ class ilMailExplorer extends ilTreeExplorerGUI
     {
         $f = $this->ui->factory();
         /** @var ilTree $tree */
-        $tree = $this->getTree();
+        $tree = $this->tree;
 
         $subtree  = $tree->getChilds($tree->readRootId());
         $data     = $subtree;
@@ -152,10 +173,308 @@ class ilMailExplorer extends ilTreeExplorerGUI
             ->factory()
             ->symbol()
             ->icon()
-            ->custom($path, $this->parentObject->getTitle());
+            ->custom($path, 'a');
 
         $simple = $factory->simple($this->getNodeContent($node), $icon);
 
         return $simple;
     }
+
+    /**
+     * Get a list of records (that list can also be empty).
+     * Each record will be relayed to $this->build to retrieve a Node.
+     * Also, each record will be asked for Sub-Nodes using this function.
+     * @return array
+     */
+    public function getChildren($record, $environment = null) : array
+    {
+        return $this->getChildsOfNode($record["child"]);
+    }
+
+    /**
+     * Build and return a Node.
+     * The renderer will provide the $factory-parameter which is the UI-factory
+     * for nodes, as well as the (unspecified) $environment as configured at the Tree.
+     * $record is the data the node should be build for.
+     * @return \ILIAS\UI\Component\Tree\Node
+     */
+    public function build(\ILIAS\UI\Component\Tree\Node\Factory $factory, $record, $environment = null) : \ILIAS\UI\Component\Tree\Node\Node
+    {
+        $node = $this->createNode($factory, $record);
+
+        $href = $this->getNodeHref($record);
+
+        if ($href)
+        {
+            $node = $node->withAdditionalOnLoadCode( function($id) use ($href) {
+                $js = "$('#$id').find('.node-label').on('click', function(event) {
+                            window.location = '{$href}';
+                            return false;
+                        });";
+                return $js;
+            });
+        }
+
+        if ($this->isNodeOpen($record["child"]))
+        {
+            $node = $node->withExpanded(true);
+        }
+        //$node = $node->withHighlighted(true);
+
+        return $node;
+    }
+
+    /**
+     * Get HTML
+     *
+     * @return string html
+     */
+    public function getHTML($new = false)
+    {
+        if ($this->getPreloadChilds())
+        {
+            $this->preloadChilds();
+        }
+
+        return $this->render();
+    }
+
+    /**
+     * Get childs of node
+     *
+     * @param int $a_parent_node_id parent id
+     * @return array childs
+     */
+    private function getChildsOfNode($a_parent_node_id)
+    {
+        if ($this->preloaded && $this->getSearchTerm() == "")
+        {
+            if (is_array($this->childs[$a_parent_node_id]))
+            {
+                return $this->childs[$a_parent_node_id];
+            }
+            return array();
+        }
+
+        $wl = $this->getTypeWhiteList();
+        if (is_array($wl) && count($wl) > 0)
+        {
+            $childs = $this->tree->getChildsByTypeFilter($a_parent_node_id, $wl, $this->getOrderField());
+        }
+        else
+        {
+            $childs = $this->tree->getChilds($a_parent_node_id, $this->getOrderField());
+        }
+
+        // apply black list filter
+        $bl = $this->getTypeBlackList();
+        if (is_array($bl) && count($bl) > 0)
+        {
+            $bl_childs = array();
+            foreach($childs as $k => $c)
+            {
+                if (!in_array($c["type"], $bl) && $this->matches($c))
+                {
+                    $bl_childs[$k] = $c;
+                }
+            }
+            return $bl_childs;
+        }
+
+        $final_childs = [];
+        foreach($childs as $k => $c)
+        {
+            if ($this->matches($c))
+            {
+                $final_childs[$k] = $c;
+            }
+        }
+
+        return $final_childs;
+    }
+
+    /**
+     * Get all open nodes
+     *
+     * @param
+     * @return
+     */
+    private function isNodeOpen($node_id)
+    {
+        return ($this->getNodeId($this->getRootNode()) == $node_id
+            || in_array($node_id, $this->open_nodes)
+            || in_array($node_id, $this->custom_open_nodes));
+    }
+
+    /**
+     * Get preload childs
+     *
+     * @return boolean preload childs
+     */
+    private function getPreloadChilds()
+    {
+        return $this->preload_childs;
+    }
+
+    /**
+     * Preload childs
+     */
+    private function preloadChilds()
+    {
+        $subtree = $this->tree->getSubTree($this->getRootNode());
+        foreach ($subtree as $s)
+        {
+            $wl = $this->getTypeWhiteList();
+            if (is_array($wl) && count($wl) > 0 && !in_array($s["type"], $wl))
+            {
+                continue;
+            }
+            $bl = $this->getTypeBlackList();
+            if (is_array($bl) && count($bl) > 0 && in_array($s["type"], $bl))
+            {
+                continue;
+            }
+            $this->childs[$s["parent"]][] = $s;
+            $this->all_childs[$s["child"]] = $s;
+        }
+
+        if ($this->order_field != "")
+        {
+            foreach ($this->childs as $k => $childs)
+            {
+                $this->childs[$k] = ilUtil::sortArray($childs, $this->order_field, "asc", $this->order_field_numeric);
+            }
+        }
+
+        // sort childs and store prev/next reference
+        if ($this->order_field == "")
+        {
+            $this->all_childs =
+                ilUtil::sortArray($this->all_childs, "lft", "asc", true, true);
+            $prev = false;
+            foreach ($this->all_childs as $k => $c)
+            {
+                if ($prev)
+                {
+                    $this->all_childs[$prev]["next_node_id"] = $k;
+                }
+                $this->all_childs[$k]["prev_node_id"] = $prev;
+                $this->all_childs[$k]["next_node_id"] = false;
+                $prev = $k;
+            }
+        }
+
+        $this->preloaded = true;
+    }
+
+    /**
+     * Render tree
+     *
+     * @return string
+     */
+    private function render()
+    {
+        $r = $this->ui->renderer();
+
+        return $r->render([
+            $this->getTreeComponent()
+        ]);
+    }
+
+    /**
+     * Get id for node
+     *
+     * @param mixed $a_node node object/array
+     * @return string id
+     */
+    private function getNodeId($a_node)
+    {
+        return $a_node["child"];
+    }
+
+    /**
+     * Get root node
+     *
+     * @return mixed node object/array
+     */
+    function getRootNode()
+    {
+        if (!isset($this->root_node_data))
+        {
+            $this->root_node_data =  $this->tree->getNodeData($this->getRootId());
+        }
+        return $this->root_node_data;
+    }
+
+
+    private function getRootId()
+    {
+        return $this->root_id
+            ? $this->root_id
+            : $this->tree->readRootId();
+    }
+
+    /**
+     * Handle explorer internal command.
+     *
+     * @return boolean true, if an internal command has been performed.
+     */
+    public function handleCommand()
+    {
+        if ($_GET["exp_cmd"] != "" &&
+            $_GET["exp_cont"] == $this->getContainerId())
+        {
+            $cmd = $_GET["exp_cmd"];
+            if (in_array($cmd, array("openNode", "closeNode", "getNodeAsync")))
+            {
+                $this->$cmd();
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get type white list
+     *
+     * @return array array of strings of node types that should be retrieved
+     */
+    private function getTypeWhiteList()
+    {
+        return $this->type_white_list;
+    }
+
+    private function getOrderField()
+    {
+        return $this->order_field;
+    }
+
+    private function getTypeBlackList()
+    {
+        return $this->type_black_list;
+    }
+
+    /**
+     * Does a node match a search term (or is search term empty)
+     *
+     * @param array
+     * @return bool
+     */
+    protected function matches($node): bool
+    {
+        if ($this->getSearchTerm() == "" ||
+            is_int(stripos($this->getNodeContent($node), $this->getSearchTerm())))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private function getSearchTerm()
+    {
+        return $this->search_term;
+    }
+
+
 }
