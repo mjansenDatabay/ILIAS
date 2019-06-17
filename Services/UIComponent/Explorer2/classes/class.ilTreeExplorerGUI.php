@@ -431,9 +431,8 @@ abstract class ilTreeExplorerGUI extends ilExplorerBaseGUI  implements \ILIAS\UI
 		$f = $this->ui->factory();
 		$tree = $this->getTree();
 
-		$readRootId = $tree->readRootId();
-		$data       = array(
-			$tree->getNodeData($readRootId)
+		$data = array(
+			$tree->getNodeData($tree->readRootId())
 		);
 
 		$tree = $f->tree()->expandable($this)
