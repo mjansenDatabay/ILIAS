@@ -76,7 +76,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         $this->tree->setTableNames('mail_tree', 'mail_obj_data');
     }
 
-    function getNodeContent($node)
+    function getNodeContent(array $node)
     {
         $content = $node['title'];
 
@@ -89,7 +89,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $content;
     }
 
-    function getNodeIcon($node)
+    function getNodeIcon(array $node)
     {
         if ($node['child'] == $this->getNodeId($this->getRootNode())) {
             $icon = ilUtil::getImagePath('icon_mail.svg');
@@ -105,7 +105,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $icon;
     }
 
-    function getNodeIconAlt($node)
+    function getNodeIconAlt(array $node)
     {
         $text = $this->lng->txt('icon') . ' ' . $this->lng->txt($node['m_type']);
 
@@ -116,7 +116,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $text;
     }
 
-    function getNodeHref($node)
+    function getNodeHref(array $node)
     {
         if ($node['child'] == $this->getNodeId($this->getRootNode())) {
             $node['child'] = 0;
@@ -129,7 +129,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $href;
     }
 
-    function isNodeHighlighted($node)
+    function isNodeHighlighted(array $node)
     {
         $folderId = (int) ($this->httpRequest->getQueryParams()['mobj_id'] ?? 0);
 
@@ -319,11 +319,11 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      * @param
      * @return
      */
-    private function isNodeOpen($node_id)
+    private function isNodeOpen($nodeId)
     {
-        return ($this->getNodeId($this->getRootNode()) == $node_id
-            || in_array($node_id, $this->open_nodes)
-            || in_array($node_id, $this->custom_open_nodes));
+        return ($this->getNodeId($this->getRootNode()) == $nodeId
+            || in_array($nodeId, $this->open_nodes)
+            || in_array($nodeId, $this->custom_open_nodes));
     }
 
     /**
@@ -406,10 +406,10 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
 
     /**
      * Get id for node
-     * @param mixed $node node object/array
+     * @param array $node node object/array
      * @return string id
      */
-    private function getNodeId($node)
+    private function getNodeId(array $node)
     {
         return $node["child"];
     }
