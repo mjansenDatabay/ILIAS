@@ -4,6 +4,7 @@
 use ILIAS\UI\Component\Tree\Node\Factory;
 use ILIAS\UI\Component\Tree\Node\Node;
 use ILIAS\UI\Component\Tree\Tree;
+use ILIAS\UI\Component\Tree\TreeRecursion;
 
 /**
  * Class Mail Explorer
@@ -11,7 +12,7 @@ use ILIAS\UI\Component\Tree\Tree;
  * @author  Stefan Meyer <meyer@leifos.com>
  * @version $Id$
  */
-class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
+class ilMailExplorer implements TreeRecursion
 {
     /** @var ilMailGUI */
     private $parentObject;
