@@ -167,16 +167,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     }
 
     /**
-     * Handle explorer internal command.
-     *
-     * @return boolean true, if an internal command has been performed.
-     */
-    public function handleCommand()
-    {
-        return false;
-    }
-
-    /**
      * @param $factory
      * @param $node
      * @return mixed

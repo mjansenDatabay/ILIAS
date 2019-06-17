@@ -152,10 +152,6 @@ class ilMailGUI
         $this->forwardClass = $this->ctrl->getNextClass($this);
         $this->showHeader();
 
-        if ($this->ctrl->getCmd() !== 'showExplorer') {
-            $this->handleFolderExplorerCommands();
-        }
-
         switch (strtolower($this->forwardClass)) {
             case 'ilmailformgui':
                 $this->ctrl->forwardCommand(new \ilMailFormGUI());
@@ -269,14 +265,5 @@ class ilMailGUI
         if (isset($this->httpRequest->getQueryParams()['message_sent'])) {
             $DIC->tabs()->setTabActive('fold');
         }
-    }
-
-    /**
-     *
-     */
-    private function handleFolderExplorerCommands()
-    {
-        $exp = new ilMailExplorer($this, 'showExplorer', $this->user->getId());
-        $exp->handleCommand();
     }
 }

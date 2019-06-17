@@ -35,12 +35,10 @@ class ilMailGlobalScreenToolProvider extends AbstractDynamicToolProvider
 		if (strtolower($baseClass) === 'ilmailgui') {
 			$exp = new ilMailExplorer(new ilMailGUI(), 'showExplorer', $this->dic->user()->getId());
 
-			if (!$exp->handleCommand()) {
-				$tools[] = $factory
-					->tool($identification('Mail|Tree'))
-					->withTitle($this->dic->language()->txt("mail_folders"))
-					->withContent($this->dic->ui()->factory()->legacy($exp->getHTML()));
-			}
+            $tools[] = $factory
+                ->tool($identification('Mail|Tree'))
+                ->withTitle($this->dic->language()->txt("mail_folders"))
+                ->withContent($this->dic->ui()->factory()->legacy($exp->getHTML()));
 		}
 
 		return $tools;
