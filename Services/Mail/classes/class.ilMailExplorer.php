@@ -283,16 +283,16 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
             return array();
         }
 
-        $whitelist = $this->getTypeWhiteList();
+        $whitelist = $this->type_white_list;
         if (is_array($whitelist) && count($whitelist) > 0) {
-            $childs = $this->tree->getChildsByTypeFilter($parentNodeId, $whitelist, $this->getOrderField());
+            $childs = $this->tree->getChildsByTypeFilter($parentNodeId, $whitelist, $this->order_field);
         }
         else {
-            $childs = $this->tree->getChilds($parentNodeId, $this->getOrderField());
+            $childs = $this->tree->getChilds($parentNodeId, $this->order_field);
         }
 
         // apply black list filter
-        $blacklist = $this->getTypeBlackList();
+        $blacklist = $this->type_black_list;
         if (is_array($blacklist) && count($blacklist) > 0) {
             $blacklistChildren = array();
             foreach($childs as $key => $child) {
@@ -343,11 +343,11 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     {
         $subtree = $this->tree->getSubTree($this->getRootNode());
         foreach ($subtree as $subNode) {
-            $whitelist = $this->getTypeWhiteList();
+            $whitelist = $this->type_white_list;
             if (is_array($whitelist) && count($whitelist) > 0 && !in_array($subNode["type"], $whitelist)) {
                 continue;
             }
-            $blacklist = $this->getTypeBlackList();
+            $blacklist = $this->type_black_list;
             if (is_array($blacklist) && count($blacklist) > 0 && in_array($subNode["type"], $blacklist)) {
                 continue;
             }
@@ -433,26 +433,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $this->root_id
             ? $this->root_id
             : $this->tree->readRootId();
-    }
-
-    /**
-     * Get type white list
-     *
-     * @return array array of strings of node types that should be retrieved
-     */
-    private function getTypeWhiteList()
-    {
-        return $this->type_white_list;
-    }
-
-    private function getOrderField()
-    {
-        return $this->order_field;
-    }
-
-    private function getTypeBlackList()
-    {
-        return $this->type_black_list;
     }
 
     /**
