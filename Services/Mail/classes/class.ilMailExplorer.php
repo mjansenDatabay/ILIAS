@@ -76,73 +76,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         $this->tree->setTableNames('mail_tree', 'mail_obj_data');
     }
 
-    private function getNodeContent(array $node)
-    {
-        $content = $node['title'];
-
-        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
-            $content = $this->lng->txt('mail_folders');
-        } elseif ($node['depth'] < 3) {
-            $content = $this->lng->txt('mail_' . $node['title']);
-        }
-
-        return $content;
-    }
-
-    private function getNodeIcon(array $node)
-    {
-        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
-            $icon = ilUtil::getImagePath('icon_mail.svg');
-        } else {
-            $iconType = $node['m_type'];
-            if ($node['m_type'] === 'user_folder') {
-                $iconType = 'local';
-            }
-
-            $icon = ilUtil::getImagePath('icon_' . $iconType . '.svg');
-        }
-
-        return $icon;
-    }
-
-    private function getNodeIconAlt(array $node)
-    {
-        $text = $this->lng->txt('icon') . ' ' . $this->lng->txt($node['m_type']);
-
-        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
-            $text = $this->lng->txt('icon') . ' ' . $this->lng->txt('mail_folders');
-        }
-
-        return $text;
-    }
-
-    private function getNodeHref(array $node)
-    {
-        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
-            $node['child'] = 0;
-        }
-
-        $this->ctrl->setParameterByClass('ilMailFolderGUI', 'mobj_id', $node['child']);
-        $href = $this->ctrl->getLinkTargetByClass('ilMailFolderGUI', '', '', false, false);
-        $this->ctrl->clearParametersByClass('ilMailFolderGUI');
-
-        return $href;
-    }
-
-    private function isNodeHighlighted(array $node)
-    {
-        $folderId = (int) ($this->httpRequest->getQueryParams()['mobj_id'] ?? 0);
-
-        if (
-            $node['child'] == $folderId ||
-            (0 === $folderId && $node['child'] == $this->getNodeId($this->getRootNode()))
-        ) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Get Tree UI
      *
@@ -454,5 +387,72 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
     private function getSearchTerm()
     {
         return $this->search_term;
+    }
+
+    private function getNodeContent(array $node)
+    {
+        $content = $node['title'];
+
+        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
+            $content = $this->lng->txt('mail_folders');
+        } elseif ($node['depth'] < 3) {
+            $content = $this->lng->txt('mail_' . $node['title']);
+        }
+
+        return $content;
+    }
+
+    private function getNodeIcon(array $node)
+    {
+        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
+            $icon = ilUtil::getImagePath('icon_mail.svg');
+        } else {
+            $iconType = $node['m_type'];
+            if ($node['m_type'] === 'user_folder') {
+                $iconType = 'local';
+            }
+
+            $icon = ilUtil::getImagePath('icon_' . $iconType . '.svg');
+        }
+
+        return $icon;
+    }
+
+    private function getNodeIconAlt(array $node)
+    {
+        $text = $this->lng->txt('icon') . ' ' . $this->lng->txt($node['m_type']);
+
+        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
+            $text = $this->lng->txt('icon') . ' ' . $this->lng->txt('mail_folders');
+        }
+
+        return $text;
+    }
+
+    private function getNodeHref(array $node)
+    {
+        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
+            $node['child'] = 0;
+        }
+
+        $this->ctrl->setParameterByClass('ilMailFolderGUI', 'mobj_id', $node['child']);
+        $href = $this->ctrl->getLinkTargetByClass('ilMailFolderGUI', '', '', false, false);
+        $this->ctrl->clearParametersByClass('ilMailFolderGUI');
+
+        return $href;
+    }
+
+    private function isNodeHighlighted(array $node)
+    {
+        $folderId = (int) ($this->httpRequest->getQueryParams()['mobj_id'] ?? 0);
+
+        if (
+            $node['child'] == $folderId ||
+            (0 === $folderId && $node['child'] == $this->getNodeId($this->getRootNode()))
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
