@@ -413,17 +413,6 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         return $icon;
     }
 
-    private function getNodeIconAlt(array $node)
-    {
-        $text = $this->lng->txt('icon') . ' ' . $this->lng->txt($node['m_type']);
-
-        if ($node['child'] == $this->getNodeId($this->getRootNode())) {
-            $text = $this->lng->txt('icon') . ' ' . $this->lng->txt('mail_folders');
-        }
-
-        return $text;
-    }
-
     private function getNodeHref(array $node)
     {
         if ($node['child'] == $this->getNodeId($this->getRootNode())) {
@@ -435,19 +424,5 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
         $this->ctrl->clearParametersByClass('ilMailFolderGUI');
 
         return $href;
-    }
-
-    private function isNodeHighlighted(array $node)
-    {
-        $folderId = (int) ($this->httpRequest->getQueryParams()['mobj_id'] ?? 0);
-
-        if (
-            $node['child'] == $folderId ||
-            (0 === $folderId && $node['child'] == $this->getNodeId($this->getRootNode()))
-        ) {
-            return true;
-        }
-
-        return false;
     }
 }
