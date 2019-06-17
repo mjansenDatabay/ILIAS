@@ -54,7 +54,7 @@ class ilMailExplorer implements TreeRecursion
 
     private $preloaded = false;
 
-    private $order_field_numeric = false;
+    private $orderFieldNumeric = false;
 
 
     /**
@@ -253,7 +253,7 @@ class ilMailExplorer implements TreeRecursion
                     $childs,
                     $this->order_field,
                     'asc',
-                    $this->order_field_numeric
+                    $this->orderFieldNumeric
                 );
             }
         }
