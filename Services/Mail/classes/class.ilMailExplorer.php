@@ -209,7 +209,7 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      */
     private function getChildsOfNode($parentNodeId)
     {
-        if ($this->preloaded && $this->getSearchTerm() == "") {
+        if ($this->preloaded && $this->search_term == "") {
             if (is_array($this->childs[$parentNodeId])) {
                 return $this->childs[$parentNodeId];
             }
@@ -376,17 +376,12 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      */
     private function matches($node): bool
     {
-        if ($this->getSearchTerm() == "" ||
-            is_int(stripos($this->getNodeContent($node), $this->getSearchTerm()))
+        if ($this->search_term == "" ||
+            is_int(stripos($this->getNodeContent($node), $this->search_term))
         ) {
             return true;
         }
         return false;
-    }
-
-    private function getSearchTerm()
-    {
-        return $this->search_term;
     }
 
     private function getNodeContent(array $node)
