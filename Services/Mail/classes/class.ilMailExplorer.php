@@ -106,6 +106,8 @@ class ilMailExplorer implements \ILIAS\UI\Component\Tree\TreeRecursion
      * Get a list of records (that list can also be empty).
      * Each record will be relayed to $this->build to retrieve a Node.
      * Also, each record will be asked for Sub-Nodes using this function.
+     * @param      $record
+     * @param null $environment
      * @return array
      */
     public function getChildren($record, $environment = null) : array
