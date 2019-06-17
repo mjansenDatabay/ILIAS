@@ -113,7 +113,7 @@ class ilMailExplorer implements TreeRecursion
      */
     public function getChildren($record, $environment = null) : array
     {
-        return $this->getChildsOfNode($record["child"]);
+        return $this->getChildsOfNode($record['child']);
     }
 
     /**
@@ -146,7 +146,7 @@ class ilMailExplorer implements TreeRecursion
             });
         }
 
-        if ($this->isNodeOpen($record["child"])) {
+        if ($this->isNodeOpen($record['child'])) {
             $node = $node->withExpanded(true);
         }
 
@@ -199,7 +199,7 @@ class ilMailExplorer implements TreeRecursion
      */
     private function getChildsOfNode($parentNodeId)
     {
-        if ($this->preloaded && $this->search_term == "") {
+        if ($this->preloaded && $this->search_term == '') {
             if (is_array($this->childs[$parentNodeId])) {
                 return $this->childs[$parentNodeId];
             }
@@ -219,7 +219,7 @@ class ilMailExplorer implements TreeRecursion
         if (is_array($blacklist) && count($blacklist) > 0) {
             $blacklistChildren = array();
             foreach($childs as $key => $child) {
-                if (!in_array($child["type"], $blacklist) && $this->matches($child)) {
+                if (!in_array($child['type'], $blacklist) && $this->matches($child)) {
                     $blacklistChildren[$key] = $child;
                 }
             }
@@ -266,34 +266,34 @@ class ilMailExplorer implements TreeRecursion
         $subtree = $this->tree->getSubTree($this->getRootNode());
         foreach ($subtree as $subNode) {
             $whitelist = $this->type_white_list;
-            if (is_array($whitelist) && count($whitelist) > 0 && !in_array($subNode["type"], $whitelist)) {
+            if (is_array($whitelist) && count($whitelist) > 0 && !in_array($subNode['type'], $whitelist)) {
                 continue;
             }
             $blacklist = $this->type_black_list;
-            if (is_array($blacklist) && count($blacklist) > 0 && in_array($subNode["type"], $blacklist)) {
+            if (is_array($blacklist) && count($blacklist) > 0 && in_array($subNode['type'], $blacklist)) {
                 continue;
             }
-            $this->childs[$subNode["parent"]][] = $subNode;
-            $this->all_childs[$subNode["child"]] = $subNode;
+            $this->childs[$subNode['parent']][] = $subNode;
+            $this->all_childs[$subNode['child']] = $subNode;
         }
 
-        if ($this->order_field != "") {
+        if ($this->order_field != '') {
             foreach ($this->childs as $key => $childs) {
                 $this->childs[$key] = ilUtil::sortArray(
                     $childs,
                     $this->order_field,
-                    "asc",
+                    'asc',
                     $this->order_field_numeric
                 );
             }
         }
 
         // sort childs and store prev/next reference
-        if ($this->order_field == "") {
+        if ($this->order_field == '') {
             $this->all_childs = ilUtil::sortArray(
                 $this->all_childs,
-                "lft",
-                "asc",
+                'lft',
+                'asc',
                 true,
                 true
             );
@@ -301,10 +301,10 @@ class ilMailExplorer implements TreeRecursion
             $prev = false;
             foreach ($this->all_childs as $key => $children) {
                 if ($prev) {
-                    $this->all_childs[$prev]["next_node_id"] = $key;
+                    $this->all_childs[$prev]['next_node_id'] = $key;
                 }
-                $this->all_childs[$key]["prev_node_id"] = $prev;
-                $this->all_childs[$key]["next_node_id"] = false;
+                $this->all_childs[$key]['prev_node_id'] = $prev;
+                $this->all_childs[$key]['next_node_id'] = false;
                 $prev = $key;
             }
         }
@@ -333,7 +333,7 @@ class ilMailExplorer implements TreeRecursion
      */
     private function getNodeId(array $node)
     {
-        return $node["child"];
+        return $node['child'];
     }
 
     /**
@@ -365,7 +365,7 @@ class ilMailExplorer implements TreeRecursion
      */
     private function matches($node): bool
     {
-        if ($this->search_term == "" ||
+        if ($this->search_term == '' ||
             is_int(stripos($this->getNodeContent($node), $this->search_term))
         ) {
             return true;
