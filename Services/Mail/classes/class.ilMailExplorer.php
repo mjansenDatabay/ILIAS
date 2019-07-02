@@ -17,9 +17,6 @@ class ilMailExplorer implements TreeRecursion
     /** @var ilMailGUI */
     private $parentObject;
 
-    /** @var  */
-    private $preload_childs;
-
     /** @var \ILIAS\DI\UIServices */
     private $ui;
 
@@ -155,9 +152,7 @@ class ilMailExplorer implements TreeRecursion
      */
     public function getHTML()
     {
-        if ($this->getPreloadChilds()) {
-            $this->preloadChilds();
-        }
+        $this->preloadChilds();
 
         return $this->render();
     }
@@ -223,16 +218,6 @@ class ilMailExplorer implements TreeRecursion
         return ($this->getNodeId($this->getRootNode()) == $nodeId
             || in_array($nodeId, $this->open_nodes)
             || in_array($nodeId, $this->custom_open_nodes));
-    }
-
-    /**
-     * Get preload childs
-     *
-     * @return boolean preload childs
-     */
-    private function getPreloadChilds()
-    {
-        return $this->preload_childs;
     }
 
     /**
