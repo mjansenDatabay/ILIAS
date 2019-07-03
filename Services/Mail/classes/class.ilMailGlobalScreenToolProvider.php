@@ -29,8 +29,8 @@ class ilMailGlobalScreenToolProvider extends AbstractDynamicToolProvider
 
         $tools = [];
 
-        $baseClass = (string) ($this->dic->http()->request()->getQueryParams()['baseClass'] ?? '');
-        if (strtolower($baseClass) === 'ilmailgui') {
+        $additional_data = $called_contexts->getLast()->getAdditionalData();
+        if ($additional_data->exists(self::SHOW_MAIL_FOLDERS_TOOL) && $additional_data->get(self::SHOW_MAIL_FOLDERS_TOOL) === true) {
             $exp = new ilMailExplorer(new ilMailGUI(), $this->dic->user()->getId());
 
             $tools[] = $this->factory
