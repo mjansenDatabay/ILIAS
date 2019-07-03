@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 
 use ILIAS\GlobalScreen\Scope\Tool\Provider\AbstractDynamicToolProvider;
-use ILIAS\NavigationContext\Stack\CalledContexts;
-use ILIAS\NavigationContext\Stack\ContextCollection;
 
 /**
  * Class ilMailGlobalScreenToolProvider
@@ -10,23 +8,22 @@ use ILIAS\NavigationContext\Stack\ContextCollection;
  */
 class ilMailGlobalScreenToolProvider extends AbstractDynamicToolProvider
 {
+    const SHOW_MAIL_FOLDERS_TOOL = 'show_mail_folders_tool';
 	/**
 	 * @inheritDoc
 	 */
-	public function isInterestedInContexts(): ContextCollection
+	public function isInterestedInContexts(): \ILIAS\GlobalScreen\Scope\Tool\Context\Stack\ContextCollection
 	{
-		return $this->dic->navigationContext()->collection()->main();
+        return $this->context_collection->main()->repository()->administration();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function getToolsForContextStack(CalledContexts $called_contexts): array
+	public function getToolsForContextStack(\ILIAS\GlobalScreen\Scope\Tool\Context\Stack\CalledContexts $called_contexts): array
 	{
-		$factory = $this->globalScreen()->tool();
-
 		$identification = function ($id) {
-			return $this->globalScreen()->identification()->fromSerializedIdentification($id);
+		    return $this->identification_provider->identifier($id);
 		};
 
 		$tools = [];
@@ -35,8 +32,8 @@ class ilMailGlobalScreenToolProvider extends AbstractDynamicToolProvider
 		if (strtolower($baseClass) === 'ilmailgui') {
 			$exp = new ilMailExplorer(new ilMailGUI(), $this->dic->user()->getId());
 
-            $tools[] = $factory
-                ->tool($identification('Mail|Tree'))
+            $tools[] = $this->factory
+                ->tool($identification('tree'))
                 ->withTitle($this->dic->language()->txt("mail_folders"))
                 ->withContent($this->dic->ui()->factory()->legacy($exp->getHTML()));
 		}

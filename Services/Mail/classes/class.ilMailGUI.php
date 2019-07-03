@@ -59,6 +59,18 @@ class ilMailGUI
         }
 
         $this->initFolder();
+
+
+        $toolContext = $DIC->globalScreen()
+                           ->tool()
+                           ->context()
+                           ->current();
+
+        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilMailGlobalScreenToolProvider::SHOW_MAIL_FOLDERS_TOOL);
+        if (false === $additionalDataExists) {
+            $toolContext->addAdditionalData(ilMailGlobalScreenToolProvider::SHOW_MAIL_FOLDERS_TOOL, true);
+        }
+
     }
 
     /**
