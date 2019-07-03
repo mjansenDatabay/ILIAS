@@ -273,9 +273,9 @@ class ilMailExplorer implements TreeRecursion
      */
     private function render()
     {
-        $r = $this->ui->renderer();
+        $renderer = $this->ui->renderer();
 
-        return $r->render([
+        return $renderer->render([
             $this->getTreeComponent()
         ]);
     }
