@@ -1,12 +1,30 @@
 <?php
+declare(strict_types=1);
 /* Copyright (c) 1998-2016 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+use ILIAS\UI\Component\Tree\TreeRecursion;
 
 /**
  * Class ilForumExplorerGUI
  * @author Michael Jansen <mjansen@databay.de>
  */
-class ilForumExplorerGUI extends ilExplorerBaseGUI
+class ilForumExplorerGUI implements TreeRecursion
 {
+    /**
+     * @var
+     */
+    private $parent_obj;
+
+    /**
+     * @var
+     */
+    private $id;
+
+    /**
+     * @var \ILIAS\DI\UIServices
+     */
+    private $ui;
+
     /**
      * @var string
      */
@@ -55,6 +73,9 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     /** @var \ilForumAuthorInformation[] */
     protected $authorInformation = [];
 
+    /** @var array */
+    private $custom_open_nodes = array();
+
     /**
      * {@inheritdoc}
      */
@@ -62,13 +83,12 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     {
         global $DIC;
 
-        parent::__construct($a_expl_id, $a_parent_obj, $a_parent_cmd);
+        $this->id = $a_expl_id;
 
-        $this->setSkipRootNode(false);
-        $this->setAjax(true);
-
+        $this->ui = $DIC->ui();
         $this->tpl  = $DIC->ui()->mainTemplate();
         $this->ctrl = $DIC->ctrl();
+        $this->parent_obj = $a_parent_obj;
 
         $frm               = new ilForum();
         $this->max_entries = (int) $frm->getPageHits();
@@ -127,15 +147,6 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
             'import_name'         => $this->root_node->getImportName(),
             'post_read'           => $this->root_node->isPostRead()
         );
-    }
-
-    /**
-     * Factory method for a new instance of a node template
-     * @return ilTemplate
-     */
-    protected function getNodeTemplateInstance()
-    {
-        return new ilTemplate('tpl.tree_node_content.html', true, true, 'Modules/Forum');
     }
 
     /**
@@ -248,24 +259,6 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     }
 
     /**
-     * @param array $node
-     * @return \ilForumAuthorInformation
-     */
-    private function getAuthorInformationByNode(array $node): \ilForumAuthorInformation
-    {
-        if (isset($this->authorInformation[(int) $node['pos_pk']])) {
-            return $this->authorInformation[(int) $node['pos_pk']];
-        }
-
-        return $this->authorInformation[(int) $node['pos_pk']] = new ilForumAuthorInformation(
-            $node['pos_author_id'],
-            $node['pos_display_user_id'],
-            $node['pos_usr_alias'],
-            $node['import_name']
-        );
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getNodeId($a_node)
@@ -308,8 +301,6 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
     {
         $this->preloadChildren();
 
-        $html = parent::getHTML();
-
         $this->tpl->addOnLoadCode('il.ForumExplorer.init(' . json_encode(array(
                 'selectors' => array(
                     'container'        => '#' . $this->getContainerId(),
@@ -319,6 +310,168 @@ class ilForumExplorerGUI extends ilExplorerBaseGUI
 
         $this->tpl->addJavascript($this->js_explorer_frm_path);
 
-        return $html;
+        return $this->render();
+    }
+
+    /**
+     * Get a list of records (that list can also be empty).
+     * Each record will be relayed to $this->build to retrieve a Node.
+     * Also, each record will be asked for Sub-Nodes using this function.
+     * @return array
+     */
+    public function getChildren($record, $environment = null) : array
+    {
+        if (false === isset($record['child'])) {
+            return array();
+        }
+        return $this->getChildsOfNode($record['child']);
+    }
+
+    /**
+     * Build and return a Node.
+     * The renderer will provide the $factory-parameter which is the UI-factory
+     * for nodes, as well as the (unspecified) $environment as configured at the Tree.
+     * $record is the data the node should be build for.
+     *
+     * @param \ILIAS\UI\Component\Tree\Node\Factory $factory
+     * @param                                       $record
+     * @param null                                  $environment
+     * @return \ILIAS\UI\Component\Tree\Node\Node
+     */
+    public function build(\ILIAS\UI\Component\Tree\Node\Factory $factory, $record, $environment = null) : \ILIAS\UI\Component\Tree\Node\Node
+    {
+        $node = $this->createNode($factory, $record);
+
+        $href = $this->getNodeHref($record);
+
+        if ($href) {
+            $node = $node->withAdditionalOnLoadCode(function ($id) use ($href) {
+                $js = "$('#$id').find('.node-label').on('click', function(event) {
+                    window.location = '{$href}';
+                    return false;
+                });";
+                return $js;
+            });
+        }
+
+        return $node;
+    }
+
+    /**
+     * Render tree
+     *
+     * @return string
+     */
+    private function render()
+    {
+        $renderer = $this->ui->renderer();
+
+        return $renderer->render([
+            $this->getTreeComponent()
+        ]);
+    }
+
+    /**
+     * Get Tree UI
+     *
+     * @return Tree|object
+     */
+    public function getTreeComponent()
+    {
+        $f = $this->ui->factory();
+        /** @var ilTree $tree */
+
+        $data = $this->thread->getNestedSetPostChildren($this->root_node->getId());
+
+        $tree = $f->tree()
+                  ->expandable($this)
+                  ->withData($data)
+                  ->withHighlightOnNodeClick(true);
+
+        return $tree;
+    }
+    /**
+     * Set node to be opened (additional custom opened node, not standard expand behaviour)
+     *
+     * @param
+     * @return
+     */
+    private function setNodeOpen($a_id)
+    {
+        if (!in_array($a_id, $this->custom_open_nodes)) {
+            $this->custom_open_nodes[] = $a_id;
+        }
+    }
+
+    /**
+     * @param $factory
+     * @param $node
+     * @return mixed
+     */
+    private function createNode(
+        \ILIAS\UI\Component\Tree\Node\Factory $factory,
+        $node
+    ) {
+        global $DIC;
+
+        $path = $this->getNodeIcon($node);
+
+        $icon = $DIC->ui()
+                    ->factory()
+                    ->symbol()
+                    ->icon()
+                    ->custom($path, 'forum');
+
+        $simple = $factory->simple($this->getNodeContent($node), $icon);
+
+        return $simple;
+    }
+
+    /**
+     * Factory method for a new instance of a node template
+     * @return ilTemplate
+     */
+    private function getNodeTemplateInstance()
+    {
+        return new ilTemplate('tpl.tree_node_content.html', true, true, 'Modules/Forum');
+    }
+
+    /**
+     * @param array $node
+     * @return \ilForumAuthorInformation
+     */
+    private function getAuthorInformationByNode(array $node): \ilForumAuthorInformation
+    {
+        if (isset($this->authorInformation[(int) $node['pos_pk']])) {
+            return $this->authorInformation[(int) $node['pos_pk']];
+        }
+
+        return $this->authorInformation[(int) $node['pos_pk']] = new ilForumAuthorInformation(
+            $node['pos_author_id'],
+            $node['pos_display_user_id'],
+            $node['pos_usr_alias'],
+            $node['import_name']
+        );
+    }
+
+    /**
+     * Get container id
+     *
+     * @param
+     * @return
+     */
+    private function getContainerId()
+    {
+        return "il_expl2_jstree_cont_".$this->getId();
+    }
+
+    /**
+     * Get id of explorer element
+     *
+     * @return integer id
+     */
+    private function getId()
+    {
+        return $this->id;
     }
 }

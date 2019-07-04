@@ -105,6 +105,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         $this->rbac                = $DIC->rbac();
         $this->locator             = $DIC['ilLocator'];
 
+
         $this->type = 'frm';
         parent::__construct($a_data, $a_id, $a_call_by_reference, false);
 
@@ -122,6 +123,16 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
         // Model of current post
         $this->objCurrentPost = new ilForumPost((int)$_GET['pos_pk'], $this->is_moderator);
+
+        $toolContext = $DIC->globalScreen()
+                           ->tool()
+                           ->context()
+                           ->current();
+
+        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL);
+        if (false === $additionalDataExists) {
+            $toolContext->addAdditionalData(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL, true);
+        }
     }
 
     protected function initSessionStorage()
@@ -2536,7 +2547,6 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         if ($this->isHierarchicalView()) {
             $exp = new ilForumExplorerGUI('frm_exp_' . $this->objCurrentTopic->getId(), $this, 'viewThread');
             $exp->setThread($this->objCurrentTopic);
-            $exp->handleCommand();
         }
 
         $this->lng->loadLanguageModule('forum');
