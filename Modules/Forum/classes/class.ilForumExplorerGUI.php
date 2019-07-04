@@ -186,26 +186,26 @@ class ilForumExplorerGUI implements TreeRecursion
      */
     public function getNodeContent($a_node)
     {
-        $tpl = $this->getNodeTemplateInstance();
+//        $tpl = $this->getNodeTemplateInstance();
+//
+//        $tpl->setCurrentBlock('node-content-block');
+//        $tpl->setVariable('TITLE', $a_node['pos_subject']);
+//        $tpl->setVariable('TITLE_CLASSES', implode(' ', $this->getNodeTitleClasses($a_node)));
+//        $tpl->parseCurrentBlock();
+//
+//        if ($this->root_node->getId() == $a_node['pos_pk']) {
+//            return $tpl->get();
+//        }
+//
+//        $authorinfo = $this->getAuthorInformationByNode($a_node);
+//
+//        $tpl->setCurrentBlock('unlinked-node-content-block');
+//        $tpl->setVariable('UNLINKED_CONTENT_CLASS', $this->getUnlinkedNodeContentClass());
+//        $tpl->setVariable('AUTHOR', $authorinfo->getAuthorShortName());
+//        $tpl->setVariable('DATE', ilDatePresentation::formatDate(new ilDateTime($a_node['pos_date'], IL_CAL_DATETIME)));
+//        $tpl->parseCurrentBlock();
 
-        $tpl->setCurrentBlock('node-content-block');
-        $tpl->setVariable('TITLE', $a_node['pos_subject']);
-        $tpl->setVariable('TITLE_CLASSES', implode(' ', $this->getNodeTitleClasses($a_node)));
-        $tpl->parseCurrentBlock();
-
-        if ($this->root_node->getId() == $a_node['pos_pk']) {
-            return $tpl->get();
-        }
-
-        $authorinfo = $this->getAuthorInformationByNode($a_node);
-
-        $tpl->setCurrentBlock('unlinked-node-content-block');
-        $tpl->setVariable('UNLINKED_CONTENT_CLASS', $this->getUnlinkedNodeContentClass());
-        $tpl->setVariable('AUTHOR', $authorinfo->getAuthorShortName());
-        $tpl->setVariable('DATE', ilDatePresentation::formatDate(new ilDateTime($a_node['pos_date'], IL_CAL_DATETIME)));
-        $tpl->parseCurrentBlock();
-
-        return $tpl->get();
+        return $a_node['pos_subject'];
     }
 
     /**
@@ -321,10 +321,7 @@ class ilForumExplorerGUI implements TreeRecursion
      */
     public function getChildren($record, $environment = null) : array
     {
-        if (false === isset($record['child'])) {
-            return array();
-        }
-        return $this->getChildsOfNode($record['child']);
+        return $this->getChildsOfNode($record['post_id']);
     }
 
     /**
@@ -383,13 +380,21 @@ class ilForumExplorerGUI implements TreeRecursion
 
         $data = $this->thread->getNestedSetPostChildren($this->root_node->getId());
 
+        $endData = array();
+        foreach ($data as $node) {
+            if ($node['depth'] == 2) {
+                $endData[] = $node;
+            }
+        }
+
         $tree = $f->tree()
                   ->expandable($this)
-                  ->withData($data)
+                  ->withData($endData)
                   ->withHighlightOnNodeClick(true);
 
         return $tree;
     }
+
     /**
      * Set node to be opened (additional custom opened node, not standard expand behaviour)
      *
