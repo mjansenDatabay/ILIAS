@@ -41,4 +41,6 @@ interface Factory
 	 */
 	public function simple(string $label, Icon $icon=null): Simple;
 
+	public function byline(string $label, string $byLine, Icon $icon=null): Byline;
+
 }
