@@ -317,17 +317,16 @@ class ilForumExplorerGUI implements TreeRecursion
         return $tree;
     }
 
-
     /**
      * Build and return a Node.
      * The renderer will provide the $factory-parameter which is the UI-factory
      * for nodes, as well as the (unspecified) $environment as configured at the Tree.
      * $record is the data the node should be build for.
-     *
      * @param \ILIAS\UI\Component\Tree\Node\Factory $factory
      * @param                                       $record
      * @param null                                  $environment
      * @return \ILIAS\UI\Component\Tree\Node\Node
+     * @throws ilDateTimeException
      */
     public function build(\ILIAS\UI\Component\Tree\Node\Factory $factory, $record, $environment = null) : \ILIAS\UI\Component\Tree\Node\Node
     {
