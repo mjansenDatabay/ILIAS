@@ -234,14 +234,6 @@ class ilForumExplorerGUI implements TreeRecursion
     /**
      * {@inheritdoc}
      */
-    public function getNodeId($a_node)
-    {
-        return $a_node['pos_pk'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeIcon($a_node)
     {
         if ($this->root_node->getId() == $a_node['pos_pk']) {
@@ -385,15 +377,6 @@ class ilForumExplorerGUI implements TreeRecursion
     }
 
     /**
-     * Factory method for a new instance of a node template
-     * @return ilTemplate
-     */
-    private function getNodeTemplateInstance()
-    {
-        return new ilTemplate('tpl.tree_node_content.html', true, true, 'Modules/Forum');
-    }
-
-    /**
      * @param array $node
      * @return \ilForumAuthorInformation
      */
@@ -419,16 +402,6 @@ class ilForumExplorerGUI implements TreeRecursion
      */
     private function getContainerId()
     {
-        return "il_expl2_jstree_cont_".$this->getId();
-    }
-
-    /**
-     * Get id of explorer element
-     *
-     * @return integer id
-     */
-    private function getId()
-    {
-        return $this->id;
+        return "il_expl2_jstree_cont_" . $this->id;
     }
 }
