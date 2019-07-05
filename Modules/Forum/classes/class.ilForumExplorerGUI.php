@@ -226,9 +226,9 @@ class ilForumExplorerGUI implements TreeRecursion
 
         if (isset($a_node['post_read']) && $a_node['post_read']) {
             return $this->ctrl->getLinkTarget($this->parent_obj, $this->parent_cmd, $a_node['pos_pk']);
-        } else {
-            return $this->ctrl->getLinkTarget($this->parent_obj, 'markPostRead', $a_node['pos_pk']);
         }
+
+        return $this->ctrl->getLinkTarget($this->parent_obj, 'markPostRead', $a_node['pos_pk']);
     }
 
     /**
@@ -289,6 +289,35 @@ class ilForumExplorerGUI implements TreeRecursion
         return $this->getChildsOfNode($record['post_id']);
     }
 
+
+    /**
+     * Get Tree UI
+     *
+     * @return Tree|object
+     */
+    public function getTreeComponent()
+    {
+        $f = $this->ui->factory();
+        /** @var ilTree $tree */
+
+        $data = $this->thread->getNestedSetPostChildren($this->root_node->getId());
+
+        $endData = array();
+        foreach ($data as $node) {
+            if ($node['depth'] == 2) {
+                $endData[] = $node;
+            }
+        }
+
+        $tree = $f->tree()
+                  ->expandable($this)
+                  ->withData($endData)
+                  ->withHighlightOnNodeClick(true);
+
+        return $tree;
+    }
+
+
     /**
      * Build and return a Node.
      * The renderer will provide the $factory-parameter which is the UI-factory
@@ -332,8 +361,6 @@ class ilForumExplorerGUI implements TreeRecursion
             $this->getTreeComponent()
         ]);
     }
-
-
 
     /**
      * Set node to be opened (additional custom opened node, not standard expand behaviour)
