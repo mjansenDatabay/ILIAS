@@ -229,10 +229,10 @@ class ilForumExplorerGUI implements TreeRecursion
         }
 
         if (isset($a_node['post_read']) && $a_node['post_read']) {
-            return $this->ctrl->getLinkTarget($this->parent_obj, $this->parent_cmd, $a_node['pos_pk']);
+            return $this->ctrl->getLinkTarget($this->parent_obj, $this->parent_cmd, $a_node['pos_pk'], false, false);
         }
 
-        return $this->ctrl->getLinkTarget($this->parent_obj, 'markPostRead', $a_node['pos_pk']);
+        return $this->ctrl->getLinkTarget($this->parent_obj, 'markPostRead', $a_node['pos_pk'], false, false);
     }
 
     /**
