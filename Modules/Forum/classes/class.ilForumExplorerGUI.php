@@ -182,33 +182,6 @@ class ilForumExplorerGUI implements TreeRecursion
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getNodeContent($a_node)
-    {
-//        $tpl = $this->getNodeTemplateInstance();
-//
-//        $tpl->setCurrentBlock('node-content-block');
-//        $tpl->setVariable('TITLE', $a_node['pos_subject']);
-//        $tpl->setVariable('TITLE_CLASSES', implode(' ', $this->getNodeTitleClasses($a_node)));
-//        $tpl->parseCurrentBlock();
-//
-//        if ($this->root_node->getId() == $a_node['pos_pk']) {
-//            return $tpl->get();
-//        }
-//
-//        $authorinfo = $this->getAuthorInformationByNode($a_node);
-//
-//        $tpl->setCurrentBlock('unlinked-node-content-block');
-//        $tpl->setVariable('UNLINKED_CONTENT_CLASS', $this->getUnlinkedNodeContentClass());
-//        $tpl->setVariable('AUTHOR', $authorinfo->getAuthorShortName());
-//        $tpl->setVariable('DATE', ilDatePresentation::formatDate(new ilDateTime($a_node['pos_date'], IL_CAL_DATETIME)));
-//        $tpl->parseCurrentBlock();
-
-        return $a_node['pos_subject'];
-    }
-
-    /**
      * @param array $node_config
      * @return array
      */
@@ -368,32 +341,7 @@ class ilForumExplorerGUI implements TreeRecursion
         ]);
     }
 
-    /**
-     * Get Tree UI
-     *
-     * @return Tree|object
-     */
-    public function getTreeComponent()
-    {
-        $f = $this->ui->factory();
-        /** @var ilTree $tree */
 
-        $data = $this->thread->getNestedSetPostChildren($this->root_node->getId());
-
-        $endData = array();
-        foreach ($data as $node) {
-            if ($node['depth'] == 2) {
-                $endData[] = $node;
-            }
-        }
-
-        $tree = $f->tree()
-                  ->expandable($this)
-                  ->withData($endData)
-                  ->withHighlightOnNodeClick(true);
-
-        return $tree;
-    }
 
     /**
      * Set node to be opened (additional custom opened node, not standard expand behaviour)
@@ -427,7 +375,11 @@ class ilForumExplorerGUI implements TreeRecursion
                     ->icon()
                     ->custom($path, 'forum');
 
-        $simple = $factory->simple($this->getNodeContent($node), $icon);
+        $authorinfo = $this->getAuthorInformationByNode($node);
+        $creationDate = ilDatePresentation::formatDate(new ilDateTime($node['pos_date'], IL_CAL_DATETIME));
+        $bylineString = $authorinfo->getAuthorShortName() . ', ' . $creationDate;
+
+        $simple = $factory->byline($node['pos_subject'], $bylineString, $icon);
 
         return $simple;
     }
