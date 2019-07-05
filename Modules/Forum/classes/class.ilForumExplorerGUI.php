@@ -352,6 +352,7 @@ class ilForumExplorerGUI implements TreeRecursion
      * @param $factory
      * @param $node
      * @return mixed
+     * @throws ilDateTimeException
      */
     private function createNode(
         \ILIAS\UI\Component\Tree\Node\Factory $factory,
@@ -367,9 +368,9 @@ class ilForumExplorerGUI implements TreeRecursion
                     ->icon()
                     ->custom($path, 'forum');
 
-        $authorinfo = $this->getAuthorInformationByNode($node);
+        $authorInfo = $this->getAuthorInformationByNode($node);
         $creationDate = ilDatePresentation::formatDate(new ilDateTime($node['pos_date'], IL_CAL_DATETIME));
-        $bylineString = $authorinfo->getAuthorShortName() . ', ' . $creationDate;
+        $bylineString = $authorInfo->getAuthorShortName() . ', ' . $creationDate;
 
         $simple = $factory->byline($node['pos_subject'], $bylineString, $icon);
 
