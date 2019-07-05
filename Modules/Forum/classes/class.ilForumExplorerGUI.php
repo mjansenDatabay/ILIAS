@@ -25,6 +25,9 @@ class ilForumExplorerGUI implements TreeRecursion
      */
     private $ui;
 
+    /** @var  */
+    private $parent_cmd;
+
     /**
      * @var string
      */
@@ -89,6 +92,7 @@ class ilForumExplorerGUI implements TreeRecursion
         $this->tpl  = $DIC->ui()->mainTemplate();
         $this->ctrl = $DIC->ctrl();
         $this->parent_obj = $a_parent_obj;
+        $this->parent_cmd = $a_parent_cmd;
 
         $frm               = new ilForum();
         $this->max_entries = (int) $frm->getPageHits();
