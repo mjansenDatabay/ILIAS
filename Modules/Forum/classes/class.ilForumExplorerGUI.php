@@ -153,22 +153,6 @@ class ilForumExplorerGUI implements TreeRecursion
     }
 
     /**
-     * @inheritdoc
-     */
-    public function beforeRendering()
-    {
-        if (isset($_GET['post_created_below']) && (int) $_GET['post_created_below'] > 0) {
-            $parent = (int)$_GET['post_created_below'];
-            do {
-                $this->setNodeOpen((int) $parent);
-            } while ($parent = $this->node_id_to_parent_node_id_map[$parent]);
-
-            $this->store->set("on_" . $this->id,
-                serialize(array_unique(array_merge($this->open_nodes, $this->custom_open_nodes))));
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getHTML()
