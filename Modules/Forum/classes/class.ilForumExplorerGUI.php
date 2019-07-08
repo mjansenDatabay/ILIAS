@@ -186,7 +186,7 @@ class ilForumExplorerGUI implements TreeRecursion
      */
     public function getChildren($record, $environment = null) : array
     {
-        return $this->getChildsOfNode($record['post_id']);
+        return $this->getChildsOfNode($record['pos_pk']);
     }
 
     /**
