@@ -120,40 +120,6 @@ class ilForumExplorerGUI implements TreeRecursion
     }
 
     /**
-     * @inheritdoc
-     */
-    public function isNodeClickable($a_node)
-    {
-        $result = parent::isNodeClickable($a_node);
-        if (!$result) {
-            return false;
-        }
-
-        return $this->root_node->getId() != $a_node['pos_pk'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRootNode()
-    {
-        if (null === $this->root_node) {
-            $this->root_node = $this->thread->getFirstPostNode();
-        }
-
-        return array(
-            'pos_pk'              => $this->root_node->getId(),
-            'pos_subject'         => $this->root_node->getSubject(),
-            'pos_author_id'       => $this->root_node->getPosAuthorId(),
-            'pos_display_user_id' => $this->root_node->getDisplayUserId(),
-            'pos_usr_alias'       => $this->root_node->getUserAlias(),
-            'pos_date'            => $this->root_node->getCreateDate(),
-            'import_name'         => $this->root_node->getImportName(),
-            'post_read'           => $this->root_node->isPostRead()
-        );
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getChildsOfNode($a_parent_node_id)
@@ -165,24 +131,6 @@ class ilForumExplorerGUI implements TreeRecursion
         }
 
         return $this->thread->getNestedSetPostChildren($a_parent_node_id, 1);
-    }
-
-    /**
-     *
-     */
-    public function preloadChildren()
-    {
-        $this->preloaded_children            = array();
-        $this->node_id_to_parent_node_id_map = array();
-
-        $children = $this->thread->getNestedSetPostChildren($this->root_node->getId());
-
-        array_walk($children, function (&$a_node, $key) {
-            $this->node_id_to_parent_node_id_map[(int) $a_node['pos_pk']]             = (int) $a_node['parent_pos'];
-            $this->preloaded_children[(int) $a_node['parent_pos']][$a_node['pos_pk']] = $a_node;
-        });
-
-        $this->preloaded = true;
     }
 
     /**
@@ -202,49 +150,6 @@ class ilForumExplorerGUI implements TreeRecursion
         }
 
         return $node_title_classes;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUnlinkedNodeContentClass()
-    {
-        return 'ilForumTreeUnlinkedContent';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNodeHref($a_node)
-    {
-        $this->ctrl->setParameter($this->parent_obj, 'backurl', null);
-        $this->ctrl->setParameter($this->parent_obj, 'pos_pk', $a_node['pos_pk']);
-
-        if (isset($a_node['counter']) && $a_node['counter'] > 0) {
-            $this->ctrl->setParameter(
-                $this->parent_obj,
-                'page',
-                floor(($a_node['counter'] - 1) / $this->max_entries)
-            );
-        }
-
-        if (isset($a_node['post_read']) && $a_node['post_read']) {
-            return $this->ctrl->getLinkTarget($this->parent_obj, $this->parent_cmd, $a_node['pos_pk'], false, false);
-        }
-
-        return $this->ctrl->getLinkTarget($this->parent_obj, 'markPostRead', $a_node['pos_pk'], false, false);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNodeIcon($a_node)
-    {
-        if ($this->root_node->getId() == $a_node['pos_pk']) {
-            return ilObject::_getIcon(0, 'tiny', 'frm');
-        }
-
-        return $this->getAuthorInformationByNode($a_node)->getProfilePicture();
     }
 
     /**
@@ -270,15 +175,6 @@ class ilForumExplorerGUI implements TreeRecursion
     {
         $this->preloadChildren();
 
-        $this->tpl->addOnLoadCode('il.ForumExplorer.init(' . json_encode(array(
-                'selectors' => array(
-                    'container'        => '#' . $this->getContainerId(),
-                    'unlinked_content' => '.' . $this->getUnlinkedNodeContentClass()
-                )
-            )) . ');');
-
-        $this->tpl->addJavascript($this->js_explorer_frm_path);
-
         return $this->render();
     }
 
@@ -292,7 +188,6 @@ class ilForumExplorerGUI implements TreeRecursion
     {
         return $this->getChildsOfNode($record['post_id']);
     }
-
 
     /**
      * Get Tree UI
@@ -435,4 +330,52 @@ class ilForumExplorerGUI implements TreeRecursion
     {
         return "il_expl2_jstree_cont_" . $this->id;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getNodeIcon($a_node)
+    {
+        if ($this->root_node->getId() == $a_node['pos_pk']) {
+            return ilObject::_getIcon(0, 'tiny', 'frm');
+        }
+
+        return $this->getAuthorInformationByNode($a_node)->getProfilePicture();
+    }
+
+    private function preloadChildren()
+    {
+        $this->preloaded_children            = array();
+        $this->node_id_to_parent_node_id_map = array();
+
+        $children = $this->thread->getNestedSetPostChildren($this->root_node->getId());
+
+        array_walk($children, function (&$a_node, $key) {
+            $this->node_id_to_parent_node_id_map[(int) $a_node['pos_pk']]             = (int) $a_node['parent_pos'];
+            $this->preloaded_children[(int) $a_node['parent_pos']][$a_node['pos_pk']] = $a_node;
+        });
+
+        $this->preloaded = true;
+    }
+
+    private function getNodeHref($a_node)
+    {
+        $this->ctrl->setParameter($this->parent_obj, 'backurl', null);
+        $this->ctrl->setParameter($this->parent_obj, 'pos_pk', $a_node['pos_pk']);
+
+        if (isset($a_node['counter']) && $a_node['counter'] > 0) {
+            $this->ctrl->setParameter(
+                $this->parent_obj,
+                'page',
+                floor(($a_node['counter'] - 1) / $this->max_entries)
+            );
+        }
+
+        if (isset($a_node['post_read']) && $a_node['post_read']) {
+            return $this->ctrl->getLinkTarget($this->parent_obj, $this->parent_cmd, $a_node['pos_pk'], false, false);
+        }
+
+        return $this->ctrl->getLinkTarget($this->parent_obj, 'markPostRead', $a_node['pos_pk'], false, false);
+    }
+
 }
