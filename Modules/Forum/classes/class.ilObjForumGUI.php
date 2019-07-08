@@ -123,16 +123,6 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
         // Model of current post
         $this->objCurrentPost = new ilForumPost((int)$_GET['pos_pk'], $this->is_moderator);
-
-        $toolContext = $DIC->globalScreen()
-                           ->tool()
-                           ->context()
-                           ->current();
-
-        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL);
-        if (false === $additionalDataExists) {
-            $toolContext->addAdditionalData(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL, true);
-        }
     }
 
     protected function initSessionStorage()
@@ -2459,6 +2449,17 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
     public function viewThreadObject()
     {
+        global $DIC;
+        $toolContext = $DIC->globalScreen()
+                           ->tool()
+                           ->context()
+                           ->current();
+
+        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL);
+        if (false === $additionalDataExists) {
+            $toolContext->addAdditionalData(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL, true);
+        }
+
         $bottom_toolbar                    = clone $this->toolbar;
         $bottom_toolbar_split_button_items = array();
 
