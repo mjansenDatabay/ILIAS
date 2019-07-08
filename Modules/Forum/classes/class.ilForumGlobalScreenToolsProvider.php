@@ -57,10 +57,10 @@ class ilForumGlobalScreenToolsProvider extends AbstractDynamicToolProvider
 
             $exp->setThread($thread);
 
-                $tools[] = $this->factory
-                    ->tool($iff('Forum|Tree'))
-                    ->withTitle($this->dic->language()->txt("tree"))
-                    ->withContent($l($exp->getHTML()));
+            $tools[] = $this->factory
+                ->tool($iff('Forum|Tree'))
+                ->withTitle($this->dic->language()->txt("tree"))
+                ->withContent($l($exp->getHTML()));
         }
 
         return $tools;
