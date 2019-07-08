@@ -8301,7 +8301,7 @@ div.alert ul > li:before {
 .il-tree .il-tree-node.expandable .node-label {
   padding-left: 2px;
 }
-.il-tree .il-tree-node.expandable .node-byline {
+.il-tree .node-byline {
   display: block;
   line-height: 0.9em;
   margin-bottom: 10px;
