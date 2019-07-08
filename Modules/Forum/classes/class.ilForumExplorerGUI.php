@@ -305,17 +305,6 @@ class ilForumExplorerGUI implements TreeRecursion
     }
 
     /**
-     * Get container id
-     *
-     * @param
-     * @return
-     */
-    private function getContainerId()
-    {
-        return "il_expl2_jstree_cont_" . $this->id;
-    }
-
-    /**
      * {@inheritdoc}
      */
     private function getNodeIcon($a_node)
