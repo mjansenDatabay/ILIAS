@@ -99,14 +99,6 @@ class ilForumExplorerGUI implements TreeRecursion
     }
 
     /**
-     * @return ilForumTopic
-     */
-    public function getThread()
-    {
-        return $this->thread;
-    }
-
-    /**
      * @param ilForumTopic $thread
      */
     public function setThread($thread)
