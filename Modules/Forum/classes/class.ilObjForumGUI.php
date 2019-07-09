@@ -134,7 +134,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         $this->objCurrentPost = new ilForumPost((int)$_GET['pos_pk'], $this->is_moderator);
 
         $this->sortationOptions = array(
-            ilForumProperties::VIEW_TREE => 'order_by_posts',
+            ilForumProperties::VIEW_TREE => 'sort_by_posts',
             ilForumProperties::VIEW_DATE => 'order_by_date'
         );
 
@@ -2889,10 +2889,15 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $sorting = $_SESSION['viewmode'];
         }
 
+        $translatedOptions = array();
+        foreach ($this->sortationOptions as $option) {
+            $translatedOptions[] = $this->lng->txt($option);
+        }
+
         $sortViewControl = $DIC->ui()
                                ->factory()
                                ->viewControl()
-                               ->sortation($this->sortationOptions)
+                               ->sortation($translatedOptions)
                                ->withLabel($this->lng->txt($this->sortationOptions[$sorting]))
                                ->withTargetURL($DIC->ctrl()->getLinkTarget($this, 'applySortation'), 'sort_by');
 
