@@ -2894,8 +2894,8 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         }
 
         $translatedOptions = array();
-        foreach ($this->sortationOptions as $option) {
-            $translatedOptions[] = $this->lng->txt($option);
+        foreach ($this->sortationOptions as $key => $option) {
+            $translatedOptions[$key] = $this->lng->txt($option);
         }
 
         $sortViewControl = $DIC->ui()
@@ -5076,9 +5076,12 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
     private function applySortationObject()
     {
         global $DIC;
-        $sorting = $DIC->http()
-                       ->request()
-                       ->getQueryParams()['sort_by'] ?? $this->defaultSorting;
+
+        $queryParameters = $DIC->http()
+                              ->request()
+                              ->getQueryParams();
+
+        $sorting =  $queryParameters['sort_by'] ?? $this->defaultSorting;
 
         if (!array_key_exists($sorting, $this->sortationOptions)) {
             $sorting = $this->defaultSorting;
