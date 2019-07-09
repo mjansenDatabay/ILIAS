@@ -2898,16 +2898,22 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $translatedOptions[$key] = $this->lng->txt($option);
         }
 
+        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
+        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
+        $this->ctrl->setParameter($this, 'viewmode', $sorting);
+
+        $url             = $DIC->ctrl()->getLinkTarget($this, 'applySortation');
+
+        $this->ctrl->clearParameters($this);
+
         $sortViewControl = $DIC->ui()
                                ->factory()
                                ->viewControl()
                                ->sortation($translatedOptions)
                                ->withLabel($this->lng->txt($this->sortationOptions[$sorting]))
-                               ->withTargetURL($DIC->ctrl()->getLinkTarget($this, 'applySortation'), 'sort_by');
+                               ->withTargetURL($url, 'sort_by');
 
         $DIC->toolbar()->addComponent($sortViewControl);
-
-        $this->ctrl->clearParameters($this);
 
         $permalink = new ilPermanentLinkGUI('frm', $this->object->getRefId(), '_' . $this->objCurrentTopic->getId());
         $this->tpl->setVariable('PRMLINK', $permalink->getHTML());
@@ -5081,7 +5087,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                               ->request()
                               ->getQueryParams();
 
-        $sorting =  $queryParameters['sort_by'] ?? $this->defaultSorting;
+        $sorting = $queryParameters['sort_by'] ?? $this->defaultSorting;
 
         if (!array_key_exists($sorting, $this->sortationOptions)) {
             $sorting = $this->defaultSorting;
