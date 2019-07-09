@@ -16,6 +16,15 @@ use ILIAS\UI\Renderer;
  */
 class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 {
+    /**
+     * @var array
+     */
+    private $sortationOptions;
+    /**
+     * @var int
+     */
+    private $defaultSorting;
+
     /** @var string */
     public $modal_history = '';
 
@@ -123,6 +132,13 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
         // Model of current post
         $this->objCurrentPost = new ilForumPost((int)$_GET['pos_pk'], $this->is_moderator);
+
+        $this->sortationOptions = array(
+            ilForumProperties::VIEW_TREE => 'order_by_posts',
+            ilForumProperties::VIEW_DATE => 'order_by_date'
+        );
+
+        $this->defaultSorting = ilForumProperties::VIEW_TREE;
     }
 
     protected function initSessionStorage()
@@ -2868,46 +2884,19 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $threadContentTemplate->setVariable('TOOLBAR_BOTTOM', $bottom_toolbar->getHTML());
         }
 
-        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
-        $this->ctrl->setParameter($this, 'viewmode', ilForumProperties::VIEW_TREE);
-
-        $isEngaged = false;
-        if (isset ($_SESSION['viewmode']) && $_SESSION['viewmode'] === ilForumProperties::VIEW_TREE) {
-            $isEngaged = true;
+        $sorting = $this->defaultSorting;
+        if (isset($_SESSION['viewmode'])) {
+            $sorting = $_SESSION['viewmode'];
         }
 
-        $orderByPostsButton = $DIC->ui()
-                                  ->factory()
-                                  ->button()
-                                  ->standard(
-                                      $this->lng->txt("sort_by_posts"),
-                                      $DIC->ctrl()->getLinkTarget($this, "viewThread")
-                                  )
-                                  ->withEngagedState($isEngaged);
+        $sortViewControl = $DIC->ui()
+                               ->factory()
+                               ->viewControl()
+                               ->sortation($this->sortationOptions)
+                               ->withLabel($this->lng->txt($this->sortationOptions[$sorting]))
+                               ->withTargetURL($DIC->ctrl()->getLinkTarget($this, 'applySortation'), 'sort_by');
 
-        $DIC->toolbar()->addComponent($orderByPostsButton);
-
-        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
-        $this->ctrl->setParameter($this, 'viewmode', ilForumProperties::VIEW_DATE);
-
-        $isEngaged = false;
-        if (isset ($_SESSION['viewmode']) && $_SESSION['viewmode'] === ilForumProperties::VIEW_DATE) {
-            $isEngaged = true;
-        }
-
-
-        $orderByDateButton = $DIC->ui()
-                          ->factory()
-                          ->button()
-                          ->standard(
-                              $this->lng->txt("order_by_date"),
-                              $DIC->ctrl()->getLinkTarget($this, "viewThread")
-                          )
-                          ->withEngagedState($isEngaged);
-
-        $DIC->toolbar()->addComponent($orderByDateButton);
+        $DIC->toolbar()->addComponent($sortViewControl);
 
         $this->ctrl->clearParameters($this);
 
@@ -5073,5 +5062,23 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $tpl->setVariable('FORM', $oEditReplyForm->getHTML());
         }
         $this->ctrl->clearParameters($this);
+    }
+
+    private function applySortationObject()
+    {
+        global $DIC;
+        $sorting = $DIC->http()
+                       ->request()
+                       ->getQueryParams()['sort_by'] ?? $this->defaultSorting;
+
+        if (!array_key_exists($sorting, $this->sortationOptions)) {
+            $sorting = $this->defaultSorting;
+        }
+
+        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
+        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
+        $this->ctrl->setParameter($this, 'viewmode', $sorting);
+
+        $this->ctrl->redirect($this, 'viewThread');
     }
 }
