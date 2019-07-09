@@ -1403,26 +1403,6 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         $this->tabs->setBackTarget($this->lng->txt('all_topics'),
             'ilias.php?baseClass=ilRepositoryGUI&amp;ref_id=' . $_GET['ref_id']);
 
-        // by answer view
-        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
-        $this->ctrl->setParameter($this, 'viewmode', ilForumProperties::VIEW_TREE);
-        $this->tabs->addTarget('sort_by_posts', $this->ctrl->getLinkTarget($this, 'viewThread'));
-
-        // by date view
-        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
-        $this->ctrl->setParameter($this, 'viewmode', ilForumProperties::VIEW_DATE);
-        $this->tabs->addTarget('order_by_date', $this->ctrl->getLinkTarget($this, 'viewThread'));
-
-        $this->ctrl->clearParameters($this);
-
-        if ($this->isHierarchicalView()) {
-            $this->tabs->activateTab('sort_by_posts');
-        } else {
-            $this->tabs->activateTab('order_by_date');
-        }
-
         /**
          * @var $frm ilForum
          */
@@ -2450,6 +2430,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
     public function viewThreadObject()
     {
         global $DIC;
+
         $toolContext = $DIC->globalScreen()
                            ->tool()
                            ->context()
@@ -2886,6 +2867,49 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         if ($numberOfPostings > 0) {
             $threadContentTemplate->setVariable('TOOLBAR_BOTTOM', $bottom_toolbar->getHTML());
         }
+
+        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
+        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
+        $this->ctrl->setParameter($this, 'viewmode', ilForumProperties::VIEW_TREE);
+
+        $isEngaged = false;
+        if (isset ($_SESSION['viewmode']) && $_SESSION['viewmode'] === ilForumProperties::VIEW_TREE) {
+            $isEngaged = true;
+        }
+
+        $orderByPostsButton = $DIC->ui()
+                                  ->factory()
+                                  ->button()
+                                  ->standard(
+                                      $this->lng->txt("sort_by_posts"),
+                                      $DIC->ctrl()->getLinkTarget($this, "viewThread")
+                                  )
+                                  ->withEngagedState($isEngaged);
+
+        $DIC->toolbar()->addComponent($orderByPostsButton);
+
+        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
+        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
+        $this->ctrl->setParameter($this, 'viewmode', ilForumProperties::VIEW_DATE);
+
+        $isEngaged = false;
+        if (isset ($_SESSION['viewmode']) && $_SESSION['viewmode'] === ilForumProperties::VIEW_DATE) {
+            $isEngaged = true;
+        }
+
+
+        $orderByDateButton = $DIC->ui()
+                          ->factory()
+                          ->button()
+                          ->standard(
+                              $this->lng->txt("order_by_date"),
+                              $DIC->ctrl()->getLinkTarget($this, "viewThread")
+                          )
+                          ->withEngagedState($isEngaged);
+
+        $DIC->toolbar()->addComponent($orderByDateButton);
+
+        $this->ctrl->clearParameters($this);
 
         $permalink = new ilPermanentLinkGUI('frm', $this->object->getRefId(), '_' . $this->objCurrentTopic->getId());
         $this->tpl->setVariable('PRMLINK', $permalink->getHTML());
