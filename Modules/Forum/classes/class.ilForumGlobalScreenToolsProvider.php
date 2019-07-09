@@ -52,10 +52,9 @@ class ilForumGlobalScreenToolsProvider extends AbstractDynamicToolProvider
                     true,
                     false
                 ),
-                'viewThread'
+                'viewThread',
+                $thread
             );
-
-            $exp->setThread($thread);
 
             $tools[] = $this->factory
                 ->tool($iff('Forum|Tree'))

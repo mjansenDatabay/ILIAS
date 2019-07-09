@@ -2543,8 +2543,12 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         }
 
         if ($this->isHierarchicalView()) {
-            $exp = new ilForumExplorerGUI('frm_exp_' . $this->objCurrentTopic->getId(), $this, 'viewThread');
-            $exp->setThread($this->objCurrentTopic);
+            $exp = new ilForumExplorerGUI(
+                'frm_exp_' . $this->objCurrentTopic->getId(),
+                $this,
+                'viewThread',
+                $this->objCurrentTopic
+            );
         }
 
         $this->lng->loadLanguageModule('forum');

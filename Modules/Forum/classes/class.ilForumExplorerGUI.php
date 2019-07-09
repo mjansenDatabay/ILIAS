@@ -82,7 +82,7 @@ class ilForumExplorerGUI implements TreeRecursion
     /**
      * {@inheritdoc}
      */
-    public function __construct($a_expl_id, $a_parent_obj, $a_parent_cmd)
+    public function __construct($a_expl_id, $a_parent_obj, $a_parent_cmd, ilForumTopic $thread)
     {
         global $DIC;
 
@@ -96,13 +96,7 @@ class ilForumExplorerGUI implements TreeRecursion
 
         $frm               = new ilForum();
         $this->max_entries = (int) $frm->getPageHits();
-    }
 
-    /**
-     * @param ilForumTopic $thread
-     */
-    public function setThread($thread)
-    {
         $this->thread    = $thread;
         $this->root_node = $thread->getFirstPostNode();
 
