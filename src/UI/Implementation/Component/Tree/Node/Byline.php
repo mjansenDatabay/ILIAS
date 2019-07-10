@@ -17,7 +17,7 @@ class Byline extends \ILIAS\UI\Implementation\Component\Tree\Node\Simple impleme
      */
     private $byline;
 
-    public function __construct(string $label, string $byline, \ILIAS\UI\Component\Symbol\Icon\Icon $icon=null)
+    public function __construct(string $label, string $byline, \ILIAS\UI\Component\Symbol\Icon\Icon $icon = null)
     {
         parent::__construct($label, $icon);
 
