@@ -304,7 +304,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             'deliverDraftZipFile',
             'deliverZipFile',
             'cancelDraft',
-            'deleteThreadDrafts'
+            'deleteThreadDrafts',
         );
 
         if (!in_array($cmd, $exclude_cmds)) {
@@ -2447,16 +2447,6 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
     {
         global $DIC;
 
-        $toolContext = $DIC->globalScreen()
-                           ->tool()
-                           ->context()
-                           ->current();
-
-        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL);
-        if (false === $additionalDataExists) {
-            $toolContext->addAdditionalData(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL, true);
-        }
-
         $bottom_toolbar                    = clone $this->toolbar;
         $bottom_toolbar_split_button_items = array();
 
@@ -2488,6 +2478,16 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
         if (!$this->access->checkAccess('read', '', $this->object->getRefId())) {
             $this->error->raiseError($this->lng->txt('permission_denied'), $this->error->MESSAGE);
+        }
+
+        $toolContext = $DIC->globalScreen()
+                           ->tool()
+                           ->context()
+                           ->current();
+
+        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL);
+        if (false === $additionalDataExists && $_SESSION['viewmode'] === ilForumProperties::VIEW_TREE) {
+            $toolContext->addAdditionalData(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL, true);
         }
 
         // init objects
@@ -2893,25 +2893,22 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $sorting = $_SESSION['viewmode'];
         }
 
-        $translatedOptions = array();
-        foreach ($this->sortationOptions as $key => $option) {
-            $translatedOptions[$key] = $this->lng->txt($option);
+        $translationKeys = array();
+        foreach ($this->sortationOptions as $sortingConstantKey => $languageKey) {
+            $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
+            $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
+            $this->ctrl->setParameter($this, 'viewmode', $sortingConstantKey);
+
+            $translationKeys[$this->lng->txt($languageKey)] = $DIC->ctrl()->getLinkTarget($this, 'viewThread', '', false, false);
+
+            $this->ctrl->clearParameters($this);
         }
-
-        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
-        $this->ctrl->setParameter($this, 'viewmode', $sorting);
-
-        $url             = $DIC->ctrl()->getLinkTarget($this, 'applySortation');
-
-        $this->ctrl->clearParameters($this);
 
         $sortViewControl = $DIC->ui()
                                ->factory()
                                ->viewControl()
-                               ->sortation($translatedOptions)
-                               ->withLabel($this->lng->txt($this->sortationOptions[$sorting]))
-                               ->withTargetURL($url, 'sort_by');
+                               ->mode($translationKeys, $this->lng->txt($this->sortationOptions[$sorting]))
+                               ->withActive($this->lng->txt($this->sortationOptions[$sorting]));
 
         $DIC->toolbar()->addComponent($sortViewControl);
 
@@ -5077,26 +5074,5 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $tpl->setVariable('FORM', $oEditReplyForm->getHTML());
         }
         $this->ctrl->clearParameters($this);
-    }
-
-    private function applySortationObject()
-    {
-        global $DIC;
-
-        $queryParameters = $DIC->http()
-                              ->request()
-                              ->getQueryParams();
-
-        $sorting = $queryParameters['sort_by'] ?? $this->defaultSorting;
-
-        if (!array_key_exists($sorting, $this->sortationOptions)) {
-            $sorting = $this->defaultSorting;
-        }
-
-        $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentTopic->getId());
-        $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
-        $this->ctrl->setParameter($this, 'viewmode', $sorting);
-
-        $this->ctrl->redirect($this, 'viewThread');
     }
 }
