@@ -16,14 +16,14 @@ use ILIAS\UI\Renderer;
  */
 class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $sortationOptions;
-    /**
-     * @var int
-     */
+
+    /** @var int */
     private $defaultSorting;
+
+    /** @var \ILIAS\GlobalScreen\Services */
+    private $globalScreen;
 
     /** @var string */
     public $modal_history = '';
@@ -100,6 +100,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         $this->httpRequest = $DIC->http()->request();
         $this->uiFactory   = $DIC->ui()->factory();
         $this->uiRenderer  = $DIC->ui()->renderer();
+        $this->globalScreen = $DIC->globalScreen();
 
         $this->access              = $DIC->access();
         $this->ilObjDataCache      = $DIC['ilObjDataCache'];
@@ -2445,8 +2446,6 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
     public function viewThreadObject()
     {
-        global $DIC;
-
         $bottom_toolbar                    = clone $this->toolbar;
         $bottom_toolbar_split_button_items = array();
 
@@ -2480,10 +2479,10 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $this->error->raiseError($this->lng->txt('permission_denied'), $this->error->MESSAGE);
         }
 
-        $toolContext = $DIC->globalScreen()
-                           ->tool()
-                           ->context()
-                           ->current();
+        $toolContext = $this->globalScreen
+                            ->tool()
+                            ->context()
+                            ->current();
 
         $additionalDataExists = $toolContext->getAdditionalData()->exists(ilForumGlobalScreenToolsProvider::SHOW_FORUM_THREADS_TOOL);
         if (false === $additionalDataExists && $_SESSION['viewmode'] === ilForumProperties::VIEW_TREE) {
@@ -2899,18 +2898,23 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $this->ctrl->setParameter($this, 'pos_pk', $this->objCurrentPost->getId());
             $this->ctrl->setParameter($this, 'viewmode', $sortingConstantKey);
 
-            $translationKeys[$this->lng->txt($languageKey)] = $DIC->ctrl()->getLinkTarget($this, 'viewThread', '', false, false);
+            $translationKeys[$this->lng->txt($languageKey)] = $this->ctrl->getLinkTarget(
+                $this,
+                'viewThread',
+                '',
+                false,
+                false
+            );
 
             $this->ctrl->clearParameters($this);
         }
 
-        $sortViewControl = $DIC->ui()
-                               ->factory()
+        $sortViewControl = $this->uiFactory
                                ->viewControl()
                                ->mode($translationKeys, $this->lng->txt($this->sortationOptions[$sorting]))
                                ->withActive($this->lng->txt($this->sortationOptions[$sorting]));
 
-        $DIC->toolbar()->addComponent($sortViewControl);
+        $this->toolbar->addComponent($sortViewControl);
 
         $permalink = new ilPermanentLinkGUI('frm', $this->object->getRefId(), '_' . $this->objCurrentTopic->getId());
         $this->tpl->setVariable('PRMLINK', $permalink->getHTML());
