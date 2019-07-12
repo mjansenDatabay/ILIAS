@@ -280,14 +280,15 @@ class ilMemberAgreement
 	 */
 	public static function _setFirstAccessTime($a_usr_id, $a_obj_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		$query = "SELECT * FROM member_agreement ".
 			"WHERE usr_id = ".$ilDB->quote($a_usr_id ,'integer')." ".
 			"AND obj_id = ".$ilDB->quote($a_obj_id ,'integer');
 		$res = $ilDB->query($query);
 
-		if (!$row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		if (!$row = $ilDB->fetchAssoc($res))
 		{
 		 	$query = "INSERT INTO member_agreement (usr_id,obj_id,accepted,acceptance_time) ".
 		 		"VALUES( ".

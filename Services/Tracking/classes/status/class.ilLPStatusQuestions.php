@@ -52,6 +52,9 @@ class ilLPStatusQuestions extends ilLPStatus
 		return $usr_ids;
 	}
 
+
+
+
 	/**
 	 * Determine status
 	 *
