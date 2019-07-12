@@ -41,7 +41,7 @@ class ilCourseFile
 
 	var $course_id = null;
 	var $file_id = null;
-	
+
 	private $fss_storage = null;
 
 	/**
@@ -150,27 +150,33 @@ class ilCourseFile
 	{
 		return $this->error_code;
 	}
-	
+
 	function getAbsolutePath()
 	{
-		if(is_object($this->fss_storage))
-		{
-// fau: fixCourseFileUpload - use the uploaded file extension
-			$pi = pathinfo($this->getFilename());
-			$suffix = empty($pi['extension']) ? '' : '.' . $pi['extension'];
-
-			if (is_file($this->fss_storage->getInfoDirectory().'/'.$this->getFileId().$suffix))
-			{
-				// new uploads
-				return $this->fss_storage->getInfoDirectory().'/'.$this->getFileId().$suffix;
-			}
-			elseif (is_file($this->fss_storage->getInfoDirectory().'/'.$this->getFileId()))
-			{
-				// older uploads
-				return $this->fss_storage->getInfoDirectory().'/'.$this->getFileId();
-			}
-// fau.
+		// workaround for "secured" files.
+		if(!$this->fss_storage instanceof \ilFSStorageCourse) {
+			return false;
 		}
+
+		$file = $this->fss_storage->getInfoDirectory().'/'.$this->getFileId();
+
+// fau: fixCourseFileDownload - try to use use the uploaded file extension
+		$pi = pathinfo($this->getFileName());
+		$ext =  $pi['extension'];
+		$variants = [
+			$file,					// standard
+			$file . '.sec',			// standard, secured
+			$file . '.' . $ext,		// patched until 5.3.15
+			$file . $ext . '.sec',	// patched until 5.3.15, secured
+		];
+
+		foreach ($variants as $file) {
+			if(file_exists($file)) {
+				return $file;
+			}
+		}
+// fau.
+
 		return false;
 	}
 
@@ -241,15 +247,11 @@ class ilCourseFile
 
 		if($a_upload)
 		{
-// fau: fixCourseFileUpload - use the uploaded file extension
-			$pi = pathinfo($this->getFilename());
-			$suffix = empty($pi['extension']) ? '' : '.' . $pi['extension'];
-
 			// now create file
 			ilUtil::moveUploadedFile($this->getTemporaryName(),
 				$this->getFileName(),
-				$this->fss_storage->getInfoDirectory().'/'.$this->getFileId().$suffix);
-// fau.
+				$this->fss_storage->getInfoDirectory().'/'.$this->getFileId());
+
 		}
 		return true;
 	}
