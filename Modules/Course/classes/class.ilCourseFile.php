@@ -42,6 +42,9 @@ class ilCourseFile
 	var $course_id = null;
 	var $file_id = null;
 
+	/**
+	 * @var \ilFSStorageCourse|null
+	 */
 	private $fss_storage = null;
 
 	/**
@@ -151,6 +154,9 @@ class ilCourseFile
 		return $this->error_code;
 	}
 
+	/**
+	 * @return bool|string
+	 */
 	function getAbsolutePath()
 	{
 		// workaround for "secured" files.
