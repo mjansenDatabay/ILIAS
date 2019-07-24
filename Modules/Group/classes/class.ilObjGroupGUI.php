@@ -703,6 +703,8 @@ class ilObjGroupGUI extends ilContainerGUI
 // fau: fairSub - validate group object
 			if(!$this->object->validate())
 			{
+				global $DIC;
+				$ilErr = $DIC['ilErr'];
 				ilUtil::sendFailure($ilErr->getMessage());
 				$form->setValuesByPost();
 				$this->editObject($form);
