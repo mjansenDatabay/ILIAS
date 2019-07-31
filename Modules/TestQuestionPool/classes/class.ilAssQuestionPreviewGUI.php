@@ -305,6 +305,9 @@ class ilAssQuestionPreviewGUI
 		}
 		else
 		{
+// fau: fixValidateSolutionSubmit - show validation message for preview
+			ilUtil::sendFailure($this->questionOBJ->getValidateSolutionMessage(), true);
+// fau.
 			$this->previewSession->setInstantResponseActive(false);
 		}
 		
@@ -313,7 +316,12 @@ class ilAssQuestionPreviewGUI
 	
 	private function handleQuestionActionCmd()
 	{
-		$this->questionOBJ->persistPreviewState($this->previewSession);
+// fau: fixValidateSolutionSubmit - show validation message for preview
+		$valid = $this->questionOBJ->persistPreviewState($this->previewSession);
+		if (!$valid) {
+			ilUtil::sendFailure($this->questionOBJ->getValidateSolutionMessage(), true);
+		}
+// fau.
 		$this->ctrl->redirect($this, self::CMD_SHOW);
 	}
 	
@@ -538,6 +546,9 @@ class ilAssQuestionPreviewGUI
 		if( !$this->saveQuestionSolution() )
 		{
 			$this->previewSession->setInstantResponseActive(false);
+// fau: fixValidateSolutionSubmit - show validation message for preview
+			ilUtil::sendFailure($this->questionOBJ->getValidateSolutionMessage(), false);
+// fau.
 			$this->showCmd();
 			return;
 		}
@@ -554,6 +565,9 @@ class ilAssQuestionPreviewGUI
 		if( !$this->saveQuestionSolution() )
 		{
 			$this->previewSession->setInstantResponseActive(false);
+// fau: fixValidateSolutionSubmit - show validation message for preview
+			ilUtil::sendFailure($this->questionOBJ->getValidateSolutionMessage(), false);
+// fau.
 			$this->showCmd();
 			return;
 		}

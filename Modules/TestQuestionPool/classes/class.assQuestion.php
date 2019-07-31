@@ -268,6 +268,14 @@ abstract class assQuestion
 	 */
 	protected $testQuestionConfig;
 // fau.
+
+
+// fau: fixQuestionValidateSubmit - new classs variable
+	/**
+	 * @var string message produced by validateSolutionSubmit
+	 */
+	protected $validateSolutionMessage;
+// fau.
 	
 	protected static $allowedImageMaterialFileExtensionsByMimeType = array(
 		'image/jpeg' => array('jpg', 'jpeg'), 'image/png' => array('png'), 'image/gif' => array('gif')
@@ -1372,7 +1380,27 @@ abstract class assQuestion
 	{
 		return true;
 	}
-	
+
+
+// fau: fixValidateSolutionSubmit - getter and setter
+	/**
+	 * @return string
+	 */
+	public function getValidateSolutionMessage()
+	{
+		return $this->validateSolutionMessage;
+	}
+
+	/**
+	 * @param string $validateSolutionMessage
+	 */
+	public function setValidateSolutionMessage($validateSolutionMessage)
+	{
+		$this->validateSolutionMessage = $validateSolutionMessage;
+	}
+// fau.
+
+
 	/**
 	 * Saves the learners input of the question to the database.
 	 * 
