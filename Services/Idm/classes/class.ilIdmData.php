@@ -273,7 +273,7 @@ class ilIdmData
         {
             $limit = new ilDateTime(ilCust::get('shib_create_limited'), IL_CAL_DATE);
             $userObj->setTimeLimitUnlimited(0);
-            $userObj->setTimeLimitFrom(time());
+            $userObj->setTimeLimitFrom(time() - 10);
             $userObj->setTimeLimitUntil($limit->get(IL_CAL_UNIX));
         }
         else

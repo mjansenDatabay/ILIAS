@@ -744,14 +744,15 @@ class ilObjUser extends ilObject
 // fau: samlAuth - new function _findLoginByField
 	static function _findLoginByField($fieldname, $value)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		$query = "SELECT login FROM usr_data ".
 		"WHERE ". $fieldname . " = ". $ilDB->quote($value, 'text');
 		$result = $ilDB->query($query);
 
 		// take the first found
-		if ($row = $result->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($row = $ilDB->fetchAssoc($result))
 		{
 			return $row['login'];
 		}
