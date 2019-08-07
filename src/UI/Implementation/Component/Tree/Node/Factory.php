@@ -18,8 +18,8 @@ class Factory implements INode\Factory
 		return new Simple($label, $icon);
 	}
 
-    public function byline(string $label, string $byline, IIcon $icon = null) : IByline
+    public function bylined(string $label, string $bylined, IIcon $icon = null) : IByline
     {
-        return new Bylined($label, $byline, $icon);
+        return new Bylined($label, $bylined, $icon);
     }
 }
