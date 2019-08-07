@@ -60,7 +60,7 @@ interface Factory
      * @param string                                    $label
      * @param string                                    $byline
      * @param \ILIAS\UI\Component\Symbol\Icon\Icon|null $icon
-     * @return Byline
+     * @return Bylined
      */
-    public function byline(string $label, string $byline, Icon $icon=null): Byline;
+    public function byline(string $label, string $byline, Icon $icon=null): Bylined;
 }

@@ -5,8 +5,8 @@ namespace ILIAS\UI\Implementation\Component\Tree\Node;
 
 use ILIAS\UI\Component\Tree\Node as INode;
 use ILIAS\UI\Component\Symbol\Icon\Icon as IIcon;
-use ILIAS\UI\Component\Tree\Node\Byline as IByline;
-use \ILIAS\UI\Implementation\Component\Tree\Node\Byline;
+use ILIAS\UI\Component\Tree\Node\Bylined as IByline;
+use \ILIAS\UI\Implementation\Component\Tree\Node\Bylined;
 
 class Factory implements INode\Factory
 {
@@ -20,6 +20,6 @@ class Factory implements INode\Factory
 
     public function byline(string $label, string $byline, IIcon $icon = null) : IByline
     {
-        return new Byline($label, $byline, $icon);
+        return new Bylined($label, $byline, $icon);
     }
 }

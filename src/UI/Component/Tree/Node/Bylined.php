@@ -9,12 +9,12 @@ namespace ILIAS\UI\Component\Tree\Node;
  * This describes a tree node with an byline with additional information
  * about this node
  */
-interface Byline extends Simple
+interface Bylined extends Simple
 {
     /**
      * The byline string that will be displayed as additional
      * information to the current node
      * @return string
      */
-    public function getByline() : string;
+    public function getBylined() : string;
 }

@@ -33,8 +33,8 @@ class BylineNodeTest extends ILIAS_UI_TestBase
 	public function createBylineNode()
     {
         $node = $this->node_factory->byline('My Label', 'This is my byline', $this->icon);
-        $this->assertEquals('My Label', $node->getByline());
-        $this->assertEquals('This is my byline', $node->getByline());
+        $this->assertEquals('My Label', $node->getBylined());
+        $this->assertEquals('This is my byline', $node->getBylined());
         $this->assertEquals($this->icon, $node->getIcon());
     }
 

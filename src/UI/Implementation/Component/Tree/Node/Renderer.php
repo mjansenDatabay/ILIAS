@@ -28,8 +28,8 @@ class Renderer extends AbstractComponentRenderer {
 			$async = true;
 		}
 
-		if ($component instanceof Node\Byline && null !== $component->getByline()) {
-            $tpl->setVariable('BYLINE', $component->getByline());
+		if ($component instanceof Node\Bylined && null !== $component->getBylined()) {
+            $tpl->setVariable('BYLINE', $component->getBylined());
         }
 
 		$tpl->setVariable("LABEL", $component->getLabel());
@@ -107,7 +107,7 @@ class Renderer extends AbstractComponentRenderer {
 	protected function getComponentInterfaceName() {
 		return array(
 			Node\Simple::class,
-            Node\Byline::class
+            Node\Bylined::class
 		);
 	}
 }
