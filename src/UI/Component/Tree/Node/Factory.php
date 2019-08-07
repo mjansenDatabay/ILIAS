@@ -54,8 +54,8 @@ interface Factory
      * rules:
      *   usage:
      *      1: >
-     *        A Byline Node SHOULD when there is a need to display a byline
-     *        of additional information to a tree node.
+     *        A Byline Node SHOULD be used when there is a need to display a
+     *        byline of additional information to a tree node.
      * ---
      * @param string                                    $label
      * @param string                                    $bylined
