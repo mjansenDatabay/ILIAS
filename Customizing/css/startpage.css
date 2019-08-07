@@ -7,107 +7,146 @@
  * Hide navigation tree
  */
 .ilTreeView, .ilLeftNav { display: none; }
-.ilLeftNavSpace { margin-left: 0 !important; }
+.ilLeftNavSpace { margin-left: 0; }
 
 
+/**
+ * Banner and Login Container
+ */
 .ilc_section_BannerContainer {
     display: none;
 }
-
 @media (min-width: 768px) {
+
+    /* show login as oox on the banner */
     .ilc_section_LoginContainer {
         position: absolute;
-        top: 0;
-        left: 20px;
+        top: -20px;
+        left: 15px;
         z-index: 1000;
         background-color: #fafafc;
-        -webkit-box-shadow: 10px 10px 0px 0px rgba(0,0,0,0.2);
-        -moz-box-shadow: 10px 10px 0px 0px rgba(0,0,0,0.2);
-        box-shadow: 10px 10px 0px 0px rgba(0,0,0,0.2);
-        padding-right: 10px;
+        padding-top: 5px;
+        padding-right: 5px;
+        -webkit-box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.2);
+        -moz-box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.2);
+        box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.2);
     }
 
+    /* positioning of the banner */
     .ilc_section_BannerContainer {
-        min-height: 300px;
+        display:block;
         margin-top: -53px;
-        margin-left: -50px;
-        margin-right: -50px;
-        display: block;
+        margin-left: -30px;
+        margin-right: -30px;
     }
 
+    /* Rotating Banner Images */
+    .ilc_section_BannerContainer .ilc_ca_icntr_CarouselICntr {
+        height:300px;
+    }
+    .ilc_section_BannerContainer .ilc_Mob  {
+        position: absolute;
+        height: 300px;
+        left: 0;
+        right: 0;
+        overflow:hidden;
+    }
+    .ilc_section_BannerContainer .ilc_Mob img {
+        position: absolute;
+        height: 300px;
+        width:auto!important;
+        right: 0;
+    }
+
+    /* Banner Texts */
+    .ilc_section_BannerContainer .ilc_Paragraph {
+        position: absolute;
+        background: #036;
+        color: white;
+        top: 240px;
+        right: 30px;
+        left: 30px;
+        padding: 20px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .ilc_section_BannerContainer .ilc_Paragraph a {
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+    }
+    .ilc_section_BannerContainer .ilc_Paragraph a:hover {
+        color: white;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    /* Put banner directly below menu */
     .ilMainHeader {
-        border-bottom: 0!important;
+        border-bottom: 0;
     }
 
+    /* For view with write permissions */
     #ilSubTab {
-        margin-bottom: 50px!important;
+        margin-bottom: 50px;
+    }
+
+    /* Login messages */
+    div.ilAdminRow {
+        position:absolute;
+        top: 10px;
+        left: 300px;
+        right: 15px;
+        z-index: 1000;
+        width:auto;
     }
 }
 
 
 /*
- * Banner Image
+ * Login blocks
  */
-.ilc_section_BannerBlock {
-    margin-bottom: 10px;
-}
-.ilc_section_BannerBlock table.ilc_media_cont_MediaContainer,
-.ilc_section_BannerBlock table.ilc_media_cont_MediaContainer tbody
-.ilc_section_BannerBlock table.ilc_media_cont_MediaContainer tr
-.ilc_section_BannerBlock table.ilc_media_cont_MediaContainer td {
-    display: block;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    width: 100%!important;
-    height: 100px!important;
-    /* needed for cutting image */
-    position: relative;
-    overflow: hidden;
-}
-.ilc_section_BannerBlock img {
-    /* center and cut image */
-    position: absolute;
-    height: 100px!important;
-    left: 50%;                              /* this is relative to the container width */
-    -webkit-transform: translate(-50%);     /* this works relative to the image width */
-    -ms-transform: translate(-50%);
-    transform: translate(-50%);
-}
-
-/*
- * Banner Image in Editor
- */
-#il_EditPage .ilc_section_BannerBlock img {
-    position: relative;
-    height: 100px!important;
-    width: 100%!important;
-    left: 0;
-    -webkit-transform: translate(0);
-    -ms-transform: translate(0);
-    transform: translate(0);
-}
-
-
-/*
- * Styles for Login form
- */
-.loginBlock {
+div.loginBlock {
     padding-left: 22px;
 }
-.loginHeadline {
-    background-image: url(../../templates/default/images/tree_col.svg)!important;
+h2.loginHeadline {
+    background-image: url(../../templates/default/images/tree_col.svg);
     background-repeat: no-repeat;
     background-position: 0 3px;
     margin-left: -22px;
     padding-left: 22px;
+    margin-top:0;
+    margin-bottom: 0;
+    font-size: 120%;
 }
-.loginHeadline.open {
-    background-image: url(../../templates/default/images/tree_exp.svg)!important;
+h2.loginHeadline.open {
+    background-image: url(../../templates/default/images/tree_exp.svg);
 }
+
+div.loginFormLinks {
+    margin-top: -5px;
+    font-size: 80%;
+}
+
 .loginHelp {
     padding-top: 20px;
 }
-h2 small {font-size: 13px; }
-h2 a { color: #036!important;}
+
+
+/**
+ * Grid below Banner
+ */
+.ilc_section_GridContainer > .row {
+    display:flex;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.ilc_section_GridContainer > .row > div {
+    display:flex;
+    background-color: #fafafc;
+    border: 15px solid white;
+    min-height: 300px;
+
+}
