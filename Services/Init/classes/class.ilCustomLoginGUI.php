@@ -102,6 +102,7 @@ class ilCustomLoginGUI
 		$ilCtrl = $DIC->ctrl();
 		$ilSetting = $DIC->settings();
 		$lng = $DIC->language();
+		$ilUser = $DIC->user();
 
 		if (!empty($_GET['login_target']))
         {
@@ -114,6 +115,19 @@ class ilCustomLoginGUI
 		$action = $ilCtrl->getFormActionByClass(['ilStartupGUI', 'ilStartUpGUI']);
 
 		$tpl = new ilTemplate("tpl.custom_login.html", true, true, "Services/Init");
+
+		if ($ilSetting->get("password_assistance") and $ilUser->getId() == ANONYMOUS_USER_ID)
+		{
+			$tpl->setCurrentBlock("password_assistance");
+			$tpl->setVariable("FORGOT_PASSWORD", $lng->txt("forgot_password"));
+			$tpl->setVariable("FORGOT_USERNAME", $lng->txt("forgot_username"));
+			$tpl->setVariable("CMD_FORGOT_PASSWORD","ilias.php?baseClass=ilStartUpGUI&amp;cmd=jumpToPasswordAssistance&amp;".$common_par);
+			$tpl->setVariable("CMD_FORGOT_USERNAME","ilias.php?baseClass=ilStartUpGUI&amp;cmd=jumpToUsernameAssistance&amp;".$common_par);
+			$tpl->parseCurrentBlock();
+		}
+		$tpl->setVariable("USER_AGREEMENT", $lng->txt("usr_agreement"));
+		$tpl->setVariable("LINK_USER_AGREEMENT", "ilias.php?baseClass=ilStartUpGUI&amp;cmd=showTermsOfService&amp;".$common_par);
+
 		$tpl->setVariable("FORMACTION", $action);
 		$tpl->setVariable("LOGIN_TITLE", $lng->txt("local_login_to_ilias"));
 		$tpl->setVariable("LOGIN_TITLE_ADD", $lng->txt("local_login_to_ilias_addition"));
@@ -185,19 +199,7 @@ class ilCustomLoginGUI
 					. "&amp;client_id=".CLIENT_ID
 					. "&amp;target=".$_GET["login_target"];
 
-		if ($ilSetting->get("password_assistance") and $ilUser->getId() == ANONYMOUS_USER_ID)
-		{
-			$tpl->setCurrentBlock("password_assistance");
-			$tpl->setVariable("FORGOT_PASSWORD", $lng->txt("forgot_password"));
-			$tpl->setVariable("FORGOT_USERNAME", $lng->txt("forgot_username"));
-			$tpl->setVariable("CMD_FORGOT_PASSWORD","ilias.php?baseClass=ilStartUpGUI&amp;cmd=jumpToPasswordAssistance&amp;".$common_par);
-			$tpl->setVariable("CMD_FORGOT_USERNAME","ilias.php?baseClass=ilStartUpGUI&amp;cmd=jumpToUsernameAssistance&amp;".$common_par);
-			$tpl->parseCurrentBlock();
-		}
 
-		$tpl->setVariable("USER_AGREEMENT", $lng->txt("usr_agreement"));
-		$tpl->setVariable("LINK_USER_AGREEMENT", "ilias.php?baseClass=ilStartUpGUI&amp;cmd=showTermsOfService&amp;".$common_par);
-		
 		return $tpl->get();
 	}
 }

@@ -110,6 +110,11 @@
 div.loginBlock {
     padding-left: 22px;
 }
+
+div.loginBlock small {
+    font-size: 80%;
+}
+
 h2.loginHeadline {
     background-image: url(../../templates/default/images/tree_col.svg);
     background-repeat: no-repeat;
@@ -126,8 +131,16 @@ h2.loginHeadline.open {
 
 div.loginFormLinks {
     margin-top: -5px;
-    font-size: 80%;
 }
+
+#localLoginForm {
+    margin-top: 5px;
+}
+
+#localLoginForm  div.localLoginAssistance {
+    margin-top: 5px;
+}
+
 
 .loginHelp {
     padding-top: 20px;
