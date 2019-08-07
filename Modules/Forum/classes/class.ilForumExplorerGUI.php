@@ -267,7 +267,7 @@ class ilForumExplorerGUI implements TreeRecursion
         $creationDate = ilDatePresentation::formatDate(new ilDateTime($node['pos_date'], IL_CAL_DATETIME));
         $bylineString = $authorInfo->getAuthorShortName() . ', ' . $creationDate;
 
-        $simple = $factory->byline($node['pos_subject'], $bylineString, $icon);
+        $simple = $factory->bylined($node['pos_subject'], $bylineString, $icon);
 
         return $simple;
     }
