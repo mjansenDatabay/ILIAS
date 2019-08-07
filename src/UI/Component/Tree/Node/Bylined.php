@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace ILIAS\UI\Component\Tree\Node;
 
 /**
- * This describes a tree node with an byline with additional information
+ * This describes a tree node with an byline providing additional information
  * about this node
  */
 interface Bylined extends Simple

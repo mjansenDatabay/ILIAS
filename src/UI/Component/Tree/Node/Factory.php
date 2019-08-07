@@ -48,7 +48,7 @@ interface Factory
      *     The Bylined Node is an entry containing additional information about
      *     the node.
      *   composition: >
-     *     It consists of a string-label, a byline an optional Icon.
+     *     It consists of a string-label, a byline and an optional Icon.
      *   effect: >
      *     This node is a simple node with an additional string-byline.
      * rules:
