@@ -267,7 +267,8 @@ class ilVhbAuth
 
 	public function findCourse()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		require_once("./Modules/Course/classes/class.ilObjCourseAccess.php");
 		require_once("./Modules/Course/classes/class.ilCourseParticipants.php");
@@ -279,7 +280,7 @@ class ilVhbAuth
 			" AND m.catalog = 'vhb'";
 		$res = $ilDB->query($query);
 
-		while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
+		while ($row = $ilDB->fetchAssoc($res))
 		{
 			// use file name matching with wildcards to get courses with the LV number
 			// semester independend courses can have the following entries: LV_328_822_1_*_1
@@ -341,7 +342,8 @@ class ilVhbAuth
 
 	public function findUser()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		// user is already found
 		if ($this->user_obj->getId())
@@ -363,7 +365,7 @@ class ilVhbAuth
 		}
 
 		$res = $ilDB->query($query);
-		if ($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($row = $ilDB->fetchAssoc($res))
 		{
 			$this->user_obj = new ilObjUser($row["usr_id"]);
 		}
@@ -432,14 +434,15 @@ class ilVhbAuth
 
 	private function setNewLogin($a_new_login)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		$query = "SELECT usr_id FROM usr_data"
 			. " WHERE login = " . $ilDB->quote($a_new_login, 'text')
 			. " AND usr_id <> " . $ilDB->quote($this->user_obj->getId(), 'integer');
 		$res = $ilDB->query($query);
 
-		if ($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($row = $ilDB->fetchAssoc($res))
 		{
 		    return false;
 		}
@@ -455,14 +458,16 @@ class ilVhbAuth
 
 	public function assignRole($a_role_name)
 	{
-		global $ilDB, $rbacadmin;
+		global $DIC;
+		$ilDB = $DIC->database();
+		$rbacadmin = $DIC->rbac()->admin();
 
 		// search for role by title (not nice to use db here)
 		$query = "SELECT obj_id FROM object_data".
 			" WHERE title=" . $ilDB->quote($a_role_name).
 			" AND type ='role'";
 		$res = $ilDB->query($query);
-		if ($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($row = $ilDB->fetchAssoc($res))
 		{
 			$rbacadmin->assignUser($row["obj_id"], $this->user_obj->getId(), true);
 		}
