@@ -1,11 +1,6 @@
 #!/bin/bash
-PHPSTAN="libs/composer/vendor/bin/phpstan"
-
-PRE="\t*** "
-
-function printLn() {
-	echo -e "$PRE $1"
-}
+source CI/Import/Functions.sh
+source CI/Import/Variables.sh
 
 if [[ -x "$PHPSTAN" ]]
   then
