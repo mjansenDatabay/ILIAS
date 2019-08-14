@@ -2,6 +2,7 @@ parameters:
     ignoreErrors:
         - /PHPDoc tag/
     excludes_analyse:
+        - '%currentWorkingDirectory%/CI/*'
         - '%currentWorkingDirectory%/libs/*'
         - '%currentWorkingDirectory%/Customizing/*'
         - '%currentWorkingDirectory%/src/UI/examples/*'
