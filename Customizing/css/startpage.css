@@ -70,10 +70,10 @@
         text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-weight: bold;
     }
     .ilc_section_BannerContainer .ilc_Paragraph a {
         color: white;
-        font-weight: bold;
         text-decoration: none;
     }
     .ilc_section_BannerContainer .ilc_Paragraph a:hover {
@@ -110,11 +110,9 @@
 div.loginBlock {
     padding-left: 22px;
 }
-
 div.loginBlock small {
     font-size: 80%;
 }
-
 h2.loginHeadline {
     background-image: url(../../templates/default/images/tree_col.svg);
     background-repeat: no-repeat;
@@ -128,20 +126,22 @@ h2.loginHeadline {
 h2.loginHeadline.open {
     background-image: url(../../templates/default/images/tree_exp.svg);
 }
-
+h2.logoutHeadline {
+    margin-left: -22px;
+    padding-left: 22px;
+    margin-top:0;
+    margin-bottom: 0;
+    font-size: 120%;
+}
 div.loginFormLinks {
     margin-top: -5px;
 }
-
 #localLoginForm {
     margin-top: 5px;
 }
-
 #localLoginForm  div.localLoginAssistance {
     margin-top: 5px;
 }
-
-
 .loginHelp {
     padding-top: 20px;
 }
@@ -158,8 +158,15 @@ div.loginFormLinks {
 
 .ilc_section_GridContainer > .row > div {
     display:flex;
-    background-color: #fafafc;
+    background-color: #f0f0f0;
     border: 15px solid white;
     min-height: 300px;
+}
 
+/* Links */
+.ilc_Paragraph a {
+    text-decoration: none;
+}
+.ilc_Paragraph a:hover {
+    text-decoration: underline;
 }
