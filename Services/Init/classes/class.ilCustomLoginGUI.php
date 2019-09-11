@@ -16,6 +16,7 @@ class ilCustomLoginGUI
 	 * 
 	 * @param 	string 		html code with placeholders
 	 * @return 	string		html code with replaces placeholders
+     * @throws ilTemplateException
 	 */
 	static function addLoginBlocks($a_html)
 	{
@@ -42,10 +43,8 @@ class ilCustomLoginGUI
 			$a_html = preg_replace('/\[LOGIN\].*\[\/LOGIN\]/', $block, $a_html);
 			$a_html = preg_replace('/\[SSO\].*\[\/SSO\]/', '', $a_html);
 		}
-		
-		$block = self::getLoginBlockLinks();
-		$a_html = preg_replace('/\[LOGIN_LINKS\].*\[\/LOGIN_LINKS\]/', $block, $a_html);
-		
+
+		self::addLoginScript();
 		return $a_html;
 	}
 
@@ -182,25 +181,31 @@ class ilCustomLoginGUI
 
 		return $tpl->get();
 	}
-	
-	
-	/**
-	 * Get the HTML code for login links block
-	 * 
-	 * @return string
-	 */
-	static function getLoginBlockLinks()
-	{
-		global $ilSetting, $lng, $ilUser;
-
-		$tpl = new ilTemplate("tpl.custom_login_links.html", true, true, "Services/Init");
-
-		$common_par = "lang=".$lng->getLangKey()
-					. "&amp;client_id=".CLIENT_ID
-					. "&amp;target=".$_GET["login_target"];
 
 
-		return $tpl->get();
-	}
+    /**
+     * Add the script to handle the login blocks
+     * @throws ilTemplateException
+     */
+	static function addLoginScript()
+    {
+        global $DIC;
+         $ilSetting = $DIC->settings();
+
+        $tpl = new ilTemplate("tpl.custom_script.js", true, true, "Services/Init");
+
+        if ($ilSetting->get("shib_active"))
+        {
+            $tpl->setVariable("LOGIN_INIT_DISPLAY", "false");
+        }
+        else
+        {
+            $tpl->setVariable("LOGIN_INIT_DISPLAY", "true");
+        }
+
+        /** @var ilTemplate $mainTemplate */
+        $mainTemplate = $DIC['tpl'];
+        $mainTemplate->addOnLoadCode($tpl->get());
+    }
 }
 ?>

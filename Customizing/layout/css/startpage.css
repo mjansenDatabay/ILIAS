@@ -1,11 +1,13 @@
 /*
- * Custom Content Styles
- * Copied from Customizing/css/startpage.css
+ * Custom Content Styles for the Start Page of StudOn
+ *
+ * Copied to from Customizing/layout/css/startpage.css
+ * (same directory nesting level as specific content styles)
+ * The original file can be included in ilObjRootFolderGUI::renderObject()
+ * This would have higher priority then the content style
  */
 
-/*
- * Hide navigation tree
- */
+/* Hide navigation tree */
 .ilTreeView, .ilLeftNav { display: none; }
 .ilLeftNavSpace { margin-left: 0; }
 
@@ -18,7 +20,7 @@
 }
 @media (min-width: 768px) {
 
-    /* show login as oox on the banner */
+    /* show the login container as a panel on top the banner */
     .ilc_section_LoginContainer {
         position: absolute;
         top: -20px;
@@ -40,7 +42,7 @@
         margin-right: -30px;
     }
 
-    /* Rotating Banner Images */
+    /* rotating banner images */
     .ilc_section_BannerContainer .ilc_ca_icntr_CarouselICntr {
         height:300px;
     }
@@ -58,7 +60,7 @@
         right: 0;
     }
 
-    /* Banner Texts */
+    /* rotating banner texts */
     .ilc_section_BannerContainer .ilc_Paragraph {
         position: absolute;
         background: #036;
@@ -82,17 +84,17 @@
         text-decoration: underline;
     }
 
-    /* Put banner directly below menu */
+    /* put banner directly below menu */
     .ilMainHeader {
         border-bottom: 0;
     }
 
-    /* For view with write permissions */
+    /* for admins viewing the page with write permissions */
     #ilSubTab {
         margin-bottom: 50px;
     }
 
-    /* Login messages */
+    /* success and failure messages (can be improved) */
     div.ilAdminRow {
         position:absolute;
         top: 10px;
@@ -105,57 +107,63 @@
 
 
 /*
- * Login blocks
+ * Elements of the login container
  */
-div.loginBlock {
-    padding-left: 22px;
+.ilc_section_LoginContainer {
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 30px;
 }
-div.loginBlock small {
-    font-size: 80%;
+
+/* blocks being shown when their headline is clicked */
+.ilc_section_LoginFormHidden,
+.ilc_section_LoginInfoHidden  {
+    display:none;
 }
-h2.loginHeadline {
-    background-image: url(../../templates/default/images/tree_col.svg);
+
+.ilc_section_LoginContainer .ilc_text_block_TableContent {
+    margin:0;
+    padding:0;
+    line-height:1.5em;
+}
+
+.ilc_section_LoginContainer a:active,
+.ilc_section_LoginContainer a:hover,
+.ilc_section_LoginContainer a:focus {
+    color: #003366!important;
+}
+
+/* headlines in the login box */
+.ilc_section_LoginContainer h2 {
+    background-image: url(../../../templates/default/images/tree_col.svg);
     background-repeat: no-repeat;
     background-position: 0 3px;
     margin-left: -22px;
     padding-left: 22px;
-    margin-top:0;
+    margin-top: 12px;
     margin-bottom: 0;
     font-size: 120%;
 }
-h2.loginHeadline.open {
-    background-image: url(../../templates/default/images/tree_exp.svg);
+.ilc_section_LoginContainer h2.open {
+    background-image: url(../../../templates/default/images/tree_exp.svg);
 }
-h2.logoutHeadline {
-    margin-left: -22px;
-    padding-left: 22px;
-    margin-top:0;
-    margin-bottom: 0;
-    font-size: 120%;
+.ilc_section_LoginContainer small {
+    font-size: 80%;
 }
-div.loginFormLinks {
-    margin-top: -5px;
-}
-#localLoginForm {
-    margin-top: 5px;
-}
-#localLoginForm  div.localLoginAssistance {
-    margin-top: 5px;
-}
+
 .loginHelp {
     padding-top: 20px;
 }
 
-
 /**
- * Grid below Banner
+ * Grid for info blocks below the banner
+ * (flex display is used to have the same background height for all blocks)
  */
 .ilc_section_GridContainer > .row {
-    display:flex;
+    display: flex;
     flex-wrap: wrap;
     margin-top: 15px;
 }
-
 .ilc_section_GridContainer > .row > div {
     display:flex;
     background-color: #f0f0f0;
@@ -163,7 +171,10 @@ div.loginFormLinks {
     min-height: 300px;
 }
 
-/* Links */
+/*
+* Links in the text paragraphs
+* (should not be underlined by default, otherwise looking ugly in link lists)
+*/
 .ilc_Paragraph a {
     text-decoration: none;
 }

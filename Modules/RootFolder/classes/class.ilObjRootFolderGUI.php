@@ -249,7 +249,7 @@ class ilObjRootFolderGUI extends ilContainerGUI
 // fau.
 
 // fau: rootIsReduced - add startpage css
-		$this->tpl->addCustomCss('Customizing/css/startpage.css');
+//		$this->tpl->addCustomCss('Customizing/layout/css/startpage.css');
 // fau.
 
 		include_once "Services/Object/classes/class.ilObjectListGUI.php";

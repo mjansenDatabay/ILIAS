@@ -10703,8 +10703,12 @@ footer.ilFooter {
   padding: 20px 0 0 0;
   text-align: left;
   color: #f0f0f0;
-  background-color: transparent;
-  background-image: url("images/studon/fau-sign.png"), radial-gradient(ellipse at center center, #0059b3 0%, #003366 100%);
+  background-color: #036;
+  /* background-image: url("images/studon/fau-sign.png"); */
+  /*
+	background-color: transparent;
+	background-image: url("images/studon/fau-sign.png"), radial-gradient(ellipse at center center , lighten(#036,15%) 0%, #036 100%);
+	*/
   background-repeat: no-repeat;
   background-attachment: scroll, scroll;
   background-position: 90% 30%, 0% 0%;
