@@ -153,10 +153,6 @@ class ilLoggingErrorFileStorage {
 	 * @return array
 	 */
 	private function shortenPHPSessionId(array $server) {
-		global $DIC;
-
-		$ilLog = $DIC['ilLog'];
-
 		$cookie_content = $server["HTTP_COOKIE"];
 		$cookie_content = explode(";", $cookie_content);
 

@@ -1370,7 +1370,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 	*/
 	public function copyObject()
 	{
-		if (count($_POST["q_id"]) > 0)
+		if (isset($_POST["q_id"]) && is_array($_POST["q_id"]) && count($_POST["q_id"]) > 0)
 		{
 			foreach ($_POST["q_id"] as $key => $value)
 			{
@@ -1395,7 +1395,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 	*/
 	function moveObject()
 	{
-		if (count($_POST["q_id"]) > 0)
+		if (isset($_POST["q_id"]) && is_array($_POST["q_id"]) && count($_POST["q_id"]) > 0)
 		{
 			foreach ($_POST["q_id"] as $key => $value)
 			{
