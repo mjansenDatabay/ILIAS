@@ -50,7 +50,7 @@ class ilStudyAccess
 	 * Check the mapping of conditions data and study data
 	 * @param 	array		conditions data	
 	 * @param 	array		study data
-	 * @return unknown_type
+	 * @return boolean
 	 */
 	public static function _checkConditions($a_conditionsdata, $a_studydata)
 	{
@@ -173,7 +173,9 @@ class ilStudyAccess
 	 */
 	public static function _getStudyData($a_user_id, $a_with_cache = true)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
+
 		static $cached_data = array();
 
 		if ($a_with_cache and isset($cached_data[$a_user_id]))
@@ -181,7 +183,7 @@ class ilStudyAccess
 			return $cached_data[$a_user_id];
 		}
 
-		$query = 'SELECT usr_id, study_no, school_id, degree_id, ref_semester'
+		$query = 'SELECT usr_id, study_no, school_id, degree_id, ref_semester, study_type'
 			. ' FROM usr_study'
 			. ' WHERE usr_id='. $ilDB->quote($a_user_id,'integer')
 			. ' ORDER BY study_no ASC';

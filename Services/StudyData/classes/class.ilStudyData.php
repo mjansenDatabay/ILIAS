@@ -12,7 +12,11 @@
 */
 
 class ilStudyData
-{	
+{
+	const TYPE_FULL = "V";
+	const TYPE_PART = "T";
+	const TYPE_NONE  = "";
+
 	static $study_data_visible;
 
 	/**
@@ -80,7 +84,25 @@ class ilStudyData
 		}
 		return $options;
 	}
-	
+
+	/**
+	 * get an array of option for a study type
+	 *
+	 * @return array	type_code => type title
+	 */
+	static function _getStudyTypeSelectOptions()
+	{
+		global $lng;
+		$options = array(
+			self::TYPE_NONE => $lng->txt("please_select"),
+			self::TYPE_FULL => $lng->txt('studydata_type_full'),
+			self::TYPE_PART => $lng->txt('studydata_type_part')
+		);
+
+		return $options;
+	}
+
+
 	/**
 	 * lookup a subject title
 	 * 
@@ -200,8 +222,10 @@ class ilStudyData
      */
 	static function _getStudyDataTextForData($a_data)
     {
-        global $lng;
+    	global $DIC;
+    	$lng = $DIC->language();
 
+        $text = '';
         foreach ($a_data as $study)
         {
             $study_text = "";
@@ -217,8 +241,18 @@ class ilStudyData
             if (!empty($study_text))
             {
                 $text .= $text ? "\n\n" : "";
-                $text .= self::_getRefSemesterText($study['ref_semester'])."\n";
-                $text .= $study_text;
+                $text .= self::_getRefSemesterText($study['ref_semester']);
+				switch($study['study_type']) {
+					case self::TYPE_PART:
+						$text .= ' (' . $lng->txt('studydata_type_part') . ')';
+						break;
+					case self::TYPE_FULL:
+						$text .= ' (' . $lng->txt('studydata_type_full') . ')';
+						break;
+				}
+				$text .= ' :';
+
+				$text .= "\n". $study_text;
             }
         }
 
@@ -274,8 +308,9 @@ class ilStudyData
 	*/
 	static function _saveStudyData($a_user_id, $a_data)
 	{
-		global $ilDB;
-		
+		global $DIC;
+		$ilDB = $DIC->database();
+
 		$query = "DELETE from usr_study"
 		. 		" WHERE usr_id=". $ilDB->quote($a_user_id,'integer');
 		$ilDB->query($query);
@@ -297,13 +332,14 @@ class ilStudyData
 				
 				$query = "
 					REPLACE into usr_study(
-					usr_id, study_no, school_id, degree_id, ref_semester)
+					usr_id, study_no, school_id, degree_id, ref_semester, study_type)
 					VALUES("
 					. $ilDB->quote($a_user_id,'integer'). ","
 					. $ilDB->quote($study_no,'integer'). ","
 					. $ilDB->quote($study["school_id"],'integer'). ","
 					. $ilDB->quote($study["degree_id"],'integer').","
-					. $ilDB->quote($study["ref_semester"],'text')
+					. $ilDB->quote($study["ref_semester"],'text').","
+					. $ilDB->quote($study["study_type"],'text')
 					. ")";
 				$ilDB->query($query);
 				

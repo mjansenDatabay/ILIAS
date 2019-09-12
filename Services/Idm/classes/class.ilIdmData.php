@@ -195,6 +195,10 @@ class ilIdmData
                 }
                 $studata['school_id'] = $fau[$i++];
                 $studata['ref_semester'] =  $ref_semester;
+                $type = substr($raw['fau_studytype'], $study - 1, 1);
+                if(!empty($type) && $type != '_') {
+                    $studata['study_type'] = $type;
+                }
 
                 for ($subject = 1; $subject <= 3; $subject++)
                 {

@@ -267,6 +267,7 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
 			$rawdata['fau_employee']                = null;
 			$rawdata['fau_student']                 = null;
 			$rawdata['fau_guest']                   = null;
+            $rawdata['fau_studytype']               = null;
 
 			$this->data->setRawData($rawdata, true);
 		}

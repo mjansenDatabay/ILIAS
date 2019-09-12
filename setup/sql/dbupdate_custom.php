@@ -1001,3 +1001,27 @@ if (!$ilDB->tableColumnExists('booking_settings', 'user_storno'))
     );
 }
 ?>
+<#62>
+<?php
+/**
+ * Create the tables for study data
+ */
+if(!$ilDB->tableColumnExists('usr_study','study_type'))
+{
+    $ilDB->addTableColumn('usr_study', 'study_type',
+        array('type' => 'text', 'length' => 1, 'notnull' => false, 'default' => null)
+    );
+}
+if(!$ilDB->tableColumnExists('il_studycond','study_type'))
+{
+    $ilDB->addTableColumn('il_studycond', 'study_type',
+        array('type' => 'text', 'length' => 1, 'notnull' => false, 'default' => null)
+    );
+}
+if(!$ilDB->tableColumnExists('il_sub_studycond','study_type'))
+{
+    $ilDB->addTableColumn('il_sub_studycond', 'study_type',
+        array('type' => 'text', 'length' => 1, 'notnull' => false, 'default' => null)
+    );
+}
+?>

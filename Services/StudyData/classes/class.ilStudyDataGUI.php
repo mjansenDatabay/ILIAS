@@ -133,8 +133,13 @@ class ilStudyDataGUI
 			$item = new ilSelectInputGUI($this->lng->txt('studydata_school'), 'study'.$study_no.'_school_id');
 			$item->setOptions(ilStudyData::_getSchoolSelectOptions());
 			$this->form->addItem($item);
-			
-			for ($subject_no = 1; $subject_no <= 3; $subject_no++)
+
+			// type
+            $item = new ilSelectInputGUI($this->lng->txt('studydata_type'), 'study'.$study_no.'_study_type');
+            $item->setOptions(ilStudyData::_getStudyTypeSelectOptions());
+            $this->form->addItem($item);
+
+            for ($subject_no = 1; $subject_no <= 3; $subject_no++)
 			{
 				// subject
 				$item = new ilSelectInputGUI(sprintf($this->lng->txt('studydata_subject_no'),$subject_no), 
@@ -171,6 +176,7 @@ class ilStudyDataGUI
 			$values['study'.$study_no.'_ref_semester'] = $study['ref_semester'];
 			$values['study'.$study_no.'_degree_id'] = $study['degree_id'];
 			$values['study'.$study_no.'_school_id'] = $study['school_id'];
+            $values['study'.$study_no.'_study_type'] = $study['study_type'];
 			
 			$subject_no = 1;
 			foreach($study['subjects'] as $subject)
@@ -199,6 +205,7 @@ class ilStudyDataGUI
 			$study['ref_semester'] = $this->form->getInput('study'.$study_no.'_ref_semester');
 			$study['degree_id'] = $this->form->getInput('study'.$study_no.'_degree_id');
 			$study['school_id'] = $this->form->getInput('study'.$study_no.'_school_id');
+            $study['study_type'] = $this->form->getInput('study'.$study_no.'_study_type');
 			
 			for ($subject_no = 1; $subject_no <= 3; $subject_no++)
 			{

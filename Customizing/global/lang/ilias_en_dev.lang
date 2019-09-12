@@ -210,11 +210,11 @@ common#:#links_password_coded#:#password-code
 common#:#lm_helptext#:#An ILIAS-learnmodule is constructed like an electronical book. With the Online-editor you can create pages with text and media elements, which can be integrated in a chapterstructure or be linked as free pages (digressions). ILIAS-Learnmodule can be exported and be used in different Learn environments or offline. <p class="alert">Advice: with the external tool <a href="http://boldt-media.de/about-elaix.html">eLAIX</a> you can convert OpenOffice-documents to ILIAS-Learnmodules.</p>
 common#:#local_login_help_title#:#Help for local login
 common#:#local_login_to_ilias#:#Local Login
-common#:#local_login_to_ilias_addition#:#(Users, Guests, Test Accounts <br />with StudOn Username)
+common#:#local_login_to_ilias_addition#:#(with StudOn Username)
 common#:#logged_in_to_ilias#:#You are logged in to StudOn.
 common#:#logged_in_to_ilias_info#:#Click on logout, if you want to end your session.
 common#:#login_to_ilias_via_shibboleth#:#Single Sign-On
-common#:#login_to_ilias_via_shibboleth_addition#:#(Matriculated Students, FAU Employees <br /> with FAU Username)
+common#:#login_to_ilias_via_shibboleth_addition#:#(with FAU Username)
 common#:#mcst_helptext#:#A mediacast can include many mediaobjects (e.g. audio files), which can be played or downloaded in the browser. <p class="alert">Enormous video files (e.g. lecture recordings) you best upload to the <a href="http://www.video.uni-erlangen.de" target="_blank">video portal</a> of the university. There you can set protection on them and refer them from StudOn-course as "external content".</p>
 common#:#mem_external_notification_subject#:#Registration of %s for "%s"###fau: courseUdf
 common#:#mem_external_notification_subject_changed#:#Registration of %s for "%s" changed###fau: courseUdf
@@ -343,15 +343,20 @@ common#:#studydata_degree#:#Expected Graduation
 common#:#studydata_long#:#Study Data (subject, semester, graduation, faculty)
 common#:#studydata_msg_incomplete#:#The study data are not complete! A study course must have a reference semester, a graduation, a faculty and a least one subject. A subject must be specified with a name and the semester number.
 common#:#studydata_ref_semester#:#Reference Semester
-common#:#studydata_ref_semester_any#:#without date:
-common#:#studydata_ref_semester_summer#:#in the summer %s:
-common#:#studydata_ref_semester_winter#:#in the winter %s/%s:
+common#:#studydata_ref_semester_any#:#without date
+common#:#studydata_ref_semester_summer#:#in the summer %s
+common#:#studydata_ref_semester_winter#:#in the winter %s/%s
 common#:#studydata_school#:#Faculty
 common#:#studydata_semester#:#Semester
 common#:#studydata_semester_text#:#%s. semester
 common#:#studydata_semester_subject_no#:#Semester subject %s
 common#:#studydata_subject#:#Subject
 common#:#studydata_subject_no#:#Fach %s
+common#:#studydata_type#:#Study Type
+common#:#studydata_type_full#:#Full time
+common#:#studydata_type_part#:#Part time
+common#:#studydata_type_none#:#Unknown
+common#:#studydata_type_any#:#Any
 common#:#sub_added_to_waiting_list#:#You have been assigned to the waiting list. You are assigned to position %s on the waiting list.
 common#:#sub_fair_date#:#Equal Chances Until
 common#:#sub_fair_date_info#:#All registrations will be equally collected on the waiting list and the free places will be filled by lot afterwards. Later registrations will get higher waiting positions. A later filling from the waiting list will also respect the equal chances.

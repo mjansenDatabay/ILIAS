@@ -205,12 +205,12 @@ common#:#links_password_coded#:#Passwort-Code
 common#:#lm_helptext#:#Ein ILIAS-Lernmodul ist wie ein elektronisches Buch aufgebaut. Mit dem Online-Editor erstellen Sie Seiten mit Text und Medienelementen, die in einer Kapitelstruktur eingegliedert oder als freie Seiten (Exkurse) verlinkt werden. ILIAS-Lernmodule lassen sich exportieren und in anderen Lernumgebungen oder offline weiternutzen. <p class="alert">Tipp: mit dem externen Tool <a href="http://boldt-media.de/about-elaix.html">eLAIX</a> können Sie OpenOffice-Dokumente in ILIAS-Lernmodule konvertieren.</p>
 common#:#local_login_help_title#:#Hilfe zur lokalen Anmeldung
 common#:#local_login_to_ilias#:#Lokale Anmeldung
-common#:#local_login_to_ilias_addition#:#(Nutzer/innen, Gäste, Testzugänge <br />mit StudOn-Benutzerkennung)
+common#:#local_login_to_ilias_addition#:#(mit StudOn-Benutzerkennung)
 common#:#logged_in_to_ilias#:#<strong>Sie sind bei StudOn eingeloggt.</strong>
 common#:#logged_in_to_ilias_info#:#Klicken Sie auf Abmelden, wenn Sie Ihre Sitzung schließen möchten.
 common#:#login_required_for_object#:#Bitte melden Sie sich an.
 common#:#login_to_ilias_via_shibboleth#:#Single Sign-On
-common#:#login_to_ilias_via_shibboleth_addition#:#(immatrikulierte Studierende, Mitarbeiter/innen<br />mit FAU-Benutzerkennung)
+common#:#login_to_ilias_via_shibboleth_addition#:#(mit FAU-Benutzerkennung)
 common#:#mcst_helptext#:#Ein Mediacast kann mehrere Medienobjekte (z.B. Audio-Dateien) beinhalten, die sich im Browser abspielen oder herunterladen lassen. <p class="alert">Umfangreiche Video-Datei (z.B. Vorlesungsaufzeichnungen) laden Sie am besten im <a href="http://www.video.uni-erlangen.de" target="_blank">Video-Portal</a> der Universität hoch. Sie können sie dort mit einem Schutz versehen und in Ihrem StudOn-Kurs als "Externer Inhalt" verlinken.</p>
 common#:#mem_cron_autofill_fair#:#Chancengleiche Anmeldungen vergeben
 common#:#mem_cron_autofill_fair_info#:#Nach Ablauf der chancengleichen Anmeldung werden die freien Plätze in Gruppen und Kursen automatisch vergeben.
@@ -314,15 +314,20 @@ common#:#studydata_degree#:#Angehender Abschluss
 common#:#studydata_long#:#Studiengangsdaten (Fach, Semester, Abschluss, Fakultät)
 common#:#studydata_msg_incomplete#:#Die Studiendaten sind nicht vollständig! Zu einem Studiengang müssen Bezugs-Semester, Abschluss, Fakultät und mindestens ein Fach angegeben sein. Zu einem Fach müssen der Name und das Semester angegeben sein.
 common#:#studydata_ref_semester#:#Bezugs-Semester
-common#:#studydata_ref_semester_any#:#Ohne Zeitangabe:
-common#:#studydata_ref_semester_summer#:#Im Sommer %s:
-common#:#studydata_ref_semester_winter#:#Im Winter %s/%s:
+common#:#studydata_ref_semester_any#:#Ohne Zeitangabe
+common#:#studydata_ref_semester_summer#:#Im Sommer %s
+common#:#studydata_ref_semester_winter#:#Im Winter %s/%s
 common#:#studydata_school#:#Fakultät
 common#:#studydata_semester#:#Semester
 common#:#studydata_semester_text#:# %s. Semester
 common#:#studydata_semester_subject_no#:#Semester Fach %s
 common#:#studydata_subject#:#Fach
 common#:#studydata_subject_no#:#Fach %s
+common#:#studydata_type#:#Studientyp
+common#:#studydata_type_full#:#Vollzeit
+common#:#studydata_type_part#:#Teilzeit
+common#:#studydata_type_none#:#Unbekannt
+common#:#studydata_type_any#:#Beliebig
 common#:#sub_added_to_waiting_list#:#Sie wurden auf die Warteliste gesetzt. <br />Sie haben Platz %s auf der Warteliste.
 common#:#sub_fair_date#:#Chancengleich bis
 common#:#sub_fair_date_info#:#Bis zu diesem Zeitpunkt werden alle Anmeldungen chancengleich auf der Warteliste gesammelt und die freien Plätze danach ausgelost. Alle nachfolgenden Anmeldungen erhalten höhere Wartelistenplätze. Beim Aufrücken von der Warteliste wird ebenfalls zwischen chancengleichen Anmeldungen gelost.
