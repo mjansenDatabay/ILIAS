@@ -25,13 +25,14 @@
         position: absolute;
         top: -20px;
         left: 15px;
+        width: 330px;
         z-index: 1000;
         background-color: #fafafc;
         padding-top: 5px;
         padding-right: 5px;
-        -webkit-box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.2);
-        -moz-box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.2);
-        box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.2);
+        -webkit-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
+        box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
     }
 
     /* positioning of the banner */
@@ -44,18 +45,18 @@
 
     /* rotating banner images */
     .ilc_section_BannerContainer .ilc_ca_icntr_CarouselICntr {
-        height:300px;
+        height:400px;
     }
     .ilc_section_BannerContainer .ilc_Mob  {
         position: absolute;
-        height: 300px;
+        height: 400px;
         left: 0;
         right: 0;
         overflow:hidden;
     }
     .ilc_section_BannerContainer .ilc_Mob img {
         position: absolute;
-        height: 300px;
+        height: 400px;
         width:auto!important;
         right: 0;
     }
@@ -65,9 +66,10 @@
         position: absolute;
         background: #036;
         color: white;
-        top: 240px;
-        right: 30px;
-        left: 30px;
+        /*top: 240px;*/
+        bottom:0px;
+        right: 8px;
+        left: 0px;
         padding: 20px;
         text-align: center;
         overflow: hidden;
@@ -94,14 +96,20 @@
         margin-bottom: 50px;
     }
 
+
+
     /* success and failure messages (can be improved) */
     div.ilAdminRow {
         position:absolute;
-        top: 10px;
-        left: 300px;
-        right: 15px;
+    }
+    div.alert {
+        position:absolute;
+        top: -20px;
+        left: 350px;
         z-index: 1000;
-        width:auto;
+        -webkit-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
+        box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
     }
 }
 
@@ -140,7 +148,6 @@
     background-position: 0 3px;
     margin-left: -22px;
     padding-left: 22px;
-    margin-top: 12px;
     margin-bottom: 0;
     font-size: 120%;
 }
