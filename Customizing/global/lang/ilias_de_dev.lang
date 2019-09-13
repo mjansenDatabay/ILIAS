@@ -303,6 +303,7 @@ common#:#studycond_field_ref_semester#:#Bezugs-Semester
 common#:#studycond_field_ref_semester_info#:#Geben Sie hier an, auf welches Semester sich die Fachsemester-Bedingungen beziehen. Wenn Sie diese Auswahl offen lassen, beziehen sich die Bedingungen auf den Zeitpunkt des Beitritts.
 common#:#studycond_field_subject#:#Studienfach
 common#:#studycond_field_subject_info#:#Wählen Sie ein vorgegebenes Studienfach oder lassen Sie die Auswahl offen, wenn das Fach beliebig sein kann.
+common#:#studycond_field_studytype_info#:#Wählen Sie einen Studientyp oder lassen Sie die Auswahl offen, wenn der Typ beliebig sein kann.
 common#:#studycond_max_semester#:#bis %s. Fachsemester (%s)
 common#:#studycond_min_max_semester#:#%s. bis %s. Fachsemester (%s)
 common#:#studycond_min_semester#:#ab %s. Fachsemester (%s)

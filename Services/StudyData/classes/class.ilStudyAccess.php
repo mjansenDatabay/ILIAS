@@ -88,8 +88,14 @@ class ilStudyAccess
 				{
 					continue; // failed
 				}
-	
-				// check subjects and semester
+
+                // check type
+                if ($cond['study_type'] and ($cond['study_type'] != $study['study_type']))
+                {
+                    continue; // failed
+                }
+
+                // check subjects and semester
 				// only one subject/semester combination must fit
 				$subject_semester_passed = false;
 				foreach ($study['subjects'] as $subject)
@@ -141,12 +147,13 @@ class ilStudyAccess
 	 */
 	private static function _getConditionsData($a_ref_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		// Don't use a cache for conditions
 		// The result will be stored in RBAC cache
 
-		$query = 'SELECT ref_id, school_id, subject_id, degree_id, min_semester, max_semester, ref_semester'
+		$query = 'SELECT ref_id, school_id, subject_id, degree_id, min_semester, max_semester, ref_semester, study_type'
 			.' FROM il_studycond'
 			.' WHERE ref_id = '.$ilDB->quote($a_ref_id,'integer');
 		$result = $ilDB->query($query);
@@ -274,6 +281,5 @@ class ilStudyAccess
 	    
 	    return sprintf("%04d%01d", $cur_year, $cur_sem);
 	}
-	
 }
-?>
+

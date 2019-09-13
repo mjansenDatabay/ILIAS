@@ -18,24 +18,37 @@ include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
 
 class ilSubscribersStudyCondGUI
 {
-	/** @var  string page peadline */
+	/** @var  string  */
 	protected $headline;
-	/** @var  string page info */
+	/** @var  string  */
 	protected $info;
-	/** @var  bool provide a bacl link */
+	/** @var  bool  */
 	protected $with_backlink;
+	/** @var ilCtrl */
+	protected $ctrl;
+	/** @var ilTemplate */
+	protected $tpl;
+	/** @var ilLanguage */
+	protected $lng;
+	/** @var ilPropertyFormGUI */
+	protected $form_gui;
+
+	protected $parent_gui;
+	protected $parent_obj_id;
+	protected $parent_ref_id;
 
 	/**
-	* Constructor
-	* @access public
-	*/
-	function __construct(&$a_parent_gui)
+	 * Constructor
+	 * @access public
+	 * @param $a_parent_gui
+	 */
+	function __construct($a_parent_gui)
 	{
-		global $ilCtrl, $tpl, $lng;
+		global $DIC;
 
-		$this->ctrl = $ilCtrl;
-		$this->tpl = $tpl;
-		$this->lng = $lng;
+		$this->ctrl = $DIC->ctrl();
+		$this->tpl = $DIC['tpl'];
+		$this->lng = $DIC->language();
 		$this->parent_gui = $a_parent_gui;
 		$this->parent_obj_id = $this->parent_gui->object->getId();
 		$this->parent_ref_id = $this->parent_gui->object->getRefId();
@@ -52,10 +65,12 @@ class ilSubscribersStudyCondGUI
 	*/
 	public function executeCommand()
 	{
-		global $ilAccess, $ilErr;
+		global $DIC;
+
+		$ilErr = $DIC['ilErr'];
 
 		// access to all functions in this class are only allowed if edit_permission is granted
-		if (!$ilAccess->checkAccess("write", "edit", $this->parent_ref_id, "", $this->parent_obj_id))
+		if (!$DIC->access()->checkAccess("write", "edit", $this->parent_ref_id, "", $this->parent_obj_id))
 		{
 			$ilErr->raiseError($this->lng->txt("permission_denied"),$ilErr->MESSAGE);
 		}
@@ -118,7 +133,10 @@ class ilSubscribersStudyCondGUI
 		$this->with_backlink = $with_backlink;
 	}
 
-
+	/**
+	 * @param $a_html
+	 * @throws ilTemplateException
+	 */
 	private function show($a_html)
 	{
 		if ($this->isWithBacklink())
@@ -141,10 +159,10 @@ class ilSubscribersStudyCondGUI
 
 
 	/**
-	* List the form definitions
-	* @access private
-	*/
-	private function listConditions()
+	 * List the form definitions
+	 * @throws ilTemplateException
+	 */
+	protected function listConditions()
 	{
 		// build the table of form definitions
 		include_once 'Services/Membership/classes/class.ilSubscribersStudyCondTableGUI.php';
@@ -155,26 +173,28 @@ class ilSubscribersStudyCondGUI
 	/**
 	* Return to the parent GUI
 	*/
-	private function back()
+	protected function back()
 	{
 	  $this->ctrl->returnToParent($this,'studycond');
 	}
 
 
 	/**
-	* Show an empty form to create a new condition
-	*/
-	private function create()
+	 * Show an empty form to create a new condition
+	 * @throws ilTemplateException
+	 */
+	protected function create()
 	{
 		$this->initForm("create");
 		$this->show($this->form_gui->getHtml());
 	}
 
-	
+
 	/**
-	* Show the form to edit an existing condition
-	*/
-	private function edit()
+	 * Show the form to edit an existing condition
+	 * @throws ilTemplateException
+	 */
+	protected function edit()
 	{
 		$condition = new ilSubscribersStudyCond((int) $_GET["cond_id"]);
 		$condition->read();
@@ -183,12 +203,13 @@ class ilSubscribersStudyCondGUI
 		$this->getValues($condition);
 		$this->show($this->form_gui->getHtml());
 	}
-	
-	
+
+
 	/**
-	* Save a newly entered condition
-	*/
-    private function saveCond()
+	 * Save a newly entered condition
+	 * @throws ilTemplateException
+	 */
+    protected function saveCond()
     {
         $this->initForm("create");
         if ($this->form_gui->checkInput())
@@ -210,9 +231,10 @@ class ilSubscribersStudyCondGUI
 
 
 	/**
-	* Update a changed condition
-	*/
-    private function updateCond()
+	 * Update a changed condition
+	 * @throws ilTemplateException
+	 */
+    protected function updateCond()
     {
 		$this->ctrl->saveParameter($this,"cond_id");
 		$this->initForm("edit");
@@ -238,7 +260,7 @@ class ilSubscribersStudyCondGUI
     /**
 	* Delete a condition
 	*/
-    private function delete()
+    protected function delete()
     {
     	$condition = new ilSubscribersStudyCond((int) $_GET["cond_id"]);
     	
@@ -253,23 +275,24 @@ class ilSubscribersStudyCondGUI
     
 	/**
 	* Get the values of a web form into property gui
-	* @param    object  studycond object to read the values from
+	* @param    ilSubscribersStudyCond  $a_condition
 	*/
 	private function getValues($a_condition)
 	{
 		$form_gui = $this->form_gui;
-		
+
 		$form_gui->getItemByPostVar("subject_id")->setValue($a_condition->getSubjectId());
 		$form_gui->getItemByPostVar("degree_id")->setValue($a_condition->getDegreeId());
 		$form_gui->getItemByPostVar("min_semester")->setValue($a_condition->getMinSemester());
 		$form_gui->getItemByPostVar("max_semester")->setValue($a_condition->getMaxSemester());
 		$form_gui->getItemByPostVar("ref_semester")->setValue($a_condition->getRefSemester());
+		$form_gui->getItemByPostVar("study_type")->setValue($a_condition->getStudyType());
 	}
 
 
 	/**
 	* Set the values of the property gui into a webform
-	* @param    object  studycond object to store the values
+	* @param    ilSubscribersStudyCond  $a_condition
 	*/
 	private function setValues($a_condition)
 	{
@@ -280,6 +303,7 @@ class ilSubscribersStudyCondGUI
 		$a_condition->setMinSemester($form_gui->getInput("min_semester"));
 		$a_condition->setMaxSemester($form_gui->getInput("max_semester"));
 		$a_condition->setRefSemester($form_gui->getInput("ref_semester"));
+		$a_condition->setStudyType($form_gui->getInput("study_type"));
 	}
 
 
@@ -306,7 +330,15 @@ class ilSubscribersStudyCondGUI
 		$item->setOptions(ilStudyData::_getDegreeSelectOptions());
 		$this->form_gui->addItem($item);
 
-		// min semester
+
+        // study_type
+        $item = new ilSelectInputGUI($this->lng->txt("studydata_type"), "study_type");
+        $item->setOptions(ilStudyData::_getStudyTypeSelectOptions());
+        $item->setInfo($this->lng->txt("studycond_field_studytype_info"));
+        $this->form_gui->addItem($item);
+
+
+        // min semester
 		$item = new ilNumberInputGUI($this->lng->txt("studycond_field_min_semester"), "min_semester");
 		$item->setInfo($this->lng->txt("studycond_field_min_semester_info"));
 		$item->setSize(2);
@@ -323,7 +355,6 @@ class ilSubscribersStudyCondGUI
 		$item->setInfo($this->lng->txt("studycond_field_ref_semester_info"));
 		$item->setOptions(ilStudyData::_getSemesterSelectOptions());
 		$this->form_gui->addItem($item);
-		
 
         // save and cancel commands
         if ($a_mode == "create")
@@ -340,4 +371,3 @@ class ilSubscribersStudyCondGUI
         }
 	}
 }
-?>

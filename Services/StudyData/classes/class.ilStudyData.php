@@ -54,7 +54,8 @@ class ilStudyData
 	 */
 	static function _lookupSchool($a_school_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 		
 		$query = "SELECT school_title FROM study_schools"
 		.		" WHERE school_id=". $ilDB->quote($a_school_id, 'integer');
@@ -63,6 +64,7 @@ class ilStudyData
 		{
 			return $row["school_title"];
 		}
+		return '';
 	}
 	
 	/**
@@ -72,7 +74,10 @@ class ilStudyData
 	 */
 	static function _getSchoolSelectOptions()
 	{
-		global $ilDB, $lng;
+		global $DIC;
+		$ilDB = $DIC->database();
+		$lng = $DIC->language();
+
 		$query = "SELECT school_id, school_title FROM study_schools"
 		.		" ORDER by school_title";
 		$result = $ilDB->query($query);
@@ -111,7 +116,8 @@ class ilStudyData
 	 */
 	static function _lookupSubject($a_subject_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		$query = "SELECT subject_title FROM study_subjects"
 		.		" WHERE subject_id=". $ilDB->quote($a_subject_id, 'integer');
@@ -120,6 +126,7 @@ class ilStudyData
 		{
 			return $row["subject_title"] . " (" . $a_subject_id . ")";
 		}
+		return '';
 	}
 
 	/**
@@ -129,7 +136,10 @@ class ilStudyData
 	 */
 	static function _getSubjectSelectOptions()
 	{
-		global $ilDB, $lng;
+		global $DIC;
+		$ilDB = $DIC->database();
+		$lng = $DIC->language();
+
 		$query = "SELECT subject_id, subject_title FROM study_subjects"
 		.		" ORDER by subject_title";
 		$result = $ilDB->query($query);
@@ -145,12 +155,13 @@ class ilStudyData
 	/**
 	 * lookup a degree title
 	 * 
-	 * @param	integer		degree id
+	 * @param	integer		$a_degree_id
 	 * @return 	string		degree title
 	 */
 	static function _lookupDegree($a_degree_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		$query = "SELECT degree_title FROM study_degrees"
 		.		" WHERE degree_id=". $ilDB->quote($a_degree_id,'integer');
@@ -159,6 +170,7 @@ class ilStudyData
 		{
 			return $row["degree_title"] . " (" . $a_degree_id . ")";
 		}
+		return '';
 	}
 
 	
@@ -169,7 +181,10 @@ class ilStudyData
 	 */
 	static function _getDegreeSelectOptions()
 	{
-		global $ilDB, $lng;
+		global $DIC;
+		$ilDB = $DIC->database();
+		$lng = $DIC->language();
+
 		$query = "SELECT degree_id, degree_title FROM study_degrees"
 		.		" ORDER by degree_title";
 		$result = $ilDB->query($query);
@@ -204,7 +219,8 @@ class ilStudyData
 
 	/**
 	 * get a textual description of a user's study data
-	 * 
+	 *
+	 * @param int $a_user_id
 	 * @return string	multi-line description
 	 */
 	static function _getStudyDataText($a_user_id)
@@ -242,13 +258,9 @@ class ilStudyData
             {
                 $text .= $text ? "\n\n" : "";
                 $text .= self::_getRefSemesterText($study['ref_semester']);
-				switch($study['study_type']) {
-					case self::TYPE_PART:
-						$text .= ' (' . $lng->txt('studydata_type_part') . ')';
-						break;
-					case self::TYPE_FULL:
-						$text .= ' (' . $lng->txt('studydata_type_full') . ')';
-						break;
+                if ($type_text = self::_getStudyTypeText($study['study_type']))
+				{
+					$text .= ' (' . $type_text . ')';
 				}
 				$text .= ' :';
 
@@ -268,7 +280,8 @@ class ilStudyData
 	 */
 	static function _getRefSemesterText($a_ref_semester)
 	{
-		global $lng;
+		global $DIC;
+		$lng = $DIC->language();
 		
 		if (substr($a_ref_semester, 4) == '1')
 		{
@@ -285,6 +298,28 @@ class ilStudyData
 		}
 
 		return $reftext;
+	}
+
+	/**
+	 * get the text for a study type
+	 * @param  string $a_study_type
+	 * @return string
+	 */
+	static function _getStudyTypeText($a_study_type)
+	{
+		global $DIC;
+		$lng = $DIC->language();
+
+		switch ($a_study_type)
+		{
+			case self::TYPE_PART:
+				return $lng->txt('studydata_type_part');
+
+			case ilStudyData::TYPE_FULL:
+				return $lng->txt('studydata_type_full');
+
+		}
+		return '';
 	}
 
 
@@ -368,4 +403,3 @@ class ilStudyData
 	}	
 }
 
-?>

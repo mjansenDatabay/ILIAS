@@ -332,6 +332,7 @@ common#:#studycond_field_ref_semester#:#Reference-Semester
 common#:#studycond_field_ref_semester_info#:#Set here on which semester the subjectsemester-conditions refer to. If you let the choice open, the conditions refer to the moment of Joining.
 common#:#studycond_field_subject#:#studysubject
 common#:#studycond_field_subject_info#:#Choose a given studysubject or let the choice open, if the subject can be any.
+common#:#studycond_field_studytype_info#:#Choose a study type or let the choice open, if the type can be any.
 common#:#studycond_max_semester#:#until %s. subjectsemester (%s)
 common#:#studycond_min_max_semester#:#%s. until %s. subjectsemester (%s)
 common#:#studycond_min_semester#:#from %s. subjectsemester (%s)

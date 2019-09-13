@@ -16,27 +16,32 @@ require_once "Services/StudyData/classes/class.ilStudyData.php";
 class ilStudyDataGUI
 {
 	
-	/**
-	 * @var	object	User object
-	 */
+	/* @var	ilObjUser */
 	var $user = null;
 	
-	/**
-	 * @var object	Form object
-	 */
+	/* @var ilPropertyFormGUI */
 	var $form = null;
 
-	
+	/** @var ilTemplate */
+	var $tpl;
+
+	/** @var ilCtrl */
+	var $ctrl;
+
+	/** @var ilLanguage  */
+	var $lng;
+
 	/**
 	 * Constructor
+     * @param ilObjUser $a_user
 	 */
 	public function __construct($a_user)
 	{
-		global $ilCtrl,$tpl,$lng;
+	    global $DIC;
 		
-		$this->tpl = $tpl;
-		$this->ctrl = $ilCtrl;
-		$this->lng = $lng;
+		$this->tpl = $DIC['tpl'];
+		$this->ctrl = $DIC->ctrl();
+		$this->lng = $DIC->language();
 		$this->lng->loadLanguageModule('registration');
 		
 		$this->user = $a_user;
@@ -48,10 +53,13 @@ class ilStudyDataGUI
 	 */
 	public function executeCommand()
 	{
-		global $ilias, $rbacsystem;
-		if(!$rbacsystem->checkAccess("write", USER_FOLDER_ID))
+	    global $DIC;
+	    /** @var ilErrorHandling $ilErr */
+	    $ilErr = $DIC['ilErr'];
+
+		if(!$DIC->rbac()->system()->checkAccess("write", USER_FOLDER_ID))
 		{
-			$ilias->raiseError("You are not entitled to access this page!",$ilias->error_obj->WARNING);
+			$ilErr->raiseError("You are not entitled to access this page!");
 		}
 
 		$cmd = $this->ctrl->getCmd("edit");
@@ -70,7 +78,7 @@ class ilStudyDataGUI
 	/**
 	 * Show the edit screen
 	 */
-	private function editObject()
+	protected function editObject()
 	{
 		$this->initForm();
 		$this->getValues();
@@ -80,7 +88,7 @@ class ilStudyDataGUI
 	/**
 	 * Save the form data
 	 */
-	private function updateObject()
+    protected function updateObject()
 	{
 		$this->initForm();
 
