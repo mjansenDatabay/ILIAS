@@ -21,7 +21,7 @@
 @media (min-width: 768px) {
 
     /* show the login container as a panel on top the banner */
-    .ilc_section_LoginContainer {
+    #il_center_col > .ilc_section_LoginContainer {
         position: absolute;
         top: -20px;
         left: 15px;
@@ -36,7 +36,7 @@
     }
 
     /* positioning of the banner */
-    .ilc_section_BannerContainer {
+    #il_center_col > .ilc_section_BannerContainer {
         display:block;
         margin-top: -53px;
         margin-left: -30px;
@@ -44,17 +44,17 @@
     }
 
     /* rotating banner images */
-    .ilc_section_BannerContainer .ilc_ca_icntr_CarouselICntr {
+    #il_center_col > .ilc_section_BannerContainer .ilc_ca_icntr_CarouselICntr {
         height:400px;
     }
-    .ilc_section_BannerContainer .ilc_Mob  {
+    #il_center_col > .ilc_section_BannerContainer .ilc_Mob  {
         position: absolute;
         height: 400px;
         left: 0;
         right: 0;
         overflow:hidden;
     }
-    .ilc_section_BannerContainer .ilc_Mob img {
+    #il_center_col > .ilc_section_BannerContainer .ilc_Mob img {
         position: absolute;
         height: 400px;
         width:auto!important;
@@ -62,14 +62,16 @@
     }
 
     /* rotating banner texts */
-    .ilc_section_BannerContainer .ilc_Paragraph {
+    #il_center_col > .ilc_section_BannerContainer .ilc_Paragraph {
         position: absolute;
-        background: #036;
-        color: white;
         /*top: 240px;*/
         bottom:0px;
-        right: 8px;
+        right: 0px;
         left: 0px;
+    }
+    .ilc_section_BannerContainer .ilc_Paragraph {
+        background: #036;
+        color: white;
         padding: 20px;
         text-align: center;
         overflow: hidden;
