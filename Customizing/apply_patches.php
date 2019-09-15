@@ -92,4 +92,6 @@ $p->applyPatch('ilPermissionPatches54.initH5P');
 $p->applyPatch('ilPermissionPatches54.initLearnplaces');
 $p->applyPatch('ilPermissionPatches54.initGroupReference');
 
+$p->applyPatch('ilPermissionPatches54.initCreatePermissions');
+
 //$p->logout();

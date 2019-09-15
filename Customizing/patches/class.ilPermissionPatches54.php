@@ -75,15 +75,6 @@ class ilPermissionPatches54
         $pu->copyDefaultPermission('lm','read_learning_progress',	'copa','read_learning_progress');
         $pu->copyDefaultPermission('lm','edit_learning_progress',	'copa','edit_learning_progress');
         $pu->copyDefaultPermission('lm','edit_permission',	    'copa','edit_permission');
-
-        $pu->copyDefaultPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_lm', 'create_copa')
-        ));
-        $pu->copyPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_lm', 'create_copa')
-        ));
     }
 
     /**
@@ -103,15 +94,6 @@ class ilPermissionPatches54
         $pu->copyDefaultPermission('tst','edit_permission',	    'iass','edit_permission');
         $pu->copyDefaultPermission('tst','tst_results',	        'iass','edit_members');
         $pu->copyDefaultPermission('tst','tst_results',	        'iass','amend_grading');
-
-        $pu->copyDefaultPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_tst', 'create_iass')
-        ));
-        $pu->copyPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_tst', 'create_iass')
-        ));
     }
 
     /**
@@ -133,14 +115,15 @@ class ilPermissionPatches54
         $pu->copyDefaultPermission('grp','edit_permission',	    'lso','edit_permission');
         $pu->copyDefaultPermission('grp','manage_members',	    'lso','manage_members');
 
-        $pu->copyDefaultPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_grp', 'create_lso')
-        ));
-        $pu->copyPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_grp', 'create_lso')
-        ));
+        $pu->copyDefaultPermission('grp','create_file',	'lso','create_file');
+        $pu->copyDefaultPermission('grp','create_lm',	    'lso','create_lm');
+        $pu->copyDefaultPermission('grp','create_htlm',	'lso','create_htlm');
+        $pu->copyDefaultPermission('grp','create_sahs',	 'lso','create_sahs');
+        $pu->copyDefaultPermission('grp','create_exc',	 'lso','create_exc');
+        $pu->copyDefaultPermission('grp','create_tst',	'lso','create_tst');
+        $pu->copyDefaultPermission('grp','create_svy',	 'lso','create_svy');
+        $pu->copyDefaultPermission('grp','create_tst',	 'lso','create_iass');
+        $pu->copyDefaultPermission('grp','create_lm',	    'lso','create_copa');
     }
 
 
@@ -157,15 +140,6 @@ class ilPermissionPatches54
         $pu->copyDefaultPermission('lm','write',				    'xhfp','write');
         $pu->copyDefaultPermission('lm','delete',				    'xhfp','delete');
         $pu->copyDefaultPermission('lm','edit_permission',	    'xhfp','edit_permission');
-
-        $pu->copyDefaultPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_lm', 'create_xhfp')
-        ));
-        $pu->copyPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_lm', 'create_xhfp')
-        ));
     }
 
     /**
@@ -180,15 +154,6 @@ class ilPermissionPatches54
         $pu->copyDefaultPermission('lm','write',				    'xsrl','write');
         $pu->copyDefaultPermission('lm','delete',				    'xsrl','delete');
         $pu->copyDefaultPermission('lm','edit_permission',	    'xsrl','edit_permission');
-
-        $pu->copyDefaultPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_lm', 'create_xsrl')
-        ));
-        $pu->copyPermissions(
-            array('cat','crs','grp','fold'), array(
-            array('create_lm', 'create_xsrl')
-        ));
     }
 
     /**
@@ -203,14 +168,34 @@ class ilPermissionPatches54
         $pu->copyDefaultPermission('crsr','write',				'grpr','write');
         $pu->copyDefaultPermission('crsr','delete',				'grpr','delete');
         $pu->copyDefaultPermission('crsr','edit_permission',	    'grpr','edit_permission');
+    }
+
+    /**
+     * Init the create permissions for new objects
+     */
+    public function initCreatePermissions()
+    {
+        $pu = new ilPermissionUtils(true);
 
         $pu->copyDefaultPermissions(
             array('cat','crs','grp','fold'), array(
-            array('create_grp', 'create_grpr')
+            array('create_grp', 'create_grpr'),
+            array('create_lm', 'create_copa'),
+            array('create_tst', 'create_iass'),
+            array('create_grp', 'create_lso'),
+            array('create_lm', 'create_xhfp'),
+            array('create_lm', 'create_xsrl'),
+
         ));
+
         $pu->copyPermissions(
             array('cat','crs','grp','fold'), array(
-            array('create_grp', 'create_grpr')
+            array('create_grp', 'create_grpr'),
+            array('create_lm', 'create_copa'),
+            array('create_tst', 'create_iass'),
+            array('create_grp', 'create_lso'),
+            array('create_lm', 'create_xhfp'),
+            array('create_lm', 'create_xsrl')
         ));
     }
 
