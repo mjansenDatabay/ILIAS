@@ -1,0 +1,217 @@
+<?php
+include_once("./Customizing/classes/class.ilPermissionUtils.php");
+
+/**
+ * fim: [cust] permission patches for ILIAS 5.4
+ */
+class ilPermissionPatches54
+{
+    /**
+     * Adapt the permissions of blogs
+     */
+    public function adaptBlog()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('blog','write', 'blog','redact');
+
+        $pu->copyPermissions(
+            array('blog'), array(
+            array('write', 'redact')
+        ));
+    }
+
+    /**
+     * Adapt the permissions of blogs
+     */
+    public function adaptDataCollection()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('dcl','write', 'dcl','edit_content');
+
+        $pu->copyPermissions(
+            array('dcl'), array(
+            array('write', 'edit_content')
+        ));
+    }
+
+    /**
+     * Adapt the permissions of wikis
+     */
+    public function adaptWiki()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('wiki','write', 'wiki','statistics_read');
+        $pu->copyDefaultPermission('wiki','write', 'wiki','edit_page_meta');
+        $pu->copyDefaultPermission('wiki','write', 'wiki','edit_wiki_navigation');
+        $pu->copyDefaultPermission('wiki','write', 'wiki','activate_wiki_protection');
+        $pu->copyDefaultPermission('wiki','write', 'wiki','wiki_html_export');
+        $pu->copyDefaultPermission('wiki','write', 'wiki','delete_wiki_pages');
+
+        $pu->copyPermissions(array('wiki'), array(
+            array('write', 'statistics_read'),
+            array('write', 'edit_page_meta'),
+            array('write', 'edit_wiki_navigation'),
+            array('write', 'activate_wiki_protection'),
+            array('write', 'wiki_html_export'),
+            array('write', 'delete_wiki_pages'),
+        ));
+    }
+
+    /**
+     * Copy from Learning Module to Content Page
+     */
+    public function initContentPage()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('lm','visible',			    'copa','visible');
+        $pu->copyDefaultPermission('lm','read',				    'copa','read');
+        $pu->copyDefaultPermission('lm','copy',				    'copa','copy');
+        $pu->copyDefaultPermission('lm','write',				    'copa','write');
+        $pu->copyDefaultPermission('lm','delete',				    'copa','delete');
+        $pu->copyDefaultPermission('lm','read_learning_progress',	'copa','read_learning_progress');
+        $pu->copyDefaultPermission('lm','edit_learning_progress',	'copa','edit_learning_progress');
+        $pu->copyDefaultPermission('lm','edit_permission',	    'copa','edit_permission');
+
+        $pu->copyDefaultPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_lm', 'create_copa')
+        ));
+        $pu->copyPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_lm', 'create_copa')
+        ));
+    }
+
+    /**
+     * Copy from Test to Individual Assessment
+     */
+    public function initIndividualAssesment()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('tst','visible',			    'iass','visible');
+        $pu->copyDefaultPermission('tst','read',				    'iass','read');
+        $pu->copyDefaultPermission('tst','copy',				    'iass','copy');
+        $pu->copyDefaultPermission('tst','write',				    'iass','write');
+        $pu->copyDefaultPermission('tst','delete',				'iass','delete');
+        $pu->copyDefaultPermission('tst','read_learning_progress','iass','read_learning_progress');
+        $pu->copyDefaultPermission('tst','edit_learning_progress','iass','edit_learning_progress');
+        $pu->copyDefaultPermission('tst','edit_permission',	    'iass','edit_permission');
+        $pu->copyDefaultPermission('tst','tst_results',	        'iass','edit_members');
+        $pu->copyDefaultPermission('tst','tst_results',	        'iass','amend_grading');
+
+        $pu->copyDefaultPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_tst', 'create_iass')
+        ));
+        $pu->copyPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_tst', 'create_iass')
+        ));
+    }
+
+    /**
+     * Copy from Group to LearningSequence
+     */
+    public function initLearningSequence()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('grp','visible',			    'lso','visible');
+        $pu->copyDefaultPermission('grp','read',				    'lso','read');
+        $pu->copyDefaultPermission('grp','copy',				    'lso','copy');
+        $pu->copyDefaultPermission('grp','write',				    'lso','write');
+        $pu->copyDefaultPermission('grp','delete',				'lso','delete');
+        $pu->copyDefaultPermission('grp','join',				    'lso','participate');
+        $pu->copyDefaultPermission('grp','leave',				    'lso','unparticipate');
+        $pu->copyDefaultPermission('grp','read_learning_progress','lso','read_learning_progress');
+        $pu->copyDefaultPermission('grp','edit_learning_progress','lso','edit_learning_progress');
+        $pu->copyDefaultPermission('grp','edit_permission',	    'lso','edit_permission');
+        $pu->copyDefaultPermission('grp','manage_members',	    'lso','manage_members');
+
+        $pu->copyDefaultPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_grp', 'create_lso')
+        ));
+        $pu->copyPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_grp', 'create_lso')
+        ));
+    }
+
+
+    /**
+     * Copy from Learning Module to H5P
+     */
+    public function initH5P()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('lm','visible',			    'xhfp','visible');
+        $pu->copyDefaultPermission('lm','read',				    'xhfp','read');
+        $pu->copyDefaultPermission('lm','copy',				    'xhfp','copy');
+        $pu->copyDefaultPermission('lm','write',				    'xhfp','write');
+        $pu->copyDefaultPermission('lm','delete',				    'xhfp','delete');
+        $pu->copyDefaultPermission('lm','edit_permission',	    'xhfp','edit_permission');
+
+        $pu->copyDefaultPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_lm', 'create_xhfp')
+        ));
+        $pu->copyPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_lm', 'create_xhfp')
+        ));
+    }
+
+    /**
+     * Copy from Learning Module to Learnplaces
+     */
+    public function initLearnplaces()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('lm','visible',			    'xsrl','visible');
+        $pu->copyDefaultPermission('lm','read',				    'xsrl','read');
+        $pu->copyDefaultPermission('lm','write',				    'xsrl','write');
+        $pu->copyDefaultPermission('lm','delete',				    'xsrl','delete');
+        $pu->copyDefaultPermission('lm','edit_permission',	    'xsrl','edit_permission');
+
+        $pu->copyDefaultPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_lm', 'create_xsrl')
+        ));
+        $pu->copyPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_lm', 'create_xsrl')
+        ));
+    }
+
+    /**
+     * Copy from Course Reference to Group Reference
+     */
+    public function initGroupReference()
+    {
+        $pu = new ilPermissionUtils(true);
+
+        $pu->copyDefaultPermission('crsr','visible',			    'grpr','visible');
+        $pu->copyDefaultPermission('crsr','copy',				    'grpr','copy');
+        $pu->copyDefaultPermission('crsr','write',				'grpr','write');
+        $pu->copyDefaultPermission('crsr','delete',				'grpr','delete');
+        $pu->copyDefaultPermission('crsr','edit_permission',	    'grpr','edit_permission');
+
+        $pu->copyDefaultPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_grp', 'create_grpr')
+        ));
+        $pu->copyPermissions(
+            array('cat','crs','grp','fold'), array(
+            array('create_grp', 'create_grpr')
+        ));
+    }
+
+}

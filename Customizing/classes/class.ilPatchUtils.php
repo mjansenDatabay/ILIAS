@@ -22,7 +22,6 @@ class ilPatchUtils
 	public function login()
 	{
 		try {
-			$this->cron->initIlias();
 			$this->cron->authenticate();
 		}
 		catch(Exception $e)

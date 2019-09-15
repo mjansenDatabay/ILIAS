@@ -78,4 +78,18 @@ $p->login();
 //$p->applyPatch('ilPermissionPatches51.initCombiSubscription');
 //$p->applyPatch('ilPermissionPatches51.initAdobeConnect');
 
+/*******************************
+ * New Permissions in ILIAS 5.4
+ ******************************/
+
+$p->applyPatch('ilPermissionPatches54.adaptBlog');
+$p->applyPatch('ilPermissionPatches54.adaptDataCollection');
+$p->applyPatch('ilPermissionPatches54.adaptWiki');
+$p->applyPatch('ilPermissionPatches54.initContentPage');
+$p->applyPatch('ilPermissionPatches54.initIndividualAssesment');
+$p->applyPatch('ilPermissionPatches54.initLearningSequence');
+$p->applyPatch('ilPermissionPatches54.initH5P');
+$p->applyPatch('ilPermissionPatches54.initLearnplaces');
+$p->applyPatch('ilPermissionPatches54.initGroupReference');
+
 //$p->logout();
