@@ -209,15 +209,17 @@ class ilLPMarks
 		return '';
 	}
 
-	/**
-	 * fim: [export] get the LP marks of an object
-	 *
-	 * @param int 		obj_id
-	 * @param array		usr_id => mark data
-	 */
+    /**
+     * fim: [export] get the LP marks of an object
+     *
+     * @param int        obj_id
+     * @param array        usr_id => mark data
+     * @return array
+     */
 	public static function _getMarkDataOfObject($a_obj_id)
 	{
-		global $ilDB;
+	    global $DIC;
+		$ilDB = $DIC->database();
 
 		$marks = array();
 
@@ -225,7 +227,7 @@ class ilLPMarks
 			"WHERE obj_id = ".$ilDB->quote($a_obj_id ,'integer');
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
+		while($row = $ilDB->fetchAssoc(($res)))
 		{
 			$marks[$row['usr_id']] = $row;
 		}
