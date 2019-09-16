@@ -155,6 +155,19 @@ class ilMaterializedPathTree implements ilTreeImplementation
 			$fields = implode(',',$a_fields);
 		}
 
+// fau: treeQuery53 - don't use tree_id for repository tree
+// this has bad performance on our MariaDB 10.1
+// deleted subtrees may have negative tree_id, but the given childs are already primary keys
+
+		if ($this->getTree()->getTreeTable() == 'tree' && $this->getTree()->getTreeId() == 1)
+		{
+			$treeClause = '';
+		}
+		else
+		{
+			$treeClause = 'AND '.$this->getTree()->getTreeTable().'.'.$this->getTree()->getTreePk().' = '.$ilDB->quote($this->getTree()->getTreeId(),'integer').' ';
+		}
+
 		// @todo order by
 		$query = 'SELECT '.
 				$fields.' '.
@@ -164,11 +177,12 @@ class ilMaterializedPathTree implements ilTreeImplementation
 				'BETWEEN '.
 				$ilDB->quote($a_node['path'],'text').' AND '.
 				$ilDB->quote($a_node['path'].'.Z','text').' '.
-				'AND '.$this->getTree()->getTreeTable().'.'.$this->getTree()->getTreePk().' = '.$ilDB->quote($this->getTree()->getTreeId(),'integer').' '.
+				$treeClause .
 				$type_str.' '.
 				'ORDER BY '.$this->getTree()->getTreeTable().'.path';
 		
 		return $query;
+// fau.
 	}
 	
 	/**
