@@ -12,6 +12,8 @@ class ilMyCampusSynchronisation
 	protected $sum_added = 0;
 	protected $error = "";
 
+	/** @var ilMyCampusClient */
+	protected $campus;
 	/**
 	 * ilMyCampusSynchronisation constructor.
 	 * @throws ilLogException

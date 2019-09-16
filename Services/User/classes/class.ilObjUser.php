@@ -770,13 +770,14 @@ class ilObjUser extends ilObject
 	*/
 	static function _findUserIdByAccount($account)
 	{
-		global $ilDB;
+	    global $DIC;
+		$ilDB = $DIC->database();
 
 		// first try the external account
 		$query = "SELECT usr_id FROM usr_data ".
 		"WHERE ext_account = ". $ilDB->quote($account, 'text');
 		$result = $ilDB->query($query);
-		if ($row = $result->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($row = $ilDB->fetchAssoc($result))
 		{
 			return $row['usr_id'];
 		}
@@ -786,7 +787,7 @@ class ilObjUser extends ilObject
 		"WHERE login = ". $ilDB->quote($account, 'text');
 		$result = $ilDB->query($query);
 
-		if ($row = $result->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($row = $ilDB->fetchAssoc($result))
 		{
 			return $row['usr_id'];
 		}
