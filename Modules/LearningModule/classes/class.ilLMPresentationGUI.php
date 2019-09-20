@@ -3197,6 +3197,7 @@ class ilLMPresentationGUI
 		$this->tpl->setVariable("FORMACTION", $this->ctrl->getFormaction($this));
 
 		$nodes = $this->lm_tree->getSubtree($this->lm_tree->getNodeData($this->lm_tree->getRootId()));
+		$nodes = $this->filterNonAccessibleNode($nodes);
 
 		if (!is_array($_POST["item"]))
 		{
@@ -3325,6 +3326,27 @@ class ilLMPresentationGUI
 		$this->tpl->show();
 
 	}
+
+    /**
+     * @param array $nodes
+     * @return array
+     */
+    protected function filterNonAccessibleNode($nodes)
+    {
+        $tracker = $this->getTracker();
+        // if navigation is restricted based on correct answered questions
+        // check if we have preceeding pages including unsanswered/incorrect answered questions
+        if (!$this->offlineMode())
+        {
+            if ($this->lm->getRestrictForwardNavigation()) {
+                $nodes = array_filter($nodes, function ($node) use ($tracker) {
+                    return !$tracker->hasPredIncorrectAnswers($node["child"]);
+                });
+            }
+        }
+        return $nodes;
+    }
+
 
 	/**
 	 * Init print view selection form.
@@ -3539,7 +3561,11 @@ class ilLMPresentationGUI
 					$activated = false;
 				}
 			}
-
+            if ($this->lm->getRestrictForwardNavigation()) {
+                if ($this->getTracker()->hasPredIncorrectAnswers($node["obj_id"])) {
+                    continue;
+                }
+            }
 			if ($activated &&
 				ilObjContentObject::_checkPreconditionsOfPage($this->lm->getRefId(),$this->lm->getId(), $node["obj_id"]))
 			{
