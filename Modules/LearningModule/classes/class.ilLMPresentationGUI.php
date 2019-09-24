@@ -1587,8 +1587,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -1887,8 +1892,10 @@ class ilLMPresentationGUI
 	function basicPageGuiInit($a_page_gui)
 	{
 		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 		$a_page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-			$this->lm->getStyleSheetId(), "lm"));
+			$this->lm->getStyleSheetId(), "lm", $this->lm->getRefId()));
+// fau.
 		if (!$this->offlineMode())
 		{
 			$a_page_gui->setOutputMode("presentation");
@@ -1926,8 +1933,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -2230,8 +2242,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -2284,8 +2301,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -2904,8 +2926,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -3163,8 +3190,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -3440,8 +3472,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -3481,9 +3518,10 @@ class ilLMPresentationGUI
 			{
 				$page_object_gui = $this->getLMPageGUI($this->lm->getFooterPage());
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 				$page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->lm->getStyleSheetId(), "lm"));
-
+					$this->lm->getStyleSheetId(), "lm", $this->lm->getRefId()));
+// fau.
 	
 				// determine target frames for internal links
 				$page_object_gui->setLinkFrame($_GET["frame"]);
@@ -3501,9 +3539,10 @@ class ilLMPresentationGUI
 			{
 				$page_object_gui = $this->getLMPageGUI($this->lm->getHeaderPage());
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 				$page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->lm->getStyleSheetId(), "lm"));
-
+					$this->lm->getStyleSheetId(), "lm", $this->lm->getRefId()));
+// fau.
 	
 				// determine target frames for internal links
 				$page_object_gui->setLinkFrame($_GET["frame"]);
@@ -3630,9 +3669,10 @@ class ilLMPresentationGUI
 					$page_object_gui = $this->getLMPageGUI($page_id);
 					$page_object = $page_object_gui->getPageObject();
 					include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 					$page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-						$this->lm->getStyleSheetId(), "lm"));
-
+						$this->lm->getStyleSheetId(), "lm", $this->lm->getRefId()));
+// fau.
 
 					// get lm page
 					$lm_pg_obj = new ilLMPageObject($this->lm, $page_id);
@@ -4040,8 +4080,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{
@@ -4348,8 +4393,13 @@ class ilLMPresentationGUI
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
+// fau: inheritContentStyle - get the effective content style by ref_id
 			$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-				ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+				ilObjStyleSheet::getContentStylePath(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->lm->getStyleSheetId(), $this->lm->getType(), $this->lm->getRefId()))
+			);
+// fau.
 		}
 		else
 		{

@@ -465,8 +465,12 @@ class ilGlossaryTermGUI
 
 		// content style
 		$this->tpl->setCurrentBlock("ContentStyle");
+// fau: inheritContentStyle - get the effective content style by ref_id
 		$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->term_glossary->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath(
+				ilObjStyleSheet::getEffectiveContentStyleId(
+					$this->glossary->getStyleSheetId(), $this->term_glossary->getType(), $this->glossary->getRefId())));
+// fau.
 		$this->tpl->parseCurrentBlock();
 
 		// syntax style
@@ -501,7 +505,10 @@ class ilGlossaryTermGUI
 		{
 			$def = $defs[$j];
 			$page_gui = new ilGlossaryDefPageGUI($def["id"]);
-			$page_gui->setStyleId($this->term_glossary->getStyleSheetId());
+// fau: inheritContentStyle - get the effective content style for the page
+			$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
+				$this->glossary->getStyleSheetId(), 'glo', $this->glossary->getRefId()));
+// fau.
 			$page_gui->setSourcecodeDownloadScript("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;ref_id=".$_GET["ref_id"]);
 			$page_gui->setTemplateOutput(false);
 			$output = $page_gui->preview();
@@ -569,8 +576,12 @@ class ilGlossaryTermGUI
 
 		// content style
 		$this->tpl->setCurrentBlock("ContentStyle");
+// fau: inheritContentStyle - get the effective content style by ref_id
 		$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->term_glossary->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath(
+				ilObjStyleSheet::getEffectiveContentStyleId(
+					$this->glossary->getStyleSheetId(), 'glo', $this->glossary->getRefId())));
+// fau.
 		$this->tpl->parseCurrentBlock();
 
 		// syntax style
@@ -591,7 +602,10 @@ class ilGlossaryTermGUI
 		$definition = new ilGlossaryDefinition($_GET["def"]);
 		$page_gui = new ilGlossaryDefPageGUI($definition->getId());
 		$page_gui->setTemplateOutput(false);
-		$page_gui->setStyleId($this->term_glossary->getStyleSheetId());
+// fau: inheritContentStyle - get the effective content style for the page
+		$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
+			$this->glossary->getStyleSheetId(), 'glo', $this->glossary->getRefId()));
+// fau.
 		$page_gui->setSourcecodeDownloadScript("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;ref_id=".$_GET["ref_id"]);
 		$page_gui->setFileDownloadLink("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;ref_id=".$_GET["ref_id"]);
 		$page_gui->setFullscreenLink("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;ref_id=".$_GET["ref_id"]);

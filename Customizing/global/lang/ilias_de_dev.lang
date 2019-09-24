@@ -631,6 +631,10 @@ style#:#sty_custom_css_edit#:#Spezielle Styles bearbeiten
 style#:#sty_custom_css_description#:#Hier können Sie spezielle Style-Einstellungen als CSS-Code eingeben. Der Code wird an die generierte CSS-Datei angehängt. Spezielle Styles funktionieren nur in StudOn - nicht im Standard-ILIAS.
 style#:#sty_custom_css_color_info#:#Vordefinierte Farben werden wie in den Style-Formularen angegeben, z.B. color: !MeineFarbe(20);
 style#:#sty_custom_css_image_info#:#Bilder werden mit vorangestelltem ! referenziert, z.B. background-image: url(!MeinHintergrund.png);
+style#:#sty_inherit#:#Als Standard festlegen###// fau: inheritContentStyle
+style#:#sty_inherit_info#:#Dieser Style wird für alle Unterobjekte verwendet, die keinen eigenen Style ausgewählt haben.###// fau: inheritContentStyle
+style#:#sty_inherited_from#:#Standard festgelegt von###// fau: inheritContentStyle
+style#:#sty_inherited_from_info#:#Der Standard-Style ist im angegebenen übergeordneten Objekts festgelegt.###// fau: inheritContentStyle
 survey#:#anonymize_survey_description#:#Die Anonymisierung entfernt alle persönlichen Daten aus der Umfragenstatistik.<ul><li>Bei öffentlichen Umfragen mit CAPTCHA muss zum Starten ein kurzer Bildtext erkannt werden, um das Ausfüllen durch Programme zu verhindern.</li><li>Bei öffentlichen Umfragen mit Zugangsschlüssel muss eine vorab verteilte fünfstellige Kennung eingegeben werden.</li></ul>Für registrierte StudOn-Nutzer wird kein CAPTCHA oder Zugangsschlüssel benötigt.
 survey#:#anonymize_with_captcha#:#Anonyme Umfrage mit CAPTCHA
 survey#:#anonymize_with_captcha_info#:#Die Umfrage kann von anonymen Benutzern nach manueller Eingabe von Zeichen aus einer generierten Grafik gestartet werden. Diese Option ist nicht mit Zugangsschlüsseln kombinierbar!

@@ -126,8 +126,10 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 					$view_frame);
 
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 				$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->content_object->getStyleSheetId(), "lm"));
+					$this->content_object->getStyleSheetId(), "lm", $this->content_object->getRefId()));
+// fau.
 				$page_gui->setTemplateTargetVar("ADM_CONTENT");
 				$page_gui->getPageObject()->buildDom();
 				$int_links = $page_gui->getPageObject()->getInternalLinks();

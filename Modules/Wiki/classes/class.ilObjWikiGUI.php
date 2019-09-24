@@ -135,8 +135,10 @@ class ilObjWikiGUI extends ilObjectGUI
 				$wpage_gui = ilWikiPageGUI::getGUIForTitle($this->object->getId(),
 					ilWikiUtil::makeDbTitle($_GET["page"]), $_GET["old_nr"], $this->object->getRefId());
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 				$wpage_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->object->getStyleSheetId(), "wiki"));
+					$this->object->getStyleSheetId(), "wiki", $this->object->getRefId()));
+// fau.
 				$this->setContentStyleSheet();
 				if (!$ilAccess->checkAccess("write", "", $this->object->getRefId()) &&
 					(!$ilAccess->checkAccess("edit_content", "", $this->object->getRefId()) ||
@@ -1257,8 +1259,10 @@ class ilObjWikiGUI extends ilObjectGUI
 		$wpage_gui = ilWikiPageGUI::getGUIForTitle($this->object->getId(),
 			ilWikiUtil::makeDbTitle($page), 0, $this->object->getRefId());
 		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 		$wpage_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-			$this->object->getStyleSheetId(), "wiki"));
+			$this->object->getStyleSheetId(), "wiki", $this->object->getRefId()));
+// fau.
 
 		$this->setContentStyleSheet();
 		//$wpage_gui->setOutputMode(IL_PAGE_PREVIEW);
@@ -1728,8 +1732,12 @@ class ilObjWikiGUI extends ilObjectGUI
 		}
 
 		$ctpl->setCurrentBlock("ContentStyle");
+// fau: inheritContentStyle - get the effective content style by ref_id
 		$ctpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath(
+				ilObjStyleSheet::getEffectiveContentStyleId(
+					$this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId())));
+// fau.
 		$ctpl->parseCurrentBlock();
 
 	}
@@ -1823,6 +1831,19 @@ class ilObjWikiGUI extends ilObjectGUI
 					$lng->txt("sty_create_ind_style"));
 			}
 		}
+
+// fau: inheritContentStyle - add inheritance properties to the form
+		if ($style_id <= 0) {
+			$parent_usage = ilObjStyleSheet::getEffectiveParentStyleUsage($this->ref_id);
+			if (!empty($parent_usage)) {
+				$pu = new ilNonEditableValueGUI($this->lng->txt('sty_inherited_from'));
+				$pu->setInfo($this->lng->txt('sty_inherited_from_info'));
+				$pu->setValue(ilObject::_lookupTitle($parent_usage['obj_id']));
+				$this->form->addItem($pu);
+			}
+		}
+// fau.
+
 		$this->form->setTitle($lng->txt("wiki_style"));
 		$this->form->setFormAction($ilCtrl->getFormAction($this));
 	}

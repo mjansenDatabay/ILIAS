@@ -1025,3 +1025,16 @@ if(!$ilDB->tableColumnExists('il_sub_studycond','study_type'))
     );
 }
 ?>
+<#63>
+<?php
+/**
+ * fau: inheritContentStyle - add the ref_id of a container style (set if scope is the sub tree)
+ */
+if(!$ilDB->tableColumnExists('style_usage','scope_ref_id'))
+{
+    $ilDB->addTableColumn('style_usage', 'scope_ref_id',
+        array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0)
+    );
+    $ilDB->addIndex('style_usage', array('scope_ref_id'), 'i9');
+}
+?>

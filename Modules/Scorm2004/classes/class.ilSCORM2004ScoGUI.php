@@ -405,8 +405,13 @@ die("deprecated");
 		$tpl->setVariable("LOCATION_STYLESHEET", ilUtil::getStyleSheetLocation());
 		$tpl->setBodyClass("");
 		$tpl->setCurrentBlock("ContentStyle");
+// fau: inheritContentStyle - get the effective content style by ref_id
 		$tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->slm_object->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath(
+				ilObjStyleSheet::getEffectiveContentStyleId(
+					$this->slm_object->getStyleSheetId(), $this->slm_object->getType(), $this->slm_object->getRefId()))
+		);
+// fau.
 		$tpl->parseCurrentBlock();
 		
 		// get javascript

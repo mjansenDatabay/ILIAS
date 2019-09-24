@@ -828,6 +828,19 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
 					$lng->txt("sty_create_ind_style"));
 			}
 		}
+
+// fau: inheritContentStyle - add inheritance properties to the form
+		if ($style_id <= 0) {
+			$parent_usage = ilObjStyleSheet::getEffectiveParentStyleUsage($this->ref_id);
+			if (!empty($parent_usage)) {
+				$pu = new ilNonEditableValueGUI($this->lng->txt('sty_inherited_from'));
+				$pu->setInfo($this->lng->txt('sty_inherited_from_info'));
+				$pu->setValue(ilObject::_lookupTitle($parent_usage['obj_id']));
+				$this->form->addItem($pu);
+			}
+		}
+// fau.
+
 		$this->form->setTitle($lng->txt("cont_style"));
 		$this->form->setFormAction($ilCtrl->getFormAction($this));
 	}

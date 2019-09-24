@@ -122,11 +122,11 @@ class ilContainerStartObjectsContentGUI
 		{
 			return;
 		}
-
+// fau: inheritContentStyle - add ref_id
 		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
 			ilObjStyleSheet::getContentStylePath(ilObjStyleSheet::getEffectiveContentStyleId(
-				$this->parent_obj->getStyleSheetId(), $this->parent_obj->getType())));
+				$this->parent_obj->getStyleSheetId(), $this->parent_obj->getType(), $this->parent_obj->getRefId())));
 		$tpl->setCurrentBlock("SyntaxStyle");
 		$tpl->setVariable("LOCATION_SYNTAX_STYLESHEET",
 			ilObjStyleSheet::getSyntaxStylePath());
@@ -137,8 +137,8 @@ class ilContainerStartObjectsContentGUI
 		
 		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-			$this->parent_obj->getStyleSheetId(), $this->parent_obj->getType()));
-
+			$this->parent_obj->getStyleSheetId(), $this->parent_obj->getType(), $this->parent_obj->getRefId()));
+// fau.
 		$page_gui->setPresentationTitle("");
 		$page_gui->setTemplateOutput(false);
 		$page_gui->setHeader("");

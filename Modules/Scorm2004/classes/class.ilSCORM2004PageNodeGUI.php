@@ -77,8 +77,10 @@ class ilSCORM2004PageNodeGUI extends ilSCORM2004NodeGUI
 				$page_gui->setEditPreview(true);
 				$page_gui->setPresentationTitle($this->node_object->getTitle());
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - add ref_id
 				$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->slm_object->getStyleSheetId(), "sahs"));
+					$this->slm_object->getStyleSheetId(), "sahs", $this->slm_object->getRefId()));
+// fau.
 
 				if ($this->node_object->tree->getParentId($this->node_object->getId()) > 0)
 				{

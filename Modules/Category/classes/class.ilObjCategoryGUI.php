@@ -168,8 +168,12 @@ class ilObjCategoryGUI extends ilContainerGUI
 				$this->checkPermission("read");
 				$this->prepareOutput();
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - get the effective content style by ref_id
 				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-					ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
+					ilObjStyleSheet::getContentStylePath(
+						ilObjStyleSheet::getEffectiveContentStyleId(
+						$this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId())));
+// fau.
 				$this->renderObject();
 				break;
 
@@ -311,8 +315,12 @@ class ilObjCategoryGUI extends ilContainerGUI
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				if (is_object($this->object))
 				{
+// fau: inheritContentStyle - get the effective content style by ref_id
 					$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-						ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
+						ilObjStyleSheet::getContentStylePath(
+							ilObjStyleSheet::getEffectiveContentStyleId(
+								$this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId())));
+// fau.
 				}
 
 				if(!$cmd)

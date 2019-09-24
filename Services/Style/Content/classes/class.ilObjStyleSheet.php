@@ -1896,13 +1896,16 @@ class ilObjStyleSheet extends ilObject
 	}
 // fau.
 
+// fau: inheritContentStyle - add ref_id as parameter and find a parent style
 	/**
-	* Get effective Style Id
-	*
-	* @param	integer		style id that may be set in object
-	* @param	string		object type
+	 * Get effective Style Id
+	 *
+	 * @param	integer		$a_style_id	style id that may be set in object
+	 * @param	string		$a_type	object type
+	 * @param	integer		$a_ref_id
+	 * @return integer
 	*/
-	static function getEffectiveContentStyleId($a_style_id, $a_type = "")
+	static function getEffectiveContentStyleId($a_style_id, $a_type = "", $a_ref_id = null)
 	{
 		global $DIC;
 
@@ -1915,6 +1918,15 @@ class ilObjStyleSheet extends ilObject
 			$a_style_id = $fixed_style;
 		}
 
+		// check for an inherited style
+		if ($a_style_id <= 0 && $a_ref_id > 0)
+		{
+			if (!empty($usage = self::getEffectiveParentStyleUsage($a_ref_id)))
+			{
+				$a_style_id = $usage['style_id'];
+			}
+		}
+
 		// check global default style
 		if ($a_style_id <= 0)
 		{
@@ -1925,9 +1937,45 @@ class ilObjStyleSheet extends ilObject
 		{
 			return $a_style_id;
 		}
-		
+
 		return 0;
 	}
+// fau.
+
+// fau: inheritContentStyle - new function getEffectiveParentStyleUsage()
+	/**
+	 * Get the effective parent style usage record for a repository object
+	 *
+	 * @param int $a_ref_id	 ref_id of the object
+	 * @return array		['obj_id' => int, 'style_id => int, scope_ref_id => int]
+	 */
+	static function getEffectiveParentStyleUsage($a_ref_id)
+	{
+		global $DIC;
+		$tree = $DIC->repositoryTree();
+		$ilDB = $DIC->database();
+
+		$path = $tree->getPathId($a_ref_id);
+
+		// select the style usage records of parent object that have a scope set by their ref_id
+		$query = "SELECT * FROM style_usage WHERE "
+				. $ilDB->in('scope_ref_id', $path, false, 'integer');
+
+		$usages = [];
+		$result = $ilDB->query($query);
+		while ($row = $ilDB->fetchAssoc($result)) {
+			$usages[$row['scope_ref_id']] = $row;
+		}
+
+		foreach (array_reverse($path) as $ref_id) {
+			if (isset($usages[$ref_id])) {
+				return $usages[$ref_id];
+			}
+		}
+
+		return [];
+	}
+// fau.
 
 	/**
 	 * Get parameters of class
@@ -3913,11 +3961,12 @@ class ilObjStyleSheet extends ilObject
 		
 		return $rec["value"];
 	}
-	
+
+// fau: inheritContentStyle - add parameter $a_scope_ref_id and save it
 	/**
 	* Write style usage
 	*/
-	static function writeStyleUsage($a_obj_id, $a_style_id)
+	static function writeStyleUsage($a_obj_id, $a_style_id, $a_scope_ref_id = 0)
 	{
 		global $DIC;
 
@@ -3926,10 +3975,13 @@ class ilObjStyleSheet extends ilObject
 		$ilDB->replace("style_usage", array(
 			"obj_id" => array("integer", (int) $a_obj_id)),
 			array(
-				"style_id" => array("integer", (int) $a_style_id))
-			);
+				"style_id" => array("integer", (int) $a_style_id),
+				"scope_ref_id" => array("integer", (int) $a_scope_ref_id)
+			)
+		);
 	}
-	
+// fau.
+
 	/**
 	* Lookup object style
 	*/
@@ -3951,6 +4003,27 @@ class ilObjStyleSheet extends ilObject
 		
 		return 0;
 	}
+
+// fau: inheritContentStyle - new function lookupObjectStyleScope()
+	/**
+	 * Lookup the scope of an object style (object is a container)
+	 * @param	int	$a_obj_id
+	 * @return	int				ref_id of the container if scope is the subtree, 0 if scope is only the object
+	 */
+	static function lookupObjectStyleScope($a_obj_id)
+	{
+		global $DIC;
+
+		$ilDB = $DIC->database();
+
+		$set = $ilDB->query("SELECT scope_ref_id FROM style_usage ".
+			" WHERE obj_id = ".$ilDB->quote($a_obj_id, "integer")
+		);
+		$rec  = $ilDB->fetchAssoc($set);
+
+		return (int) $rec["scope_ref_id"];
+	}
+// fau.
 
 	/**
 	 * Lookup object style

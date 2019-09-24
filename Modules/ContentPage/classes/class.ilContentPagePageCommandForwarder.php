@@ -87,11 +87,12 @@ class ilContentPagePageCommandForwarder implements \ilContentPageObjectConstants
 	protected function getPageObjectGUI($isEmbedded = false): \ilContentPagePageGUI
 	{
 		$pageObjectGUI = new \ilContentPagePageGUI($this->parentObject->getId(), 0, $isEmbedded);
+// fau: inheritContentStyle - add ref_id
 		$pageObjectGUI->setStyleId(
 			\ilObjStyleSheet::getEffectiveContentStyleId(
-			$this->parentObject->getStyleSheetId(), $this->parentObject->getType())
+			$this->parentObject->getStyleSheetId(), $this->parentObject->getType(), $this->parentObject->getRefId())
 		);
-
+// fau.
 		$pageObjectGUI->obj->addUpdateListener($this->parentObject, 'update');
 
 		return $pageObjectGUI;
@@ -156,12 +157,13 @@ class ilContentPagePageCommandForwarder implements \ilContentPageObjectConstants
 		$pageObjectGUI = $this->getPageObjectGUI();
 		$pageObjectGUI->setEnabledTabs(false);
 
+// fau: inheritContentStyle - add ref_id
 		$pageObjectGUI->setStyleId(
 			\ilObjStyleSheet::getEffectiveContentStyleId(
-				$this->parentObject->getStyleSheetId(), $this->parentObject->getType()
+				$this->parentObject->getStyleSheetId(), $this->parentObject->getType(), $this->parentObject->getRefId()
 			)
 		);
-
+// fau.
 		return $pageObjectGUI;
 	}
 
@@ -175,12 +177,13 @@ class ilContentPagePageCommandForwarder implements \ilContentPageObjectConstants
 		$pageObjectGUI = $this->getPageObjectGUI(true);
 		$pageObjectGUI->setEnabledTabs(false);
 
+// fau: inheritContentStyle - add ref_id
 		$pageObjectGUI->setStyleId(
 			\ilObjStyleSheet::getEffectiveContentStyleId(
-				$this->parentObject->getStyleSheetId(), $this->parentObject->getType()
+				$this->parentObject->getStyleSheetId(), $this->parentObject->getType(), $this->parentObject->getRefId()
 			)
 		);
-
+// fau.
 		return $pageObjectGUI;
 	}
 

@@ -1458,8 +1458,13 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		$tpl->parseCurrentBlock();
 
 		$tpl->setCurrentBlock("ContentStyle");
-		$tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId(), false));
+// fau: inheritContentStyle - get the effective content style by ref_id
+        $this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
+            ilObjStyleSheet::getContentStylePath(
+                ilObjStyleSheet::getEffectiveContentStyleId(
+                    $this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId()))
+        );
+// fau.
 		$tpl->parseCurrentBlock();
 
 		$tpl->setVariable("LOCATION_STYLESHEET", ilObjStyleSheet::getContentPrintStyle());

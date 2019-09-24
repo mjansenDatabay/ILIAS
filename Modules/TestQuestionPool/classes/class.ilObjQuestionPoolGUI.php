@@ -187,7 +187,12 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 			case "ilassquestionpagegui":
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$this->tpl->setCurrentBlock("ContentStyle");
-				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET", ilObjStyleSheet::getContentStylePath(0));
+// fau: inheritContentStyle - get the effective content style by ref_id
+				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
+					ilObjStyleSheet::getContentStylePath(
+						ilObjStyleSheet::getEffectiveContentStyleId(
+							0, 'qpl', $this->object->getRefId())));
+// fau.
 				$this->tpl->parseCurrentBlock();
 		
 				// syntax style
@@ -217,6 +222,12 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 				$this->ctrl->setReturnByClass("ilAssQuestionPageGUI", "view");
 				$this->ctrl->setReturn($this, "questions");
 				$page_gui = new ilAssQuestionPageGUI($_GET["q_id"]);
+// fau: inheritContentStyle - set style for content editor
+				$page_gui->setStyleId(
+					ilObjStyleSheet::getEffectiveContentStyleId(
+					0, 'qpl', $this->object->getRefId())
+				);
+// fau.
 				$page_gui->obj->addUpdateListener(
 					$question,
 					'updateTimestamp'

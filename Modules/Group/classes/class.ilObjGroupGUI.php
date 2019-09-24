@@ -199,8 +199,13 @@ class ilObjGroupGUI extends ilContainerGUI
 				$this->tabs_gui->setTabActive('none');
 				$this->checkPermission("read");
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
+// fau: inheritContentStyle - get the effective content style by ref_id
 				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-					ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
+					ilObjStyleSheet::getContentStylePath(
+						ilObjStyleSheet::getEffectiveContentStyleId(
+							$this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId()))
+				);
+// fau.
 				$this->renderObject();
 				break;
 

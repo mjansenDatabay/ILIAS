@@ -1270,7 +1270,12 @@ class ilTestServiceGUI
 
 		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$this->tpl->setCurrentBlock("ContentStyle");
-		$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET", ilObjStyleSheet::getContentStylePath(0));
+// fau: inheritContentStyle - get the effective content style by ref_id
+        $this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
+            ilObjStyleSheet::getContentStylePath(
+                ilObjStyleSheet::getEffectiveContentStyleId(
+                    0, $this->object->getType(), $this->object->getRefId())));
+// fau.
 		$this->tpl->parseCurrentBlock();
 
 		$this->tpl->setCurrentBlock("SyntaxStyle");

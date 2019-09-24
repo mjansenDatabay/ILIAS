@@ -97,18 +97,18 @@ class ilContainerStartObjectsGUI
 					$new_page_object->createFromXML();
 					unset($new_page_object);
 				}
-
+// fau: inheritContentStyle - add ref_id
 				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
 					ilObjStyleSheet::getContentStylePath(ilObjStyleSheet::getEffectiveContentStyleId(
-						$this->object->getStyleSheetId(), $this->object->getType())));
+						$this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId())));
 
 				$this->ctrl->setReturnByClass("ilcontainerstartobjectspagegui", "edit");				
 				include_once "Services/Container/classes/class.ilContainerStartObjectsPageGUI.php";
 				$pgui = new ilContainerStartObjectsPageGUI($this->object->getId());
 				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$pgui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->object->getStyleSheetId(), $this->object->getType()));
-
+					$this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId()));
+// fau.
 				$ret = $this->ctrl->forwardCommand($pgui);
 				if($ret)
 				{

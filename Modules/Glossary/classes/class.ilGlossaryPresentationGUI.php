@@ -318,8 +318,12 @@ class ilGlossaryPresentationGUI
 			$this->tpl->setCurrentBlock("ContentStyle");
 			if (!$this->offlineMode())
 			{
+// fau: inheritContentStyle - get the effective content style by ref_id
 				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-					ilObjStyleSheet::getContentStylePath($this->glossary->getStyleSheetId()));
+					ilObjStyleSheet::getContentStylePath(
+						ilObjStyleSheet::getEffectiveContentStyleId(
+							$this->glossary->getStyleSheetId(), $this->glossary->getType(), $this->glossary->getRefId())));
+// fau.
 			}
 			else
 			{
@@ -458,8 +462,12 @@ class ilGlossaryPresentationGUI
 			$tpl->setCurrentBlock("ContentStyle");
 			if (!$this->offlineMode())
 			{
-				$tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-					ilObjStyleSheet::getContentStylePath($this->glossary->getStyleSheetId()));
+// fau: inheritContentStyle - get the effective content style by ref_id
+				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
+					ilObjStyleSheet::getContentStylePath(
+						ilObjStyleSheet::getEffectiveContentStyleId(
+							$this->glossary->getStyleSheetId(), $this->glossary->getType(), $this->glossary->getRefId())));
+// fau.
 			}
 			else
 			{
@@ -527,7 +535,10 @@ class ilGlossaryPresentationGUI
 			$page_gui = new ilGlossaryDefPageGUI($def["id"]);
 			$page_gui->setGlossary($this->glossary);
 			$page_gui->setOutputMode($a_page_mode);
-			$page_gui->setStyleId($this->glossary->getStyleSheetId());
+// fau: inheritContentStyle - get the effective content style for the page
+			$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
+				$this->glossary->getStyleSheetId(), 'glo', $this->glossary->getRefId()));
+// fau.
 			$page = $page_gui->getPageObject();
 
 			// internal links
@@ -734,8 +745,12 @@ class ilGlossaryPresentationGUI
 		$this->tpl = new ilTemplate("tpl.fullscreen.html", true, true, "Services/COPage");
 		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$this->tpl->setVariable("LOCATION_STYLESHEET", ilUtil::getStyleSheetLocation());
+// fau: inheritContentStyle - get the effective content style by ref_id
 		$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->glossary->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath(
+				ilObjStyleSheet::getEffectiveContentStyleId(
+					$this->glossary->getStyleSheetId(), $this->glossary->getType(), $this->glossary->getRefId())));
+// fau.
 
 		//$int_links = $page_object->getInternalLinks();
 		$med_links = ilMediaItem::_getMapAreasIntLinks($_GET["mob_id"]);

@@ -647,8 +647,10 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 				$ilTabs->setBackTarget($lng->txt("back"),
 					$ilCtrl->getLinkTarget($this, ""));
 
+// fau: inheritContentStyle - add ref_id
 				$style_sheet_id = ilObjStyleSheet::getEffectiveContentStyleId(
-					$this->object->getStyleSheetId(), "blog");
+					$this->object->getStyleSheetId(), "blog", $this->object->getRefId());
+// fau.
 
 				include_once("./Modules/Blog/classes/class.ilBlogPostingGUI.php");
 				$bpost_gui = new ilBlogPostingGUI($this->node_id,
@@ -3442,8 +3444,12 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		}
 
 		$ctpl->setCurrentBlock("ContentStyle");
+// fau: inheritContentStyle - get the effective content style by ref_id
 		$ctpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath(
+			    ilObjStyleSheet::getEffectiveContentStyleId(
+			        $this->object->getStyleSheetId(), $this->object->getType(), $this->object->getRefId())));
+// fau.
 		$ctpl->parseCurrentBlock();
 	}
 	
@@ -3495,7 +3501,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$st->setValue(ilObject::_lookupTitle($style_id));
 					$form->addItem($st);
 
-					// delete command
+                    // delete command
 					$form->addCommandButton("editStyle", $this->lng->txt("style_edit_style"));
 					$form->addCommandButton("deleteStyle", $this->lng->txt("style_delete_style"));
 				}
@@ -3512,6 +3518,18 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 				$form->addCommandButton("saveStyleSettings", $this->lng->txt("save"));
 				$form->addCommandButton("createStyle", $this->lng->txt("sty_create_ind_style"));
 			}
+
+// fau: inheritContentStyle - add inheritance properties to the form
+			if ($style_id <= 0) {
+                $parent_usage = ilObjStyleSheet::getEffectiveParentStyleUsage($this->ref_id);
+                if (!empty($parent_usage)) {
+                    $pu = new ilNonEditableValueGUI($this->lng->txt('sty_inherited_from'));
+                    $pu->setInfo($this->lng->txt('sty_inherited_from_info'));
+                    $pu->setValue(ilObject::_lookupTitle($parent_usage['obj_id']));
+                    $form->addItem($pu);
+                }
+            }
+// fau.
 		}
 		
 		$form->setTitle($this->lng->txt("blog_style"));
