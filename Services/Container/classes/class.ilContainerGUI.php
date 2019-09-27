@@ -3675,10 +3675,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$desc = new ilTextAreaInputGUI($this->lng->txt("description"), "desc");
 		$desc->setRows(2);
 		$desc->setCols(40);
-		if(is_object($trans))
-		{
-			$desc->setValue($trans->getDefaultDescription());
-		}
+// fau: fixContainerLongDescription - use the long description for edit forms
+        $desc->setValue($this->object->getLongDescription());
+// fau.
 		$form->addItem($desc);
 	}
 
