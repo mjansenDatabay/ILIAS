@@ -900,24 +900,31 @@ class ilSurveyParticipantsGUI
 					// unique code?
 					if(!array_key_exists($code, $existing))
 					{
-						// could be date or datetime
-						if(strlen($created) == 10)
-						{
-							$created = new ilDate($created, IL_CAL_DATE);						
+// fau: fixImportSurveyCodes - ignore the line with column names
+						try {
+							// could be date or datetime
+							if(strlen($created) == 10)
+							{
+								$created = new ilDate($created, IL_CAL_DATE);
+							}
+							else
+							{
+								$created = new ilDateTime($created, IL_CAL_DATETIME);
+							}
+							$created = $created->get(IL_CAL_UNIX);
+
+							$user_data = array(
+								"email" => $email
+								,"lastname" => $last_name
+								,"firstname" => $first_name
+							);
+							$this->object->importSurveyCode($code, $created, $user_data);
 						}
-						else
-						{
-							$created = new ilDateTime($created, IL_CAL_DATETIME);
+						catch (ilDateTimeException $e) {
+							continue;
 						}
-						$created = $created->get(IL_CAL_UNIX);
-						
-						$user_data = array(
-							"email" => $email
-							,"lastname" => $last_name
-							,"firstname" => $first_name
-						);			
-						$this->object->importSurveyCode($code, $created, $user_data);						
-					}					
+// fau.
+					}
 				}				
 			}						
 			
