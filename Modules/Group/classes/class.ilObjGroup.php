@@ -786,7 +786,7 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 		}
 // fau.
 
-		// fim: [memad] check deny time for registration
+// fau: regPeriod - check deny time for registration
 		if (!$this->isRegistrationUnlimited())
 		{
 
@@ -808,7 +808,7 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 				}
 			}
 		}
-		// fim.
+// fau.
 		if($this->isMembershipLimited())
 		{
 			if($this->getMinMembers() <= 0 && $this->getMaxMembers() <= 0)

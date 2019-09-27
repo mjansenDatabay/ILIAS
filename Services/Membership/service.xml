@@ -7,10 +7,10 @@
 		<cron id="mem_notification" class="ilMembershipCronNotifications" />
 		<cron id="mem_min_members" class="ilMembershipCronMinMembers" />
 	</crons>
-    <!-- fim: [rpl] add registration period limiter -->
+<!-- fau: regPeriod - add registration period limiter -->
     <baseclasses>
         <baseclass name="ilRegistrationPeriodLimiterGUI" dir="classes" />
     </baseclasses>
-    <!-- fim. -->
+<!-- fau. -->
 	<logging />
 </service>

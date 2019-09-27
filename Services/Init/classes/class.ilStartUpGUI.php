@@ -1922,10 +1922,10 @@ class ilStartUpGUI
 	 */
 	protected function getAcceptance()
 	{
-		// fim: [layout] use standard main menu, but don't show links
+// fau: pageLayout - use standard main menu, but don't show links
 		global $ilMainMenu;
 		$ilMainMenu->showLogoOnly(true);
-		// fim.
+// fau.
 
 		$this->showTermsOfService();
 	}
@@ -2334,43 +2334,45 @@ class ilStartUpGUI
 		include_once("./Services/UICore/classes/class.ilUIFramework.php");
 		ilUIFramework::init();
 
-		// fim: [layout] use customized startup template with added standard main menu
+// fau: pageLayout - use customized startup template with added standard main menu
 		global $ilMainMenu;
 		$tpl->addBlockfile('CONTENT', 'content', 'tpl.startup_screen.html', 'Services/Init');
 		$tpl->setCurrentBlock('menu_block');
 		$tpl->setVariable("MAINMENU", $ilMainMenu->getHTML());
 		$tpl->setVariable("MAINMENU_SPACER", $ilMainMenu->getSpacerClass());
 		$tpl->parseCurrentBlock();
-		// fim.
+// fau.
 
-		/* fim: [layout] don't show back or logout link (main menu is presented)
-		if($a_show_back)
-		{
-			// #13400
-			$param = 'client_id=' . $_COOKIE['ilClientId'] . '&lang=' . $lng->getLangKey();
-			
-			$tpl->setCurrentBlock('link_item_bl');
-			$tpl->setVariable('LINK_TXT', $lng->txt('login_to_ilias'));
-			$tpl->setVariable('LINK_URL', 'login.php?cmd=force_login&'.$param);
-			$tpl->parseCurrentBlock();
-
-			include_once './Services/Init/classes/class.ilPublicSectionSettings.php';
-			if(ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) &&
-				$ilAccess->checkAccessOfUser(ANONYMOUS_USER_ID, 'read', '', ROOT_FOLDER_ID))
-			{
-				$tpl->setVariable('LINK_URL', 'index.php?'.$param);
-				$tpl->setVariable('LINK_TXT', $lng->txt('home'));
-				$tpl->parseCurrentBlock();
-			}
-		}
-		else if($a_show_logout)
-		{
-			$tpl->setCurrentBlock('link_item_bl');
-			$tpl->setVariable('LINK_TXT', $lng->txt('logout'));
-			$tpl->setVariable('LINK_URL', ILIAS_HTTP_PATH . '/logout.php');
-			$tpl->parseCurrentBlock();
-		}
-		fim. */
+// fau: pageLayout - don't show back or logout link (main menu is presented)
+//
+//		if($a_show_back)
+//		{
+//			// #13400
+//			$param = 'client_id=' . $_COOKIE['ilClientId'] . '&lang=' . $lng->getLangKey();
+//
+//			$tpl->setCurrentBlock('link_item_bl');
+//			$tpl->setVariable('LINK_TXT', $lng->txt('login_to_ilias'));
+//			$tpl->setVariable('LINK_URL', 'login.php?cmd=force_login&'.$param);
+//			$tpl->parseCurrentBlock();
+//
+//			include_once './Services/Init/classes/class.ilPublicSectionSettings.php';
+//			if(ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) &&
+//				$ilAccess->checkAccessOfUser(ANONYMOUS_USER_ID, 'read', '', ROOT_FOLDER_ID))
+//			{
+//				$tpl->setVariable('LINK_URL', 'index.php?'.$param);
+//				$tpl->setVariable('LINK_TXT', $lng->txt('home'));
+//				$tpl->parseCurrentBlock();
+//			}
+//		}
+//		else if($a_show_logout)
+//		{
+//			$tpl->setCurrentBlock('link_item_bl');
+//			$tpl->setVariable('LINK_TXT', $lng->txt('logout'));
+//			$tpl->setVariable('LINK_URL', ILIAS_HTTP_PATH . '/logout.php');
+//			$tpl->parseCurrentBlock();
+//		}
+//
+// fau.
 
 		if(is_array($a_tmpl))
 		{
@@ -2383,27 +2385,28 @@ class ilStartUpGUI
 			$template_dir  = 'Services/Init';
 		}
 
-		/* fim: [layout] header title and language selection is set by standard main menu
-		//Header Title
-		include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
-		$header_top_title = ilObjSystemFolder::_getHeaderTitle();
-		if (trim($header_top_title) != "" && $tpl->blockExists("header_top_title"))
-		{
-			$tpl->setCurrentBlock("header_top_title");
-			$tpl->setVariable("TXT_HEADER_TITLE", $header_top_title);
-			$tpl->parseCurrentBlock();
-		}
-
-		// language selection
-		$selection = self::getLanguageSelection();
-		if($selection)
-		{
-			$tpl->setCurrentBlock("lang_select");
-			$tpl->setVariable("TXT_LANGSELECT", $lng->txt("language"));
-			$tpl->setVariable("LANG_SELECT", $selection);
-			$tpl->parseCurrentBlock();
-		}
-		fim. */
+// fau: pageLayout - header title and language selection is set by standard main menu
+//
+//		//Header Title
+//		include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
+//		$header_top_title = ilObjSystemFolder::_getHeaderTitle();
+//		if (trim($header_top_title) != "" && $tpl->blockExists("header_top_title"))
+//		{
+//			$tpl->setCurrentBlock("header_top_title");
+//			$tpl->setVariable("TXT_HEADER_TITLE", $header_top_title);
+//			$tpl->parseCurrentBlock();
+//		}
+//
+//		// language selection
+//		$selection = self::getLanguageSelection();
+//		if($selection)
+//		{
+//			$tpl->setCurrentBlock("lang_select");
+//			$tpl->setVariable("TXT_LANGSELECT", $lng->txt("language"));
+//			$tpl->setVariable("LANG_SELECT", $selection);
+//			$tpl->parseCurrentBlock();
+//		}
+// fau.
 
 		$tpl->addBlockFile('STARTUP_CONTENT', 'startup_content', $template_file, $template_dir);
 	}

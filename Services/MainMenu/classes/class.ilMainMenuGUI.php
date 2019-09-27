@@ -431,7 +431,7 @@ class ilMainMenuGUI
             $this->tpl->setVariable("HEADER_ICON_RESPONSIVE", ilUtil::getImagePath("HeaderIconResponsive.svg"));
         }
 
-		// fim: [layout] don't show links in reduced mode
+// fau: pageLayout - don't show links in reduced mode
 
 		if (ilCust::get('ilias_footer_type') != 'exam')
 		{
@@ -446,7 +446,7 @@ class ilMainMenuGUI
 				$this->tpl->parseCurrentBlock();
 			}
 		}
-		// fim.
+// fau.
 
 		$this->tpl->setVariable("TXT_MAIN_MENU", $lng->txt("main_menu"));
 
@@ -556,9 +556,9 @@ class ilMainMenuGUI
         $main_tpl = $this->main_tpl;
 
         // screen id
-		// fim: [help] make showing of ids independent from author mode
+// fau - showHelpIds -  make showing of ids independent from author mode
 		if (ilCust::get("help_show_ids")) {
-		// fim.
+// fau.
             if ($ilHelp->getScreenId() != "") {
                 if ($this->getMode() == self::MODE_FULL) {
                     $this->tpl->setCurrentBlock("screen_id");

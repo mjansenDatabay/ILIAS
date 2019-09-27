@@ -1,13 +1,5 @@
 <?php
-
-/**
- * fim
- * Institut für Lern-Innovation
- * Friedrich-Alexander-Universität
- * Erlangen-Nürnberg
- * Germany
- * Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE
- */
+// fau: regPeriod - class to show registration startings
 
 /**
  * Registration period limiter GUI class.

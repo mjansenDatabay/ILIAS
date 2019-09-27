@@ -232,8 +232,8 @@ class ilObjectGUI
 			$this->prepareOutput();
 		}
 	}
-	
-	// fim: [help] show a helptext box for the new type
+
+// fau: showTypeHelptext - function to show a helptext box for the new type
 	function showTypeHelptext()
 	{
 		if ($this->getCreationMode())
@@ -263,7 +263,7 @@ class ilObjectGUI
 
 		$this->tpl->setRightContent($tpl->get());
 	}
-	// fim.
+// fau.
 	
 	/**
 	 * Get object service
@@ -926,9 +926,9 @@ class ilObjectGUI
 			}
 			$tpl->setContent($this->getCreationFormsHTML($forms));
 
-			// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 			$this->showTypeHelptext();
-			// fim.
+// fau.
 		}
 	}
 
@@ -1239,10 +1239,10 @@ class ilObjectGUI
 		// display only this form to correct input
 		$form->setValuesByPost();
 		$tpl->setContent($form->getHtml());
-		
-		// fim: [help] add create info
+
+// fau: showTypeHelptext - add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
 	}
 	
 	/**
@@ -1362,9 +1362,9 @@ class ilObjectGUI
 		
 		$tpl->setContent($form->getHTML());
 
-		// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
 	}
 
 	public function addExternalEditFormCustom(ilPropertyFormGUI $a_form)
@@ -1474,10 +1474,10 @@ class ilObjectGUI
 		$ilTabs->activateTab("settings");
 		$form->setValuesByPost();
 		$tpl->setContent($form->getHtml());
-		
-		// fim: [help] add create info
+
+// fau: showTypeHelptext - add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
 	}
 	
 	/**

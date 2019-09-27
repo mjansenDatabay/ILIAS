@@ -647,12 +647,12 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			// fim.
 		}
 		
-		// fim: [portal] don't show permanent link on root page
+// fau: rootIsReduced - don't show permanent link on root page
 		if ($this->object->getType() != 'root')
 		{
 			$this->showPermanentLink();
 		}
-		// fim.
+// fau.
 
 		// add tree updater javascript
 		if ((int) $_GET["ref_id"] > 1 && $ilSetting->get("rep_tree_synchronize"))

@@ -3399,16 +3399,16 @@ class ilUtil
 		// locale is provided and mb string functions are supported
 		if ($array_sortorder == "asc")
 		{
-			// fim: [sort] use case sensitive string compare
+// fau: sortCase - use case sensitive string compare
 			return ilStr::strCmpCaseSensitive($a[$array_sortby], $b[$array_sortby]);
-			// fim.
+// fau.
 		}
 
 		if ($array_sortorder == "desc")
 		{
-			// fim: [sort] use case sensitive string compare
+// fau: sortCase - use case sensitive string compare
 			return !ilStr::strCmpCaseSensitive($a[$array_sortby], $b[$array_sortby]);
-			// fim.
+// fau.
 			return strcoll(ilStr::strToUpper($b[$array_sortby]), ilStr::strToUpper($a[$array_sortby]));
 		}
 	}

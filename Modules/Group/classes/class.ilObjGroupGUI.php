@@ -780,7 +780,7 @@ class ilObjGroupGUI extends ilContainerGUI
 			// update object settings
 			$this->object->update();
 
-			//fim: [rpl] check the status of the registration for this period
+// fau: regPeriod - check the status of the registration for this period
 
 			if(ilCust::get('rpl_warning_on') and !$this->object->isRegistrationUnlimited())
 			{
@@ -793,7 +793,7 @@ class ilObjGroupGUI extends ilContainerGUI
 					ilUtil::sendFailure($message, true);
 				}
 			}
-			//fim.
+// fau.
 
 			include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
 			ilObjectServiceSettingsGUI::updateServiceSettingsForm(
@@ -1957,8 +1957,7 @@ class ilObjGroupGUI extends ilContainerGUI
 			$dur->setShowTime(true);
 			$dur->setStart($this->object->getRegistrationStart());
 			$dur->setEnd($this->object->getRegistrationEnd());
-			// fim: [memad] show deny time for registration
-			// fim: [rpl] check the status of the registration for this period
+// fau: regPeriod - check the status of the registration for this period
 			$info = array();
 
 			$deny_regstart_from = ilCust::get('ilias_deny_regstart_from');
@@ -1979,7 +1978,7 @@ class ilObjGroupGUI extends ilContainerGUI
 				$info[] = ilRegistrationPeriodLimiter::_getOverviewLink($this->object->getRegistrationStart());
 			}
 			$dur->setInfo(implode('<br />', $info));
-			// fim.
+// fau.
 			$form->addItem($dur);
 			
 			// cancellation limit		

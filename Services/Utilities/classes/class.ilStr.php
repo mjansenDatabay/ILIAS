@@ -148,13 +148,19 @@ class ilStr
 		}
 	}
 
-	// fim: [sort] new function to compare two string case sensitive
+// fau: sortCase - new function to compare two string case sensitive
 	/**
 	 * Compare two string case sensitive
 	 */
 	static function strCmpCaseSensitive($a, $b)
 	{
-		global $ilCollator;
+		global $DIC;
+
+		$ilCollator = null;
+		if (isset($DIC["ilCollator"]))
+		{
+			$ilCollator = $DIC["ilCollator"];
+		}
 
 		if (is_object($ilCollator))
 		{
@@ -166,7 +172,7 @@ class ilStr
 		}
 
 	}
-	// fim.
+// fau.
 	
 	/**
 	 * Shorten text to the given number of bytes.

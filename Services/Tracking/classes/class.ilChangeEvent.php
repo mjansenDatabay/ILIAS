@@ -512,13 +512,6 @@ class ilChangeEvent
 	 */
 	static function _catchupWriteEvents($obj_id, $usr_id, $timestamp = null)
 	{
-		// fim: [performance] don't catchup write events if change event tracking is not enabled
-		if (!self::_isActive())
-		{
-			return;
-		}
-		// fim.
-		
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];

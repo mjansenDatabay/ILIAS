@@ -1320,7 +1320,7 @@ class ilObjCourseGUI extends ilContainerGUI
 			}
 // fau.
 
-			// fim: [rpl] check the status of the registration for this period
+// fau: regPeriod - check the status of the registration for this period
 
 			if(ilCust::get('rpl_warning_on') and $this->object->getSubscriptionLimitationType() == IL_CRS_SUBSCRIPTION_LIMITED)
 			{
@@ -1349,7 +1349,7 @@ class ilObjCourseGUI extends ilContainerGUI
 					ilEvaluationData::_setObjMarkedForEvaluation($this->object, false);
 				}
 			}
-			// fim.
+// fau.
 
 		if(!$old_autofill && $this->object->hasWaitingListAutoFill())
 		{
@@ -1686,8 +1686,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		{
 			$sdur->setEnd(new ilDateTime($this->object->getSubscriptionEnd(),IL_CAL_UNIX));			
 		}
-		// fim: [rpl] check the status of the registration for this period
-		// fim: [memad] show deny time for registration
+// fau: regPeriod - check the status of the registration for this period
 
 		$info = array();
 		$deny_regstart_from = ilCust::get('ilias_deny_regstart_from');
@@ -1707,7 +1706,7 @@ class ilObjCourseGUI extends ilContainerGUI
 			$info[] = ilRegistrationPeriodLimiter::_getOverviewLink((int)$this->object->getSubscriptionStart());
 		}
 		$sdur->setInfo(implode(' ', $info));
-		// fim.
+// fau.
 		$form->addItem($sdur);
 		
 		// cancellation limit		

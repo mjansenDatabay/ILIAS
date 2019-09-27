@@ -1738,9 +1738,9 @@ class ilObjSurveyGUI extends ilObjectGUI
 				$this->tpl->parseCurrentBlock();
 			}
 
-			// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 			$this->showTypeHelptext();
-			// fim.
+// fau.
 		}
 		
 		// display form to correct errors

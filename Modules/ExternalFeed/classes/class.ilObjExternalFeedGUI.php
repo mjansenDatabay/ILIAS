@@ -104,9 +104,9 @@ class ilObjExternalFeedGUI extends ilObjectGUI
 		$ilCtrl->setCmdClass("ilexternalfeedblockgui");
 		$ilCtrl->setCmd("create");
 
-		// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
 
 		return $this->executeCommand();
 	}

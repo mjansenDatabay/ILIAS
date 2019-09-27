@@ -45,14 +45,6 @@ class ilSessionStatistics
 
 		$ilDB = $DIC['ilDB'];
 
-        // fim: [performance] don't write seesion statistics for fixed handling
-        global $ilSetting;
-        if ($ilSetting->get('session_handling_type') == ilSession::SESSION_HANDLING_FIXED)
-        {
-            return;
-        }
-        // fim.
-
 		if(!$a_user_id || !$a_session_id || !self::isActive())
 		{
 			return;
@@ -86,20 +78,7 @@ class ilSessionStatistics
 		global $DIC;
 		
 		$ilDB = $DIC['ilDB'];
-		
-		// fim: [performance] don't write seesion statistics for fixed handling
-		$ilSetting = $DIC['ilSetting'];
-		if ($ilSetting->get('session_handling_type') == ilSession::SESSION_HANDLING_FIXED)
-		{
-			return;
-		}
-		// fim.
 
-
-		global $DIC;
-
-		$ilDB = $DIC['ilDB'];
-		
 		if(!self::isActive())
 		{
 			return;
@@ -300,14 +279,6 @@ class ilSessionStatistics
 	 */
 	public static function aggretateRaw($a_now)
 	{
-        // fim: [performance] don't write seesion statistics for fixed handling
-        global $ilSetting;
-        if ($ilSetting->get('session_handling_type') == ilSession::SESSION_HANDLING_FIXED)
-        {
-            return;
-        }
-        // fim.
-
 		if(!self::isActive())
 		{
 			return;

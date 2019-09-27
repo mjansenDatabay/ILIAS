@@ -773,10 +773,10 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$this->object = new ilObjSession();
 		}
 		$this->initForm('create');
-		return $this->form;
-		// fim: [help] add create info
+// fau: showTypeHelptext -  add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
+		return $this->form;
 	}
 
 	/**

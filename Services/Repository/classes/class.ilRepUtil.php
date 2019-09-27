@@ -245,7 +245,7 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 			// fim.
 
 			// BEGIN ChangeEvent: Record remove from system.
-			// fim: [trash] record write event only if parent
+			// fim: [trash] record write event only if ref_id exists
 			if ($node_data['ref_id'])
 			{
 				require_once('Services/Tracking/classes/class.ilChangeEvent.php');

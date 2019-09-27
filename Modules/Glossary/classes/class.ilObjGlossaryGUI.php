@@ -411,9 +411,9 @@ class ilObjGlossaryGUI extends ilObjectGUI
 
 		return $form;
 
-		// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
 	}
 	
 	function importObject()

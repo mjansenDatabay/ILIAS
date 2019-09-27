@@ -586,9 +586,7 @@ class ilPersonalSettingsGUI
 			
 			$options = array(
 				"y" => $this->lng->txt("users_online_show_y"),
-				// fim: [performance] prevent showing associated users online
-				// "associated" => $this->lng->txt("users_online_show_associated"),
-				// fim.
+				"associated" => $this->lng->txt("users_online_show_associated"),
 				"n" => $this->lng->txt("users_online_show_n"));
 			$si->setOptions($options);
 			$si->setValue($ilUser->prefs["show_users_online"]);

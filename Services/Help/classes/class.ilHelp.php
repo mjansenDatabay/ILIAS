@@ -56,13 +56,13 @@ class ilHelp
 		if ($rec["tt_text"] != "")
 		{
 			$t = $rec["tt_text"];
-			// fim: [help] make showing of ids independent from OH_REF_ID
+// fau - showHelpIds - make showing of ids independent from OH_REF_ID
 
 			if (ilCust::get("help_show_ids"))
 			{
 				$t.="<br/><i class='small'>".$a_tt_id."</i>";
 			}
-			// fim.
+// fau.
 			return $t;
 		}
 		else // try to get general version
@@ -77,23 +77,23 @@ class ilHelp
 			if ($rec["tt_text"] != "")
 			{
 				$t = $rec["tt_text"];
-				// fim: [help] make showing of ids independent from OH_REF_ID
+// fau - showHelpIds - make showing of ids independent from OH_REF_ID
 
 				if (ilCust::get("help_show_ids"))
 				{
 					$t.="<br/><i class='small'>".$a_tt_id."</i>";
 				}
-				// fim.
+// fau.
 				return $t;
 			}
 		}
-		// fim: [help] make showing of ids independent from OH_REF_ID
+// fau - showHelpIds - make showing of ids independent from OH_REF_ID
 
 		if (ilCust::get("help_show_ids"))
 		{
 			return "<i>".$a_tt_id."</i>";
 		}
-		// fim.
+// fau.
 		return "";
 	}
 

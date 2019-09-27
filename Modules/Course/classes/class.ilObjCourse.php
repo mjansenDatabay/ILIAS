@@ -1293,7 +1293,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		}
 // fau.
 
-		// fim: [memad] check deny time for registration
+// fau: regPeriod - check deny time for registration
 		if($this->getSubscriptionLimitationType() == IL_CRS_SUBSCRIPTION_LIMITED)
 		{
 
@@ -1314,7 +1314,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 				}
 			}
 		}
-		// fim.
+// fau.
 
 		#if((!$this->getActivationUnlimitedStatus() and
 		#	!$this->getSubscriptionUnlimitedStatus()) and

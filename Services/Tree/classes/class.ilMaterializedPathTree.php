@@ -559,7 +559,7 @@ class ilMaterializedPathTree implements ilTreeImplementation
 		// The idea is to use a subquery to join and filter the trees, and only the result
 		// is joined to obj_reference and obj_data.
 		
-		// fim: [performance] split slow subtree query in two queries
+// fim: subtreeQuery - split slow subtree query in two queries
 		// first query for the path of the given node
 		$query = "SELECT t1.path FROM ".$this->getTree()->getTreeTable(). " t1 " .
 				" WHERE t1.child = " . $ilDB->quote($a_endnode_id, 'integer') .
@@ -583,7 +583,7 @@ class ilMaterializedPathTree implements ilTreeImplementation
 				"WHERE t2.path BETWEEN " . $ilDB->quote($path, 'text') . " AND " .$ilDB->quote($path.'.Z', 'text').
 				"AND t2." . $this->getTree()->getTreePk() . " = " . $ilDB->quote($this->getTree()->getTreeId(), 'integer') . " " .
 				"ORDER BY t2.path";
-        // fim.
+// fau.
 
  		$res = $ilDB->query($query);
 		$nodes = array();

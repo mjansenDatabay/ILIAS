@@ -530,7 +530,7 @@ class ilUserUtil
 
 		//configuration by user preference
 		#21782
-		// fim: [layout] use personal startingPoint only for logged in users
+// fau: pageLayout - use personal startingPoint only for logged in users
 		// needed, because studon logo is linked with starting point
 		if (!$ilUser->getId() or $ilUser->getId() == ANONYMOUS_USER_ID)
 		{
@@ -538,7 +538,7 @@ class ilUserUtil
 
 		}
 		elseif(self::hasPersonalStartingPoint() && $ilUser->getPref('usr_starting_point') != NULL)
-		// fim.
+// fau.
 		{
 			$current = self::getPersonalStartingPoint();
 			if($current == self::START_REPOSITORY_OBJ)

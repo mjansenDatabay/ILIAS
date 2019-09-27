@@ -366,21 +366,21 @@ class ilUserQuery
 		$count_query = $count_query." ".
 			$join;
 
-        // fim: [performance] build optimized user query for role
+// fau: userQuery -  build optimized user query for role
+        $role_join = '';
+        $role_cond = '';
+
         if ($this->role > 0)
         {
             $role_join = " INNER JOIN rbac_ua ON usr_data.usr_id = rbac_ua.usr_id";
             $role_cond = " AND rbac_ua.rol_id = ".$ilDB->quote($this->role, "integer");
-
-            $query.= $role_join;
-            $count_query.= $role_join;
         }
-        // fim.
 
+        $query.= $role_join;
+        $count_query.= $role_join;
 
-		// filter
-
-		// fim: [bugfix] apply user filter also to count query
+        // apply user filter also to count query
+        // excluding anonymous user is not needed if user filter is active
 		if($this->users and is_array(($this->users)))
 		{
 			$where = ' WHERE '.$ilDB->in('usr_data.usr_id',$this->users,false,'integer');
@@ -390,16 +390,10 @@ class ilUserQuery
             $where = " WHERE usr_data.usr_id <> ".$ilDB->quote(ANONYMOUS_USER_ID, "integer");
         }
 
-        $query .= $where;
-		$count_query.=  $where;
+        $query .= $where . $role_cond;
+		$count_query.=  $where . $role_cond;
         $where = " AND";
-        // fim.
-
-
-        // fim: [performance] apply optimized user query for role
-        $query .= $role_cond;
-        $count_query.= $role_cond;
-        // fim.
+// fau.
 
 		if ($this->first_letter != "")
 		{
@@ -521,7 +515,7 @@ class ilUserQuery
 			$where = " AND";
 		}
 
-        // fim: [performance] omit old user query for roles
+// fau: userQuery - omit old user query for roles
 //		if ($this->role > 0)		// global role
 //		{
 //			$add = $where." usr_data.usr_id IN (".
@@ -532,7 +526,7 @@ class ilUserQuery
 //			$count_query.= $add;
 //			$where = " AND";
 //		}
-        // fim.
+// fau.
 		
 		if($this->user_folder)
 		{

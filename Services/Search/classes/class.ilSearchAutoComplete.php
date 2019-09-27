@@ -68,14 +68,14 @@ class ilSearchAutoComplete
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		// fim: [search] customize the availability of auto-complete function
 
+// fau: searchAutoComplete - customize the availability of auto-complete function
 		if (!ilCust::get("search_enable_autocomplete"))
 		{
 			include_once './Services/JSON/classes/class.ilJsonUtil.php';
 			return ilJsonUtil::encode(array());
 		}
-		// fim.
+// fau.
 
 		include_once './Services/Search/classes/class.ilSearchSettings.php';
 		if(ilSearchSettings::getInstance()->enabledLucene())

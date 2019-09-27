@@ -192,9 +192,9 @@ class ilContainerReferenceGUI extends ilObjectGUI
 			$ilErr->raiseError($this->lng->txt("permission_denied"),$ilErr->MESSAGE);
 		}
 
-		// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 		$this->showTypeHelptext();
-		// fim.
+// fau.
 
 		$form = $this->initForm(self::MODE_CREATE);
 		$this->tpl->setContent($form->getHTML());

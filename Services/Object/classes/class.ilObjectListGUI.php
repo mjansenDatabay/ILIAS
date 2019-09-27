@@ -1225,10 +1225,7 @@ class ilObjectListGUI
 		// ...
 		
 		// #8280: WebDav is only supported in repository
-		// fim: [webdav] customize visibility of locking info and warnings
-
-		if($this->context == self::CONTEXT_REPOSITORY and ilCust::get('webdav_show_warnings'))
-		// fim.
+		if($this->context == self::CONTEXT_REPOSITORY)
 		{
 			// add centralized offline status
 			if(ilObject::lookupOfflineStatus($this->obj_id))
@@ -1243,7 +1240,9 @@ class ilObjectListGUI
 
 			// BEGIN WebDAV Display locking information
 			require_once ('Services/WebDAV/classes/class.ilDAVActivationChecker.php');
-			if (ilDAVActivationChecker::_isActive())
+			// fim: [webdav] customize visibility of locking info and warnings
+			if (ilDAVActivationChecker::_isActive() && ilCust::get('webdav_show_warnings'))
+			// fim.
 			{
 				// Show lock info
 				require_once('Services/WebDAV/classes/lock/class.ilWebDAVLockBackend.php');
@@ -2670,13 +2669,8 @@ class ilObjectListGUI
 							? $command["txt"]
 							: $this->lng->txt($command["lang_var"]);
 
-						// fim: [layout] remember mount_webfolder command
-						if ($command["cmd"] == "mount_webfolder")
-						{
-							$mountcommand = $command;
-							$mountcommand["txt"] = $txt;
-						}
-						else
+						// fim: [webdav] don't show webfolder command
+						if ($command["cmd"] != "mount_webfolder")
 						{
 							$this->insertCommand($cmd_link, $txt,
 								$command["frame"], $command["img"], $command["cmd"]);
@@ -3253,15 +3247,6 @@ class ilObjectListGUI
 				$htpl->setVariable("PROP_CHUNKS", 
 					implode("&nbsp;&nbsp;&nbsp;", $chunks)."&nbsp;&nbsp;&nbsp;");
 			}
-
-			// fim: [layout] insert remembered mount command
-			if ($mountcommand)
-			{
-				$this->insertCommand($mountcommand['link'], $mountcommand['txt'],
-								$mountcommand["frame"], $mountcommand["img"], $mountcommand["cmd"]);
-			}
-			// fim.
-
 		}
 		
 		$htpl->setVariable("ACTION_DROP_DOWN",

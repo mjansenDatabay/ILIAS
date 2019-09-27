@@ -841,7 +841,7 @@ class ilObjRoleFolderGUI extends ilObjectGUI
 		}
 	}
 
-	// fim: [performance] new function to cleanup the rbac log
+// fau: cleanupRbacLog - new function to cleanup the rbac log
 	/**
 	 * Cleanup the RBAC log
 	 */
@@ -853,18 +853,18 @@ class ilObjRoleFolderGUI extends ilObjectGUI
 		ilUtil::sendSuccess($this->lng->txt("cleanup_rbac_log_finished"), true);
 		$this->ctrl->redirect($this, 'editSettings');
 	}
-	// fim.
+// fau.
 
 	function editSettingsObject(ilPropertyFormGUI $a_form = null)
 	{
-		// fim: [performance] add button to cleanup log
+// fau: cleanupRbacLog - add button to cleanup log
 		global $ilToolbar;
 		$this->lng->loadLanguageModule('ps');
 		$ilToolbar->addButton(
 			$this->lng->txt('cleanup_rbac_log'),
 			$this->ctrl->getLinkTarget($this, 'cleanupRbacLog')
 		);
-		// fim.
+// fau.
 
 		if(!$a_form)
 		{

@@ -1010,7 +1010,7 @@ class ilTree
 
 		// fim: [trash] don't check materialized path trees that are already in trash when being deleted
 		if ($this->__isMainTree() and ($this->getTreeId() >= 0 or is_a($this->getTreeImplementation(), 'ilNestedSetTree')))
-			// fim.
+		// fim.
 		{
 			// @todo normally this part is not executed, since the subtree is first 
 			// moved to trash and then deleted.

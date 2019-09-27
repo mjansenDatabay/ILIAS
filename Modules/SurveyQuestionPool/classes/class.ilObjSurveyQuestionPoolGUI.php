@@ -750,9 +750,9 @@ class ilObjSurveyQuestionPoolGUI extends ilObjectGUI
 			ilUtil::redirect("ilias.php?ref_id=".$newObj->getRefId().
 				"&baseClass=ilObjSurveyQuestionPoolGUI");
 
-			// fim: [help] add create info
+// fau: showTypeHelptext - add create info
 			$this->showTypeHelptext();
-			// fim.
+// fau.
 		}
 		
 		// display form to correct errors

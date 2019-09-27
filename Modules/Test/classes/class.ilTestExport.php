@@ -1113,9 +1113,6 @@ abstract class ilTestExport
 
 		// get Log File
 		$expDir = $this->test_obj->getExportDirectory();
-		// fim: [todo] warnings
-		// echo $expDir;
-		// fim.
 		include_once "./Services/Logging/classes/class.ilLog.php";
 		$expLog = new ilLog($expDir, "export.log");
 		$expLog->delete();

@@ -254,9 +254,9 @@ class ilRbacLog
 
 		$ilDB->query("DELETE FROM rbac_log WHERE ref_id = ".$ilDB->quote($a_ref_id, "integer"));
 
-		// fim: [performance] no rbac_log garbage collection when object is deleted
-		// self::garbageCollection();
-		// fim.
+// fau: cleanupRbacLog - no rbac_log garbage collection when object is deleted
+//		self::garbageCollection();
+// fau.
 	}
 
 	static function garbageCollection()
