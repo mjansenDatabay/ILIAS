@@ -379,7 +379,9 @@ class ilQuestionExporter
 		$this->tpl->setCurrentBlock("textsubset");
 		$this->tpl->setVariable("VAL_ID", $this->json_decoded->id);
 		$this->tpl->setVariable("TXT_SUBMIT_ANSWERS", $this->lng->txt("cont_submit_answers"));
-		$this->tpl->setVariable("VAL_MAXLENGTH", $maxlength);
+// fau: fixTextSubsetInLm - prevent the wrong block to be parsed
+//		$this->tpl->setVariable("VAL_MAXLENGTH", $maxlength);
+// fau.
 		if ($this->preview_mode) {
 			$this->tpl->setVariable("VAL_NO_DISPLAY", "style=\"display:none\"");
 		}
