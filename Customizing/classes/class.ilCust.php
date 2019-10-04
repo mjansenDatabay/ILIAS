@@ -71,8 +71,10 @@ class ilCust
 			{
 				/** @var ilIniFile $ilClientIniFile */
 				$ilClientIniFile = $DIC['ilClientIniFile'];
-				$this->client_settings = $ilClientIniFile->readGroup("customize");
-				$this->client_settings_loaded = true;
+				if ($ilClientIniFile instanceof ilIniFile) {
+                    $this->client_settings = $ilClientIniFile->readGroup("customize");
+                    $this->client_settings_loaded = true;
+                }
 			}
 		}
 
