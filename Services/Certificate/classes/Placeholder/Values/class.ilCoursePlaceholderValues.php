@@ -116,7 +116,28 @@ class ilCoursePlaceholderValues implements ilCertificatePlaceholderValues
 
 		$placeholders['COURSE_TITLE'] = $this->ilUtilHelper->prepareFormOutput($courseObject->getTitle());
 
-		return $placeholders;
+
+// fau: courseDataCert - add custom fields for presentation
+        $olp = ilObjectLP::getInstance($objId);
+        if ($olp->isActive())
+        {
+            $mark = new ilLPMarks($objId, $userId);
+            $this->language->loadLanguageModule('trac');
+            $placeholders["COURSE_USER_MARK"] = $mark->getMark();
+            $placeholders["COURSE_USER_COMMENT"] = $mark->getComment();
+        }
+
+        foreach (ilCourseDefinedFieldDefinition::_getFields($objId) as $field)
+        {
+            $name = str_replace('[', '(', $field->getName());
+            $name = str_replace(']', ')', $name);
+
+            $data = new ilCourseUserData($userId, $field->getId());
+            $placeholders[$name] = $data->getValue();
+        }
+// fau.
+
+        return $placeholders;
 	}
 
 	/**
