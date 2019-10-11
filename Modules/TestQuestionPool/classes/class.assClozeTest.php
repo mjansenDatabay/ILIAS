@@ -1312,12 +1312,6 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 					"value" => $data["value2"]
 				);
 			}
-			// fim: [bugfix] clear previous savings if last one is empty
-			else
-			{
-				unset($user_result[$data["value1"]]);
-			}
-			// fim.
 		}
 		
 		ksort($user_result); // this is required when identical scoring for same solutions is disabled
