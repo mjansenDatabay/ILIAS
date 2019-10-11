@@ -69,10 +69,14 @@ class ilWaitingListTableGUI extends ilTable2GUI
 
 		$this->rep_object = $rep_object;
 
+		$this->setExternalSorting(true);
+		$this->setExternalSegmentation(true);
 		$this->setId('crs_wait_'. $this->getRepositoryObject()->getId());
+		$this->setFormName('waiting');
+		$this->setPrefix('waiting');
+
 		parent::__construct($a_parent_obj,'participants');
 
-		$this->setFormName('waiting');
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj,'participants'));
 
 // fau: fairSub - adjust waiting list columns
@@ -94,6 +98,7 @@ class ilWaitingListTableGUI extends ilTable2GUI
 
 		$this->setPrefix('waiting');
 		$this->setSelectAllCheckbox('waiting',true);
+
 		$this->setRowTemplate("tpl.show_waiting_list_row.html","Services/Membership");
 		
 		$this->enable('sort');
@@ -386,6 +391,7 @@ class ilWaitingListTableGUI extends ilTable2GUI
 			$usr_data_fields[] = $field;
 		}
 
+		$l = $this->getLimit();
 		$usr_data = ilUserQuery::getUserListData(
 			$this->getOrderField(),
 			$this->getOrderDirection(),
@@ -402,7 +408,30 @@ class ilWaitingListTableGUI extends ilTable2GUI
 			$usr_data_fields,
 			$this->wait_user_ids
 		);
-		
+		if (0 === count($usr_data['set']) && $this->getOffset() > 0 && $this->getExternalSegmentation()) {
+			$this->resetOffset();
+
+			$usr_data = ilUserQuery::getUserListData(
+				$this->getOrderField(),
+				$this->getOrderDirection(),
+				$this->getOffset(),
+				$this->getLimit(),
+				'',
+				'',
+				null,
+				false,
+				false,
+				0,
+				0,
+				null,
+				$usr_data_fields,
+				$this->wait_user_ids
+			);
+		}
+
+		ilLoggerFactory::getLogger('mem')->dump($this->wait_user_ids);
+		ilLoggerFactory::getLogger('mem')->dump($usr_data);
+
 		foreach((array) $usr_data['set'] as $user)
 		{
 			$usr_ids[] = $user['usr_id'];
@@ -500,25 +529,17 @@ class ilWaitingListTableGUI extends ilTable2GUI
 		}
 		
 		// Waiting list subscription
-        // fim: [bugfix] avoid overwriting user array
-        foreach($this->wait as $usr_id => $w_data)
+		foreach($this->wait as $usr_id => $wait_usr_data)
 		{
-            // fim: [bugfix] omit waiting list records that are not in user paging limit or offset
-            if (!in_array($usr_id, $usr_ids))
-            {
-                continue;
-            }
-            // fim.
-
-			$a_user_data[$usr_id]['sub_time'] = $w_data['time'];
+			if (isset($a_user_data[$usr_id])) {
+				$a_user_data[$usr_id]['sub_time'] = $wait_usr_data['time'];
 // fau: fairSub - add further data to waiting list table
-			$a_user_data[$usr_id]['subject'] = $w_data['subject'];
-			$a_user_data[$usr_id]['to_confirm'] = $w_data['to_confirm'];
+                $a_user_data[$usr_id]['subject'] = $wait_usr_data['subject'];
+                $a_user_data[$usr_id]['to_confirm'] = $wait_usr_data['to_confirm'];
 // fau.
-
+			}
 		}
-        // fim.
-
+		
 		$this->setMaxCount($usr_data['cnt'] ? $usr_data['cnt'] : 0);
 		return $this->setData($a_user_data);		
 	}

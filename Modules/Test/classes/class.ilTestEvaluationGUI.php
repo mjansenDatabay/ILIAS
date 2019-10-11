@@ -576,7 +576,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 
 		for($pass = 0; $pass <= $data->getParticipant($active_id)->getLastPass(); $pass++)
 		{
-			$finishdate = $this->object->getPassFinishDate($active_id, $pass);
+			$finishdate = ilObjTest::lookupPassResultsUpdateTimestamp($active_id, $pass);
 			if($finishdate > 0)
 			{
 				if(($DIC->access()->checkAccess('write', '', (int)$_GET['ref_id'])))
@@ -1151,7 +1151,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 
 		$template->setVariable("FORMACTION", $this->ctrl->getFormAction($this));
 
-		$this->populatePassFinishDate($template, $this->object->getPassFinishDate($active_id, $pass));
+		$this->populatePassFinishDate($template, ilObjTest::lookupLastTestPassAccess($active_id, $pass));
 
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation("output", "test_print.css", "Modules/Test"), "print");
 		if ($this->object->getShowSolutionAnswersOnly())
@@ -1505,7 +1505,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 			}
 		}
 
-		$this->populatePassFinishDate($tpl, $this->object->getPassFinishDate($active_id, $pass));
+		$this->populatePassFinishDate($tpl, ilObjTest::lookupLastTestPassAccess($active_id, $pass));
 		
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation("output", "test_print.css", "Modules/Test"), "print");
 		if ($this->object->getShowSolutionAnswersOnly())
