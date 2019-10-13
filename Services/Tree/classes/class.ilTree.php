@@ -2206,7 +2206,13 @@ class ilTree
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		
+
+// fau: treeParentCache - check for cached parent
+		if (isset($this->parent_cache[$a_node_id])) {
+			return $this->parent_cache[$a_node_id];
+		}
+// fau.
+
 		if (!isset($a_node_id))
 		{
 			$message = "No node_id given!";
@@ -2222,6 +2228,10 @@ class ilTree
 			$this->tree_id));
 
 		$row = $ilDB->fetchObject($res);
+
+// fau: treeParentCache - cache parent
+		$this->parent_cache[$a_node_id] = $row->parent;
+// fau.
 		return $row->parent;
 	}
 
