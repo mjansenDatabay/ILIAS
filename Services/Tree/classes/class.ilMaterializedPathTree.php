@@ -187,8 +187,6 @@ class ilMaterializedPathTree implements ilTreeImplementation
 				$type_str.' '.
 				'ORDER BY '.$this->getTree()->getTreeTable().'.path';
 
-		log_line('getSubTreeQuery');
-		log_line($query);
 		return $query;
 // fau.
 	}
@@ -608,9 +606,6 @@ class ilMaterializedPathTree implements ilTreeImplementation
 				$treeClause2 . ' ' .
 				"ORDER BY t2.path";
 
-		log_line('getSubtreeInfo');
-		log_line($query);
-
  		$res = $ilDB->query($query);
 		$nodes = array();
 		while ($row = $ilDB->fetchAssoc($res))
@@ -628,7 +623,6 @@ class ilMaterializedPathTree implements ilTreeImplementation
 		}
 // fau.
 
-		log_var($nodes);
 
 		$depth_first_compare = function($a, $b)
 		{
