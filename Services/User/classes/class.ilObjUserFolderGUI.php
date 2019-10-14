@@ -208,7 +208,10 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		$ilTabs = $DIC['ilTabs'];
 
 		include_once("./Services/User/classes/class.ilUserTableGUI.php");
-		$utab = new ilUserTableGUI($this, "view");
+
+// fau: userQuery - don't load the items twice if filter is applied
+		$utab = new ilUserTableGUI($this, "view", ilUserTableGUI::MODE_USER_FOLDER, false);
+// fau.
 		$utab->resetOffset();
 		$utab->writeFilterToSession();
 		$this->viewObject();

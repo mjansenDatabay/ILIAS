@@ -492,34 +492,35 @@ class ilUserQuery
 		}
 		if ($this->no_courses)		// no courses assigned
 		{
-			$add = $where." usr_data.usr_id NOT IN (".
-				"SELECT DISTINCT ud.usr_id ".
-				"FROM usr_data ud join rbac_ua ON (ud.usr_id = rbac_ua.usr_id) ".
-				"JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) ".
-				"WHERE od.title LIKE 'il_crs_%')";
+// fau: userQuery - optimize condition for 'no courses assigned'
+            $add = $where." NOT EXISTS (".
+                "SELECT * FROM rbac_ua INNER JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) ".
+                "WHERE rbac_ua.usr_id = usr_data.usr_id AND od.title LIKE 'il_crs_%')";
+// fau.
 			$query.= $add;
 			$count_query.= $add;
 			$where = " AND";
 		}
 		if ($this->no_groups)		// no groups assigned
 		{
-			$add = $where." usr_data.usr_id NOT IN (".
-				"SELECT DISTINCT ud.usr_id ".
-				"FROM usr_data ud join rbac_ua ON (ud.usr_id = rbac_ua.usr_id) ".
-				"JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) ".
-				"WHERE od.title LIKE 'il_grp_%')";
+// fau: userQuery - optimize condition for 'no groups assigned'
+            $add = $where." NOT EXISTS (".
+                "SELECT * FROM rbac_ua INNER JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) ".
+                "WHERE rbac_ua.usr_id = usr_data.usr_id AND od.title LIKE 'il_grp_%')";
+// fau.
 			$query.= $add;
 			$count_query.= $add;
 			$where = " AND";
 		}
 		if ($this->crs_grp > 0)		// members of course/group
 		{
-			$cgtype = ilObject::_lookupType($this->crs_grp, true);
-			$add = $where." usr_data.usr_id IN (".
-				"SELECT DISTINCT ud.usr_id ".
-				"FROM usr_data ud join rbac_ua ON (ud.usr_id = rbac_ua.usr_id) ".
-				"JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) ".
-				"WHERE od.title = ".$ilDB->quote("il_".$cgtype."_member_".$this->crs_grp, "text").")";
+            $cgtype = ilObject::_lookupType($this->crs_grp, true);
+
+// fau: userQuery - optimize condition for 'members of course/group'
+            $add = $where." EXISTS (".
+                "SELECT * FROM rbac_ua INNER JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) ".
+                "WHERE rbac_ua.usr_id = usr_data.usr_id AND od.title = ".$ilDB->quote("il_".$cgtype."_member_".$this->crs_grp, "text").")";
+// fau.
 			$query.= $add;
 			$count_query.= $add;
 			$where = " AND";
