@@ -148,10 +148,16 @@ class ilMaterializedPathTree implements ilTreeImplementation
 		{
 			$join = $this->getTree()->buildJoin();
 		}
-		
+
 		$fields = '* ';
 		if(count($a_fields))
 		{
+// fau: treeQuery53 - add the tree pk to the queried fields for later filter outside this function
+			if (!in_array($this->getTree()->getTreeTable() . '.' . $this->getTree()->getTreePk(), $a_fields)
+				&& !in_array($this->getTree()->getTreePk(), $a_fields)) {
+					$a_fields[] = $this->getTree()->getTreeTable() . '.' . $this->getTree()->getTreePk();
+			}
+// fau.
 			$fields = implode(',',$a_fields);
 		}
 
@@ -180,7 +186,9 @@ class ilMaterializedPathTree implements ilTreeImplementation
 				$treeClause .
 				$type_str.' '.
 				'ORDER BY '.$this->getTree()->getTreeTable().'.path';
-		
+
+		log_line('getSubTreeQuery');
+		log_line($query);
 		return $query;
 // fau.
 	}
@@ -559,16 +567,32 @@ class ilMaterializedPathTree implements ilTreeImplementation
 		// The idea is to use a subquery to join and filter the trees, and only the result
 		// is joined to obj_reference and obj_data.
 		
-// fim: subtreeQuery - split slow subtree query in two queries
+// fau: subtreeQuery - split slow subtree query in two queries
+//
+// fau: treeQuery53 - don't use tree_id for repository tree
+// this has bad performance on our MariaDB 10.1
+// deleted subtrees may have negative tree_id, the are filtered out afterwards
+
+		// use empty tree clause of tree is repository (this may add deleted items)
+		if ($this->getTree()->getTreeTable() == 'tree' && $this->getTree()->getTreeId() == 1) {
+			$treeClause1 = '';
+			$treeClause2 = '';
+		}
+		else {
+			$treeClause1 = ' AND t1.'.$this->getTree()->getTreePk().' = '.$ilDB->quote($this->getTree()->getTreeId(),'integer');
+			$treeClause2 = ' AND t2.'.$this->getTree()->getTreePk().' = '.$ilDB->quote($this->getTree()->getTreeId(),'integer');
+		}
+
 		// first query for the path of the given node
-		$query = "SELECT t1.path FROM ".$this->getTree()->getTreeTable(). " t1 " .
+		$query = "SELECT t1." . $this->getTree()->getTreePk() . ", t1.path FROM ".$this->getTree()->getTreeTable(). " t1 " .
 				" WHERE t1.child = " . $ilDB->quote($a_endnode_id, 'integer') .
-				" AND t1." . $this->getTree()->getTreePk() . " = " . $ilDB->quote($this->getTree()->getTreeId(), 'integer');
+				$treeClause1;
 		
 		$res = $ilDB->query($query);
-		if ($row = $ilDB->fetchObject($res))
+		$row = $ilDB->fetchAssoc($res);
+		if ($row[$this->getTree()->getTreePk()] == $this->getTree()->getTreeId())
 		{
-			$path = $row->path;
+			$path = $row['path'];
 		}
 		else
 		{
@@ -576,26 +600,36 @@ class ilMaterializedPathTree implements ilTreeImplementation
 		}
 		
 		// then query for the nodes in that path
-		$query = "SELECT t2.child child, type, t2.path path " .
+		$query = "SELECT t2." . $this->getTree()->getTreePk() . ", t2.child child, type, t2.path path " .
 				"FROM " . $this->getTree()->getTreeTable() . " t2 " .
 				"JOIN " . $this->getTree()->getTableReference() . " obr ON t2.child = obr.ref_id " .
 				"JOIN " . $this->getTree()->getObjectDataTable() . " obd ON obr.obj_id = obd.obj_id " .
 				"WHERE t2.path BETWEEN " . $ilDB->quote($path, 'text') . " AND " .$ilDB->quote($path.'.Z', 'text').
-				"AND t2." . $this->getTree()->getTreePk() . " = " . $ilDB->quote($this->getTree()->getTreeId(), 'integer') . " " .
+				$treeClause2 . ' ' .
 				"ORDER BY t2.path";
-// fau.
+
+		log_line('getSubtreeInfo');
+		log_line($query);
 
  		$res = $ilDB->query($query);
 		$nodes = array();
-		while ($row = $ilDB->fetchObject($res))
+		while ($row = $ilDB->fetchAssoc($res))
 		{
+			// filter out deleted items if tree is repository
+			if ($row[$this->getTree()->getTreePk()] != $this->getTree()->getTreeId()) {
+				continue;
+			}
+
 			#$nodes[$row->child]['lft'] = $row->lft;
 			#$nodes[$row->child]['rgt'] = $row->rgt;
-			$nodes[$row->child]['child'] = $row->child;
-			$nodes[$row->child]['type'] = $row->type;
-			$nodes[$row->child]['path'] = $row->path;
+			$nodes[$row['child']]['child'] = $row['child'];
+			$nodes[$row['child']]['type'] = $row['type'];
+			$nodes[$row['child']]['path'] = $row['path'];
 		}
-		
+// fau.
+
+		log_var($nodes);
+
 		$depth_first_compare = function($a, $b)
 		{
 			$a_exploded = explode('.', $a['path']);

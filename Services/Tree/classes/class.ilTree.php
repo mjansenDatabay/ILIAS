@@ -945,6 +945,11 @@ class ilTree
 		$res = $ilDB->query($query);
 		while($row = $ilDB->fetchAssoc($res))
 		{
+// fau: treeQuery53 - filter by tree id outside query
+			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+				continue;
+			}
+// fau.
 			if($a_with_data)
 			{
 				$subtree[] = $this->fetchNodeData($row);
@@ -2006,6 +2011,11 @@ class ilTree
 		$subnodes = array();
 		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC))
 		{
+// fau: treeQuery53 - filter by tree id outside query
+			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+				continue;
+			}
+// fau.
 			$subnodes[] = $row['child'];
 		}
 
@@ -2731,12 +2741,17 @@ class ilTree
 		$res = $ilDB->query($query);
 		
 		$counter = (int) $lft_childs = array();
-		while($row = $ilDB->fetchObject($res))
+// fau: treeQuery53 - filter by tree id outside query
+		while($row = $ilDB->fetchAssoc($res))
 		{
-			$lft_childs[$row->child] = $row->parent;
+			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+				continue;
+			}
+
+			$lft_childs[$row['child']] = $row['parent'];
 			++$counter;
 		}
-
+// fau.
 		// CHECK FOR DUPLICATE CHILD IDS
 		if($counter != count($lft_childs))
 		{
@@ -2946,6 +2961,11 @@ class ilTree
 		$set = $ilDB->query($query);
 		while($row = $ilDB->fetchAssoc($set))
 		{
+// fau: treeQuery53 - filter by tree id outside query
+			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+				continue;
+			}
+// fau.
 			$res[] = $row;
 		}
 		
