@@ -787,9 +787,12 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 		$enlarge_path = ilUtil::getImagePath("enlarge.svg", false, "output");
 		$fullscreen_link =
 			$this->ctrl->getLinkTarget($this, "showFullscreen", "", false, false);
+// fau: fixHtmlMobInMediaPoolPreview - propagate switch for html type
 		$params = array ('mode' => $mode, 'enlarge_path' => $enlarge_path,
 			'link_params' => "ref_id=".$_GET["ref_id"],'fullscreen_link' => $fullscreen_link,
-			'ref_id' => $_GET["ref_id"], 'pg_frame' => $pg_frame, 'webspace_path' => $wb_path);
+			'ref_id' => $_GET["ref_id"], 'pg_frame' => $pg_frame, 'webspace_path' => $wb_path,
+            'enable_html_mob' => ilObjMediaObject::isTypeAllowed("html") ? "y" : "n");
+// fau.
 		$output = xslt_process($xh,"arg:/_xml","arg:/_xsl",NULL,$args, $params);
 		echo xslt_error($xh);
 		xslt_free($xh);
