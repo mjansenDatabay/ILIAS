@@ -508,10 +508,12 @@ class ilAttendanceList
 				{
 					$this->presets[$value][1] = true;
 				}
-				else
-				{
-					$this->addPreset($value, $value, true);
-				}
+// fau: fixPrintForMembers - respect the default presets (their data protection is already checked)
+//				else
+//				{
+//					$this->addPreset($value, $value, true);
+//				}
+// fau.
 			}
 			
 			$this->setTitle($form->getInput('title'), $form->getInput('desc'));

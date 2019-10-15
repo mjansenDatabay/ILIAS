@@ -391,6 +391,21 @@ class ilMembershipGUI
 
 				$this->setSubTabs($GLOBALS['DIC']['ilTabs']);
 
+// fau: fixPrintForMembers - check permissions when list is generated
+				if ($cmd == 'printForMembersOutput') {
+					if(
+						$this->getParentObject()->getType() != 'crs'
+						|| !$this->getParentObject()->getShowMembers()
+						|| !$this->getParentObject()->getShowMembersExport()
+						|| !$this->checkPermissionBool('read')
+						|| !ilParticipants::_isParticipant($this->getParentObject()->getRefId(), $ilUser->getId())
+					)
+					{
+						ilUtil::sendFailure($this->lng->txt('no_permission'), true);
+						$this->ctrl->redirect($this->getParentGUI());
+					}
+				}
+// fau.
 				//exclude mailMembersBtn cmd from this check
 				if(
 					$cmd == "mailMembersBtn" ||
