@@ -158,7 +158,7 @@ il.Accordion = {
 		}
 
 // fau: ownFooter - adjust footer when accordion changes
-        il.UICore.refreshLayout();
+		dispatchEvent(new Event("resize"));
 // fau.
 
         return false;
