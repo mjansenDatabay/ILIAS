@@ -4186,6 +4186,9 @@ class ilObjCourseGUI extends ilContainerGUI
 
 		$ilUser = $DIC['ilUser'];
 		return ilCourseParticipant::_getInstanceByObjId($this->object->getId(), $ilUser->getId())->isAdmin()
+// fau: tweakCoursAdminPermission - allow access to course administrators if write end manage_members permission is given
+		or ($this->checkPermissionBool('write') && $this->checkPermissionBool('manage_members'))
+// fau.
 		or $this->checkPermissionBool('edit_permission');
 	}
 
