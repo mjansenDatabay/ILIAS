@@ -165,7 +165,7 @@ class ilMaterializedPathTree implements ilTreeImplementation
 // this has bad performance on our MariaDB 10.1
 // deleted subtrees may have negative tree_id, but the given childs are already primary keys
 
-		if ($this->getTree()->getTreeTable() == 'tree' && $this->getTree()->getTreeId() == 1)
+		if ($this->getTree()->__isMainTree()  && $this->getTree()->getTreeId() == 1)
 		{
 			$treeClause = '';
 		}

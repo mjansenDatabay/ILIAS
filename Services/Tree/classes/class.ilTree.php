@@ -946,7 +946,7 @@ class ilTree
 		while($row = $ilDB->fetchAssoc($res))
 		{
 // fau: treeQuery53 - filter by tree id outside query
-			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+			if ($this->__isMainTree() && $row[$this->getTreePk()] != $this->getTreeId()) {
 				continue;
 			}
 // fau.
@@ -1076,7 +1076,7 @@ class ilTree
 // fau: treeQuery53 - don't use tree_id for repository tree
 // this has bad performance on our MariaDB 10.1
 // deleted subtrees may have negative tree_id, but the given childs are already primary keys
-		if ($this->table_tree == 'tree' && $this->tree_id == 1)
+		if ($this->__isMainTree() && $this->tree_id == 1)
 		{
             $treeClause = '';
 		}
@@ -1128,7 +1128,7 @@ class ilTree
 // fau: treeQuery53 - don't use tree_id for repository tree
 // this has bad performance on our MariaDB 10.1
 // deleted subtrees may have negative tree_id, but the given childs are already primary keys
-        if ($this->table_tree == 'tree' && $this->tree_id == 1)
+        if ($this->__isMainTree() && $this->tree_id == 1)
         {
             $treeClause = '';
         }
@@ -2012,7 +2012,7 @@ class ilTree
 		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC))
 		{
 // fau: treeQuery53 - filter by tree id outside query
-			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+			if ($this->__isMainTree() && $row[$this->getTreePk()] != $this->getTreeId()) {
 				continue;
 			}
 // fau.
@@ -2744,7 +2744,7 @@ class ilTree
 // fau: treeQuery53 - filter by tree id outside query
 		while($row = $ilDB->fetchAssoc($res))
 		{
-			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+			if ($this->__isMainTree() && $row[$this->getTreePk()] != $this->getTreeId()) {
 				continue;
 			}
 
@@ -2962,7 +2962,7 @@ class ilTree
 		while($row = $ilDB->fetchAssoc($set))
 		{
 // fau: treeQuery53 - filter by tree id outside query
-			if ($row[$this->getTreePk()] != $this->getTreeId()) {
+			if ($this->__isMainTree() && $row[$this->getTreePk()] != $this->getTreeId()) {
 				continue;
 			}
 // fau.
