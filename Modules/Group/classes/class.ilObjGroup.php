@@ -972,7 +972,11 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 			"WHERE obj_id = ".$ilDB->quote($this->getId() ,'integer');
 		// fim.
 		$res = $ilDB->manipulate($query);
-		
+
+// fau: fixGroupDescription - update metadata
+		$this->updateMetaData();
+// fau.
+
 		$ilAppEventHandler->raise('Modules/Group',
 			'update',
 			array('object' => $this,
