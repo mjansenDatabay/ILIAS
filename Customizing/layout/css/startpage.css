@@ -28,8 +28,6 @@
         width: 330px;
         z-index: 1000;
         background-color: #fafafc;
-        padding-top: 5px;
-        padding-right: 5px;
         -webkit-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
         -moz-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
         box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.3);
@@ -38,6 +36,7 @@
     /* positioning of the banner */
     #il_center_col > .ilc_section_BannerContainer {
         display:block;
+        height:400px;
         margin-top: -53px;
         margin-left: -30px;
         margin-right: -30px;
@@ -68,18 +67,18 @@
         bottom:0px;
         right: 0px;
         left: 0px;
-    }
-    .ilc_section_BannerContainer .ilc_Paragraph {
-        background: #036;
-        color: white;
-        padding: 20px;
         text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
         font-weight: bold;
     }
+    .ilc_section_BannerContainer .ilc_Paragraph {
+        background: #fafafc;
+        color: #003366;
+        padding: 20px;
+    }
     .ilc_section_BannerContainer .ilc_Paragraph a {
-        color: white;
+        color: #004080;
         text-decoration: none;
     }
     .ilc_section_BannerContainer .ilc_Paragraph a:hover {
@@ -120,6 +119,7 @@
  * Elements of the login container
  */
 .ilc_section_LoginContainer {
+    padding-top: 5px;
     padding-left: 30px;
     padding-right: 30px;
     padding-bottom: 30px;
@@ -169,13 +169,16 @@
  * (flex display is used to have the same background height for all blocks)
  */
 .ilc_section_GridContainer > .row {
+    display: -webkit-flex;
     display: flex;
     flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
     margin-top: 15px;
 }
 .ilc_section_GridContainer > .row > div {
+    display: -webkit-flex;
     display:flex;
-    background-color: #f0f0f0;
+    background-color: #fafafc;
     border: 15px solid white;
     min-height: 300px;
 }
