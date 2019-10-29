@@ -4361,7 +4361,8 @@ function getAnswerFeedbackPoints()
 		}
 		
 		$arrResults = array();
-		
+
+// fau: fixWrongQuestionCount - filter questions wrongly assigned to the pass
 		$query = "
 			SELECT		tst_test_result.question_fi,
 						tst_test_result.points reached,
@@ -4374,6 +4375,7 @@ function getAnswerFeedbackPoints()
 			LEFT JOIN	tst_solutions
 			ON			tst_solutions.active_fi = tst_test_result.active_fi
 			AND			tst_solutions.question_fi = tst_test_result.question_fi
+			AND 		tst_solutions.pass = tst_test_result.pass
 			
 			WHERE		tst_test_result.active_fi = %s
 			AND			tst_test_result.pass = %s
@@ -4385,8 +4387,11 @@ function getAnswerFeedbackPoints()
 		
 		while( $row = $ilDB->fetchAssoc($solutionresult) )
 		{
-			$arrResults[ $row['question_fi'] ] = $row;
+		    if (in_array($row['question_fi'], $sequence)) {
+                $arrResults[ $row['question_fi'] ] = $row;
+            }
 		}
+// fau.
 
 		$numWorkedThrough = count($arrResults);
 
