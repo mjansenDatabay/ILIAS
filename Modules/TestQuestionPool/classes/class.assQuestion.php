@@ -1521,7 +1521,7 @@ abstract class assQuestion
 
 		
 		// update test pass results
-		
+// fau: fixWrongQuestionsCount - filter by question_ids of that pass
 		$result = $ilDB->queryF("
 			SELECT		SUM(points) reachedpoints,
 						SUM(hint_count) hint_count,
@@ -1530,11 +1530,12 @@ abstract class assQuestion
 			FROM		tst_test_result
 			WHERE		active_fi = %s
 			AND			pass = %s
-			",
+			AND " . $ilDB->in('question_fi', $data['question_ids'], false, 'integer'),
 			array('integer','integer'),
 			array($active_id, $pass)
 		);
-		
+// fau.
+
 		if ($result->numRows() > 0)
 		{
 			if( $obligationsEnabled )

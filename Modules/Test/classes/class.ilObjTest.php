@@ -5384,7 +5384,8 @@ function getAnswerFeedbackPoints()
 		
 		return $data;
 	}
-	
+
+// fau: fixWrongQuestionsCount - return also the list of question ids
 	public static function _getQuestionCountAndPointsForPassOfParticipant($active_id, $pass)
 	{
 		global $DIC;
@@ -5397,8 +5398,8 @@ function getAnswerFeedbackPoints()
 			case ilObjTest::QUESTION_SET_TYPE_DYNAMIC:
 				
 				$res = $ilDB->queryF("
-						SELECT		COUNT(qpl_questions.question_id) qcount,
-									SUM(qpl_questions.points) qsum
+						SELECT		qpl_questions.question_id,
+									qpl_questions.points
 						FROM		tst_active
 						INNER JOIN	tst_tests
 						ON			tst_tests.test_id = tst_active.test_fi
@@ -5419,9 +5420,8 @@ function getAnswerFeedbackPoints()
 			case ilObjTest::QUESTION_SET_TYPE_RANDOM:
 
 				$res = $ilDB->queryF("
-						SELECT		tst_test_rnd_qst.pass,
-									COUNT(tst_test_rnd_qst.question_fi) qcount,
-									SUM(qpl_questions.points) qsum
+						SELECT		tst_test_rnd_qst.question_fi question_id,
+									qpl_questions.points
 
 						FROM		tst_test_rnd_qst,
 									qpl_questions
@@ -5429,9 +5429,6 @@ function getAnswerFeedbackPoints()
 						WHERE		tst_test_rnd_qst.question_fi = qpl_questions.question_id
 						AND			tst_test_rnd_qst.active_fi = %s
 						AND			pass = %s
-
-						GROUP BY	tst_test_rnd_qst.active_fi,
-									tst_test_rnd_qst.pass
 					",
 					array('integer', 'integer'),
 					array($active_id, $pass)
@@ -5442,8 +5439,8 @@ function getAnswerFeedbackPoints()
 			case ilObjTest::QUESTION_SET_TYPE_FIXED:
 				
 				$res = $ilDB->queryF("
-						SELECT		COUNT(tst_test_question.question_fi) qcount,
-									SUM(qpl_questions.points) qsum
+						SELECT		tst_test_question.question_fi question_id,
+									qpl_questions.points
 						
 						FROM		tst_test_question,
 									qpl_questions,
@@ -5452,8 +5449,6 @@ function getAnswerFeedbackPoints()
 						WHERE		tst_test_question.question_fi = qpl_questions.question_id
 						AND			tst_test_question.test_fi = tst_active.test_fi
 						AND			tst_active.active_id = %s
-						
-						GROUP BY	tst_test_question.test_fi
 					",
 					array('integer'),
 					array($active_id)
@@ -5465,16 +5460,20 @@ function getAnswerFeedbackPoints()
 				
 				throw new ilTestException("not supported question set type: $questionSetType");
 		}
-		
-		$row = $ilDB->fetchAssoc($res);
-		
-		if( is_array($row) )
+
+		$qcount = 0;
+		$qsum = 0;
+		$ids = array();
+		while ( $row = $ilDB->fetchAssoc($res))
 		{
-			return array("count" => $row["qcount"], "points" => $row["qsum"]);
+		    $qcount++;
+		    $qsum += $row['points'];
+		    $ids[] = $row['question_id'];
 		}
-		
-		return array("count" => 0, "points" => 0);
+        $return = array("count" => $qcount, "points" => $qsum, 'question_ids' => $ids);
+		return $return;
 	}
+// fau.
 
 	function &getCompleteEvaluationData($withStatistics = TRUE, $filterby = "", $filtertext = "")
 	{
