@@ -164,7 +164,9 @@ class ilConditionHandler
 		$tree = $DIC->repositoryTree();
 
 		// check if parent takes over control of condition
-		$parent_ref_id = $tree->getParentId($a_target_ref_id);
+// fau: treeParentCache - use cached parent query
+		$parent_ref_id = $tree->getParentId($a_target_ref_id, true);
+// fau.
 		$parent_obj_id = ilObject::_lookupObjId($parent_ref_id);
 		$parent_type = ilObject::_lookupType($parent_obj_id);
 
@@ -826,7 +828,9 @@ class ilConditionHandler
 		}
 
 		// check if parent takes over control of condition
-		$parent_ref_id = $tree->getParentId($a_target_ref_id);
+// fau: treeParentCache - use cached parent query
+		$parent_ref_id = $tree->getParentId($a_target_ref_id, true);
+// fau.
 		$parent_obj_id = ilObject::_lookupObjId($parent_ref_id);
 		$parent_type = ilObject::_lookupType($parent_obj_id);
 

@@ -2204,24 +2204,24 @@ class ilTree
 		return $saved ? $saved : array();
 	}
 
+// fau: treeParentCache - optionally cache parent queries
 	/**
 	* get parent id of given node
 	* @access	public
 	* @param	integer	node id
+	* @param	bool	a_cached
 	* @return	integer	parent id
 	* @throws InvalidArgumentException
 	*/
-	function getParentId($a_node_id)
+	function getParentId($a_node_id, $a_cached = false)
 	{
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
 
-// fau: treeParentCache - check for cached parent
-		if (isset($this->parent_cache[$a_node_id])) {
+		if ($a_cached && isset($this->parent_cache[$a_node_id])) {
 			return $this->parent_cache[$a_node_id];
 		}
-// fau.
 
 		if (!isset($a_node_id))
 		{
@@ -2239,11 +2239,11 @@ class ilTree
 
 		$row = $ilDB->fetchObject($res);
 
-// fau: treeParentCache - cache parent
 		$this->parent_cache[$a_node_id] = $row->parent;
-// fau.
+
 		return $row->parent;
 	}
+// fau.
 
 	/**
 	* get left value of given node
