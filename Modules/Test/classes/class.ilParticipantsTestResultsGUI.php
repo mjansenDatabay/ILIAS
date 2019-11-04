@@ -2,6 +2,8 @@
 
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+use ILIAS\DI\Container;
+
 /**
  * Class ilParticipantsTestResultsGUI
  *
@@ -195,6 +197,9 @@ class ilParticipantsTestResultsGUI
 			if( $scoredParticipantList->hasScorings() )
 			{
 				$this->addDeleteAllTestResultsButton($DIC->toolbar());
+// fau: provideRecalc - add the button to recalc all test results
+                $this->addRecalcAllTestResultsButton($DIC->toolbar());
+// fau.
 			}
 		}
 		
@@ -207,8 +212,54 @@ class ilParticipantsTestResultsGUI
 		
 		$DIC->ui()->mainTemplate()->setContent($tableGUI->getHTML());
 	}
-	
-	/**
+
+// fau: provideRecalc - new functions to recalculate all test results
+    /**
+     * @param ilToolbarGUI $toolbar
+     */
+    protected function addRecalcAllTestResultsButton(ilToolbarGUI $toolbar)
+    {
+        global $DIC; /* @var ILIAS\DI\Container $DIC */
+
+        $delete_all_results_btn = ilLinkButton::getInstance();
+        $delete_all_results_btn->setCaption('tst_recalculate_solutions');
+        $delete_all_results_btn->setUrl($DIC->ctrl()->getLinkTarget($this, 'recalcAllTestResults'));
+        $toolbar->addButtonInstance($delete_all_results_btn);
+    }
+
+    /**
+     * Confirm the scoring recalculation of all participants
+     */
+    function recalcAllTestResultsCmd()
+    {
+        global $DIC; /* @var ILIAS\DI\Container $DIC */
+
+        $cgui = new ilConfirmationGUI();
+        $cgui->setFormAction($DIC->ctrl()->getFormAction($this));
+        $cgui->setHeaderText($DIC->language()->txt('tst_recalculate_solutions_confirm'));
+        $cgui->setConfirm($DIC->language()->txt('tst_recalculate_solutions'), 'confirmedRecalcAllTestResults');
+        $cgui->setCancel($DIC->language()->txt('cancel'), self::CMD_SHOW_PARTICIPANTS);
+        $DIC->ui()->mainTemplate()->setContent($cgui->getHTML());
+    }
+
+    /**
+     * Recalculate the scoring of all participants
+     */
+    function confirmedRecalcAllTestResultsCmd()
+    {
+        global $DIC; /* @var ILIAS\DI\Container $DIC */
+
+        $scorer = new ilTestScoring($this->getTestObj());
+        $scorer->setPreserveManualScores(true);
+        $scorer->recalculateSolutions();
+
+        ilUtil::sendSuccess($DIC->language()->txt('tst_recalculated_solutions'), true);
+        $DIC->ctrl()->redirect($this, self::CMD_SHOW_PARTICIPANTS);
+    }
+// fau.
+
+
+    /**
 	 * @param ilToolbarGUI $toolbar
 	 */
 	protected function addDeleteAllTestResultsButton(ilToolbarGUI $toolbar)
