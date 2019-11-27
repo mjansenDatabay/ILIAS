@@ -178,6 +178,9 @@ class ilLMPresentationGUI
 		$lng = $this->lng;
 		$ilCtrl = $this->ctrl;
 		$ilUser = $this->user;
+// fau: fixLmAccessError - initialize the error object
+		$ilErr = $this->error;
+// fau.
 
 		// check read permission and parent conditions
 		// todo: replace all this by ilAccess call
