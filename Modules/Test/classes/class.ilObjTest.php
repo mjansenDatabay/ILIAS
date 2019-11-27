@@ -5308,12 +5308,16 @@ function getAnswerFeedbackPoints()
 				if ($result->numRows())
 				{
 					$questionsbysequence = array();
-					
+
+// fau: fixTestEvaluationSequence - reindex fixed questions	sequence
+					$i = 1;
 					while ($row = $ilDB->fetchAssoc($result))
 					{
-						$questionsbysequence[$row["sequence"]] = $row;
+						$questionsbysequence[$i] = $row;
+						$i++;
 					}
-					
+// fau.
+
 					$seqresult = $ilDB->queryF(
 						"SELECT * FROM tst_sequence WHERE active_fi = %s",
 						array('integer'), array($active_id)
