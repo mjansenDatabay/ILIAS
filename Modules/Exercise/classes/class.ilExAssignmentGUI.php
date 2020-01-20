@@ -480,6 +480,9 @@ class ilExAssignmentGUI
 		//we can check in the elseif $submission->hasSubmitted()
 		elseif($a_ass->getFeedbackDate() == ilExAssignment::FEEDBACK_DATE_CUSTOM)
 		{
+// fau: fixExFeedbackCustomDate - inactive proposal - submission is needed
+            // $show_global_feedback = ($last_sub && $a_ass->afterCustomDate() && $a_ass->getFeedbackFile());
+// fau.
 			$show_global_feedback = ($a_ass->afterCustomDate() && $a_ass->getFeedbackFile());
 		}
 		else

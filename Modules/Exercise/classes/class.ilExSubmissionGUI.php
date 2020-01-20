@@ -328,14 +328,18 @@ class ilExSubmissionGUI
 		$ilCtrl = $this->ctrl;
 		
 		$needs_dl = ($this->assignment->getFeedbackDate() == ilExAssignment::FEEDBACK_DATE_DEADLINE);
-		
+// fixExFeedbackCustomDate - check the custom date for download of global feedback file
+		$custom_dl = ($this->assignment->getFeedbackDate() == ilExAssignment::FEEDBACK_DATE_CUSTOM);
+
 		if(!$this->assignment || 
 			!$this->assignment->getFeedbackFile() ||
-			($needs_dl && !$this->assignment->afterDeadlineStrict()) ||				
-			(!$needs_dl && !$this->submission->hasSubmitted()))						
+			($needs_dl && !$this->assignment->afterDeadlineStrict()) ||
+            ($custom_dl && !$this->assignment->afterCustomDate()) ||
+            (!$needs_dl && !$custom_dl && !$this->submission->hasSubmitted()))
 		{
 			$ilCtrl->redirect($this, "returnToParent");
 		}
+// fau.
 
 		// this is due to temporary bug in handleGlobalFeedbackFileUpload that missed the last "/"
 		$file = (is_file($this->assignment->getGlobalFeedbackFilePath()))
