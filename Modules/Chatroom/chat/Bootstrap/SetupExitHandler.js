@@ -5,6 +5,7 @@ var async = require('async');
  *
  */
 module.exports = function SetupExitHandler(result, callback) {
+	Container.getLogger().info('[Boot process]: Setup exit handler started!');
 
 	var CONST_NO_CLEANUP_CODE = 99;
 
@@ -35,11 +36,13 @@ module.exports = function SetupExitHandler(result, callback) {
 
 function _cleanUp(callback)
 {
+	Container.getLogger().info('[Housekeeping]: Run cleanup process for all namespaces');
+
 	//process.stdin.resume(); //so the program will not close instantly
 	var namespaces = Container.getNamespaces();
 
 	function disconnectSocketsAndUsers(namespace, nextLoop){
-		Container.getLogger().info('Cleanup %s', namespace.getName());
+		Container.getLogger().info('[Housekeeping]: Run cleanup process for namespace %s', namespace.getName());
 		namespace.disconnectSockets();
 		namespace.getDatabase().disconnectAllUsers(nextLoop);
 	}
@@ -48,6 +51,8 @@ function _cleanUp(callback)
 		if(err) {
 			throw err;
 		}
+
+		Container.getLogger().info('[Boot process]: Setup exit handler done!');
 
 		callback();
 	}

@@ -11,9 +11,15 @@ module.exports = function(conversationId, userId, timestamp) {
 		var namespace = Container.getNamespace(this.nsp.name);
 		var conversation = namespace.getConversations().getById(conversationId);
 
+		Container.getLogger().info("[Onscreen Task]: (ConversationActivity) Received new Activity in namespace %s", namespace.getName());
+
 		if (conversation !== null && conversation.isParticipant(this.participant)) {
+			conversation.trackActivity(this.participant, timestamp);
+
 			namespace.getDatabase().trackActivity(conversationId, userId, timestamp);
-			Container.getLogger().info('Track Activity for user %s in %s: %s', userId, conversationId, timestamp);
+			Container.getLogger().info('[Onscreen Task]: (ConversationActivity) Track Activity for user %s in %s: %s', userId, conversationId, timestamp);
 		}
+
+		Container.getLogger().info("[Onscreen Task]: (ConversationActivity) Done in namespace %s", namespace.getName());
 	}
 };

@@ -1,67 +1,29 @@
 var Container = require('../AppContainer');
 var async = require('async');
 
-module.exports = function() {
-	Container.getLogger().info('Requested Conversations list');
+module.exports = function () {
 
 	var namespace = Container.getNamespace(this.nsp.name);
 	var conversations = this.participant.getConversations();
 	var socket = this;
 
-	function onConversationListResult(conversation, nextLoop){
-		var conversationClosed = false;
+	Container.getLogger().info('[Onscreen Task]: (ListConversations) List conversations in namespace %s', namespace.getName());
 
-		function setConservationState(row) {
-			conversationClosed = row.is_closed;
+	async.eachSeries(conversations, function onConversation(conversation, nextLoop) {
+		var conversationState = conversation.getActivityForParticipant(socket.participant.getId());
+
+		if (!conversationState.hasClosedConversation() || (conversationState.getNumUnreadMessages() > 0 && !conversation.isGroup())) {
+			var jsonConversation = conversation.json();
+			jsonConversation.numNewMessages = conversationState.getNumUnreadMessages();
+			socket.participant.emit('conversation', jsonConversation);
 		}
 
-		function fetchLatestMessageForOpenConversation() {
-			function setLatestMessageOnConversation(row) {
-				row.userId         = row.user_id;
-				row.conversationId = row.conversation_id;
-				conversation.setLatestMessage(row);
-			}
-
-			function determineUnreadMessages() {
-				function setNumberOfNewMessages(row) {
-					conversation.setNumNewMessages(row.numMessages);
-				}
-
-				function emitConversationAndContinue() {
-					if (!conversationClosed || (conversation.getNumNewMessages() > 0 && !conversation.isGroup())) {
-						socket.participant.emit('conversation', conversation.json());
-					}
-					nextLoop();
-				}
-
-				namespace.getDatabase().countUnreadMessages(
-					conversation.getId(),
-					socket.participant.getId(),
-					setNumberOfNewMessages,
-					emitConversationAndContinue
-				);
-			}
-
-			namespace.getDatabase().getLatestMessage(
-				conversation,
-				setLatestMessageOnConversation,
-				determineUnreadMessages
-			);
-		}
-
-		namespace.getDatabase().getConversationStateForParticipant(
-			conversation.getId(),
-			socket.participant.getId(),
-			setConservationState,
-			fetchLatestMessageForOpenConversation
-		);
-	}
-
-	function onPossibleConversationListError(err) {
+		nextLoop();
+	}, function (err) {
 		if (err) {
 			throw err;
 		}
-	}
 
-	async.eachSeries(conversations, onConversationListResult, onPossibleConversationListError);
+		Container.getLogger().info('[Onscreen Task]: (ListConversations) Done in namespace %s', namespace.getName());
+	});
 };

@@ -1,4 +1,4 @@
-var CONST	= require('../Constants');
+var CONST = require('../Constants');
 var Container = require('../AppContainer');
 var Winston = require('winston');
 var Util = require('util');
@@ -9,37 +9,24 @@ var Util = require('util');
  */
 module.exports = function SetupEnvironment(result, callback) {
 
-	var logFile = 'chat.log';
-	var errorLogFile = 'chatError.log';
-	var serverConfig = Container.getServerConfig();
-
-	if(serverConfig.log !== undefined && serverConfig.log !== "")
-	{
-		logFile = serverConfig.log;
-	}
-	if(serverConfig.error_log !== undefined && serverConfig.error_log !== "")
-	{
-		errorLogFile = serverConfig.error_log;
-	}
-
 	var logger = new (Winston.Logger)({
 		transports: [
 			new (Winston.transports.File)({
 				name: 'log',
-				filename: logFile,
-				level: 'info',
+				filename: Container.getServerConfig().log,
+				level: Container.getServerConfig().log_level,
 				json: false,
-				timestamp: function(){
+				timestamp: function () {
 					var date = new Date();
 					return date.toDateString() + ' ' + date.toTimeString();
 				},
-				formatter: function(options) {
+				formatter: function (options) {
 					return Util.format(
-							'[%s] %s - %s %s',
-							options.timestamp(),
-							options.level.toUpperCase(),
-							options.message,
-							(options.meta !== undefined && options.meta.length > 0)? '\n\t' + JSON.stringify(options.meta) : '');
+						'[%s] %s - %s %s',
+						options.timestamp(),
+						options.level.toUpperCase(),
+						options.message,
+						(options.meta !== undefined && options.meta.length > 0) ? '\n\t' + JSON.stringify(options.meta) : '');
 				}
 			})
 		]
@@ -48,15 +35,15 @@ module.exports = function SetupEnvironment(result, callback) {
 	Winston.handleExceptions(
 		new (Winston.transports.File)({
 			name: 'errorlog',
-			filename: errorLogFile,
+			filename: Container.getServerConfig().error_log,
 			handleExceptions: true,
 			humanReadableUnhandledException: true,
 			json: false,
-			timestamp: function(){
+			timestamp: function () {
 				var date = new Date();
 				return date.toDateString() + ' ' + date.toTimeString();
 			},
-			formatter: function(options) {
+			formatter: function (options) {
 				return Util.format(
 					'[%s] %s - %s \n %s',
 					options.timestamp(),
@@ -69,7 +56,9 @@ module.exports = function SetupEnvironment(result, callback) {
 	);
 
 	logger.exitOnError = false;
-	logger.info('Starting Server!');
+	logger.info('Booting Chat Server!');
+	logger.log('debug', '[Boot process]: ServerConfig %s, ', JSON.stringify(Container.getServerConfig()))
+	logger.log('debug', '[Boot process]: ClientConfigs %s, ', JSON.stringify(Container.getClientConfigs()))
 
 	Container.setLogger(logger);
 

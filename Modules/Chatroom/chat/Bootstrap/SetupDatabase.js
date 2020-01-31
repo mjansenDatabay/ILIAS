@@ -8,11 +8,15 @@ var Container = require('../AppContainer');
  * @param {Function} callback
  */
 module.exports = function SetupDatabase(namespace, config, callback) {
+	Container.getLogger().info('Setup database for namespace %s', namespace.getName());
+	Container.getLogger().log('debug', 'Setup database with config %s', JSON.stringify(config));
 
 	var database = new Database(config);
 	namespace.setDatabase(database);
+	database.connect();
 
-	database.connect(function onDatabaseConnect(err, connection) {
+	callback(null, namespace);
+	/*database.connect(function onDatabaseConnect(err, connection) {
 		if(err) {
 			throw err;
 		}
@@ -21,5 +25,5 @@ module.exports = function SetupDatabase(namespace, config, callback) {
 		connection.release();
 
 		callback(null, namespace);
-	});
+	});*/
 };

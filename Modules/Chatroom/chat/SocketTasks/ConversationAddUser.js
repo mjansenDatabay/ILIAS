@@ -7,6 +7,8 @@ module.exports = function(conversationId, userId, name) {
 		var namespace = Container.getNamespace(this.nsp.name);
 		var conversation = namespace.getConversations().getById(conversationId);
 
+		Container.getLogger().info("[Onscreen Task]: (ConversationAddUser) Add new user to conversation %s in namespace %s started!", conversationId, namespace.getName());
+
 		if (conversation.isParticipant(this.participant)) {
 			var newParticipant = namespace.getSubscriberWithOfflines(userId, name);
 			var participants   = conversation.getParticipants();
@@ -24,11 +26,11 @@ module.exports = function(conversationId, userId, name) {
 					}
 				}
 
-				Container.getLogger().info('Conversation %s transformed to group conversation.', conversation.getId())
+				Container.getLogger().info("[Onscreen Task]: (ConversationAddUser) Convert conversation %s to group in namespace %s started!", conversationId, namespace.getName());
 			}
 
 			if (conversation.isParticipant(newParticipant)) {
-				Container.getLogger().info('Participant %s is already subscribed to conversation %s.', newParticipant.getName(), conversation.getId());
+				Container.getLogger().info('[Onscreen Task]: (ConversationAddUser) Participant %s is already subscribed to conversation %s.', newParticipant.getName(), conversation.getId());
 				return;
 			}
 
@@ -38,16 +40,19 @@ module.exports = function(conversationId, userId, name) {
 			participants = conversation.getParticipants();
 			for (var key in participants) {
 				if (participants.hasOwnProperty(key)){
+					conversation.trackActivity(participants, 0)
 					namespace.getDatabase().trackActivity(conversation.getId(), participants[key].getId(), 0);
 				}
 			}
 
-			Container.getLogger().info('New Participant %s for group conversation %s', newParticipant.getName(), newParticipant.getId());
+			Container.getLogger().info('[Onscreen Task]: (ConversationAddUser) New Participant %s for group conversation %s', newParticipant.getName(), newParticipant.getId());
 
 			namespace.getDatabase().updateConversation(conversation);
 
 			this.participant.emit('conversation', conversation.json());
 			this.emit('addUser', conversation.json());
 		}
+
+		Container.getLogger().info("[Onscreen Task]: (ConversationAddUser) Done in namespace %s!", conversationId, namespace.getName());
 	}
 };

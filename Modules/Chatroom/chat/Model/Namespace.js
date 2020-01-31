@@ -3,11 +3,11 @@ var Participant = require('./ConversationParticipant');
 
 /**
  * @class Namespace
- * @param {engine.io/Server} io
  * @param {string} name
+ * @param {MessageQueue} messageQueue
  * @constructor
  */
-var Namespace = function Namespace(name)
+var Namespace = function Namespace(name, messageQueue)
 {
 
 	/**
@@ -37,6 +37,9 @@ var Namespace = function Namespace(name)
 	 */
 	var _subscribers = {};
 
+	/**
+	 * @type {Database}
+	 */
 	var _database;
 
 	/**
@@ -50,6 +53,12 @@ var Namespace = function Namespace(name)
 	 * @private
 	 */
 	var _conversations = new ConversationCollection();
+
+	/**
+	 * @type {MessageQueue}
+	 * @private
+	 */
+	var _messageQueue = messageQueue
 
 	/**
 	 * @returns {string}
@@ -195,6 +204,15 @@ var Namespace = function Namespace(name)
 	 */
 	this.getConversations = function() {
 		return _conversations;
+	}
+
+	/**
+	 * Get the message queue.
+	 *
+	 * @returns {MessageQueue}
+	 */
+	this.getMessageQueue = function getMessageQueue() {
+		return _messageQueue;
 	}
 };
 

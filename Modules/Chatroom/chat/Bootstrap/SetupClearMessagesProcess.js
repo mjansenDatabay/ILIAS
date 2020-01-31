@@ -5,6 +5,7 @@ var schedule = require('node-schedule');
  * @param {Function} callback
  */
 module.exports = function SetupClearMessagesProcess(result, callback) {
+	Container.getLogger().info("[Boot process]: Setup clear messages job started!");
 
 	if (Container.getServerConfig().hasOwnProperty('deletion_mode') &&
 		parseInt(Container.getServerConfig().deletion_mode, 10) === 1) {
@@ -14,11 +15,14 @@ module.exports = function SetupClearMessagesProcess(result, callback) {
 
 		function getMessagesClearedCallback(namespaceName) {
 			return function messagesClearedCallback() {
-				Container.getLogger().info('Clear process for namespace %s finished', namespaceName);
+				Container.getLogger().info('[Scheduled Job] Clear process for namespace %s finished!', namespaceName);
 			};
 		}
 
-		schedule.scheduleJob('ClearMessagesProcess', {hour: deletionTime[0], minute: deletionTime[1]}, function clearMessagesProcess() {
+		schedule.scheduleJob('ClearMessagesProcess', {
+			hour: deletionTime[0],
+			minute: deletionTime[1]
+		}, function clearMessagesProcess() {
 			var namespaces = Container.getNamespaces();
 			var deletionUnit = Container.getServerConfig().deletion_unit;
 			var deletionValue = Container.getServerConfig().deletion_value;
@@ -34,7 +38,7 @@ module.exports = function SetupClearMessagesProcess(result, callback) {
 					namespaceName = namespaces[key].getName();
 
 				Container.getLogger().info(
-					'Start clear process for namespace %s older then %s [%s]',
+					'[Scheduled Job] Clear process for namespace %s older then %s [%s] started!',
 					namespaces[key].getName(),
 					bound.toUTCString(),
 					bound.getTime()
@@ -44,9 +48,10 @@ module.exports = function SetupClearMessagesProcess(result, callback) {
 			}
 		});
 
-		Container.getLogger().info('Clear messages process initialized for %s once a day', Container.getServerConfig().deletion_time);
+		Container.getLogger().info('[Boot process] Clear messages process initialized for %s once a day', Container.getServerConfig().deletion_time);
 	}
 
+	Container.getLogger().info("[Boot process]: Setup clear messages job done!");
 	callback();
 };
 

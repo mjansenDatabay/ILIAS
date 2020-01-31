@@ -3,6 +3,8 @@ var Container = require('../AppContainer');
 module.exports = function(conversationId, oldestMessageTimestamp, reverseSorting) {
 	if(conversationId !== null)
 	{
+		Container.getLogger().info('[Onscreen Task]: (ConversationHistory) Export history for conversation %s in namespace %s started!', conversationId, this.nsp.name);
+
 		var namespace = Container.getNamespace(this.nsp.name);
 		var conversation = namespace.getConversations().getById(conversationId);
 		var history = [];
@@ -32,8 +34,18 @@ module.exports = function(conversationId, oldestMessageTimestamp, reverseSorting
 
 				socket.participant.emit('history', json);
 
-				Container.getLogger().info('Requested History for %s since %s', conversationId, oldestMessageTimestamp);
+				Container.getLogger().info('[Onscreen Task]: (ConversationHistory) Done in namespace %s',
+					conversationId,
+					namespace.getName(),
+					oldestMessageTimestamp
+				);
 			}
+
+			Container.getLogger().info('[Onscreen Task]: (ConversationHistory) Requested History for %s in namespace %s since %s',
+				conversationId,
+				namespace.getName(),
+				oldestMessageTimestamp
+			);
 
 			namespace.getDatabase().loadConversationHistory(
 				conversation.getId(),

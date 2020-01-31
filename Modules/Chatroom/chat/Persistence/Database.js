@@ -1,10 +1,19 @@
 var Container = require('../AppContainer');
 var async = require('async');
 var Date = require('../Helper/Date');
+var UUID = require('node-uuid');
 
 var Database = function Database(config) {
 
+	/**
+	 * {}
+	 */
 	var _pool;
+
+	/**
+	 * Array
+	 */
+	var _messageQueue = [];
 
 	function handleError(err){
 		if(err) {
@@ -16,16 +25,34 @@ var Database = function Database(config) {
 		var engine = require(config.database.type);
 
 		_pool = engine.createPool({
+			connectionLimit: 10,
 			host: config.database.host,
 			port: config.database.port,
 			user: config.database.user,
 			password: config.database.pass,
 			database: config.database.name,
-			charset: 'UTF8_UNICODE_CI'
-			//debug: true
+			charset: 'UTF8_UNICODE_CI',
+			debug: false
+			// debug: ['ComQueryPacket', 'RowDataPacket']
 		});
 
-		_pool.getConnection(callback);
+		_pool.on('acquire', function (connection) {
+		//	console.log('Connection %d acquired', connection.threadId);
+		//	console.log('Total number connections after acquire %d', _pool._acquiringConnections.length);
+		});
+		_pool.on('connection', function (connection) {
+		//	console.log('New connection %d opened', connection.threadId);
+		//	console.log('Total number connections %d', _pool._allConnections.length);
+		});
+		_pool.on('enqueue', function () {
+		//	console.log('Waiting for available connection slot');
+		});
+		_pool.on('release', function (connection) {
+		//	console.log('Connection %d released', connection.threadId);
+		//	console.log('Total number connections after released %d', _pool._acquiringConnections.length );
+		});
+
+		//_pool.getConnection(callback);
 	};
 
 	this.closePrivateRoom = function(roomId){
@@ -57,7 +84,7 @@ var Database = function Database(config) {
 				throw err;
 			}
 
-			Container.getLogger().info('Successfully disconnected all users from server');
+			Container.getLogger().info('[Chatroom] Successfully disconnected all users in database');
 			callback();
 		}
 
@@ -115,7 +142,7 @@ var Database = function Database(config) {
 
 		function deleteChatroomUsers(next) {
 			// Disconnect from chat
-			var onError = function onError(err){
+			var onError = function onError(err, result){
 				if(err) {
 					throw err;
 				}
@@ -387,47 +414,72 @@ var Database = function Database(config) {
 		);
 	};
 
-	this.closeConversation = function(conversationId, userId) {
-		function onResult(result){
-			_pool.query('UPDATE osc_activity SET is_closed = ?, timestamp = ? WHERE conversation_id = ? AND user_id = ?',
-				[1, Date.getTimestamp(), conversationId, userId],
-				handleError
-			);
-		}
+	/// BEGIN NEW PERSISTENCE FUNCTION FOR ONSCREENCHAT
+	this.persist = function persist(namespace) {
+		this.persistMessageQueue(namespace);
+		this.persistConversationStates(namespace)
+	}
 
-		function onNull() {
+	this.persistMessageQueue = function persistMessageQueue(namespace) {
+		if (!namespace.getMessageQueue().isEmpty()) {
+			var data = namespace.getMessageQueue().popAll();
+			Container.getLogger().debug("[Persistence] %d messages to be persisted", data.length);
+
+			// Transform Objects to Arrays
+			for (var key in data) {
+				var item = data[key];
+				data[key] = [UUID.v4(), item.conversationId, item.userId, item.message, item.timestamp];
+			}
+
+			_pool.query('INSERT INTO osc_messages (id, conversation_id, user_id, message, timestamp) VALUES ?', [data])
 		}
+	}
+
+	this.persistConversationStates = function persistConversationStates(namespace) {
+		var conversations = namespace.getConversations().all();
+
+		for (var key in conversations) {
+			var conversation = conversations[key];
+
+			var participants = conversation.getParticipants();
+
+			async.eachSeries(participants, function (participant, nextParticipant) {
+				var conversationState = conversation.getActivityForParticipant(participant.getId());
+
+				if (!conversationState.isUpdated()) {
+					nextParticipant();
+					return;
+				}
+
+				Container.getLogger().debug("[Persistence] Update conversations state for %s in %s", participant.getId(), conversation.getId());
+
+				_pool.query('UPDATE osc_activity SET is_closed = ?, timestamp = ? WHERE conversation_id = ? AND user_id = ?',
+					[conversationState.hasClosedConversation(), conversationState.getLastActivity(), conversation.getId(), participant.getId()],
+					function () {
+						conversationState.lastUpdated(conversationState.getLastActivity());
+					}
+				);
+				nextParticipant();
+			});
+		}
+	}
+	/// END NEW PERSISTENCE FUNCTION FOR ONSCREENCHAT
+
+
+	/// BEGIN NEW PRELOAD FROM PERSICTENCE LAYER
+	this.getConversationState = function getConversationState(conversationId, onResult, onEnd) {
+		Container.getLogger().debug("[Persistence] Load participant activities for %s", conversationId);
 
 		_onQueryEvents(
-			_pool.query('SELECT * FROM osc_activity WHERE conversation_id = ? AND user_id = ?', [conversationId, userId]),
-			onResult,
-			onNull
-		);
-	};
-
-	this.getConversationStateForParticipant = function(conversationId, userId, onResult, onEnd) {
-		_onQueryEvents(
-			_pool.query('SELECT * FROM osc_activity WHERE conversation_id = ? AND user_id = ?', [conversationId, userId]),
+			_pool.query('SELECT * FROM osc_activity WHERE conversation_id = ?', [conversationId]),
 			onResult,
 			onEnd
 		);
-	};
-
-	/**
-	 *
-	 * @param message
-	 */
-	this.persistConversationMessage = function(message) {
-		_pool.query('INSERT INTO osc_messages SET ?', {
-			id: message.id,
-			conversation_id: message.conversationId,
-			user_id: message.userId,
-			message: message.message,
-			timestamp: message.timestamp
-		}, handleError);
-	};
+	}
 
 	this.loadConversations = function(onResult, onEnd) {
+		Container.getLogger().debug("[Persistence] Load conversations from database");
+
 		_onQueryEvents(
 			_pool.query('SELECT * FROM osc_conversation'),
 			onResult,
@@ -436,6 +488,8 @@ var Database = function Database(config) {
 	};
 
 	this.getLatestMessage = function(conversation, onResult, onEnd) {
+		Container.getLogger().debug("[Persistence] Load latest message for conversation %s", conversation.getId());
+
 		_onQueryEvents(
 			_pool.query('SELECT * FROM osc_messages WHERE conversation_id = ? ORDER BY timestamp DESC LIMIT 1', [conversation.getId()]),
 			onResult,
@@ -445,11 +499,12 @@ var Database = function Database(config) {
 
 	this.countUnreadMessages = function(conversationId, userId, onResult, onEnd) {
 		_onQueryEvents(
-			_pool.query('SELECT COUNT(m.id) AS numMessages FROM osc_messages m LEFT JOIN osc_activity a ON a.conversation_id = m.conversation_id WHERE m.conversation_id = ? AND a.user_id = ? AND m.timestamp > a.timestamp', [conversationId, userId]),
+			_pool.query('SELECT COUNT(m.id) AS numMessages FROM osc_messages m LEFT JOIN osc_activity a ON a.conversation_id = m.conversation_id AND a.user_id = ? WHERE m.conversation_id = ? AND (a.user_id = ? OR a.user_id IS NULL) AND (a.timestamp IS NULL OR m.timestamp > a.timestamp)', [userId, conversationId, userId]),
 			onResult,
 			onEnd
 		);
 	};
+	/// END NEW PRELOAD FROM PERSICTENCE LAYER
 
 	this.loadConversationHistory = function(conversationId, oldestMessageTimestamp, onResult, onEnd){
 		var query = 'SELECT * FROM osc_messages WHERE conversation_id = ?';
@@ -461,6 +516,8 @@ var Database = function Database(config) {
 		}
 
 		query += " ORDER BY timestamp DESC LIMIT 0, 6";
+
+		Container.getLogger().debug("[Persistence] Load message history for %s", conversationId);
 
 		_onQueryEvents(
 			_pool.query(query, params),
@@ -475,6 +532,8 @@ var Database = function Database(config) {
 	this.updateConversation = function(conversation) {
 		var participantsJson = JSON.stringify(getConversationParticipantsJson(conversation));
 
+		Container.getLogger().debug("[Persistence] Update conversation %s with participants %s as group: %s", conversation.getId(), participantsJson, conversation.isGroup());
+
 		_pool.query('UPDATE osc_conversation SET participants = ?, is_group = ? WHERE id = ?',
 			[participantsJson, conversation.isGroup(), conversation.getId()],
 			handleError
@@ -487,6 +546,8 @@ var Database = function Database(config) {
 	 */
 	this.persistConversation = function(conversation) {
 		var participantsJson = JSON.stringify(getConversationParticipantsJson(conversation));
+
+		Container.getLogger().debug("[Persistence] Persist new conversation %s", conversation.getId());
 
 		_pool.query(
 			'INSERT INTO osc_conversation SET ?',

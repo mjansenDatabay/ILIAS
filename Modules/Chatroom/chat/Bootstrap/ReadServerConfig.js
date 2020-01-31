@@ -1,7 +1,6 @@
-var CONST 		= require('../Constants');
-var Container	= require('../AppContainer');
-var Handler		= require('../Handler/FileHandler');
-var dns 		= require('dns');
+var CONST = require('../Constants');
+var Container = require('../AppContainer');
+var Handler = require('../Handler/FileHandler');
 
 /**
  * @param {Function} callback
@@ -9,12 +8,15 @@ var dns 		= require('dns');
 module.exports = function ReadServerConfig(result, callback) {
 	var config = Handler.read(Container.getArgument(CONST.SERVER_CONFIG_INDEX));
 
-	function onHostnameResolved(err, addresses, family){
-		Container.getLogger().info("DNS Resolve for: %s => IP: %s , Family: %s", config.address, addresses, family);
-		config.address = addresses;
+	if (config.log === undefined || config.log.trim() === "") {
+		config.log = 'chat.log';
 	}
-
-	dns.lookup(config.address, onHostnameResolved);
+	if (config.error_log === undefined || config.error_log.trim() === "") {
+		config.error_log = 'chatError.log';
+	}
+	if (config.log_level === undefined || config.log_level.trim() === "") {
+		config.log_level = 'info';
+	}
 
 	Container.setServerConfig(config);
 

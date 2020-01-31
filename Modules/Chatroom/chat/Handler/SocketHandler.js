@@ -1,7 +1,6 @@
 var Container = require('../AppContainer');
 
-module.exports = function(socket) {
-
+module.exports = function SocketHandler(socket) {
 	Container.getLogger().info('New Connection with SocketId: %s', socket.id);
 
 	socket.on('login', _getTask('Login'));

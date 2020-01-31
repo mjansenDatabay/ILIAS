@@ -7,15 +7,19 @@ module.exports = function (conversationId, userId, name) {
 		var conversation = namespace.getConversations().getById(conversationId);
 		var participant = namespace.getSubscriberWithOfflines(userId, name);
 
+		Container.getLogger().info('[Onscreen Task]: (ConversationRemoveUser) Remove participant from conversation %s in namespace %s!', conversationId, namespace.getName());
+
 		if (conversation.isParticipant(participant)) {
 			conversation.removeParticipant(participant);
 			participant.leave(conversation.id);
 
-			Container.getLogger().info('Participant %s left group conversation %s', participant.getName(), conversation.getId());
+			Container.getLogger().info('[Onscreen Task]: (ConversationRemoveUser) Participant %s left group conversation %s in namespace %s', participant.getName(), conversation.getId(), namespace.getName());
 
 			namespace.getDatabase().updateConversation(conversation);
 			this.participant.emit('removeUser', conversation.json());
 			conversation.emit('conversation', conversation.json());
 		}
+
+		Container.getLogger().info('[Onscreen Task]: (ConversationRemoveUser) Done for conversation %s in namespace %s!', conversationId, namespace.getName());
 	}
 };

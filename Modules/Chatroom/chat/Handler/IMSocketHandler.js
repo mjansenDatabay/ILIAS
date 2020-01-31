@@ -1,8 +1,7 @@
 var Container = require('../AppContainer');
 
-module.exports = function(socket) {
-
-	Container.getLogger().info('New IM Connection with SocketId: %s', socket.id);
+module.exports = function IMSocketHandler(socket) {
+	Container.getLogger().info('[Onscreen Task]: (SocketHandler) New connection by socket: %s', socket.id);
 
 	socket.on('login', _getTask('ConversationLogin'));
 	socket.on('conversations', _getTask('ListConversations'));

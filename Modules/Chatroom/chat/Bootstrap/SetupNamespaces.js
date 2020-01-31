@@ -5,15 +5,17 @@ var PreloadData = require('./PreloadData');
 var async = require('async');
 
 module.exports = function SetupNamespaces(result, callback) {
+	Container.getLogger().info('[Boot process]: Setup namespaces started!')
 
 	var clientConfigs = Container.getClientConfigs();
 
 	function setupNamespace(config, nextLoop) {
+		Container.getLogger().log('debug', "[Boot process]: Config %s", JSON.stringify(config));
+
 		function createNamespace(callback) {
+			Container.getLogger().info('[Boot process]: Create namespace with name %s!', config.name);
+
 			var namespace = Handler.createNamespace(config.name);
-
-			Container.getLogger().info('SetupNamespace %s!', namespace.getName());
-
 			callback(null, namespace, config);
 		}
 
@@ -22,6 +24,7 @@ module.exports = function SetupNamespaces(result, callback) {
 				throw err;
 			}
 
+			Container.getLogger().info('[Boot process]: Created namespace with name %s!', config.name);
 			nextLoop();
 		}
 
@@ -40,7 +43,7 @@ module.exports = function SetupNamespaces(result, callback) {
 			throw err;
 		}
 
-		Container.getLogger().info('SetupNamespace finished!');
+		Container.getLogger().info('[Boot process]: Setup namespaces done!');
 
 		callback();
 	}

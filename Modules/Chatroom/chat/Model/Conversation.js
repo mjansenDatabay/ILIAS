@@ -1,4 +1,5 @@
 var Container  = require('../AppContainer');
+var ParticipantConversationState = require('./ParticipantConversationState');
 
 var Conversation = function Conversation(id, participants)
 {
@@ -24,6 +25,12 @@ var Conversation = function Conversation(id, participants)
 	var _latestMessage = null;
 
 	var _numNewMessages = 0;
+
+	/**
+	 * @type {{ParticipantConversationState}}
+	 * @private
+	 */
+	var _activities = {}
 
 	/**
 	 * Returns the ID of the conversation;
@@ -84,12 +91,17 @@ var Conversation = function Conversation(id, participants)
 	 */
 	this.emit = function(event, data) {
 		var ignoredParticipants = {};
+		var conversation = this;
 
 		function emitParticipant(participant){
 			if (!participant.getAcceptsMessages()) {
 				Container.getLogger().info("Conversation.emit: User %s does not want to further receive messages", participant.getId());
 				ignoredParticipants[participant.getId()] = participant.getId();
 				return;
+			}
+
+			if (data.userId !== participant.getId()) {
+				conversation.getActivityForParticipant(participant.getId()).increaseUnreadMessages();
 			}
 
 			participant.emit(event, data);
@@ -100,8 +112,25 @@ var Conversation = function Conversation(id, participants)
 		return ignoredParticipants;
 	};
 
+	this.getActivities = function () {
+		var data = [];
+
+		Object.keys(_activities).forEach(function (key) {
+			data.push({
+				'id': _activities[key].getId(),
+				'timestamp': _activities[key].getLastActivity(),
+				'closed': _activities[key].hasClosedConversation(),
+				'unreadMessages': _activities[key].getNumUnreadMessages(),
+			})
+		})
+
+		return data;
+	}
+
 	this.addParticipant = function(participant) {
 		if (!hasParticipant(participant, _participants)) {
+			_activities[participant.getId()] = new ParticipantConversationState(participant.getId());
+
 			_participants.push(participant);
 			participant.addConversation(this);
 		}
@@ -150,6 +179,18 @@ var Conversation = function Conversation(id, participants)
 			isGroup: _group
 		};
 	};
+
+	this.trackActivity = function trackActivity(participant, timestamp) {
+		this.getActivityForParticipant(participant.getId()).trackActivity(participant, timestamp);
+	}
+
+	this.getActivityForParticipant = function getActivityForParticipant(participantId) {
+		if (!_activities.hasOwnProperty(participantId)) {
+			_activities[participantId] = new ParticipantConversationState(participantId);
+		}
+
+		return _activities[participantId];
+	}
 
 	function forParticipants(callback) {
 		for(var key in _participants) {

@@ -21,6 +21,7 @@ module.exports = function(conversationId, userId, message) {
 	}
 
 	if (conversationId !== null && userId !== null && message !== null) {
+		Container.getLogger().info('[Onscreen Task]: (ConversationMessage) New message for conversation %s in namespace %s!', conversationId, this.nsp.name);
 
 		var namespace = Container.getNamespace(this.nsp.name);
 		var conversation = namespace.getConversations().getById(conversationId);
@@ -40,10 +41,13 @@ module.exports = function(conversationId, userId, message) {
 				var doStoreMessage = shouldPersistMessage(conversation);
 
 				if (doStoreMessage) {
-					namespace.getDatabase().persistConversationMessage(messageObj);
+					Container.getLogger().debug('[Onscreen Task]: (ConversationMessage) Add message to queue for conversation %s in namespace %s', userId, conversationId, namespace.getName());
+					namespace.getMessageQueue().push(messageObj);
 				}
 
 				conversation.emit('conversation', conversation.json());
+				conversation.setLatestMessage(messageObj);
+
 				var ignoredParticipants = conversation.send(messageObj);
 
 				if (Object.keys(ignoredParticipants).length > 0) {
@@ -51,12 +55,13 @@ module.exports = function(conversationId, userId, message) {
 					participant.emit("participantsSuppressedMessages", messageObj);
 				}
 
-				Container.getLogger().info('SendMessage by "%s" in conversation %s', userId, conversationId);
+				Container.getLogger().info('[Onscreen Task]: (ConversationMessage) Message by "%s" for conversation %s in namespace %s', userId, conversationId, namespace.getName());
 			} else {
 				participant.emit("senderSuppressesMessages", messageObj);
-
-				Container.getLogger().info('SendMessage by "%s" in conversation %s not delivered, user does not want to receive messages', userId, conversationId);
+				Container.getLogger().info('[Onscreen Task]: (ConversationMessage) Message by "%s" for conversation %s in namespace %s not delivered, user does not want to receive messages', userId, conversationId, namespace.getName());
 			}
 		}
+
+		Container.getLogger().info('[Onscreen Task]: (ConversationMessage) Done for conversation %s in namespace %s', conversationId, namespace.getName());
 	}
 };

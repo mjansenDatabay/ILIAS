@@ -4,14 +4,16 @@ var async = require('async');
 var PreloadConversations = require('./PreloadConversations');
 
 module.exports = function SetupIM(result, callback) {
+	Container.getLogger().info('[Boot process]: Setup onscreen namespaces started!');
 
 	function setupIMNamespace(namespace, nextLoop) {
+		Container.getLogger().log('debug','[Boot process]: Namespace %s', namespace.getName());
+
 		function createIMNamespace(callback) {
+			Container.getLogger().info('[Boot process]: Create onscreen namespace with name %s-im', namespace.getName());
+
 			var namespaceIM = Handler.createNamespace(namespace.getName() + '-im');
 			namespaceIM.setIsIM(true);
-
-			Container.getLogger().info('SetupNamespace IM: %s!', namespaceIM.getName());
-
 			namespaceIM.setDatabase(namespace.getDatabase());
 
 			callback(null, namespaceIM);
@@ -21,6 +23,8 @@ module.exports = function SetupIM(result, callback) {
 			if(err) {
 				throw err;
 			}
+
+			Container.getLogger().info('[Boot process]: Created namespace with name %s!', result.getName());
 
 			nextLoop();
 		}
@@ -39,7 +43,7 @@ module.exports = function SetupIM(result, callback) {
 			throw err;
 		}
 
-		Container.getLogger().info('SetupNamespace IM finished!');
+		Container.getLogger().info('[Boot process]: Setup onscreen namespaces done!');
 
 		callback();
 	}
