@@ -81,17 +81,28 @@ class ilIdmData
      */
     public $studies = array();
 
+    /**
+     * @var string code of doc programme
+     */
+    public $fau_doc_programmes_code = null;
 
     /**
-     *
-     * @param string    $identity
+     * @var string approval date of doc programmes
      */
-    public function __construct($identity = null)
+    public $fau_doc_approval_date = null;
+
+    /**
+     * @var ilDBIdm
+     */
+    protected $idmDB;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        if (isset($identity))
-        {
-            $this->read($identity);
-        }
+        require_once ('Services/Idm/classes/class.ilDBIdm.php');
+        $this->idmDB = ilDBIdm::getInstance();
     }
 
 
@@ -107,16 +118,14 @@ class ilIdmData
             $this->identity = $identity;
         }
 
-        require_once ('Services/Idm/classes/class.ilDBIdm.php');
-        $ilDBIdm = ilDBIdm::getInstance();
-        if (!isset($ilDBIdm))
+        if (!isset($this->idmDB))
         {
             return false;
         }
 
-        $query = "SELECT * FROM identities WHERE pk_persistent_id = ". $ilDBIdm->quote($this->identity,'text');
-        $result = $ilDBIdm->query($query);
-        if ($rawdata = $ilDBIdm->fetchAssoc($result))
+        $query = "SELECT * FROM identities WHERE pk_persistent_id = ". $this->idmDB->quote($this->identity,'text');
+        $result = $this->idmDB->query($query);
+        if ($rawdata = $this->idmDB->fetchAssoc($result))
         {
             $this->setRawData($rawdata);
             return true;
@@ -125,6 +134,33 @@ class ilIdmData
         {
             return false;
         }
+    }
+
+    /**
+     * update the doc programmes
+     * @throws ilDatabaseException
+     */
+    public function updateDocPrograms()
+    {
+        if (!isset($this->idmDB)) {
+            return;
+        }
+
+        $query = "SELECT * FROM doc_programmes";
+        $result = $this->idmDB->query($query);
+
+        $data = [];
+        while ($row = $this->idmDB->fetchAssoc($result))
+        {
+            $data[] = [
+                'prog_id' => (int) $row['prog_code'],
+                'prog_text' => (string) $row['prog_text'],
+                'prog_end' => (string) $row['prog_end_date']
+            ];
+        }
+
+        require_once('Services/StudyData/classes/class.ilStudyData.php');
+        ilStudyData::_updateDocProgData($data);
     }
 
 
@@ -228,6 +264,10 @@ class ilIdmData
                 }
             }
         }
+
+        // set data for structured doc programme
+        $this->fau_doc_programmes_code = $raw['fau_doc_programmes_code'];
+        $this->fau_doc_approval_date = $raw['fau_doc_approval_date'];
     }
 
     /**
@@ -302,12 +342,31 @@ class ilIdmData
         // always update the account (this also updates the object title and description)
         $userObj->update();
 
-
+        // save study data only if they are delivered
         if (!empty($this->studies)) {
 
             require_once('Services/StudyData/classes/class.ilStudyData.php');
             ilStudyData::_saveStudyData($userObj->getId(), $this->studies);
         }
+
+        // always save the doc programmes data
+        $prog_id = null;
+        if (!empty($this->fau_doc_programmes_code) && is_numeric($this->fau_doc_programmes_code)) {
+            $prog_id = (int) $this->fau_doc_programmes_code;
+        }
+        $prog_approval = null;
+        if ((!empty($this->fau_doc_approval_date))) {
+            $year = substr($this->fau_doc_approval_date, 0, 4);
+            $month = substr($this->fau_doc_approval_date,4,2);
+            $day = substr($this->fau_doc_approval_date, 6,2);
+            try {
+                $prog_approval= new ilDate($year.'-'.$month.'-'.$day, IL_CAL_DATE);
+            }
+            catch (ilDateTimeException $e) {
+                $prog_approval = null;
+            }
+        }
+        ilStudyData::_saveDocData($userObj->getId(), $prog_id, $prog_approval);
 
         // update role assignments
         require_once('Services/AuthShibboleth/classes/class.ilShibbolethRoleAssignmentRules.php');

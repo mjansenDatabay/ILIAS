@@ -15,8 +15,7 @@ $p->login();
  *******************/
 
 //$p->applyPatch('ilStudyDataPatches.updateStudyDataCodes');
-//$p->applyPatch('ilStudyDataPatches.searchStudentsWithDifferentFaculties');
-//$p->applyPatch('ilStudyDataPatches.testIdmData', array('identity' => 'ar38icuf'));
+//$p->applyPatch('ilStudyDataPatches.updateDocPrograms');
 
 /*****************
 * Specific actions

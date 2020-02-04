@@ -110,7 +110,7 @@ class ilStudyData
 
 	/**
 	 * lookup a subject title
-	 * 
+	 *
 	 * @param	integer		subject id
 	 * @return 	string		subject title
 	 */
@@ -216,8 +216,86 @@ class ilStudyData
 		return $options;
 	}
 
+    /**
+     * lookup a doc program
+     *
+     * @param	integer		prog id
+     * @return 	string		subject title
+     */
+    static function _lookupDocProg($a_prog_id)
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
 
-	/**
+        $query = "SELECT prog_text FROM study_doc_prog"
+            .		" WHERE prog_id=". $ilDB->quote($a_prog_id, 'integer');
+        $result = $ilDB->query($query);
+        if($row = $ilDB->fetchAssoc($result))
+        {
+            return $row["prog_text"] . " (" . $a_prog_id . ")";
+        }
+
+        return '';
+    }
+
+    /**
+     * get an array of option for a doc program selection
+     *
+     * @return array	subject_id => subject_title
+     */
+    static function _getDocProgSelectOptions()
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+        $lng = $DIC->language();
+
+        $query = "SELECT prog_id, prog_text, prog_end FROM study_doc_prog ORDER by prog_text";
+        $result = $ilDB->query($query);
+        $options = array();
+        $options[0] = $lng->txt("please_select");
+        while ($row = $ilDB->fetchAssoc($result))
+        {
+            $option = $row["prog_text"];
+            $details = $row["prog_id"];
+            if (!empty($row['prog_end']) && $row['prog_end'] != '9999-12-31 00:00:00') {
+                $end = new ilDateTime($row['prog_end'], IL_CAL_DATETIME);
+                $details .= ', ' . $lng->txt('studydata_doc_prog_until') . ' ' . ilDatePresentation::formatDate($end);
+            }
+            $options[$row["prog_id"]] = $option . ' (' . $details . ')';
+        }
+        return $options;
+    }
+
+    /**
+     * Fill the list of doc programs
+     * @param array $data [prog_id => int, prog_text => string, prog_end => string]
+     * @return bool
+     * @throws ilDatabaseException
+     */
+    static function _updateDocProgData($data)
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        try {
+            $ilDB->manipulate('TRUNCATE TABLE study_doc_prog');
+
+            foreach ($data as $row) {
+
+                $query = "INSERT INTO study_doc_prog(prog_id, prog_text, prog_end) VALUES ("
+                    . $ilDB->quote($row['prog_id'], 'integer') . ', '
+                    . $ilDB->quote($row['prog_text'], 'text') . ', '
+                    . $ilDB->quote($row['prog_end'], 'text') . ')';
+                $ilDB->manipulate($query);
+            }
+        }
+        catch (ilDatabaseException $e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
 	 * get a textual description of a user's study data
 	 *
 	 * @param int $a_user_id
@@ -225,24 +303,12 @@ class ilStudyData
 	 */
 	static function _getStudyDataText($a_user_id)
 	{
-		$data = self::_readStudyData($a_user_id);
-        return self::_getStudyDataTextForData($data);
-	}
-
-
-    /**
-     * get a textual description of study data
-     *
-     * @param   array   study data
-     * @return string	multi-line description
-     */
-	static function _getStudyDataTextForData($a_data)
-    {
-    	global $DIC;
-    	$lng = $DIC->language();
+        global $DIC;
+        $lng = $DIC->language();
 
         $text = '';
-        foreach ($a_data as $study)
+        $studydata = self::_readStudyData($a_user_id);
+        foreach ($studydata as $study)
         {
             $study_text = "";
             foreach ($study["subjects"] as $subject)
@@ -263,9 +329,28 @@ class ilStudyData
 					$text .= ' (' . $type_text . ')';
 				}
 				$text .= ' :';
-
 				$text .= "\n". $study_text;
             }
+        }
+
+        $doc_text= '';
+        $docdata = self::_readDocData($a_user_id);
+        if (is_array($docdata)) {
+            if (!empty($docdata['prog_id'])) {
+                $doc_text = self::_lookupDocProg($docdata['prog_id']);
+            }
+            if ($docdata['prog_approval'] instanceof ilDate) {
+                if (empty($doc_text)) {
+                    $doc_text = $lng->txt('studydata_promotion');
+                }
+                $doc_text .= ', ' . $lng->txt('studydata_promotion_approval') . ' ';
+                $doc_text .= ilDatePresentation::formatDate($docdata['prog_approval']);
+            }
+        }
+
+        if (!empty($doc_text)) {
+            $text .= $text ? "\n\n" : "";
+            $text .= $doc_text;
         }
 
         return $text;
@@ -335,7 +420,20 @@ class ilStudyData
 		return ilStudyAccess::_getStudyData($a_user_id, false);
 	}
 
-	/**
+    /**
+     * read the doc programme data of a user
+     * @param 	integer		user_id
+     * @return 	array		['prog_id' => int|null, 'prog_approval' => ilDate|null]
+     * @see		ilStudyAccess::_getDocData
+     */
+    static function _readDocData($a_user_id)
+    {
+        // don't use the cache
+        return ilStudyAccess::_getDocData($a_user_id, false);
+    }
+
+
+    /**
 	* Save the study data for a user
 	*
 	* @param    int     	user id
@@ -400,6 +498,38 @@ class ilStudyData
 				$study_no++;	
 			}
 		}
-	}	
+	}
+
+    /**
+     * Save the doc programme data for a user
+     *
+     * @param    int     	user id
+     * @param    int|null   	doc programme id
+     * @param    ilDate|null   	doc programme approval date
+     */
+    static function _saveDocData($a_user_id, $a_prog_id = null, $a_prog_approval = null)
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        if (empty($a_prog_id) && empty($a_prog_approval_date)) {
+            $query = "DELETE from usr_doc_prog"
+                . 		" WHERE usr_id=". $ilDB->quote($a_user_id,'integer');
+            $ilDB->manipulate($query);
+        }
+
+        $approval_str = null;
+        if ($a_prog_approval instanceof ilDate) {
+            $approval_str = $a_prog_approval->get(IL_CAL_DATE);
+        }
+
+        $query = "  REPLACE into usr_doc_prog(usr_id, prog_id, prog_approval) VALUES("
+            . $ilDB->quote($a_user_id,'integer'). ","
+            . $ilDB->quote($a_prog_id,'integer'). ","
+            . $ilDB->quote($approval_str,'text')
+            . ")";
+
+        $ilDB->query($query);
+    }
 }
 

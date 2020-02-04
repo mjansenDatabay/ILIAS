@@ -329,6 +329,11 @@ common#:#studydata_type_full#:#Vollzeit
 common#:#studydata_type_part#:#Teilzeit
 common#:#studydata_type_none#:#Unbekannt
 common#:#studydata_type_any#:#Beliebig
+common#:#studydata_promotion#:#Promotion
+common#:#studydata_promotion_approval#:#zugelassen
+common#:#studydata_promotion_program#:#Strukturiertes Promotionsprogramm
+common#:#studydata_promotion_approval_date#:#Zulassungsdatum
+common#:#studydata_doc_prog_until#:#bis
 common#:#sub_added_to_waiting_list#:#Sie wurden auf die Warteliste gesetzt. <br />Sie haben Platz %s auf der Warteliste.
 common#:#sub_fair_date#:#Chancengleich bis
 common#:#sub_fair_date_info#:#Bis zu diesem Zeitpunkt werden alle Anmeldungen chancengleich auf der Warteliste gesammelt und die freien Plätze danach ausgelost. Alle nachfolgenden Anmeldungen erhalten höhere Wartelistenplätze. Beim Aufrücken von der Warteliste wird ebenfalls zwischen chancengleichen Anmeldungen gelost.

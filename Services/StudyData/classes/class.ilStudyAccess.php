@@ -169,10 +169,10 @@ class ilStudyAccess
 
 	/**
 	 * get the study data of a user
-	 * 
+	 *
 	 * study_no and subject_no are only used for sorting and nesting the structure
 	 * They are not added to the result to avoid inconsistencies
-	 * 
+	 *
 	 * @param 	integer		user id
 	 * @param	boolean		use cached data (default: true)
 	 * @return 	array		list of assoc study data arrays with nested subject ids
@@ -225,7 +225,53 @@ class ilStudyAccess
 		}
 		return $data;
 	}
-	
+
+    /**
+     * get the doc programme data of a user
+     *
+     * @param 	integer		user id
+     * @param	boolean		use cached data (default: true)
+     * @return 	array       ['prog_id' => int|null, 'prog_approval' => ilDate|null]
+     * @see		ilStudyData::_readDocData 	(version without cache)
+     */
+
+    public static function _getDocData($a_user_id, $a_with_cache = true)
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        static $cached_data = array();
+
+        if ($a_with_cache and isset($cached_data[$a_user_id]))
+        {
+            return $cached_data[$a_user_id];
+        }
+
+        $query = 'SELECT usr_id, prog_id, prog_approval'
+            . ' FROM usr_doc_prog'
+            . ' WHERE usr_id='. $ilDB->quote($a_user_id,'integer');
+        $result = $ilDB->query($query);
+
+        $data = array(
+            'prog_id' => null,
+            'prog_approval' => null
+        );
+        if ($row = $ilDB->fetchAssoc($result)) {
+            $data['prog_id'] = $row['prog_id'];
+            try {
+                $data['prog_approval'] = new ilDate($row['prog_approval'], IL_CAL_DATE);
+            }
+            catch (ilDateTimeException $e) {
+                $data['prog_approval'] = null;
+            }
+        }
+
+        if ($a_with_cache)
+        {
+            $cached_data[$a_user_id] = $data;
+        }
+        return $data;
+    }
 	
 	/**
 	* Get the offset of the running semester in relation to the given semester

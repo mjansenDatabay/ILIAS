@@ -1,7 +1,7 @@
 <#1>
 <?php
 	/**
-	* Create the tables for study data
+	* fim: [studydata] Create the tables for study data.
 	*/
 	if(!$ilDB->tableExists('usr_study'))
 	{
@@ -120,7 +120,7 @@
 <#5>
 <?php
 	/**
-	* Add the support for study data based subscription conditions
+	* fim: [studycond] Add the support for study data based subscription conditions.
 	*/
 	if(!$ilDB->tableExists('il_sub_studycond'))
 	{
@@ -226,7 +226,7 @@
 <#9>
 <?php
 	/**
-	 * Create the table for studydata conditions
+	 * fim: [studycond] Create the table for studydata conditions.
 	 */
 	if (!$ilDB->tableExists('il_studycond'))
 	{
@@ -487,7 +487,7 @@
 <#25>
 <?php
 	/**
-	 * Add semester for studydata subjects
+	 * fim: [studydata] Add semester for studydata subjects.
 	 */
 	if( !$ilDB->tableColumnExists('usr_subject', 'semester'))
 	{
@@ -499,7 +499,7 @@
 <#26>
 <?php
 	/**
-	 * Add subject_no for studydata subjects
+	 * fim: [studydata] Add subject_no for studydata subjects.
 	 */
 	if( !$ilDB->tableColumnExists('usr_subject', 'subject_no'))
 	{
@@ -511,7 +511,7 @@
 <#27>
 <?php
 	/**
-	 * Drop old stury registration support
+	 * fim: [studydata] Drop old study registration support.
 	 */
 	if ($ilDB->tableExists('study_matriculations'))
 		$ilDB->dropTable('study_matriculations');
@@ -578,7 +578,7 @@
 <#34>
 <?php
     /**
-     * optimize queries on frm_posts_tree
+     * fim: [studycond] optimize queries on study conditions.
      */
     if (!$ilDB->indexExistsByFields('il_studycond', array('ref_id')))
     {
@@ -1004,7 +1004,8 @@ if (!$ilDB->tableColumnExists('booking_settings', 'user_storno'))
 <#62>
 <?php
 /**
- * Create the tables for study data
+ * fim: [studydata] add the column for study type.
+ * fim: [studycond] add the column for study type.
  */
 if(!$ilDB->tableColumnExists('usr_study','study_type'))
 {
@@ -1036,5 +1037,30 @@ if(!$ilDB->tableColumnExists('style_usage','scope_ref_id'))
         array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0)
     );
     $ilDB->addIndex('style_usage', array('scope_ref_id'), 'i9');
+}
+?>
+<#64>
+<?php
+/**
+ * fim: [studydata] Create the tables for study doc programmes.
+ */
+if(!$ilDB->tableExists('usr_doc_prog'))
+{
+    $ilDB->createTable('usr_doc_prog', array(
+        'usr_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'prog_approval' => array('type' => 'date', 'notnull' => false, 'default' => null),
+    ));
+    $ilDB->addPrimaryKey('usr_doc_prog',array('usr_id'));
+}
+
+if(!$ilDB->tableExists('study_doc_prog'))
+{
+    $ilDB->createTable('study_doc_prog', array(
+        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'prog_text' => array('type' => 'text', 'length' => 250, 'notnull' => false, 'default' => null),
+        'prog_end' => array('type' => 'timestamp', 'notnull' => false, 'default' => null),
+    ));
+    $ilDB->addPrimaryKey('study_doc_prog',array('prog_id'));
 }
 ?>

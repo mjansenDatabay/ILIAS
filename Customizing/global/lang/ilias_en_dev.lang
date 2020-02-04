@@ -358,6 +358,11 @@ common#:#studydata_type_full#:#Full time
 common#:#studydata_type_part#:#Part time
 common#:#studydata_type_none#:#Unknown
 common#:#studydata_type_any#:#Any
+common#:#studydata_promotion#:#Promotion
+common#:#studydata_promotion_approval#:#approved
+common#:#studydata_promotion_program#:#Stuctured Promotion Program
+common#:#studydata_promotion_approval_date#:#Approval Date
+common#:#studydata_doc_proc_until#:#util
 common#:#sub_added_to_waiting_list#:#You have been assigned to the waiting list. You are assigned to position %s on the waiting list.
 common#:#sub_fair_date#:#Equal Chances Until
 common#:#sub_fair_date_info#:#All registrations will be equally collected on the waiting list and the free places will be filled by lot afterwards. Later registrations will get higher waiting positions. A later filling from the waiting list will also respect the equal chances.

@@ -84,43 +84,13 @@ class ilStudyDataPatches
 	}
 
     /**
-     * test the idm data
-     * @param $identity
+     * Update the doc programs
+     * @throws ilDatabaseException
      */
-    public function testIdmData($params = array('identity' => ''))
+	public function updateDocPrograms()
     {
-        require_once("Services/Idm/classes/class.ilIdmData.php");
-        require_once("Services/StudyData/classes/class.ilStudyData.php");
-        $data = new ilIdmData($params['identity']);
-        var_dump($data);
-        echo ilStudyData::_getStudyDataTextForData($data->studies) . "\n";
-
-    }
-
-    /**
-     * search for students having different faculties in theit study data
-     */
-    public function searchStudentsWithDifferentFaculties()
-    {
-        global $ilDB;
-
-        require_once("Services/Idm/classes/class.ilIdmData.php");
-        require_once("Services/StudyData/classes/class.ilStudyData.php");
-
-        $result = $ilDB->query("SELECT * FROM idm.identities");
-        while ($row = $ilDB->fetchAssoc($result))
-        {
-            $study = explode('#', $row['fau_features_of_study']);
-
-            if ((!empty($study[11]) and $study[11] != $study[3])
-            or  (!empty($study[19]) and $study[19] != $study[3]))
-            {
-                $data = new ilIdmData();
-                $data->setRawData($row);
-
-                echo $row['pk_persistent_id'] . $row['fau_features_of_study'];
-                echo ilStudyData::_getStudyDataTextForData($data->studies) ."\n";
-            }
-        }
+        require_once('Services/Idm/classes/class.ilIdmData.php');
+        $idmData = new ilIdmData();
+        $idmData->updateDocPrograms();
     }
 }

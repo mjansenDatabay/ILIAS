@@ -165,7 +165,21 @@ class ilStudyDataGUI
 			}
 		}
 
-		$this->form->addCommandButton("update", $this->lng->txt("update"));
+		$item = new ilFormSectionHeaderGUI();
+		$item->setTitle($this->lng->txt('studydata_promotion'));
+		$this->form->addItem($item);
+
+        // doc programme
+        $item = new ilSelectInputGUI($this->lng->txt('studydata_promotion_program'), 'study_doc_prog');
+        $item->setOptions(ilStudyData::_getDocProgSelectOptions());
+        $this->form->addItem($item);
+
+        // doc approval date
+        $item = new ilDateTimeInputGUI($this->lng->txt('studydata_promotion_approval_date'), 'study_doc_approval_date');
+        $item->setShowTime(false);
+        $this->form->addItem($item);
+
+        $this->form->addCommandButton("update", $this->lng->txt("update"));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 	}
 	
@@ -175,11 +189,11 @@ class ilStudyDataGUI
 	 */
 	private function getValues()
 	{
-		$data = ilStudyData::_readStudyData($this->user->getId());
+		$studydata = ilStudyData::_readStudyData($this->user->getId());
 		$values = array();
 		$values['matriculation'] = $this->user->getMatriculation();
 		$study_no = 1;
-		foreach($data as $study)
+		foreach($studydata as $study)
 		{
 			$values['study'.$study_no.'_ref_semester'] = $study['ref_semester'];
 			$values['study'.$study_no.'_degree_id'] = $study['degree_id'];
@@ -196,8 +210,16 @@ class ilStudyDataGUI
 			
 			$study_no++;
 		}
-
 		$this->form->setValuesByArray($values);
+
+        $docdata = ilStudyData::_readDocData($this->user->getId());
+        /** @var ilSelectInputGUI $item */
+        $item = $this->form->getItemByPostVar('study_doc_prog');
+        $item->setValue($docdata['prog_id']);
+
+        /** @var ilDateTimeInputGUI $item */
+        $item = $this->form->getItemByPostVar('study_doc_approval_date');
+        $item->setDate($docdata['prog_approval']);
 	}
 	
 	
@@ -242,10 +264,19 @@ class ilStudyDataGUI
 				return false;				
 			}
 		}
-		
-		print_r($studydata);
-		
-		ilStudyData::_saveStudyData($this->user->getId(), $studydata);
+
+        /** @var ilSelectInputGUI $item */
+        $this->form->setValuesByPost();
+        $item = $this->form->getItemByPostVar('study_doc_prog');
+        $prog_id = $item->getValue();
+
+        /** @var ilDateTimeInputGUI $item */
+        $item = $this->form->getItemByPostVar('study_doc_approval_date');
+        $prog_approval = $item->getDate();
+
+        ilStudyData::_saveStudyData($this->user->getId(), $studydata);
+        ilStudyData::_saveDocData($this->user->getId(), $prog_id, $prog_approval);
+
 		$this->user->setMatriculation($this->form->getInput("matriculation"));
 		$this->user->update();	
 		return true;
