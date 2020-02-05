@@ -17,6 +17,12 @@ class ilStudyOptionDocProgram extends ilStudyOption
     /** @var ilDateTime|null */
     public $end;
 
+    /** @inheritdoc */
+    protected static $cache;
+
+    /** @inheritdoc */
+    protected static $allCached;
+
     /**
      * @inheritDoc
      */

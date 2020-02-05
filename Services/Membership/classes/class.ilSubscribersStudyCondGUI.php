@@ -314,6 +314,8 @@ class ilSubscribersStudyCondGUI
 	private function initForm($a_mode)
 	{
 		require_once("Services/StudyData/classes/class.ilStudyData.php");
+        require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
+        require_once("Services/StudyData/classes/class.ilStudyOptionDegree.php");
 		require_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$this->form_gui = new ilPropertyFormGUI();
 		$this->form_gui->setFormAction($this->ctrl->getFormAction($this));
@@ -321,22 +323,20 @@ class ilSubscribersStudyCondGUI
 		// subject
 		$item = new ilSelectInputGUI($this->lng->txt("studycond_field_subject"), "subject_id");
 		$item->setInfo($this->lng->txt("studycond_field_subject_info"));
-		$item->setOptions(ilStudyData::_getSubjectSelectOptions());
+		$item->setOptions(ilStudyOptionSubject::_getSelectOptions(0));
 		$this->form_gui->addItem($item);
 
 		// degree
 		$item = new ilSelectInputGUI($this->lng->txt("studycond_field_degree"), "degree_id");
 		$item->setInfo($this->lng->txt("studycond_field_degree_info"));
-		$item->setOptions(ilStudyData::_getDegreeSelectOptions());
+		$item->setOptions(ilStudyOptionDegree::_getSelectOptions(0));
 		$this->form_gui->addItem($item);
-
 
         // study_type
         $item = new ilSelectInputGUI($this->lng->txt("studydata_type"), "study_type");
         $item->setOptions(ilStudyData::_getStudyTypeSelectOptions());
         $item->setInfo($this->lng->txt("studycond_field_studytype_info"));
         $this->form_gui->addItem($item);
-
 
         // min semester
 		$item = new ilNumberInputGUI($this->lng->txt("studycond_field_min_semester"), "min_semester");

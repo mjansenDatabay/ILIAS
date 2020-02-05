@@ -17,49 +17,6 @@ class ilStudyData
 	const TYPE_PART = "T";
 	const TYPE_NONE  = "";
 
-	/**
-	 * lookup a school title
-	 * 
-	 * @param	integer		school id
-	 * @return 	string		school title
-	 */
-	static function _lookupSchool($a_school_id)
-	{
-		global $DIC;
-		$ilDB = $DIC->database();
-		
-		$query = "SELECT school_title FROM study_schools"
-		.		" WHERE school_id=". $ilDB->quote($a_school_id, 'integer');
-		$result = $ilDB->query($query);
-		if($row = $ilDB->fetchAssoc($result))
-		{
-			return $row["school_title"];
-		}
-		return '';
-	}
-	
-	/**
-	 * get an array of option for a school selection
-	 * 
-	 * @return array	school_id => school_title
-	 */
-	static function _getSchoolSelectOptions()
-	{
-		global $DIC;
-		$ilDB = $DIC->database();
-		$lng = $DIC->language();
-
-		$query = "SELECT school_id, school_title FROM study_schools"
-		.		" ORDER by school_title";
-		$result = $ilDB->query($query);
-		$options = array();
-		$options[-1] = $lng->txt("please_select");
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$options[$row["school_id"]] = $row["school_title"]. " (" . $row["school_id"] . ")";
-		}
-		return $options;
-	}
 
 	/**
 	 * get an array of option for a study type
@@ -77,97 +34,6 @@ class ilStudyData
 
 		return $options;
 	}
-
-
-	/**
-	 * lookup a subject title
-	 *
-	 * @param	integer		subject id
-	 * @return 	string		subject title
-	 */
-	static function _lookupSubject($a_subject_id)
-	{
-		global $DIC;
-		$ilDB = $DIC->database();
-
-		$query = "SELECT subject_title FROM study_subjects"
-		.		" WHERE subject_id=". $ilDB->quote($a_subject_id, 'integer');
-		$result = $ilDB->query($query);
-		if($row = $ilDB->fetchAssoc($result))
-		{
-			return $row["subject_title"] . " (" . $a_subject_id . ")";
-		}
-		return '';
-	}
-
-	/**
-	 * get an array of option for a subject selection
-	 * 
-	 * @return array	subject_id => subject_title
-	 */
-	static function _getSubjectSelectOptions()
-	{
-		global $DIC;
-		$ilDB = $DIC->database();
-		$lng = $DIC->language();
-
-		$query = "SELECT subject_id, subject_title FROM study_subjects"
-		.		" ORDER by subject_title";
-		$result = $ilDB->query($query);
-		$options = array();
-		$options[0] = $lng->txt("please_select");
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$options[$row["subject_id"]] = $row["subject_title"]. " (" . $row["subject_id"] . ")";
-		}
-		return $options;
-	}
-
-	/**
-	 * lookup a degree title
-	 * 
-	 * @param	integer		$a_degree_id
-	 * @return 	string		degree title
-	 */
-	static function _lookupDegree($a_degree_id)
-	{
-		global $DIC;
-		$ilDB = $DIC->database();
-
-		$query = "SELECT degree_title FROM study_degrees"
-		.		" WHERE degree_id=". $ilDB->quote($a_degree_id,'integer');
-		$result = $ilDB->query($query);
-		if($row = $ilDB->fetchAssoc($result))
-		{
-			return $row["degree_title"] . " (" . $a_degree_id . ")";
-		}
-		return '';
-	}
-
-	
-	/**
-	 * get an array of option for a degree selection
-	 * 
-	 * @return array	degree_id => degree_title
-	 */
-	static function _getDegreeSelectOptions()
-	{
-		global $DIC;
-		$ilDB = $DIC->database();
-		$lng = $DIC->language();
-
-		$query = "SELECT degree_id, degree_title FROM study_degrees"
-		.		" ORDER by degree_title";
-		$result = $ilDB->query($query);
-		$options = array();
-		$options[0] = $lng->txt("please_select");
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$options[$row["degree_id"]] =  $row["degree_title"]. " (" . $row["degree_id"] . ")";
-		}
-		return $options;
-	}
-
 
 	/**
 	 * get an array of option for a semester
@@ -196,6 +62,11 @@ class ilStudyData
 	 */
 	static function _getStudyDataText($a_user_id)
 	{
+        require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
+        require_once "Services/StudyData/classes/class.ilStudyOptionSchool.php";
+        require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
+        require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
+
         global $DIC;
         $lng = $DIC->language();
 
@@ -207,11 +78,11 @@ class ilStudyData
             foreach ($study["subjects"] as $subject)
             {
                 $study_text .= $study_text ? ", " : "";
-                $study_text .= self::_lookupSubject($subject['subject_id']);
+                $study_text .= ilStudyOptionSubject::_lookupText($subject['subject_id']);
                 $study_text .= sprintf($lng->txt('studydata_semester_text'), $subject["semester"]);
             }
-            $study_text .= "\n".self::_lookupDegree($study["degree_id"]);
-            $study_text .= "\n".self::_lookupSchool($study["school_id"]);
+            $study_text .= "\n".ilStudyOptionDegree::_lookupText($study["degree_id"]);
+            $study_text .= "\n".ilStudyOptionSchool::_lookupText($study["school_id"]);
 
             if (!empty($study_text))
             {
@@ -227,7 +98,6 @@ class ilStudyData
         }
 
         $docdata = self::_readDocData($a_user_id);
-        require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
         $doc_text = ilStudyOptionDocProgram::_lookupText($docdata['prog_id']);
 
         if (!empty($doc_text)) {

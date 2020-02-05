@@ -12,6 +12,9 @@
 * 
 */
 require_once "Services/StudyData/classes/class.ilStudyData.php";
+require_once("Services/StudyData/classes/class.ilStudyOptionDegree.php");
+require_once("Services/StudyData/classes/class.ilStudyOptionSchool.php");
+require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
 require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
 
 class ilStudyDataGUI
@@ -111,7 +114,7 @@ class ilStudyDataGUI
 	 */
 	private function initForm()
 	{
-		$this->form = new ilPropertyFormGUI();
+        $this->form = new ilPropertyFormGUI();
 		$this->form->setTitle($this->lng->txt("studydata_edit"));
 		
 		// matriculation
@@ -134,12 +137,12 @@ class ilStudyDataGUI
 			
 			// degree
 			$item = new ilSelectInputGUI($this->lng->txt('studydata_degree'), 'study'.$study_no.'_degree_id');
-			$item->setOptions(ilStudyData::_getDegreeSelectOptions());
+			$item->setOptions(ilStudyOptionDegree::_getSelectOptions(0));
 			$this->form->addItem($item);
 			
 			// school
 			$item = new ilSelectInputGUI($this->lng->txt('studydata_school'), 'study'.$study_no.'_school_id');
-			$item->setOptions(ilStudyData::_getSchoolSelectOptions());
+			$item->setOptions(ilStudyOptionSchool::_getSelectOptions(-1));
 			$this->form->addItem($item);
 
 			// type
@@ -152,7 +155,7 @@ class ilStudyDataGUI
 				// subject
 				$item = new ilSelectInputGUI(sprintf($this->lng->txt('studydata_subject_no'),$subject_no), 
 											'study'.$study_no.'_subject'.$subject_no.'_subject_id');
-				$item->setOptions(ilStudyData::_getsubjectSelectOptions());
+				$item->setOptions(ilStudyOptionSubject::_getSelectOptions(0));
 				$this->form->addItem($item);
 				
 				// semester
@@ -236,6 +239,10 @@ class ilStudyDataGUI
 			$study['degree_id'] = $this->form->getInput('study'.$study_no.'_degree_id');
 			$study['school_id'] = $this->form->getInput('study'.$study_no.'_school_id');
             $study['study_type'] = $this->form->getInput('study'.$study_no.'_study_type');
+
+            if ($study['school_id'] < 0 ) {
+                $study['school_id']  = null;
+            }
 			
 			for ($subject_no = 1; $subject_no <= 3; $subject_no++)
 			{

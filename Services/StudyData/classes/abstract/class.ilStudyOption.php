@@ -7,13 +7,15 @@
 abstract class ilStudyOption
 {
     /**
-     * Static cache (different for all child classes)
+     * Static cache
+     * (needs to be redefined in all child classes, access with static::$cache)
      * @var static[]  Options indexed by id
      */
     protected static $cache;
 
     /**
-     * Indicates if all options are already cached
+     * Indicates that all options are already cached
+     * (needs to be redefined in all child classes, access with static::$allCached)
      * @var bool
      */
     protected static $allCached;

@@ -4,10 +4,11 @@
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 
-include_once 'Services/Table/classes/class.ilTable2GUI.php';
-include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
-include_once "./Services/StudyData/classes/class.ilStudyData.php";
-
+require_once 'Services/Table/classes/class.ilTable2GUI.php';
+require_once "Services/Membership/classes/class.ilSubscribersStudyCond.php";
+require_once "Services/StudyData/classes/class.ilStudyData.php";
+require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
+require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
 
 /**
 * Class ilSubscribersStudyCondTableGUI
@@ -61,8 +62,8 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
 		$data = array();
 		foreach (ilSubscribersStudyCond::_getConditionsData($this->obj_id) as $row)
 		{
-			$row['subject'] = ilStudyData::_lookupSubject($row['subject_id']);
-			$row['degree'] = ilStudyData::_lookupDegree($row['degree_id']);
+			$row['subject'] = ilStudyOptionSubject::_lookupText($row['subject_id']);
+			$row['degree'] = ilStudyOptionDegree::_lookupText($row['degree_id']);
 			$data[] = $row;
 		}
         $this->setData($data);

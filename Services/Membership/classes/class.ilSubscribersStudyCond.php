@@ -302,6 +302,8 @@ class ilSubscribersStudyCond
 		$lng = $DIC->language();
 		
 		require_once('Services/StudyData/classes/class.ilStudyData.php');
+        require_once('Services/StudyData/classes/class.ilStudyOptionDegree.php');
+        require_once('Services/StudyData/classes/class.ilStudyOptionSubject.php');
 
 		$text = array();
 		$data = self::_getConditionsData($a_obj_id);
@@ -313,11 +315,11 @@ class ilSubscribersStudyCond
 
 			if ($cond['subject_id'])
 			{
-				$ctext[] = ilStudyData::_lookupSubject($cond['subject_id']);
+				$ctext[] = ilStudyOptionSubject::_lookupText($cond['subject_id']);
 			}
 			if ($cond['degree_id'])
 			{
-				$ctext[] = ilStudyData::_lookupDegree($cond['degree_id']);
+				$ctext[] = ilStudyOptionDegree::_lookupText($cond['degree_id']);
 			}
 			if ($cond['min_semester'] and $cond['max_semester'])
 			{
