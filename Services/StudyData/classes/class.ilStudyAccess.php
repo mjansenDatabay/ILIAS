@@ -279,7 +279,7 @@ class ilStudyAccess
 	* @param    string      year and semester, e.g. '20092' (ws) or '20101' (ss)
 	* @return   int         offset (-1, 0, 1)
 	*/
-	public static function _getRunningSemesterOffset($a_semester = '')
+	protected static function _getRunningSemesterOffset($a_semester = '')
 	{
 		if (strlen($a_semester) != 5 or !is_numeric($a_semester))
 		{

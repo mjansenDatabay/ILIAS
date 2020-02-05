@@ -137,11 +137,12 @@ class ilIdmData
     }
 
     /**
-     * update the doc programmes
-     * @throws ilDatabaseException
+     * Update the doc programmes
      */
     public function updateDocPrograms()
     {
+        require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
+
         if (!isset($this->idmDB)) {
             return;
         }
@@ -149,18 +150,26 @@ class ilIdmData
         $query = "SELECT * FROM doc_programmes";
         $result = $this->idmDB->query($query);
 
-        $data = [];
+        $options = [];
         while ($row = $this->idmDB->fetchAssoc($result))
         {
-            $data[] = [
-                'prog_id' => (int) $row['prog_code'],
-                'prog_text' => (string) $row['prog_text'],
-                'prog_end' => (string) $row['prog_end_date']
-            ];
+            $option = new ilStudyOptionDocProgram();
+            $option->id = (int) $row['prog_code'];
+            $option->text = (string) $row['prog_text'];
+            if (!empty($row['prog_end_date']) && $row['prog_end_date'] != '9999-12-31 00:00:00') {
+                try {
+                    $option->end = new ilDateTime($row['prog_end_date'], IL_CAL_DATETIME);
+                } catch (ilDateTimeException $e) {
+                    $option->end = null;
+                }
+            }
+            $options[] = $option;
         }
 
-        require_once('Services/StudyData/classes/class.ilStudyData.php');
-        ilStudyData::_updateDocProgData($data);
+        ilStudyOptionDocProgram::_delete();
+        foreach ($options as $option) {
+            $option->write();
+        }
     }
 
 

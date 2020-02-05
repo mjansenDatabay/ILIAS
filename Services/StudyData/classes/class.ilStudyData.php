@@ -17,35 +17,6 @@ class ilStudyData
 	const TYPE_PART = "T";
 	const TYPE_NONE  = "";
 
-	static $study_data_visible;
-
-	/**
-	 * get the privacy setting for the visibility of study data (cached)
-	 * 
-	 * @return boolean	study data visible to the current user (true false)
-	 */
-	static function _getStudyDataVisibility()
-	{
-		global $rbacsystem;
-
-		if (!isset(self::$study_data_visible))
-		{
-			include_once 'Services/PrivacySecurity/classes/class.ilPrivacySettings.php';
-			$privacy = ilPrivacySettings::_getInstance();
-
-			if($rbacsystem->checkAccess('export_member_data',$privacy->getPrivacySettingsRefId()))
-			{
-            	self::$study_data_visible = true;
-            }
-            else
-            {
-                self::$study_data_visible = false;
-            }
-        }
-		return self::$study_data_visible;
-	}
-
-
 	/**
 	 * lookup a school title
 	 * 
@@ -216,84 +187,6 @@ class ilStudyData
 		return $options;
 	}
 
-    /**
-     * lookup a doc program
-     *
-     * @param	integer		prog id
-     * @return 	string		subject title
-     */
-    static function _lookupDocProg($a_prog_id)
-    {
-        global $DIC;
-        $ilDB = $DIC->database();
-
-        $query = "SELECT prog_text FROM study_doc_prog"
-            .		" WHERE prog_id=". $ilDB->quote($a_prog_id, 'integer');
-        $result = $ilDB->query($query);
-        if($row = $ilDB->fetchAssoc($result))
-        {
-            return $row["prog_text"] . " (" . $a_prog_id . ")";
-        }
-
-        return '';
-    }
-
-    /**
-     * get an array of option for a doc program selection
-     *
-     * @return array	subject_id => subject_title
-     */
-    static function _getDocProgSelectOptions()
-    {
-        global $DIC;
-        $ilDB = $DIC->database();
-        $lng = $DIC->language();
-
-        $query = "SELECT prog_id, prog_text, prog_end FROM study_doc_prog ORDER by prog_text";
-        $result = $ilDB->query($query);
-        $options = array();
-        $options[0] = $lng->txt("please_select");
-        while ($row = $ilDB->fetchAssoc($result))
-        {
-            $option = $row["prog_text"];
-            $details = $row["prog_id"];
-            if (!empty($row['prog_end']) && $row['prog_end'] != '9999-12-31 00:00:00') {
-                $end = new ilDateTime($row['prog_end'], IL_CAL_DATETIME);
-                $details .= ', ' . $lng->txt('studydata_doc_prog_until') . ' ' . ilDatePresentation::formatDate($end);
-            }
-            $options[$row["prog_id"]] = $option . ' (' . $details . ')';
-        }
-        return $options;
-    }
-
-    /**
-     * Fill the list of doc programs
-     * @param array $data [prog_id => int, prog_text => string, prog_end => string]
-     * @return bool
-     * @throws ilDatabaseException
-     */
-    static function _updateDocProgData($data)
-    {
-        global $DIC;
-        $ilDB = $DIC->database();
-
-        try {
-            $ilDB->manipulate('TRUNCATE TABLE study_doc_prog');
-
-            foreach ($data as $row) {
-
-                $query = "INSERT INTO study_doc_prog(prog_id, prog_text, prog_end) VALUES ("
-                    . $ilDB->quote($row['prog_id'], 'integer') . ', '
-                    . $ilDB->quote($row['prog_text'], 'text') . ', '
-                    . $ilDB->quote($row['prog_end'], 'text') . ')';
-                $ilDB->manipulate($query);
-            }
-        }
-        catch (ilDatabaseException $e) {
-            return false;
-        }
-        return true;
-    }
 
     /**
 	 * get a textual description of a user's study data
@@ -333,20 +226,9 @@ class ilStudyData
             }
         }
 
-        $doc_text= '';
         $docdata = self::_readDocData($a_user_id);
-        if (is_array($docdata)) {
-            if (!empty($docdata['prog_id'])) {
-                $doc_text = self::_lookupDocProg($docdata['prog_id']);
-            }
-            if ($docdata['prog_approval'] instanceof ilDate) {
-                if (empty($doc_text)) {
-                    $doc_text = $lng->txt('studydata_promotion');
-                }
-                $doc_text .= ', ' . $lng->txt('studydata_promotion_approval') . ' ';
-                $doc_text .= ilDatePresentation::formatDate($docdata['prog_approval']);
-            }
-        }
+        require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
+        $doc_text = ilStudyOptionDocProgram::_lookupText($docdata['prog_id']);
 
         if (!empty($doc_text)) {
             $text .= $text ? "\n\n" : "";

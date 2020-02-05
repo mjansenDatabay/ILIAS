@@ -29,7 +29,7 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
  * fim: [memcond] added ilSubscribersStudyCondGUI to call structure
  * @ilCtrl_Calls ilObjCourseGUI: ilSubscribersStudyCondGUI
  * fim.
- * fim: [memcond] added ilUnivisImportLecturesGUI to call structure
+ * fim: [univis] added ilUnivisImportLecturesGUI to call structure
  * @ilCtrl_Calls ilObjCourseGUI: ilUnivisImportLecturesGUI
  * fim.
  * fau: objectSub - added ilPropertyFormGUI to call structure

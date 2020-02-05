@@ -84,10 +84,9 @@ class ilStudyDataPatches
 	}
 
     /**
-     * Update the doc programs
-     * @throws ilDatabaseException
+     * Update the select options for study data
      */
-	public function updateDocPrograms()
+	public function updateStudyDataOptions()
     {
         require_once('Services/Idm/classes/class.ilIdmData.php');
         $idmData = new ilIdmData();

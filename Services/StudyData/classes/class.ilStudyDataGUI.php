@@ -12,6 +12,7 @@
 * 
 */
 require_once "Services/StudyData/classes/class.ilStudyData.php";
+require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
 
 class ilStudyDataGUI
 {
@@ -110,7 +111,6 @@ class ilStudyDataGUI
 	 */
 	private function initForm()
 	{
-		include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setTitle($this->lng->txt("studydata_edit"));
 		
@@ -171,7 +171,7 @@ class ilStudyDataGUI
 
         // doc programme
         $item = new ilSelectInputGUI($this->lng->txt('studydata_promotion_program'), 'study_doc_prog');
-        $item->setOptions(ilStudyData::_getDocProgSelectOptions());
+        $item->setOptions(ilStudyOptionDocProgram::_getSelectOptions(0));
         $this->form->addItem($item);
 
         // doc approval date
