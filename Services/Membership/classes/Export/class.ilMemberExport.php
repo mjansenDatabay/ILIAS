@@ -28,7 +28,7 @@ include_once('Services/User/classes/class.ilUserDefinedData.php');
 include_once('Services/User/classes/class.ilUserFormSettings.php');
 
 // fim: [export] includes needed for additional export data
-include_once('Services/StudyData/classes/class.ilStudyData.php');
+include_once('Services/StudyData/classes/class.ilStudyAccess.php');
 // fim.
 
 define("IL_MEMBER_EXPORT_CSV_FIELD_SEPERATOR",',');
@@ -639,7 +639,7 @@ class ilMemberExport
 					case 'studydata':
 						if (!$this->agreement_needed or $this->agreement[$usr_id]['accepted'])
 						{
-							$studydata = ilStudyData::_getStudyDataText($usr_id);
+							$studydata = ilStudyAccess::_getDataText($usr_id);
 						    $studydata = str_replace('"','',$studydata);
 						    $studydata = str_replace("'",'',$studydata);
 						    $studydata = str_replace("'",'',$studydata);

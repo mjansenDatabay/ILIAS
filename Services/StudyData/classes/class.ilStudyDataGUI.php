@@ -11,7 +11,8 @@
 * @ilCtrl_Calls ilStudyDataGUI:
 * 
 */
-require_once "Services/StudyData/classes/class.ilStudyData.php";
+require_once "Services/StudyData/classes/class.ilStudyCourseData.php";
+require_once "Services/StudyData/classes/class.ilStudyDocData.php";
 require_once("Services/StudyData/classes/class.ilStudyOptionDegree.php");
 require_once("Services/StudyData/classes/class.ilStudyOptionSchool.php");
 require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
@@ -132,7 +133,7 @@ class ilStudyDataGUI
 			
 			// ref semester
 			$item = new ilSelectInputGUI($this->lng->txt('studydata_ref_semester'), 'study'.$study_no.'_ref_semester');
-			$item->setOptions(ilStudyData::_getSemesterSelectOptions());
+			$item->setOptions(ilStudyCourseData::_getSemesterSelectOptions());
 			$this->form->addItem($item);
 			
 			// degree
@@ -147,7 +148,7 @@ class ilStudyDataGUI
 
 			// type
             $item = new ilSelectInputGUI($this->lng->txt('studydata_type'), 'study'.$study_no.'_study_type');
-            $item->setOptions(ilStudyData::_getStudyTypeSelectOptions());
+            $item->setOptions(ilStudyCourseData::_getStudyTypeSelectOptions());
             $this->form->addItem($item);
 
             for ($subject_no = 1; $subject_no <= 3; $subject_no++)
@@ -192,22 +193,23 @@ class ilStudyDataGUI
 	 */
 	private function getValues()
 	{
-		$studydata = ilStudyData::_readStudyData($this->user->getId());
+
+		$studydata = ilStudyCourseData::_get($this->user->getId());
 		$values = array();
 		$values['matriculation'] = $this->user->getMatriculation();
 		$study_no = 1;
-		foreach($studydata as $study)
+		foreach ($studydata as $study)
 		{
-			$values['study'.$study_no.'_ref_semester'] = $study['ref_semester'];
-			$values['study'.$study_no.'_degree_id'] = $study['degree_id'];
-			$values['study'.$study_no.'_school_id'] = $study['school_id'];
-            $values['study'.$study_no.'_study_type'] = $study['study_type'];
+			$values['study'.$study_no.'_ref_semester'] = $study->ref_semester;
+			$values['study'.$study_no.'_degree_id'] = $study->degree_id;
+			$values['study'.$study_no.'_school_id'] = $study->school_id;
+            $values['study'.$study_no.'_study_type'] = $study->study_type;
 			
 			$subject_no = 1;
-			foreach($study['subjects'] as $subject)
+			foreach($study->subjects as $subject)
 			{
-				$values['study'.$study_no.'_subject'.$subject_no.'_subject_id'] = $subject['subject_id'];
-				$values['study'.$study_no.'_subject'.$subject_no.'_semester'] = $subject['semester'];
+				$values['study'.$study_no.'_subject'.$subject_no.'_subject_id'] = $subject->subject_id;
+				$values['study'.$study_no.'_subject'.$subject_no.'_semester'] = $subject->semester;
 				$subject_no++;
 			}
 			
@@ -215,14 +217,16 @@ class ilStudyDataGUI
 		}
 		$this->form->setValuesByArray($values);
 
-        $docdata = ilStudyData::_readDocData($this->user->getId());
-        /** @var ilSelectInputGUI $item */
-        $item = $this->form->getItemByPostVar('study_doc_prog');
-        $item->setValue($docdata['prog_id']);
+        $docdata = ilStudyDocData::_get($this->user->getId());
+        foreach ($docdata as $doc) {
+            /** @var ilSelectInputGUI $item */
+            $item = $this->form->getItemByPostVar('study_doc_prog');
+            $item->setValue($doc->prog_id);
 
-        /** @var ilDateTimeInputGUI $item */
-        $item = $this->form->getItemByPostVar('study_doc_approval_date');
-        $item->setDate($docdata['prog_approval']);
+            /** @var ilDateTimeInputGUI $item */
+            $item = $this->form->getItemByPostVar('study_doc_approval_date');
+            $item->setDate($doc->prog_approval);
+        }
 	}
 	
 	
@@ -234,38 +238,41 @@ class ilStudyDataGUI
 		$studydata = array();
 		for ($study_no = 1; $study_no <= 3; $study_no++)
 		{
-			$study = array();
-			$study['ref_semester'] = $this->form->getInput('study'.$study_no.'_ref_semester');
-			$study['degree_id'] = $this->form->getInput('study'.$study_no.'_degree_id');
-			$study['school_id'] = $this->form->getInput('study'.$study_no.'_school_id');
-            $study['study_type'] = $this->form->getInput('study'.$study_no.'_study_type');
 
-            if ($study['school_id'] < 0 ) {
-                $study['school_id']  = null;
+			$study = new ilStudyCourseData;
+			$study->user_id = $this->user->getId();
+			$study->ref_semester = $this->form->getInput('study'.$study_no.'_ref_semester');
+			$study->degree_id = $this->form->getInput('study'.$study_no.'_degree_id');
+			$study->school_id = $this->form->getInput('study'.$study_no.'_school_id');
+            $study->study_type = $this->form->getInput('study'.$study_no.'_study_type');
+
+            if ($study->school_id < 0 ) {
+                $study->school_id  = null;
             }
 			
 			for ($subject_no = 1; $subject_no <= 3; $subject_no++)
 			{
-				$subject = array();
-				$subject['subject_id'] = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_subject_id');
-				$subject['semester'] = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_semester');
+				$subject = new ilStudyCourseSubject;
+				$subject->user_id = $this->user->getId();
+				$subject->subject_id = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_subject_id');
+				$subject->semester = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_semester');
 				
-				if ($subject['subject_id'] > 0 and $subject['semester'] > 0)
+				if ($subject->subject_id > 0 and $subject->semester > 0)
 				{
-					$study['subjects'][] = $subject;
+					$study->subjects[] = $subject;
 				}
-				elseif ($subject['subject_id'] > 0 or $subject['semester'] > 0)
+				elseif ($subject->subject_id > 0 or $subject->semester > 0)
 				{
 					ilUtil::sendFailure($this->lng->txt("studydata_msg_incomplete"), false);
 					return false;
 				}
 			}
 			
-			if (!empty($study['ref_semester']) and $study['degree_id'] > 0 and $study['school_id'] >= 0 and !empty($study['subjects']))
+			if (!empty($study->ref_semester) and $study->degree_id > 0 and $study->school_id >= 0 and !empty($study->subjects))
 			{
 				$studydata[] = $study;
 			}
-			elseif (!empty($study['ref_semester']) or $study['degree_id'] > 0  or $study['school_id'] >= 0 or !empty($study['subjects']))
+			elseif (!empty($study->ref_semester ) or $study->degree_id > 0  or $study->school_id >= 0 or !empty($study->subjects))
 			{
 				ilUtil::sendFailure($this->lng->txt("studydata_msg_incomplete"), false);
 				return false;				
@@ -281,8 +288,23 @@ class ilStudyDataGUI
         $item = $this->form->getItemByPostVar('study_doc_approval_date');
         $prog_approval = $item->getDate();
 
-        ilStudyData::_saveStudyData($this->user->getId(), $studydata);
-        ilStudyData::_saveDocData($this->user->getId(), $prog_id, $prog_approval);
+        if ($prog_id > 0 or !empty($prog_approval)) {
+            $doc = new ilStudyDocData();
+            $doc->user_id = $this->user->getId();
+            $doc->prog_id = $prog_id;
+            $doc->prog_approval = $prog_approval;
+        }
+
+        ilStudyCourseData::_delete($this->user->getId());
+        ilStudyDocData::_delete(($this->user->getId()));
+
+        foreach ($studydata as $study) {
+            $study->write();
+
+        }
+        if (isset($doc)) {
+            $doc->write();
+        }
 
 		$this->user->setMatriculation($this->form->getInput("matriculation"));
 		$this->user->update();	

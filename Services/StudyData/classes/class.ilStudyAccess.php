@@ -1,17 +1,19 @@
 <?php
-/* fim: [studycond] new class. */
-
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+/* fau: studyData - new class ilStudyAccess. */
 
 /**
-* Class ilStudyAccess
-* 
-* This class handles specific access rights based on study data
-*
-* @author Fred Neumann <fred.neumann@fim.uni-erlangen.de> 
+* This class handles study data and study conditions
 */
 class ilStudyAccess
 {
+    /**
+     * Require the data classes
+     */
+    public static function requireData() {
+        require_once "Services/StudyData/classes/class.ilStudyCourseData.php";
+        require_once "Services/StudyData/classes/class.ilStudyDocData.php";
+    }
+
 	/**
 	 * check study data based access conditions
 	 * 
@@ -24,8 +26,6 @@ class ilStudyAccess
 	 */
 	public static function _checkAccess($a_ref_id, $a_user_id)
 	{
-
-
         // only check objects which are
         $ref_ids = explode(',', ilCust::get('studydata_check_ref_ids'));
         if (!in_array($a_ref_id, $ref_ids))
@@ -44,15 +44,85 @@ class ilStudyAccess
 		
 		return self::_checkConditions($conditionsdata, $studydata);
 	}
-	
-	
+
+
+    /**
+     * Check if subscription is allowed for user
+     * @param $obj_id
+     * @param $user_id
+     * @return bool
+     */
+	public static function _checkSubscription($obj_id, $user_id)
+    {
+        // todo: implement
+    }
+
+
+    /**
+     * Check if a user has study data
+     * @param int $user_id
+     * @return bool
+     */
+    public static function _hasData($user_id) {
+        self::requireData();
+        return (ilStudyCourseData::_has($user_id) || ilStudyDocData::_has($user_id));
+    }
+
+    /**
+     * Get the textual description of the study data
+     * @param int $user_id
+     * @return string
+     */
+    public static function _getDataText($user_id) {
+        self::requireData();
+        $texts = [];
+        foreach (ilStudyCourseData::_get($user_id) as $data) {
+            $texts[] = $data->getText();
+        }
+        foreach (ilStudyDocData::_get($user_id) as $data) {
+            $texts[] = $data->getText();
+        }
+        return implode(" \n\n", $texts);
+    }
+
+
+    /**
+     * Check if an object has conditions
+     * @param $obj_id
+     * @return bool
+     */
+    public static function _hasConditions($obj_id) {
+        // todo: implement
+
+        return false;
+    }
+
+    /**
+     * Get the textual description of the conditions
+     * @param int $obj_id
+     * @return string
+     */
+    public static function _getConditionsText($obj_id) {
+        // todo: implement
+        return '';
+    }
+
+    /**
+     * Clone the conditions for another object
+     * @param $from_obj_id
+     * @param $to_obj_id
+     */
+    public static function _cloneConditions($from_obj_id, $to_obj_id) {
+        // todo: implement
+    }
+
 	/**
 	 * Check the mapping of conditions data and study data
 	 * @param 	array		conditions data	
 	 * @param 	array		study data
 	 * @return boolean
 	 */
-	public static function _checkConditions($a_conditionsdata, $a_studydata)
+	protected static function _checkConditions($a_conditionsdata, $a_studydata)
 	{
 		// check the conditions
 		// only one condition needs to be satisfied
@@ -176,7 +246,6 @@ class ilStudyAccess
 	 * @param 	integer		user id
 	 * @param	boolean		use cached data (default: true)
 	 * @return 	array		list of assoc study data arrays with nested subject ids
-	 * @see		ilStudyData::_readStudyData 	(version without cache)
 	 */
 	public static function _getStudyData($a_user_id, $a_with_cache = true)
 	{
@@ -226,53 +295,7 @@ class ilStudyAccess
 		return $data;
 	}
 
-    /**
-     * get the doc programme data of a user
-     *
-     * @param 	integer		user id
-     * @param	boolean		use cached data (default: true)
-     * @return 	array       ['prog_id' => int|null, 'prog_approval' => ilDate|null]
-     * @see		ilStudyData::_readDocData 	(version without cache)
-     */
 
-    public static function _getDocData($a_user_id, $a_with_cache = true)
-    {
-        global $DIC;
-        $ilDB = $DIC->database();
-
-        static $cached_data = array();
-
-        if ($a_with_cache and isset($cached_data[$a_user_id]))
-        {
-            return $cached_data[$a_user_id];
-        }
-
-        $query = 'SELECT usr_id, prog_id, prog_approval'
-            . ' FROM usr_doc_prog'
-            . ' WHERE usr_id='. $ilDB->quote($a_user_id,'integer');
-        $result = $ilDB->query($query);
-
-        $data = array(
-            'prog_id' => null,
-            'prog_approval' => null
-        );
-        if ($row = $ilDB->fetchAssoc($result)) {
-            $data['prog_id'] = $row['prog_id'];
-            try {
-                $data['prog_approval'] = new ilDate($row['prog_approval'], IL_CAL_DATE);
-            }
-            catch (ilDateTimeException $e) {
-                $data['prog_approval'] = null;
-            }
-        }
-
-        if ($a_with_cache)
-        {
-            $cached_data[$a_user_id] = $data;
-        }
-        return $data;
-    }
-	
 	/**
 	* Get the offset of the running semester in relation to the given semester
 	*

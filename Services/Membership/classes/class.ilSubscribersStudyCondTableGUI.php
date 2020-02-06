@@ -6,7 +6,7 @@
 
 require_once 'Services/Table/classes/class.ilTable2GUI.php';
 require_once "Services/Membership/classes/class.ilSubscribersStudyCond.php";
-require_once "Services/StudyData/classes/class.ilStudyData.php";
+require_once "Services/StudyData/classes/class.ilStudyCourseData.php";
 require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
 require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
 
@@ -90,11 +90,11 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
 		}
 		if ($a_set["ref_semester"])
 		{
-			$this->tpl->setVariable("REF_SEMESTER", ilStudyData::_getRefSemesterText($a_set["ref_semester"]));
+			$this->tpl->setVariable("REF_SEMESTER", ilStudyCourseData::_getRefSemesterText($a_set["ref_semester"]));
 		}
 		if ($a_set["study_type"])
 		{
-			$this->tpl->setVariable("STUDY_TYPE", ilStudyData::_getStudyTypeText($a_set["study_type"]));
+			$this->tpl->setVariable("STUDY_TYPE", ilStudyCourseData::_getStudyTypeText($a_set["study_type"]));
 		}
 		
 		$this->tpl->setVariable("TXT_EDIT", $this->lng->txt('edit'));

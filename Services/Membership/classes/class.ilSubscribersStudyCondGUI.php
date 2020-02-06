@@ -313,7 +313,7 @@ class ilSubscribersStudyCondGUI
 	*/
 	private function initForm($a_mode)
 	{
-		require_once("Services/StudyData/classes/class.ilStudyData.php");
+		require_once("Services/StudyData/classes/class.ilStudyCourseData.php");
         require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
         require_once("Services/StudyData/classes/class.ilStudyOptionDegree.php");
 		require_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
@@ -334,7 +334,7 @@ class ilSubscribersStudyCondGUI
 
         // study_type
         $item = new ilSelectInputGUI($this->lng->txt("studydata_type"), "study_type");
-        $item->setOptions(ilStudyData::_getStudyTypeSelectOptions());
+        $item->setOptions(ilStudyCourseData::_getStudyTypeSelectOptions());
         $item->setInfo($this->lng->txt("studycond_field_studytype_info"));
         $this->form_gui->addItem($item);
 
@@ -353,7 +353,7 @@ class ilSubscribersStudyCondGUI
 		// ref semester
 		$item = new ilSelectInputGUI($this->lng->txt("studycond_field_ref_semester"), "ref_semester");
 		$item->setInfo($this->lng->txt("studycond_field_ref_semester_info"));
-		$item->setOptions(ilStudyData::_getSemesterSelectOptions());
+		$item->setOptions(ilStudyCourseData::_getSemesterSelectOptions());
 		$this->form_gui->addItem($item);
 
         // save and cancel commands

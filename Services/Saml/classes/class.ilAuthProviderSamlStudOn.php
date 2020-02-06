@@ -2,7 +2,7 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once('./Services/Idm/classes/class.ilIdmData.php');
-require_once('./Services/StudyData/classes/class.ilStudyData.php');
+require_once('./Services/StudyData/classes/class.ilStudyCourseData.php');
 
 /**
  * fau: samlAuth new class for saml authentication in studon

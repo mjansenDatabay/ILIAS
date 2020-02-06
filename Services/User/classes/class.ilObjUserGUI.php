@@ -1703,9 +1703,8 @@ class ilObjUserGUI extends ilObjectGUI
 		}
 
 		// fim: [studydata] add row for studydata
-		include_once './Services/StudyData/classes/class.ilStudyData.php';
 		$stu = new ilCustomInputGUI($lng->txt("studydata"), "studydata");
-  		$stu->setHTML(nl2br(ilStudyData::_getStudyDataText($this->object->getId())));
+  		$stu->setHTML(nl2br(ilStudyAccess::_getDataText($this->object->getId())));
  		$this->form_gui->addItem($stu);
 		// fim.
 

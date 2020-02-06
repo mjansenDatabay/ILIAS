@@ -77,19 +77,14 @@ class ilIdmData
 
 
     /**
-     * @var array   study data
+     * @var ilStudyCourseData[]   study data
      */
-    public $studies = array();
+    public $studies = [];
 
     /**
-     * @var string code of doc programme
+     * @var ilStudyDocData[]  doc program data
      */
-    public $fau_doc_programmes_code = null;
-
-    /**
-     * @var string approval date of doc programmes
-     */
-    public $fau_doc_approval_date = null;
+    public $docdata = [];
 
     /**
      * @var ilDBIdm
@@ -103,6 +98,8 @@ class ilIdmData
     {
         require_once ('Services/Idm/classes/class.ilDBIdm.php');
         $this->idmDB = ilDBIdm::getInstance();
+
+        ilStudyAccess::requireData();
     }
 
 
@@ -220,7 +217,7 @@ class ilIdmData
         $this->fau_guest = $raw['fau_guest'];
 
         // fau study data
-        $this->studies = array();
+        $this->studies =[];
         if ($raw['fau_features_of_study'])
         {
             $fau = explode("#", $raw['fau_features_of_study']);
@@ -231,43 +228,43 @@ class ilIdmData
 
             for ($study = 1; $study <= 3; $study ++)
             {
-                $studata = array();
-                $studata['degree_id'] = $fau[$i++];
+                $studata = new ilStudyCourseData();
+                $studata->study_no = $study;
+                $studata->degree_id = $fau[$i++];
                 if ($fromShibboleth)
                 {
                     // old format provided with sso has semester per study
                     $semester = $fau[$i++];
                 }
-                $studata['school_id'] = $fau[$i++];
-                $studata['ref_semester'] =  $ref_semester;
+                $studata->school_id = $fau[$i++];
+                $studata->ref_semester =  $ref_semester;
                 $type = substr($raw['fau_studytype'], $study - 1, 1);
                 if(!empty($type) && $type != '_') {
-                    $studata['study_type'] = $type;
+                    $studata->study_type = $type;
                 }
 
                 for ($subject = 1; $subject <= 3; $subject++)
                 {
-                    $subdata = array();
-                    $subdata['subject_id'] = $fau[$i++];
-                    if ($fromShibboleth)
-                    {
-                        $subdata['semester'] = $semester;
+                    $subdata = new ilStudyCourseSubject();
+                    $subdata->study_no = $study;
+                    $subdata->subject_id = $fau[$i++];
+                    if ($fromShibboleth)  {
+                        $subdata->semester = $semester;
                     }
-                    else
-                    {
+                    else {
                         // new format in database has semester per subject
-                        $subdata['semester'] = $fau[$i++];
+                        $subdata->semester = $fau[$i++];
                     }
 
                     // this subjects is set
-                    if ($subdata['subject_id'])
+                    if ($subdata->subject_id)
                     {
-                        $studata['subjects'][] = $subdata;
+                        $studata->subjects[] = $subdata;
                     }
                 }
 
                 // this study is set
-                if ($studata['degree_id'])
+                if ($studata->degree_id)
                 {
                     $this->studies[] = $studata;
                 }
@@ -275,16 +272,33 @@ class ilIdmData
         }
 
         // set data for structured doc programme
-        $this->fau_doc_programmes_code = $raw['fau_doc_programmes_code'];
-        $this->fau_doc_approval_date = $raw['fau_doc_approval_date'];
+        $doc = new ilStudyDocData();
+        if (!empty($raw['fau_doc_programmes_code']) && is_numeric($raw['fau_doc_programmes_code'])) {
+            $doc->prog_id = (int)  $raw['fau_doc_programmes_code'];
+        }
+        if ((!empty($raw['fau_doc_approval_date']))) {
+            $year = substr($raw['fau_doc_approval_date'], 0, 4);
+            $month = substr($raw['fau_doc_approval_date'],4,2);
+            $day = substr($raw['fau_doc_approval_date'], 6,2);
+            try {
+                $doc->prog_approval= new ilDate($year.'-'.$month.'-'.$day, IL_CAL_DATE);
+            }
+            catch (Exception $e) {
+                $doc->prog_approval = null;
+            }
+        }
+        if (!empty($doc->prog_id || !empty($doc->prog_approval))) {
+            $this->docdata[] = $doc;
+        }
     }
 
     /**
      * Apply the basic IDM data to a user account
      * Note: the id must exist
      *
-     * @param   ilObjUser   $userObj
-     * @param   string      $mode   'create' or 'update'
+     * @param ilObjUser $userObj
+     * @param string $mode 'create' or 'update'
+     * @throws ilDateTimeException
      */
     public function applyToUser(ilObjUser $userObj, $mode = 'update')
     {
@@ -322,18 +336,21 @@ class ilIdmData
         $userObj->setExternalPasswd($this->coded_password);
 
         // time limit and activation
-        if (ilCust::get('shib_create_limited'))
+        if ($mode == 'create')
         {
-            $limit = new ilDateTime(ilCust::get('shib_create_limited'), IL_CAL_DATE);
-            $userObj->setTimeLimitUnlimited(0);
-            $userObj->setTimeLimitFrom(time() - 10);
-            $userObj->setTimeLimitUntil($limit->get(IL_CAL_UNIX));
-        }
-        else
-        {
-            $userObj->setTimeLimitUnlimited(1);
-            $userObj->setTimeLimitFrom(time());
-            $userObj->setTimeLimitUntil(time());
+            if (ilCust::get('shib_create_limited'))
+            {
+                $limit = new ilDateTime(ilCust::get('shib_create_limited'), IL_CAL_DATE);
+                $userObj->setTimeLimitUnlimited(0);
+                $userObj->setTimeLimitFrom(time() - 10);
+                $userObj->setTimeLimitUntil($limit->get(IL_CAL_UNIX));
+            }
+            else
+            {
+                $userObj->setTimeLimitUnlimited(1);
+                $userObj->setTimeLimitFrom(time());
+                $userObj->setTimeLimitUntil(time());
+            }
         }
         $userObj->setActive(1, 6);
         $userObj->setTimeLimitOwner(7);
@@ -353,29 +370,22 @@ class ilIdmData
 
         // save study data only if they are delivered
         if (!empty($this->studies)) {
-
-            require_once('Services/StudyData/classes/class.ilStudyData.php');
-            ilStudyData::_saveStudyData($userObj->getId(), $this->studies);
+            ilStudyCourseData::_delete($userObj->getId());
+            foreach ($this->studies as $study) {
+                $study->user_id = $userObj->getId();
+                foreach ($study->subjects as $subject) {
+                    $subject->user_id = $userObj->getId();
+                }
+                $study->write();
+            }
         }
 
         // always save the doc programmes data
-        $prog_id = null;
-        if (!empty($this->fau_doc_programmes_code) && is_numeric($this->fau_doc_programmes_code)) {
-            $prog_id = (int) $this->fau_doc_programmes_code;
+        ilStudyDocData::_delete($userObj->getId());
+        foreach ($this->docdata as $doc) {
+            $doc->user_id = $userObj->getId();
+            $doc->write();
         }
-        $prog_approval = null;
-        if ((!empty($this->fau_doc_approval_date))) {
-            $year = substr($this->fau_doc_approval_date, 0, 4);
-            $month = substr($this->fau_doc_approval_date,4,2);
-            $day = substr($this->fau_doc_approval_date, 6,2);
-            try {
-                $prog_approval= new ilDate($year.'-'.$month.'-'.$day, IL_CAL_DATE);
-            }
-            catch (ilDateTimeException $e) {
-                $prog_approval = null;
-            }
-        }
-        ilStudyData::_saveDocData($userObj->getId(), $prog_id, $prog_approval);
 
         // update role assignments
         require_once('Services/AuthShibboleth/classes/class.ilShibbolethRoleAssignmentRules.php');

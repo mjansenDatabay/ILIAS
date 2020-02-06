@@ -342,7 +342,6 @@ class ilUserQuery
             // fim: [studydata] don't query for studydata directly, add them later
             if ($field == 'studydata')
             {
-                include_once("./Services/StudyData/classes/class.ilStudyData.php");
                 $add_studydata = true;
                 continue;
             }
@@ -645,7 +644,7 @@ class ilUserQuery
 			// fim: [studydata] optionally add the studydata
 			if ($add_studydata)
 			{
-				$rec['studydata'] = ilStudyData::_getStudyDataText($rec['usr_id']);
+				$rec['studydata'] = ilStudyAccess::_getDataText($rec['usr_id']);
 			}
 			// fim.
 			$result[] = $rec;

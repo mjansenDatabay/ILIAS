@@ -397,11 +397,6 @@ class ilTrQuery
 			unset($all_public);
 		}
 
-		// fim: [studydata] include studydata class
-		require_once('Services/StudyData/classes/class.ilStudyData.php');
-		// fim.
-
-
 		foreach($a_result["set"] as $idx => $row)
 		{
 			// add udf data
@@ -413,7 +408,7 @@ class ilTrQuery
 			// fim: [studydata] get studydata if allowed
 			if (!$check_agreement or in_array($row["usr_id"], $agreements))
 			{
-				$a_result["set"][$idx]['studydata'] = ilStudyData::_getStudyDataText($row["usr_id"]);
+				$a_result["set"][$idx]['studydata'] = ilStudyAccess::_getDataText($row["usr_id"]);
 			}
 			// fim.
 

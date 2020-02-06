@@ -565,8 +565,7 @@ class ilUserProfile
 						$stu = new ilCustomInputGUI($lng->txt("studydata"), "studydata");
 						if($a_user)
 						{
-							include_once './Services/StudyData/classes/class.ilStudyData.php';
-							$stu->setHTML(nl2br(ilStudyData::_getStudyDataText($a_user->getId())));
+							$stu->setHTML(nl2br(ilStudyAccess::_getDataText($a_user->getId())));
 						}
 						$a_form->addItem($stu);
 					}

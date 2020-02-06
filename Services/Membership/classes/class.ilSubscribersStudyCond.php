@@ -301,7 +301,7 @@ class ilSubscribersStudyCond
 		global $DIC;
 		$lng = $DIC->language();
 		
-		require_once('Services/StudyData/classes/class.ilStudyData.php');
+		require_once('Services/StudyData/classes/class.ilStudyCourseData.php');
         require_once('Services/StudyData/classes/class.ilStudyOptionDegree.php');
         require_once('Services/StudyData/classes/class.ilStudyOptionSubject.php');
 
@@ -309,8 +309,8 @@ class ilSubscribersStudyCond
 		$data = self::_getConditionsData($a_obj_id);
 		foreach ($data as $cond)
 		{
-			$reftext = ilStudyData::_getRefSemesterText($cond['ref_semester']);
-			$type_text =  ilStudyData::_getStudyTypeText($cond['study_type']);
+			$reftext = ilStudyCourseData::_getRefSemesterText($cond['ref_semester']);
+			$type_text =  ilStudyCourseData::_getStudyTypeText($cond['study_type']);
 			$ctext = array();
 
 			if ($cond['subject_id'])
@@ -381,18 +381,16 @@ class ilSubscribersStudyCond
 	 */
 	public static function _checkConditions($a_obj_id, $a_user_id)
 	{
-		$conditionsdata = self::_getConditionsData($a_obj_id);
-		if (!count($conditionsdata))
+		if (!ilStudyAccess::_hasConditions($a_obj_id))
 		{
 			return true;
 		}
-		$studydata = ilStudyAccess::_getStudyData($a_user_id);
-		if (!count($studydata))
+		if (!ilStudyAccess::_hasData($a_user_id))
 		{
 			return false;
 		}
 
-		return ilStudyAccess::_checkConditions($conditionsdata, $studydata);
+		return ilStudyAccess::_checkSubscription($a_obj_id, $a_user_id);
 	}
 	
 	
