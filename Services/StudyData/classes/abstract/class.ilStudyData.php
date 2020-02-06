@@ -1,6 +1,9 @@
 <?php
-/* fau: studyData - new class ilStudyCourseData. */
+/* fau: studyData - new class ilStudyData. */
 
+/**
+ * Base class for all study related data
+ */
 abstract class ilStudyData
 {
 
@@ -31,15 +34,15 @@ abstract class ilStudyData
     abstract public static function _count($user_id): int;
 
     /**
-     * Get the textual description of the data
-     */
-    abstract public function getText(): string;
-
-    /**
      * Delete the data of a user
      * @param int $user_id
      */
     abstract public static function _delete($user_id);
+
+    /**
+     * Get the textual description of the data
+     */
+    abstract public function getText(): string;
 
     /**
      * Write the data of an option
@@ -51,7 +54,7 @@ abstract class ilStudyData
      * @param int $user_id
      * @return static[]
      */
-    public static function _get($user_id = null) {
+    public static function _get($user_id) {
         if (!isset(static::$cache[$user_id])) {
             static::$cache[$user_id] = static::_read($user_id);
         }

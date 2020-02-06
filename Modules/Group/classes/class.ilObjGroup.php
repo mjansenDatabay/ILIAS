@@ -1013,11 +1013,6 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 		include_once('./Modules/Group/classes/class.ilGroupParticipants.php');
 		ilGroupParticipants::_deleteAllEntries($this->getId());
 
-		// fim: [memcond] delete membership conditions when group is delete
-		require_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
-		ilSubscribersStudyCond::_deleteAll($this->getId());
-		// fim.
-
 		$ilAppEventHandler->raise('Modules/Group',
 			'delete',
 			array('object' => $this,

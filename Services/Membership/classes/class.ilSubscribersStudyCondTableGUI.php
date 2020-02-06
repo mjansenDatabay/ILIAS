@@ -5,8 +5,8 @@
 
 
 require_once 'Services/Table/classes/class.ilTable2GUI.php';
-require_once "Services/Membership/classes/class.ilSubscribersStudyCond.php";
 require_once "Services/StudyData/classes/class.ilStudyCourseData.php";
+require_once ("Services/StudyData/classes/class.ilStudyCourseCond.php");
 require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
 require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
 
@@ -60,10 +60,17 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
     private function readData()
     {
 		$data = array();
-		foreach (ilSubscribersStudyCond::_getConditionsData($this->obj_id) as $row)
+
+		foreach (ilStudyCourseCond::_get($this->obj_id) as $cond)
 		{
-			$row['subject'] = ilStudyOptionSubject::_lookupText($row['subject_id']);
-			$row['degree'] = ilStudyOptionDegree::_lookupText($row['degree_id']);
+		    $row = [];
+            $row['cond_id'] = $cond->cond_id;
+            $row['subject'] = ilStudyOptionSubject::_lookupText($cond->subject_id);
+			$row['degree'] = ilStudyOptionDegree::_lookupText($cond->degree_id);
+			$row['min_semester'] = $cond->min_semester;
+			$row['max_semester'] = $cond->max_semester;
+			$row['ref_semester'] = $cond->ref_semester;
+            $row['study_type'] = $cond->ref_semester;
 			$data[] = $row;
 		}
         $this->setData($data);

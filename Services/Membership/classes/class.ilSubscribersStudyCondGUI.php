@@ -3,7 +3,7 @@
 
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
+include_once "Services/StudyData/classes/class.ilStudyCourseCond.php";
 
 /**
 * Class ilSubscribersStudyCondGUI
@@ -196,8 +196,7 @@ class ilSubscribersStudyCondGUI
 	 */
 	protected function edit()
 	{
-		$condition = new ilSubscribersStudyCond((int) $_GET["cond_id"]);
-		$condition->read();
+		$condition = new ilStudyCourseCond((int) $_GET["cond_id"]);
 
 		$this->initForm("edit");
 		$this->getValues($condition);
@@ -214,10 +213,10 @@ class ilSubscribersStudyCondGUI
         $this->initForm("create");
         if ($this->form_gui->checkInput())
         {
-			$condition = new ilSubscribersStudyCond();
-        	$condition->setObjId($this->parent_obj_id);
+			$condition = new ilStudyCourseCond;
+        	$condition->obj_id = $this->parent_obj_id;
         	$this->setValues($condition);
-        	$condition->create();
+        	$condition->write();
         	
             ilUtil::sendInfo($this->lng->txt("studycond_condition_saved"),true);
         	$this->ctrl->redirect($this, 'listConditions');
@@ -241,10 +240,9 @@ class ilSubscribersStudyCondGUI
 		
         if ($this->form_gui->checkInput())
         {
-            $condition = new ilSubscribersStudyCond((int) $_GET["cond_id"]);
-			$condition->read();
+            $condition = new ilStudyCourseCond((int) $_GET["cond_id"]);
 			$this->setValues($condition);
-			$condition->update();
+			$condition->write();
 			
 			ilUtil::sendInfo($this->lng->txt("studycond_condition_updated"),true);
         	$this->ctrl->redirect($this, 'listConditions');
@@ -262,48 +260,43 @@ class ilSubscribersStudyCondGUI
 	*/
     protected function delete()
     {
-    	$condition = new ilSubscribersStudyCond((int) $_GET["cond_id"]);
-    	
-    	if ($condition->delete())
-    	{
-    		ilUtil::sendInfo($this->lng->txt("studycond_condition_deleted"),true);
-    	}
-    	
+        ilStudyCourseCond::_delete((int) $_GET["cond_id"]);
+        ilUtil::sendInfo($this->lng->txt("studycond_condition_deleted"),true);
         $this->ctrl->redirect($this, 'listConditions');
    	}
     
     
 	/**
 	* Get the values of a web form into property gui
-	* @param    ilSubscribersStudyCond  $a_condition
+	* @param    ilStudyCourseCond  $a_condition
 	*/
 	private function getValues($a_condition)
 	{
 		$form_gui = $this->form_gui;
 
-		$form_gui->getItemByPostVar("subject_id")->setValue($a_condition->getSubjectId());
-		$form_gui->getItemByPostVar("degree_id")->setValue($a_condition->getDegreeId());
-		$form_gui->getItemByPostVar("min_semester")->setValue($a_condition->getMinSemester());
-		$form_gui->getItemByPostVar("max_semester")->setValue($a_condition->getMaxSemester());
-		$form_gui->getItemByPostVar("ref_semester")->setValue($a_condition->getRefSemester());
-		$form_gui->getItemByPostVar("study_type")->setValue($a_condition->getStudyType());
+		$form_gui->getItemByPostVar("subject_id")->setValue($a_condition->subject_id);
+		$form_gui->getItemByPostVar("degree_id")->setValue($a_condition->degree_id);
+		$form_gui->getItemByPostVar("min_semester")->setValue($a_condition->min_semester);
+		$form_gui->getItemByPostVar("max_semester")->setValue($a_condition->max_semester);
+		$form_gui->getItemByPostVar("ref_semester")->setValue($a_condition->ref_semester);
+		$form_gui->getItemByPostVar("study_type")->setValue($a_condition->study_type);
 	}
 
 
 	/**
 	* Set the values of the property gui into a webform
-	* @param    ilSubscribersStudyCond  $a_condition
+	* @param    ilStudyCourseCond  $a_condition
 	*/
 	private function setValues($a_condition)
 	{
 		$form_gui = $this->form_gui;
 
-		$a_condition->setSubjectId($form_gui->getInput("subject_id"));
-		$a_condition->setDegreeId($form_gui->getInput("degree_id"));
-		$a_condition->setMinSemester($form_gui->getInput("min_semester"));
-		$a_condition->setMaxSemester($form_gui->getInput("max_semester"));
-		$a_condition->setRefSemester($form_gui->getInput("ref_semester"));
-		$a_condition->setStudyType($form_gui->getInput("study_type"));
+		$a_condition->subject_id = $form_gui->getInput("subject_id");
+		$a_condition->degree_id = $form_gui->getInput("degree_id");
+		$a_condition->min_semester = $form_gui->getInput("min_semester");
+		$a_condition->max_semester = $form_gui->getInput("max_semester");
+		$a_condition->ref_semester = $form_gui->getInput("ref_semester");
+		$a_condition->study_type = $form_gui->getInput("study_type");
 	}
 
 
@@ -316,7 +309,7 @@ class ilSubscribersStudyCondGUI
 		require_once("Services/StudyData/classes/class.ilStudyCourseData.php");
         require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
         require_once("Services/StudyData/classes/class.ilStudyOptionDegree.php");
-		require_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
+
 		$this->form_gui = new ilPropertyFormGUI();
 		$this->form_gui->setFormAction($this->ctrl->getFormAction($this));
 

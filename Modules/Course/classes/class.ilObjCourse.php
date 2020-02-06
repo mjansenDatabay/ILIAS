@@ -1448,11 +1448,6 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		include_once('Modules/Course/classes/Export/class.ilCourseDefinedFieldDefinition.php');
 		ilCourseDefinedFieldDefinition::_deleteByContainer($this->getId());
 
-		// fim: [memcond] delete membership conditions when course is deleted
-		require_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
-		ilSubscribersStudyCond::_deleteAll($this->getId());
-		// fim.
-
 		$ilAppEventHandler->raise('Modules/Course',
 			'delete',
 			array('object' => $this,

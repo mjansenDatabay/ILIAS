@@ -302,8 +302,6 @@ class ilObjCourseGUI extends ilContainerGUI
 					.'" target="_blank">'
 					.$this->lng->txt('univis_lecture_link')
 					.'</a>';
-
-				$info->addProperty($this->lng->txt('univis')."xxx", $link);
 	        }
 		}
 
@@ -506,10 +504,9 @@ class ilObjCourseGUI extends ilContainerGUI
 				}
 // fau.
 				// fim: [memcond] generate text for suscription with condition
-				include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
-				if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
+				if (ilStudyAccess::_hasConditions($this->object->getId()))
 				{
-					$ctext = ilSubscribersStudyCond::_getConditionsText($this->object->getId());
+					$ctext = ilStudyAccess::_getConditionsText($this->object->getId());
 				switch($this->object->getSubscriptionType())
 				{
 						case IL_CRS_SUBSCRIPTION_DIRECT:
@@ -523,8 +520,8 @@ class ilObjCourseGUI extends ilContainerGUI
 							$subscription_text = "";
 							break;
 					}
-					global $ilUser;
-					if (ilSubscribersStudyCond::_checkConditions($this->object->getId(), $ilUser->getId()))
+					$ilUser = $DIC->user();
+					if (ilStudyAccess::_checkSubscription($this->object->getId(), $ilUser->getId()))
 					{
 						$subscription_type = $this->object->getSubscriptionType();
 					}
@@ -1721,10 +1718,9 @@ class ilObjCourseGUI extends ilContainerGUI
 
 
 		// fim: [memcond] add studycond setting
-		include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
 		$stpl = new ilTemplate("tpl.show_subscribers_studycond.html", true, true, "Services/Membership");
 		$stpl->setCurrentBlock('condition');
-		$stpl->setVariable("CONDITION_TEXT", nl2br(ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
+		$stpl->setVariable("CONDITION_TEXT", nl2br(ilStudyAccess::_getConditionsText($this->object->getId())));
 		$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilsubscribersstudycondgui', ''));
 		$stpl->setVariable("TXT_CONDITION", $this->lng->txt("studycond_edit_conditions"));
 		$stpl->parseCurrentBlock();

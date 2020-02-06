@@ -99,7 +99,7 @@ class ilIdmData
         require_once ('Services/Idm/classes/class.ilDBIdm.php');
         $this->idmDB = ilDBIdm::getInstance();
 
-        ilStudyAccess::requireData();
+        ilStudyAccess::_requireData();
     }
 
 

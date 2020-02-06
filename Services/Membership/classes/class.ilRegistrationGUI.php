@@ -90,12 +90,11 @@ abstract class ilRegistrationGUI
 		
 		// fim: [memcond] define matches_studycond, describe_studycond
 		global $ilUser;
-		include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
-		$this->has_studycond = ilSubscribersStudyCond::_hasConditions($this->obj_id);
+		$this->has_studycond = ilStudyAccess::_hasConditions($this->obj_id);
 		if ($this->has_studycond)
 		{
-			$this->matches_studycond = ilSubscribersStudyCond::_checkConditions($this->obj_id, $ilUser->getId());
-			$this->describe_studycond = ilSubscribersStudyCond::_getConditionsText($this->obj_id);
+			$this->matches_studycond = ilStudyAccess::_checkSubscription($this->obj_id, $ilUser->getId());
+			$this->describe_studycond = ilStudyAccess::_getConditionsText($this->obj_id);
 		}
 		else
 		{

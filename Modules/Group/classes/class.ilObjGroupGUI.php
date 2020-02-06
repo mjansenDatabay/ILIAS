@@ -1506,10 +1506,9 @@ class ilObjGroupGUI extends ilContainerGUI
 		else
 		{
 			// fim: [memcond] generate text for suscription with condition
-			include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
-			if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
+			if (ilStudyAccess::_hasConditions($this->object->getId()))
 			{
-				$ctext = ilSubscribersStudyCond::_getConditionsText($this->object->getId());
+				$ctext = ilStudyAccess::_getConditionsText($this->object->getId());
 				switch($this->object->getRegistrationType())
 				{
 					case GRP_REGISTRATION_DIRECT:
@@ -1523,8 +1522,8 @@ class ilObjGroupGUI extends ilContainerGUI
 						$registration_text = "";
 						break;
 				}
-				global $ilUser;
-				if (ilSubscribersStudyCond::_checkConditions($this->object->getId(), $ilUser->getId()))
+				$ilUser = $DIC->user();
+				if (ilStudyAccess::_checkSubscription($this->object->getId(), $ilUser->getId()))
 				{
 					$registration_type = $this->object->getRegistrationType();
 				}
@@ -2089,12 +2088,11 @@ class ilObjGroupGUI extends ilContainerGUI
 
 
 			// fim: [memcond] add studycond setting
-			include_once "./Services/Membership/classes/class.ilSubscribersStudyCond.php";
 			$stpl = new ilTemplate("tpl.show_subscribers_studycond.html", true, true, "Services/Membership");
 			if ($a_mode == 'edit')
 			{
 				$stpl->setCurrentBlock('condition');
-				$stpl->setVariable("CONDITION_TEXT", nl2br(ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
+				$stpl->setVariable("CONDITION_TEXT", nl2br(ilStudyAccess::_getConditionsText($this->object->getId())));
 				$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilsubscribersstudycondgui', ''));
 				$stpl->setVariable("TXT_CONDITION", $this->lng->txt("studycond_edit_conditions"));
 				$stpl->parseCurrentBlock();
