@@ -1042,7 +1042,7 @@ if(!$ilDB->tableColumnExists('style_usage','scope_ref_id'))
 <#64>
 <?php
 /**
- * fim: [studydata] Create the tables for study doc programmes.
+ * fau: studyData - Create the tables for study doc programmes.
  */
 if(!$ilDB->tableExists('usr_doc_prog'))
 {
@@ -1062,5 +1062,24 @@ if(!$ilDB->tableExists('study_doc_prog'))
         'prog_end' => array('type' => 'timestamp', 'notnull' => false, 'default' => null),
     ));
     $ilDB->addPrimaryKey('study_doc_prog',array('prog_id'));
+}
+?>
+<#65>
+<?php
+/**
+ * fau: studyData - create the table for study doc conditions
+ */
+if(!$ilDB->tableExists('study_doc_cond'))
+{
+    $ilDB->createTable('study_doc_cond', array(
+        'cond_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'obj_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'min_approval_date' => array('type' => 'date', 'notnull' => false, 'default' => null),
+        'max_approval_date' => array('type' => 'date', 'notnull' => false, 'default' => null),
+    ));
+    $ilDB->addPrimaryKey('study_doc_cond',array('cond_id'));
+    $ilDB->addIndex('study_doc_cond', array('obj_id'), 'i1');
+    $ilDB->createSequence('study_doc_cond');
 }
 ?>

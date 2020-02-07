@@ -107,14 +107,27 @@ class ilStudyOptionDocProgram extends ilStudyOption
      */
     protected function getText() : string
     {
+        $text = $this->text. ' [' . $this->id . ']';
+
+        return $text;
+    }
+
+    /**
+     * Get the text for the select options
+     * Add the end date of the program
+     * @return string
+     */
+    protected function getSelectText()
+    {
         global $DIC;
         $lng = $DIC->language();
 
-        $text = $this->text. ' [' . $this->id . ']';
+        $text = $this->getText();
 
         if ($this->end instanceof ilDateTime) {
             $text .=  ' ' . $lng->txt('studydata_doc_prog_until') . ' ' . ilDatePresentation::formatDate($this->end);
         }
+
         return $text;
     }
 }

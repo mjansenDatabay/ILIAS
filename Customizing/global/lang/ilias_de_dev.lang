@@ -280,13 +280,15 @@ common#:#studon_login_exportrequest#:#Bitte loggen Sie sich ein, um den Exportan
 common#:#studon_ref_id#:#StudOn-ID
 common#:#study_data#:#Studiendaten
 common#:#studycond_add_condition#:#Bedingung hinzufügen
+common#:#studycond_add_course_condition#:#Studiums-Bedingung hinzufügen
+common#:#studycond_add_doc_condition#:#Promotions-Bedingung hinzufügen
 common#:#studycond_back#:#Zurück zu den Einstellungen
 common#:#studycond_condition#:#Beitrittsbedingung
-common#:#studycond_condition_combi_info#:#Sie können hier mehrere Bedingungen hinzufügen, die alternativ gelten sollen, d.h. es genügt eine erfüllte zum Beitritt. Innerhalb einer Bedingung müssen alle Kriterien (Fach, Abschluss, Semester) erfüllt sein, damit die Bedingung erfüllt ist.
+common#:#studycond_condition_combi_info#:#Sie können hier mehrere Bedingungen hinzufügen, die alternativ gelten sollen, d.h. es genügt eine erfüllte zum Beitritt. Innerhalb einer Bedingung müssen alle Kriterien erfüllt sein, damit die Bedingung erfüllt ist.
 common#:#studycond_condition_deleted#:#Die Bedingung wurde gelöscht.
 common#:#studycond_condition_delimiter#:#<br />oder
 common#:#studycond_condition_headline#:#Bedingungen für direkten Beitritt und Beitritt mit Passwort
-common#:#studycond_condition_info#:#Wenn Sie als Beitrittssverfahren "Direkter Beitritt" oder "Beitritt mit Passwort" gewählt habe, können Sie hier Studienfächer, Fachsemester und Abschlüsse festlegen, mit denen das möglich sein soll. Für die übrigen Nutzer gilt dann automatisch "Antrag mit Bestätigung".
+common#:#studycond_condition_info#:#Wenn Sie als Beitrittssverfahren "Direkter Beitritt" oder "Beitritt mit Passwort" gewählt habe, können Sie hier Studiums-bezogene festlegen, mit denen das möglich sein soll. Für die übrigen Nutzer gilt dann automatisch "Antrag mit Bestätigung".
 common#:#studycond_condition_info_create#:#Nach dem Anlegen können Sie hier Studiengangsbezogene Bedingungen für einen direkten Beitritt oder Beitritt mit Passwort festlegen.
 common#:#studycond_condition_saved#:#Die Bedingung wurde gespeichert.
 common#:#studycond_condition_updated#:#Die Bedingung wurde gespeichert.
@@ -304,6 +306,9 @@ common#:#studycond_field_ref_semester_info#:#Geben Sie hier an, auf welches Seme
 common#:#studycond_field_subject#:#Studienfach
 common#:#studycond_field_subject_info#:#Wählen Sie ein vorgegebenes Studienfach oder lassen Sie die Auswahl offen, wenn das Fach beliebig sein kann.
 common#:#studycond_field_studytype_info#:#Wählen Sie einen Studientyp oder lassen Sie die Auswahl offen, wenn der Typ beliebig sein kann.
+common#:#studycond_field_doc_program#:#Strukturiertes Promotionsprogramm
+common#:#studycond_field_min_approval_date#:#Frühestes Zulassungsdatum
+common#:#studycond_field_max_approval_date#:#Spätestes Zulassungsdatum
 common#:#studycond_max_semester#:#bis %s. Fachsemester (%s)
 common#:#studycond_min_max_semester#:#%s. bis %s. Fachsemester (%s)
 common#:#studycond_min_semester#:#ab %s. Fachsemester (%s)

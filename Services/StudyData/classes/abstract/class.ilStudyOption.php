@@ -56,6 +56,14 @@ abstract class ilStudyOption
      */
     abstract protected function getText(): string;
 
+    /**
+     * Get the text for the select options
+     * Can be overridden to vary between texts displayed and in select field
+     * @return string
+     */
+    protected function getSelectText() {
+        return $this->getText();
+    }
 
     /**
      * Get the options for a select field
@@ -75,7 +83,7 @@ abstract class ilStudyOption
         }
 
         foreach (static::_getAll() as $option) {
-            $return[$option->getId()] = $option->getText();
+            $return[$option->getId()] = $option->getSelectText();
         }
 
         return $return;

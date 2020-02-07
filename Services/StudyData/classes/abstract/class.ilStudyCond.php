@@ -76,6 +76,12 @@ abstract class ilStudyCond
     abstract public function write();
 
     /**
+     *Delete a condition in the database
+     */
+    abstract public function delete();
+
+
+    /**
      *
      * @param ilStudyData[] $data
      * @return bool

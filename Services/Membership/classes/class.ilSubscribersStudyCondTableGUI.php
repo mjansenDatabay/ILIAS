@@ -31,6 +31,7 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
     */
 	function __construct($a_parent_obj, $a_parent_cmd, $a_obj_id)
     {
+        $this->setId('ilSubscribersStudyCondTableGUI');
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->obj_id = $a_obj_id;
@@ -45,12 +46,13 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
 
         $this->setEnableHeader(true);
         $this->setEnableTitle(false);
+        $this->setEnableNumInfo(false);
+        $this->setExternalSegmentation(true);
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
         $this->setRowTemplate("tpl.list_subscribers_studycond_row.html", "Services/Membership");
-        $this->setDefaultOrderField("title");
+        $this->setDefaultOrderField("subject");
         $this->setDefaultOrderDirection("asc");
         $this->setPrefix("studycond_conditions");
-        $this->addCommandButton("create", $this->lng->txt("studycond_add_condition"));
 		$this->readData();
     }
 
@@ -70,7 +72,7 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
 			$row['min_semester'] = $cond->min_semester;
 			$row['max_semester'] = $cond->max_semester;
 			$row['ref_semester'] = $cond->ref_semester;
-            $row['study_type'] = $cond->ref_semester;
+            $row['study_type'] = $cond->study_type;
 			$data[] = $row;
 		}
         $this->setData($data);

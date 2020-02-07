@@ -241,6 +241,7 @@ class ilStudyDataGUI
 
 			$study = new ilStudyCourseData;
 			$study->user_id = $this->user->getId();
+			$study->study_no = $study_no;
 			$study->ref_semester = $this->form->getInput('study'.$study_no.'_ref_semester');
 			$study->degree_id = $this->form->getInput('study'.$study_no.'_degree_id');
 			$study->school_id = $this->form->getInput('study'.$study_no.'_school_id');
@@ -253,6 +254,7 @@ class ilStudyDataGUI
 			for ($subject_no = 1; $subject_no <= 3; $subject_no++)
 			{
 				$subject = new ilStudyCourseSubject;
+				$subject->study_no = $study_no;
 				$subject->user_id = $this->user->getId();
 				$subject->subject_id = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_subject_id');
 				$subject->semester = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_semester');

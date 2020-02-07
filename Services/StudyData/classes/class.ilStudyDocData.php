@@ -115,7 +115,7 @@ class ilStudyDocData extends ilStudyData
             $approval_str = $this->prog_approval->get(IL_CAL_DATE);
         }
 
-        $ilDB->replace('usr_study',
+        $ilDB->replace('usr_doc_prog',
             [
                 'usr_id' => ['integer', $this->user_id],
             ],

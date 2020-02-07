@@ -309,13 +309,15 @@ common#:#studon_login_exportrequest#:#Please log in to make an export applicatio
 common#:#studon_ref_id#:#StudOn-ID
 common#:#study_data#:#study data
 common#:#studycond_add_condition#:#add condition
+common#:#studycond_add_course_condition#:#Add Study Condition
+common#:#studycond_add_doc_condition#:#Add Promotion Condition
 common#:#studycond_back#:#back to the settings
 common#:#studycond_condition#:#joining condition
-common#:#studycond_condition_combi_info#:#You can add more conditions here, that shall count alternatively, means if one is complied its enough for joining. within a condition all criterias (subject, graduation, semester) have to be complied, thereby the condition is complied.
+common#:#studycond_condition_combi_info#:#You can add more conditions here, that shall count alternatively, means if one is complied its enough for joining. within a condition all criteria have to be complied, thereby the condition is complied.
 common#:#studycond_condition_deleted#:#The condition has been deleted.
 common#:#studycond_condition_delimiter#:#<br />or
 common#:#studycond_condition_headline#:#Conditions for direct Joining and Joining with password
-common#:#studycond_condition_info#:#If you have chosen "direct Joining" or "Joining with password" as Joining procedure, you can here determine study subjects, subjectsemester and graduations with which it should be possible. For the remaining users "application with confirmation" takes effect automatically.
+common#:#studycond_condition_info#:#If you have chosen "direct Joining" or "Joining with password" as joining procedure, you can here determine conditions under which it should be possible. For the remaining users "application with confirmation" takes effect automatically.
 common#:#studycond_condition_info_create#:#After application you can here determine study path specific conditions for direct joining or joining with password.
 common#:#studycond_condition_saved#:#The conditions have been saved.
 common#:#studycond_condition_updated#:#The condition has been saved..
@@ -333,6 +335,9 @@ common#:#studycond_field_ref_semester_info#:#Set here on which semester the subj
 common#:#studycond_field_subject#:#studysubject
 common#:#studycond_field_subject_info#:#Choose a given studysubject or let the choice open, if the subject can be any.
 common#:#studycond_field_studytype_info#:#Choose a study type or let the choice open, if the type can be any.
+common#:#studycond_field_doc_program#:#Stuctured Promotion Program
+common#:#studycond_field_min_approval_date#:#Earliest Approvel Date
+common#:#studycond_field_max_approval_date#:#Latest Approval Date
 common#:#studycond_max_semester#:#until %s. subjectsemester (%s)
 common#:#studycond_min_max_semester#:#%s. until %s. subjectsemester (%s)
 common#:#studycond_min_semester#:#from %s. subjectsemester (%s)

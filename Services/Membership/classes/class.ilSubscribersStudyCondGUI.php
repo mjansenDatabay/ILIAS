@@ -4,6 +4,7 @@
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 include_once "Services/StudyData/classes/class.ilStudyCourseCond.php";
+include_once "Services/StudyData/classes/class.ilStudyDocCond.php";
 
 /**
 * Class ilSubscribersStudyCondGUI
@@ -139,10 +140,11 @@ class ilSubscribersStudyCondGUI
 	 */
 	private function show($a_html)
 	{
-		if ($this->isWithBacklink())
+        global $DIC;
+        $ilToolbar = $DIC->toolbar();
+
+        if ($this->isWithBacklink())
 		{
-			/** @var ilToolBarGUI $ilToolbar */
-			global $ilToolbar;
 			$back = ilLinkButton::getInstance();
 			$back->setUrl($this->ctrl->getLinkTarget($this, 'back'));
 			$back->setCaption('back');
@@ -164,10 +166,28 @@ class ilSubscribersStudyCondGUI
 	 */
 	protected function listConditions()
 	{
-		// build the table of form definitions
+        global $DIC;
+        $ilToolbar = $DIC->toolbar();
+
+        $but1 = ilLinkButton::getInstance();
+        $but1->setUrl($this->ctrl->getLinkTarget($this, 'create'));
+        $but1->setCaption('studycond_add_course_condition');
+        $ilToolbar->addButtonInstance($but1);
+
+        $but2 = ilLinkButton::getInstance();
+        $but2->setUrl($this->ctrl->getLinkTarget($this, 'createDocCond'));
+        $but2->setCaption('studycond_add_doc_condition');
+        $ilToolbar->addButtonInstance($but2);
+
+
+        // build the table of form definitions
 		include_once 'Services/Membership/classes/class.ilSubscribersStudyCondTableGUI.php';
-		$table_gui = new ilSubscribersStudyCondTableGUI($this, "listConditions", $this->parent_obj_id);
-		$this->show($table_gui->getHTML());
+		$table1 = new ilSubscribersStudyCondTableGUI($this, "listConditions", $this->parent_obj_id);
+
+        include_once 'Services/Membership/classes/class.ilStudyDocCondTableGUI.php';
+        $table2 = new ilStudyDocCondTableGUI($this, "listConditions", $this->parent_obj_id);
+
+        $this->show($table1->getHTML().$table2->getHTML());
 	}
 
 	/**
@@ -189,8 +209,18 @@ class ilSubscribersStudyCondGUI
 		$this->show($this->form_gui->getHtml());
 	}
 
+    /**
+     * Show an empty form to create a new condition
+     * @throws ilTemplateException
+     */
+    protected function createDocCond()
+    {
+        $this->initDocForm("create");
+        $this->show($this->form_gui->getHtml());
+    }
 
-	/**
+
+    /**
 	 * Show the form to edit an existing condition
 	 * @throws ilTemplateException
 	 */
@@ -203,8 +233,21 @@ class ilSubscribersStudyCondGUI
 		$this->show($this->form_gui->getHtml());
 	}
 
+    /**
+     * Show the form to edit an existing condition
+     * @throws ilTemplateException
+     */
+    protected function editDocCond()
+    {
+        $condition = new ilStudyDocCond((int) $_GET["cond_id"]);
 
-	/**
+        $this->initDocForm("edit");
+        $this->getDocValues($condition);
+        $this->show($this->form_gui->getHtml());
+    }
+
+
+    /**
 	 * Save a newly entered condition
 	 * @throws ilTemplateException
 	 */
@@ -220,6 +263,30 @@ class ilSubscribersStudyCondGUI
         	
             ilUtil::sendInfo($this->lng->txt("studycond_condition_saved"),true);
         	$this->ctrl->redirect($this, 'listConditions');
+        }
+        else
+        {
+            $this->form_gui->setValuesByPost();
+            $this->show($this->form_gui->getHtml());
+        }
+    }
+
+    /**
+     * Save a newly entered condition
+     * @throws ilTemplateException
+     */
+    protected function saveDocCond()
+    {
+        $this->initDocForm("create");
+        if ($this->form_gui->checkInput())
+        {
+            $condition = new ilStudyDocCond;
+            $condition->obj_id = $this->parent_obj_id;
+            $this->setDocValues($condition);
+            $condition->write();
+
+            ilUtil::sendInfo($this->lng->txt("studycond_condition_saved"),true);
+            $this->ctrl->redirect($this, 'listConditions');
         }
         else
         {
@@ -253,20 +320,61 @@ class ilSubscribersStudyCondGUI
         	$this->show($this->form_gui->getHtml());
     	}
     }
-    
-    
+
+    /**
+     * Update a changed condition
+     * @throws ilTemplateException
+     */
+    protected function updateDocCond()
+    {
+        $this->ctrl->saveParameter($this,"cond_id");
+        $this->initDocForm("edit");
+
+        if ($this->form_gui->checkInput())
+        {
+            $condition = new ilStudyDocCond((int) $_GET["cond_id"]);
+            $this->setDocValues($condition);
+            $condition->write();
+
+            ilUtil::sendInfo($this->lng->txt("studycond_condition_updated"),true);
+            $this->ctrl->redirect($this, 'listConditions');
+        }
+        else
+        {
+            $this->form_gui->setValuesByPost();
+            $this->show($this->form_gui->getHtml());
+        }
+    }
+
+
     /**
 	* Delete a condition
 	*/
     protected function delete()
     {
-        ilStudyCourseCond::_delete((int) $_GET["cond_id"]);
-        ilUtil::sendInfo($this->lng->txt("studycond_condition_deleted"),true);
+        $cond = new ilStudyCourseCond($_GET["cond_id"]);
+        if ($cond->obj_id == $this->parent_obj_id) {
+            $cond->delete();
+            ilUtil::sendInfo($this->lng->txt("studycond_condition_deleted"),true);
+        }
         $this->ctrl->redirect($this, 'listConditions');
    	}
-    
-    
-	/**
+
+    /**
+     * Delete a condition
+     */
+    protected function deleteDocCond()
+    {
+        $cond = new ilStudyDocCond($_GET["cond_id"]);
+        if ($cond->obj_id == $this->parent_obj_id) {
+            $cond->delete();
+            ilUtil::sendInfo($this->lng->txt("studycond_condition_deleted"),true);
+        }
+        $this->ctrl->redirect($this, 'listConditions');
+    }
+
+
+    /**
 	* Get the values of a web form into property gui
 	* @param    ilStudyCourseCond  $a_condition
 	*/
@@ -282,8 +390,22 @@ class ilSubscribersStudyCondGUI
 		$form_gui->getItemByPostVar("study_type")->setValue($a_condition->study_type);
 	}
 
+    /**
+     * Get the values of a web form into property gui
+     * @param    ilStudyDocCond  $a_condition
+     */
+    private function getDocValues($a_condition)
+    {
+        $form_gui = $this->form_gui;
 
-	/**
+        $form_gui->getItemByPostVar("prog_id")->setValue($a_condition->prog_id);
+        $form_gui->getItemByPostVar("min_approval_date")->setDate($a_condition->min_approval_date);
+        $form_gui->getItemByPostVar("max_approval_date")->setDate($a_condition->max_approval_date);
+    }
+
+
+
+    /**
 	* Set the values of the property gui into a webform
 	* @param    ilStudyCourseCond  $a_condition
 	*/
@@ -299,8 +421,28 @@ class ilSubscribersStudyCondGUI
 		$a_condition->study_type = $form_gui->getInput("study_type");
 	}
 
+    /**
+     * Set the values of the property gui into a webform
+     * @param    ilStudyDocCond  $a_condition
+     */
+    private function setDocValues($a_condition)
+    {
+        $this->form_gui->setValuesByPost();
 
-	/**
+        $a_condition->prog_id = $this->form_gui->getInput("prog_id");
+
+        /** @var ilDateTimeInputGUI $item */
+        $item = $this->form_gui->getItemByPostVar('min_approval_date');
+        $a_condition->min_approval_date = $item->getDate();
+
+        /** @var ilDateTimeInputGUI $item */
+        $item = $this->form_gui->getItemByPostVar('max_approval_date');
+        $a_condition->max_approval_date = $item->getDate();
+
+    }
+
+
+    /**
 	* Initialize the form GUI
 	* @param    int     form mode ("create" or "edit")
 	*/
@@ -363,4 +505,47 @@ class ilSubscribersStudyCondGUI
             $this->form_gui->addCommandButton("listConditions", $this->lng->txt("cancel"));
         }
 	}
+
+    /**
+     * Initialize the form GUI
+     * @param    int     form mode ("create" or "edit")
+     */
+    private function initDocForm($a_mode)
+    {
+        require_once("Services/StudyData/classes/class.ilStudyOptionDocProgram.php");
+
+        $this->form_gui = new ilPropertyFormGUI();
+        $this->form_gui->setFormAction($this->ctrl->getFormAction($this));
+
+        // subject
+        $item = new ilSelectInputGUI($this->lng->txt("studycond_field_doc_program"), "prog_id");
+        $item->setOptions(ilStudyOptionDocProgram::_getSelectOptions(-1));
+        $this->form_gui->addItem($item);
+
+        // min approval date
+        $item = new ilDateTimeInputGUI($this->lng->txt('studycond_field_min_approval_date'), 'min_approval_date');
+        $item->setShowTime(false);
+        $this->form_gui->addItem($item);
+
+        // max approval date
+        $item = new ilDateTimeInputGUI($this->lng->txt('studycond_field_max_approval_date'), 'max_approval_date');
+        $item->setShowTime(false);
+        $this->form_gui->addItem($item);
+
+
+        // save and cancel commands
+        if ($a_mode == "create")
+        {
+            $this->form_gui->setTitle($this->lng->txt("studycond_add_condition"));
+            $this->form_gui->addCommandButton("saveDocCond", $this->lng->txt("save"));
+            $this->form_gui->addCommandButton("listConditions", $this->lng->txt("cancel"));
+        }
+        else
+        {
+            $this->form_gui->setTitle($this->lng->txt("studycond_edit_condition"));
+            $this->form_gui->addCommandButton("updateDocCond", $this->lng->txt("save"));
+            $this->form_gui->addCommandButton("listConditions", $this->lng->txt("cancel"));
+        }
+    }
+
 }

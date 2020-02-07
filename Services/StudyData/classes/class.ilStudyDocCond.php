@@ -30,7 +30,7 @@ class ilStudyDocCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT * FROM il_study_doc_cond ".
+        $query = "SELECT * FROM study_doc_cond ".
             "WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
         $result = $ilDB->query($query);
 
@@ -52,7 +52,7 @@ class ilStudyDocCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT count(*) num FROM il_study_doc_cond ".
+        $query = "SELECT count(*) num FROM study_doc_cond ".
             "WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
         $result = $ilDB->query($query);
 
@@ -70,7 +70,7 @@ class ilStudyDocCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "DELETE FROM il_study_doc_cond WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
+        $query = "DELETE FROM study_doc_cond WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
         $ilDB->manipulate($query);
     }
 
@@ -115,7 +115,7 @@ class ilStudyDocCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT * FROM il_study_doc_cond ".
+        $query = "SELECT * FROM study_doc_cond ".
             "WHERE cond_id = ".$ilDB->quote($this->cond_id, 'integer');
 
         $result = $ilDB->query($query);
@@ -135,13 +135,13 @@ class ilStudyDocCond extends ilStudyCond
         $ilDB = $DIC->database();
 
         if (empty($this->cond_id)) {
-           $this->cond_id = $ilDB->nextId('il_study_doc_cond');
+           $this->cond_id = $ilDB->nextId('study_doc_cond');
         }
 
         $min_approval_date = ($this->min_approval_date instanceof ilDate) ? $this->min_approval_date->get(IL_CAL_DATE) : null;
         $max_approval_date = ($this->max_approval_date instanceof ilDate) ? $this->max_approval_date->get(IL_CAL_DATE) : null;
 
-        $query = "REPLACE INTO il_study_doc_cond ("
+        $query = "REPLACE INTO study_doc_cond ("
             ."cond_id, obj_id, prog_id, min_approval_date, max_approval_date) "
             ."VALUES("
             .$ilDB->quote($this->cond_id, 'integer').", "
@@ -213,5 +213,17 @@ class ilStudyDocCond extends ilStudyCond
 
         // none of doc programs fits
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete()
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        $query = "DELETE FROM study_doc_cond WHERE cond_id = ".$ilDB->quote($this->cond_id, 'integer');
+        $ilDB->manipulate($query);
     }
 }
