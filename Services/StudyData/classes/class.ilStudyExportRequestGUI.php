@@ -12,7 +12,7 @@ class ilStudyExportRequestGUI
 	var $ctrl;
 	var $tpl;
 
-	function ilStudyExportRequestGUI()
+	function __construct()
 	{
 		global $ilCtrl, $tpl, $lng;
 
