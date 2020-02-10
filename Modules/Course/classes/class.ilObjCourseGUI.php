@@ -26,8 +26,8 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
  * @ilCtrl_Calls ilObjCourseGUI: ilMemberExportSettingsGUI
  * @ilCtrl_Calls ilObjCourseGUI: ilLTIProviderObjectSettingGUI, ilObjectTranslationGUI
  *
- * fim: [memcond] added ilSubscribersStudyCondGUI to call structure
- * @ilCtrl_Calls ilObjCourseGUI: ilSubscribersStudyCondGUI
+ * fim: [memcond] added ilStudyCondGUI to call structure
+ * @ilCtrl_Calls ilObjCourseGUI: ilStudyCondGUI
  * fim.
  * fim: [univis] added ilUnivisImportLecturesGUI to call structure
  * @ilCtrl_Calls ilObjCourseGUI: ilUnivisImportLecturesGUI
@@ -1382,7 +1382,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		if ($this->update_for_memcond)
 		{
 			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
-			$this->ctrl->redirectByClass('ilsubscribersstudycondgui');
+			$this->ctrl->redirectByClass('ilstudycondgui');
 		}
 		// fim.
 
@@ -1721,7 +1721,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		$stpl = new ilTemplate("tpl.show_subscribers_studycond.html", true, true, "Services/Membership");
 		$stpl->setCurrentBlock('condition');
 		$stpl->setVariable("CONDITION_TEXT", nl2br(ilStudyAccess::_getConditionsText($this->object->getId())));
-		$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilsubscribersstudycondgui', ''));
+		$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilstudycondgui', ''));
 		$stpl->setVariable("TXT_CONDITION", $this->lng->txt("studycond_edit_conditions"));
 		$stpl->parseCurrentBlock();
 		$stpl->setVariable("CONDITION_INFO", $this->lng->txt("studycond_condition_info"));
@@ -2872,9 +2872,9 @@ class ilObjCourseGUI extends ilContainerGUI
 			// fim.
 
 			// fim: [memcond] add command class
-			case 'ilsubscribersstudycondgui':
-				include_once("./Services/Membership/classes/class.ilSubscribersStudyCondGUI.php");
-				$cond_gui = new ilSubscribersStudyCondGUI($this, 'edit');
+			case 'ilstudycondgui':
+				include_once("./Services/StudyData/classes/class.ilStudyCondGUI.php");
+				$cond_gui = new ilStudyCondGUI($this, 'edit');
 				$this->ctrl->setReturn($this, 'edit');
 				$this->ctrl->forwardCommand($cond_gui);
 				$this->setSubTabs('properties');

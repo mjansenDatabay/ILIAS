@@ -23,8 +23,8 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 * @ilCtrl_Calls ilObjGroupGUI: ilLTIProviderObjectSettingGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilObjectMetaDataGUI, ilObjectTranslationGUI
  *
-*fim: [memcond] added ilSubscribersStudyCondGUI to call structure
- * @ilCtrl_Calls ilObjGroupGUI: ilSubscribersStudyCondGUI
+*fim: [memcond] added ilStudyCondGUI to call structure
+ * @ilCtrl_Calls ilObjGroupGUI: ilStudyCondGUI
  * fim.
  * fau: objectSub - added ilPropertyFormGUI to call structure
  * @ilCtrl_Calls ilObjGroupGUI: ilPropertyFormGUI
@@ -110,9 +110,9 @@ class ilObjGroupGUI extends ilContainerGUI
 				break;
 
 			// fim: [memcond] add command class
-			case 'ilsubscribersstudycondgui':
-				include_once("./Services/Membership/classes/class.ilSubscribersStudyCondGUI.php");
-				$cond_gui = new ilSubscribersStudyCondGUI($this, 'edit');
+			case 'ilstudycondgui':
+				include_once("./Services/StudyData/classes/class.ilStudyCondGUI.php");
+				$cond_gui = new ilStudyCondGUI($this, 'edit');
 				$this->ctrl->setReturn($this, 'edit');
 				$this->ctrl->forwardCommand($cond_gui);
 				$this->setSubTabs('settings');
@@ -880,7 +880,7 @@ class ilObjGroupGUI extends ilContainerGUI
 			// fim: [memcond] eventually redirect to condition settings after update
 			if ($this->update_for_memcond)
 			{
-				$this->ctrl->redirectByClass('ilsubscribersstudycondgui');
+				$this->ctrl->redirectByClass('ilstudycondgui');
 	        }
 	        else
 			{
@@ -2093,7 +2093,7 @@ class ilObjGroupGUI extends ilContainerGUI
 			{
 				$stpl->setCurrentBlock('condition');
 				$stpl->setVariable("CONDITION_TEXT", nl2br(ilStudyAccess::_getConditionsText($this->object->getId())));
-				$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilsubscribersstudycondgui', ''));
+				$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilstudycondgui', ''));
 				$stpl->setVariable("TXT_CONDITION", $this->lng->txt("studycond_edit_conditions"));
 				$stpl->parseCurrentBlock();
 				$stpl->setVariable("CONDITION_INFO", $this->lng->txt("studycond_condition_info"));

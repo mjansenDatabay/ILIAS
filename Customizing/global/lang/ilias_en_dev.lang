@@ -341,7 +341,7 @@ common#:#studycond_field_max_approval_date#:#Latest Approval Date
 common#:#studycond_max_semester#:#until %s. subjectsemester (%s)
 common#:#studycond_min_max_semester#:#%s. until %s. subjectsemester (%s)
 common#:#studycond_min_semester#:#from %s. subjectsemester (%s)
-common#:#studycond_min_max_approval_date#:#Approval between %s and %s
+common#:#studycond_min_max_approval_date#:#Approval in Period %s
 common#:#studycond_min_approval_date#:#Approval on/after %s
 common#:#studycond_max_approval_date#:#Approval until %s
 common#:#studycond_no_condition_defined#:#No conditions determined.

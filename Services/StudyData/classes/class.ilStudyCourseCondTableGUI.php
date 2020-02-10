@@ -1,25 +1,14 @@
 <?php
-/* fim: [memcond] new class. */
-
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+/* fau: studyData - new table class. */
 
 require_once 'Services/Table/classes/class.ilTable2GUI.php';
 require_once "Services/StudyData/classes/class.ilStudyCourseData.php";
-require_once ("Services/StudyData/classes/class.ilStudyCourseCond.php");
+require_once "Services/StudyData/classes/class.ilStudyCourseCond.php";
 require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
 require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
 
-/**
-* Class ilSubscribersStudyCondTableGUI
-*
-* @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
-* @version $Id: $
-*
-* @package webform
-*/
 
-class ilSubscribersStudyCondTableGUI extends ilTable2GUI
+class ilStudyCourseCondTableGUI extends ilTable2GUI
 {
 	var $obj_id;
 	
@@ -31,7 +20,7 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
     */
 	function __construct($a_parent_obj, $a_parent_cmd, $a_obj_id)
     {
-        $this->setId('ilSubscribersStudyCondTableGUI');
+        $this->setId('ilStudyCorseCondTableGUI');
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->obj_id = $a_obj_id;
@@ -49,10 +38,10 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
         $this->setEnableNumInfo(false);
         $this->setExternalSegmentation(true);
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-        $this->setRowTemplate("tpl.list_subscribers_studycond_row.html", "Services/Membership");
+        $this->setRowTemplate("tpl.study_course_cond_row.html", "Services/StudyData");
         $this->setDefaultOrderField("subject");
         $this->setDefaultOrderDirection("asc");
-        $this->setPrefix("studycond_conditions");
+        $this->setPrefix("study_course_cond");
 		$this->readData();
     }
 
@@ -85,8 +74,8 @@ class ilSubscribersStudyCondTableGUI extends ilTable2GUI
     protected function fillRow($a_set)
     {
 		$this->ctrl->setParameter($this->getParentObject(),"cond_id", $a_set["cond_id"]);
-		$this->tpl->setVariable("LINK_EDIT", $this->ctrl->getLinkTarget($this->getParentObject(),"edit"));
-		$this->tpl->setVariable("LINK_DELETE", $this->ctrl->getLinkTarget($this->getParentObject(),"delete"));
+		$this->tpl->setVariable("LINK_EDIT", $this->ctrl->getLinkTarget($this->getParentObject(),"editCourseCond"));
+		$this->tpl->setVariable("LINK_DELETE", $this->ctrl->getLinkTarget($this->getParentObject(),"deleteCourseCond"));
   		$this->tpl->setVariable("SUBJECT", $a_set["subject"]);
 		$this->tpl->setVariable("DEGREE", $a_set["degree"]);
 		if ($a_set["min_semester"])

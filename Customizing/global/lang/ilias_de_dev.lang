@@ -312,7 +312,7 @@ common#:#studycond_field_max_approval_date#:#Spätestes Zulassungsdatum
 common#:#studycond_max_semester#:#bis %s. Fachsemester (%s)
 common#:#studycond_min_max_semester#:#%s. bis %s. Fachsemester (%s)
 common#:#studycond_min_semester#:#ab %s. Fachsemester (%s)
-common#:#studycond_min_max_approval_date#:#Zulassung zwischen %s und %s
+common#:#studycond_min_max_approval_date#:#Zulassung im Zeitraum %s
 common#:#studycond_min_approval_date#:#Zulassung ab %s
 common#:#studycond_max_approval_date#:#Zulassung bis %s
 common#:#studycond_no_condition_defined#:#Keine Bedingung festgelegt.

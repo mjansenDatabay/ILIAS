@@ -1,23 +1,15 @@
 <?php
-/* fim: [memcond] new class. */
-
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+/* fau: studyData - new class for handling conditions. */
 
 include_once "Services/StudyData/classes/class.ilStudyCourseCond.php";
 include_once "Services/StudyData/classes/class.ilStudyDocCond.php";
 
 /**
-* Class ilSubscribersStudyCondGUI
-*
-* @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
-* @version $Id: $
-*
-* @ilCtrl_Calls ilSubscribersStudyCondGUI:
-*
-* @ingroup ServicesMembership
+* Class ilStudyCondGUI
+ *
+* @ilCtrl_Calls ilStudyCondGUI:
 */
-
-class ilSubscribersStudyCondGUI
+class ilStudyCondGUI
 {
 	/** @var  string  */
 	protected $headline;
@@ -170,7 +162,7 @@ class ilSubscribersStudyCondGUI
         $ilToolbar = $DIC->toolbar();
 
         $but1 = ilLinkButton::getInstance();
-        $but1->setUrl($this->ctrl->getLinkTarget($this, 'create'));
+        $but1->setUrl($this->ctrl->getLinkTarget($this, 'createCourseCond'));
         $but1->setCaption('studycond_add_course_condition');
         $ilToolbar->addButtonInstance($but1);
 
@@ -180,11 +172,10 @@ class ilSubscribersStudyCondGUI
         $ilToolbar->addButtonInstance($but2);
 
 
-        // build the table of form definitions
-		include_once 'Services/Membership/classes/class.ilSubscribersStudyCondTableGUI.php';
-		$table1 = new ilSubscribersStudyCondTableGUI($this, "listConditions", $this->parent_obj_id);
+		require_once 'Services/StudyData/classes/class.ilStudyCourseCondTableGUI.php';
+		$table1 = new ilStudyCourseCondTableGUI($this, "listConditions", $this->parent_obj_id);
 
-        include_once 'Services/Membership/classes/class.ilStudyDocCondTableGUI.php';
+        require_once 'Services/StudyData/classes/class.ilStudyDocCondTableGUI.php';
         $table2 = new ilStudyDocCondTableGUI($this, "listConditions", $this->parent_obj_id);
 
         $this->show($table1->getHTML().$table2->getHTML());
@@ -203,9 +194,9 @@ class ilSubscribersStudyCondGUI
 	 * Show an empty form to create a new condition
 	 * @throws ilTemplateException
 	 */
-	protected function create()
+	protected function createCourseCond()
 	{
-		$this->initForm("create");
+		$this->initCourseForm("create");
 		$this->show($this->form_gui->getHtml());
 	}
 
@@ -224,12 +215,12 @@ class ilSubscribersStudyCondGUI
 	 * Show the form to edit an existing condition
 	 * @throws ilTemplateException
 	 */
-	protected function edit()
+	protected function editCourseCond()
 	{
 		$condition = new ilStudyCourseCond((int) $_GET["cond_id"]);
 
-		$this->initForm("edit");
-		$this->getValues($condition);
+		$this->initCourseForm("edit");
+		$this->getCourseValues($condition);
 		$this->show($this->form_gui->getHtml());
 	}
 
@@ -251,14 +242,14 @@ class ilSubscribersStudyCondGUI
 	 * Save a newly entered condition
 	 * @throws ilTemplateException
 	 */
-    protected function saveCond()
+    protected function saveCourseCond()
     {
-        $this->initForm("create");
+        $this->initCourseForm("create");
         if ($this->form_gui->checkInput())
         {
 			$condition = new ilStudyCourseCond;
         	$condition->obj_id = $this->parent_obj_id;
-        	$this->setValues($condition);
+        	$this->setCourseValues($condition);
         	$condition->write();
         	
             ilUtil::sendInfo($this->lng->txt("studycond_condition_saved"),true);
@@ -300,15 +291,15 @@ class ilSubscribersStudyCondGUI
 	 * Update a changed condition
 	 * @throws ilTemplateException
 	 */
-    protected function updateCond()
+    protected function updateCourseCond()
     {
 		$this->ctrl->saveParameter($this,"cond_id");
-		$this->initForm("edit");
+		$this->initCourseForm("edit");
 		
         if ($this->form_gui->checkInput())
         {
             $condition = new ilStudyCourseCond((int) $_GET["cond_id"]);
-			$this->setValues($condition);
+			$this->setCourseValues($condition);
 			$condition->write();
 			
 			ilUtil::sendInfo($this->lng->txt("studycond_condition_updated"),true);
@@ -350,7 +341,7 @@ class ilSubscribersStudyCondGUI
     /**
 	* Delete a condition
 	*/
-    protected function delete()
+    protected function deleteCourseCond()
     {
         $cond = new ilStudyCourseCond($_GET["cond_id"]);
         if ($cond->obj_id == $this->parent_obj_id) {
@@ -378,7 +369,7 @@ class ilSubscribersStudyCondGUI
 	* Get the values of a web form into property gui
 	* @param    ilStudyCourseCond  $a_condition
 	*/
-	private function getValues($a_condition)
+	private function getCourseValues($a_condition)
 	{
 		$form_gui = $this->form_gui;
 
@@ -409,7 +400,7 @@ class ilSubscribersStudyCondGUI
 	* Set the values of the property gui into a webform
 	* @param    ilStudyCourseCond  $a_condition
 	*/
-	private function setValues($a_condition)
+	private function setCourseValues($a_condition)
 	{
 		$form_gui = $this->form_gui;
 
@@ -446,7 +437,7 @@ class ilSubscribersStudyCondGUI
 	* Initialize the form GUI
 	* @param    int     form mode ("create" or "edit")
 	*/
-	private function initForm($a_mode)
+	private function initCourseForm($a_mode)
 	{
 		require_once("Services/StudyData/classes/class.ilStudyCourseData.php");
         require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
@@ -495,13 +486,13 @@ class ilSubscribersStudyCondGUI
         if ($a_mode == "create")
         {
  			$this->form_gui->setTitle($this->lng->txt("studycond_add_condition"));
-           	$this->form_gui->addCommandButton("saveCond", $this->lng->txt("save"));
+           	$this->form_gui->addCommandButton("saveCourseCond", $this->lng->txt("save"));
             $this->form_gui->addCommandButton("listConditions", $this->lng->txt("cancel"));
         }
         else
         {
   			$this->form_gui->setTitle($this->lng->txt("studycond_edit_condition"));
-           $this->form_gui->addCommandButton("updateCond", $this->lng->txt("save"));
+           $this->form_gui->addCommandButton("updateCourseCond", $this->lng->txt("save"));
             $this->form_gui->addCommandButton("listConditions", $this->lng->txt("cancel"));
         }
 	}

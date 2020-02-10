@@ -1083,3 +1083,44 @@ if(!$ilDB->tableExists('study_doc_cond'))
     $ilDB->createSequence('study_doc_cond');
 }
 ?>
+<#66>
+<?php
+/**
+ * fau: studyData - rename the table for study course conditions
+ */
+if(!$ilDB->tableExists('study_course_cond') && $ilDB->tableExists('il_sub_studycond'))
+{
+    $ilDB->manipulate('RENAME TABLE `il_sub_studycond` TO `study_course_cond`');
+    $ilDB->manipulate('RENAME TABLE `il_sub_studycond_seq` TO `study_course_cond_seq`');
+}
+?>
+<#67>
+<?php
+/**
+ * fau: studyData - add school_id to course conditions
+ */
+if(!$ilDB->tableColumnExists('study_course_cond','school_id'))
+{
+    $ilDB->addTableColumn('study_course_cond', 'school_id',
+        array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
+    );
+}
+?>
+<#68>
+<?php
+/**
+ * fau: studyData - drop the old studycond table
+ */
+if($ilDB->tableExists('il_studycond'))
+{
+    $ilDB->manipulate('DROP TABLE IF EXISTS il_studycond');
+}
+if($ilDB->tableExists('il_studycond_seq'))
+{
+    $ilDB->manipulate('DROP TABLE IF EXISTS il_studycond_seq');
+}
+?>
+<#69>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>

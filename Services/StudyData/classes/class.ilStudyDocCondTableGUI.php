@@ -1,13 +1,10 @@
 <?php
-/* fim: [memcond] new class. */
+/* fau: studyData - new table class. */
 
 require_once 'Services/Table/classes/class.ilTable2GUI.php';
 require_once "Services/StudyData/classes/class.ilStudyDocCond.php";
 require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
 
-/**
-* Class ilStudyDocCondTableGUI
-*/
 class ilStudyDocCondTableGUI extends ilTable2GUI
 {
 	var $obj_id;
@@ -35,7 +32,7 @@ class ilStudyDocCondTableGUI extends ilTable2GUI
         $this->setEnableNumInfo(false);
         $this->setExternalSegmentation(true);
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-        $this->setRowTemplate("tpl.study_doc_cond_row.html", "Services/Membership");
+        $this->setRowTemplate("tpl.study_doc_cond_row.html", "Services/StudyData");
         $this->setDefaultOrderField("program");
         $this->setDefaultOrderDirection("asc");
         $this->setPrefix("study_doc_cond");
