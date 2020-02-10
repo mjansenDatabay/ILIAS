@@ -214,7 +214,7 @@ class ilRbacSystem
 		$operations = explode(",",$a_operations);
 		foreach ($operations as $operation)
 		{
-			// fim: [studycond] add check for studydata based access
+// fau: studyData - add check for studydata based access
 			// a grant overrules the rbac access
 			if ($operation == "read" or $operation == "visible")
 			{
@@ -223,7 +223,7 @@ class ilRbacSystem
 					continue;
 				}
 			}
-			// fim.
+// fau.
 
 			if ($operation == "create")
 			{

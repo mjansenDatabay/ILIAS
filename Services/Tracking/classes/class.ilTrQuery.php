@@ -405,12 +405,12 @@ class ilTrQuery
 				$a_result["set"][$idx] = $row = array_merge($row, $udf[$row["usr_id"]]);
 			}
 
-			// fim: [studydata] get studydata if allowed
-			if (!$check_agreement or in_array($row["usr_id"], $agreements))
+// fau: studyData - get studydata if allowed
+			if (!$a_check_agreement or in_array($row["usr_id"], $agreements))
 			{
 				$a_result["set"][$idx]['studydata'] = ilStudyAccess::_getDataText($row["usr_id"]);
 			}
-			// fim.
+// fau.
 
 			// remove all private data - if active agreement and agreement not given by user
 			if(sizeof($a_privacy_fields) && $a_check_agreement && !in_array($row["usr_id"], $agreements))
@@ -1261,10 +1261,10 @@ class ilTrQuery
 
 					switch($field)
 					{
-						// fim: [studydata] don't get the studydata directly from user table
+// fau: studyData - don't get the studydata directly from user table
 						case "studydata":
 							break;
-						// fim.
+// fau.
 
 						case 'org_units':
 							break;

@@ -23,9 +23,9 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 * @ilCtrl_Calls ilObjGroupGUI: ilLTIProviderObjectSettingGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilObjectMetaDataGUI, ilObjectTranslationGUI
  *
-*fim: [memcond] added ilStudyCondGUI to call structure
+ * fau: studyData - added ilStudyCondGUI to call structure
  * @ilCtrl_Calls ilObjGroupGUI: ilStudyCondGUI
- * fim.
+ * fau.
  * fau: objectSub - added ilPropertyFormGUI to call structure
  * @ilCtrl_Calls ilObjGroupGUI: ilPropertyFormGUI
  * fau.
@@ -109,7 +109,7 @@ class ilObjGroupGUI extends ilContainerGUI
 				$this->ctrl->forwardCommand($mem_gui);
 				break;
 
-			// fim: [memcond] add command class
+// fau: studyCond - add command class
 			case 'ilstudycondgui':
 				include_once("./Services/StudyData/classes/class.ilStudyCondGUI.php");
 				$cond_gui = new ilStudyCondGUI($this, 'edit');
@@ -118,7 +118,7 @@ class ilObjGroupGUI extends ilContainerGUI
 				$this->setSubTabs('settings');
 				$this->tabs_gui->setTabActive('settings');
 				break;
-			// fim.
+// fau.
 
 // fau: objectSub - object selection in properties form
 			case "ilpropertyformgui":

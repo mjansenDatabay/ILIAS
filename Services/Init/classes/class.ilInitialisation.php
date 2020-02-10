@@ -960,9 +960,9 @@ class ilInitialisation
 		
 		require_once "./Services/Conditions/classes/class.ilConditionHandler.php";
 
-		// fim: [studycond] require ilStudyAccess
+// fau: studyData - require ilStudyAccess
 		require_once "./Services/StudyData/classes/class.ilStudyAccess.php";
-		// fim.
+// fau.
 	}
 	
 	/**

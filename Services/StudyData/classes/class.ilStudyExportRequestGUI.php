@@ -1,19 +1,12 @@
 <?php
-/* fim: [studydata] new class. */
-
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+/* fau: studyData -  new class. */
 
 /**
 * Class lStudyExportRequestGUI
 *
-* @author Fred Neumann <fred.neumann@fim.uni-erlangen.de> 
-*
 * @ilCtrl_Calls ilStudyExportRequestGUI:
 * 
 */
-
-
 class ilStudyExportRequestGUI
 {
 	var $ctrl;

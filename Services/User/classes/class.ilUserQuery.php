@@ -339,13 +339,13 @@ class ilUserQuery
 				continue;
 			}
 
-            // fim: [studydata] don't query for studydata directly, add them later
+// fau: studyData - don't query for studydata directly, add them later
             if ($field == 'studydata')
             {
                 $add_studydata = true;
                 continue;
             }
-            // fim.
+// fau.
 
 			if(in_array($field, $all_multi_fields))
 			{
@@ -579,10 +579,10 @@ class ilUserQuery
 				}	
 				break;
 
-            // fim: [studydata] don't oeder by studydata
+// fau: studyData - don't oeder by studydata
             case "studydata":
                 break;
-           // fim.
+// fau.
 
 			default:
 				if ($this->order_dir != "asc" && $this->order_dir != "desc")
@@ -641,12 +641,12 @@ class ilUserQuery
 
 		while($rec = $ilDB->fetchAssoc($set))
 		{
-			// fim: [studydata] optionally add the studydata
+// fau: studyData - optionally add the studydata
 			if ($add_studydata)
 			{
 				$rec['studydata'] = ilStudyAccess::_getDataText($rec['usr_id']);
 			}
-			// fim.
+// fau.
 			$result[] = $rec;
 
 			if(sizeof($multi_fields))

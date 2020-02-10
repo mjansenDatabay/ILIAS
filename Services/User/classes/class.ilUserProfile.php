@@ -263,12 +263,12 @@ class ilUserProfile
 						"size" => 40,
 						"method" => "getMatriculation",
 						"group" => "other"),
-		// fim: [studydata] add studydata to profile fields
+// fau: studyData - add studydata to profile fields
 		"studydata" => array (
 						"input" => "studydata",
 						"lists_hide" => false,
 						"group" => "other"),
-		// fim.
+// fau.
 		"language" => array(
 						"input" => "language",
 						"method" => "getLanguage",
@@ -558,7 +558,7 @@ class ilUserProfile
 			
 			switch ($p["input"])
 			{
-				// fim: [studydata] add studydata to standard fields
+// fau: studyData - add studydata to standard fields
 				case "studydata":
 					if (self::$mode != self::MODE_REGISTRATION)
 					{
@@ -570,7 +570,7 @@ class ilUserProfile
 						$a_form->addItem($stu);
 					}
 					break;
-				// fim.
+// fau.
 
 				case "login":
 // fau: regCodes - show message for generated username at registration form

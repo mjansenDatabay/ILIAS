@@ -1,16 +1,12 @@
 <?php
-/* fim: [studydata] new class. */
-
-/* Copyright (c) 1998-2014 ILIAS open source, Extended GPL, see docs/LICENSE */
+/* fau: studyData - new class. */
 
 /**
-* Class ilStudyDataGUI
-*
-* @author Fred Neumann <fred.neumann@fim.uni-erlangen.de> 
-*
-* @ilCtrl_Calls ilStudyDataGUI:
-* 
-*/
+ * Class ilStudyDataGUI
+ *
+ * @ilCtrl_Calls ilStudyDataGUI:
+ *
+ */
 require_once "Services/StudyData/classes/class.ilStudyCourseData.php";
 require_once "Services/StudyData/classes/class.ilStudyDocData.php";
 require_once("Services/StudyData/classes/class.ilStudyOptionDegree.php");

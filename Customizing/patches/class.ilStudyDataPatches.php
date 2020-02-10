@@ -1,6 +1,6 @@
 <?php
 /**
- * fim: [studydata] study data and idm related patches
+ * fau: studyData - study data and idm related patches.
  */
 class ilStudyDataPatches
 {

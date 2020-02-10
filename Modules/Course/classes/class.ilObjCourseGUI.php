@@ -26,9 +26,9 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
  * @ilCtrl_Calls ilObjCourseGUI: ilMemberExportSettingsGUI
  * @ilCtrl_Calls ilObjCourseGUI: ilLTIProviderObjectSettingGUI, ilObjectTranslationGUI
  *
- * fim: [memcond] added ilStudyCondGUI to call structure
+ * fau: studyData - added ilStudyCondGUI to call structure
  * @ilCtrl_Calls ilObjCourseGUI: ilStudyCondGUI
- * fim.
+ * fau.
  * fim: [univis] added ilUnivisImportLecturesGUI to call structure
  * @ilCtrl_Calls ilObjCourseGUI: ilUnivisImportLecturesGUI
  * fim.
@@ -2785,9 +2785,9 @@ class ilObjCourseGUI extends ilContainerGUI
 			
 		}
 	}
-	
 
-	//fim: [studydata] new function __getStudyDataVisibility()
+
+// fau: studyData - new function __getStudyDataVisibility()
 	function __getStudyDataVisibility()
 	{
 		global $rbacsystem;
@@ -2808,7 +2808,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		}
 		return $this->study_data_visible;
 	}
-	// fim.
+// fau.
 
 	function executeCommand()
 	{

@@ -1,7 +1,7 @@
 <#1>
 <?php
 	/**
-	* fim: [studydata] Create the tables for study data.
+	* fau: studyData - Create the tables for study data.
 	*/
 	if(!$ilDB->tableExists('usr_study'))
 	{
@@ -120,7 +120,7 @@
 <#5>
 <?php
 	/**
-	* fim: [studycond] Add the support for study data based subscription conditions.
+	* fau: studyData - Add the support for study data based subscription conditions.
 	*/
 	if(!$ilDB->tableExists('il_sub_studycond'))
 	{
@@ -226,7 +226,7 @@
 <#9>
 <?php
 	/**
-	 * fim: [studycond] Create the table for studydata conditions.
+	 * fau: studyData - Create the table for studydata conditions.
 	 */
 	if (!$ilDB->tableExists('il_studycond'))
 	{
@@ -487,7 +487,7 @@
 <#25>
 <?php
 	/**
-	 * fim: [studydata] Add semester for studydata subjects.
+	 * fau: studyData - Add semester for studydata subjects.
 	 */
 	if( !$ilDB->tableColumnExists('usr_subject', 'semester'))
 	{
@@ -499,7 +499,7 @@
 <#26>
 <?php
 	/**
-	 * fim: [studydata] Add subject_no for studydata subjects.
+	 * fau: studyData - Add subject_no for studydata subjects.
 	 */
 	if( !$ilDB->tableColumnExists('usr_subject', 'subject_no'))
 	{
@@ -511,7 +511,7 @@
 <#27>
 <?php
 	/**
-	 * fim: [studydata] Drop old study registration support.
+	 * fau: studyData - Drop old study registration support.
 	 */
 	if ($ilDB->tableExists('study_matriculations'))
 		$ilDB->dropTable('study_matriculations');
@@ -578,7 +578,7 @@
 <#34>
 <?php
     /**
-     * fim: [studycond] optimize queries on study conditions.
+     * fau: studyData - optimize queries on study conditions.
      */
     if (!$ilDB->indexExistsByFields('il_studycond', array('ref_id')))
     {
@@ -1004,8 +1004,7 @@ if (!$ilDB->tableColumnExists('booking_settings', 'user_storno'))
 <#62>
 <?php
 /**
- * fim: [studydata] add the column for study type.
- * fim: [studycond] add the column for study type.
+ * fau: studyData - add the column for study type.
  */
 if(!$ilDB->tableColumnExists('usr_study','study_type'))
 {
