@@ -87,8 +87,8 @@ abstract class ilRegistrationGUI
 		$this->ref_id = $this->container->getRefId();
 		$this->obj_id = ilObject::_lookupObjId($this->ref_id);
 		$this->type = ilObject::_lookupType($this->obj_id);
-		
-		// fim: [memcond] define matches_studycond, describe_studycond
+
+// fau: studyCond - define matches_studycond, describe_studycond
 		global $ilUser;
 		$this->has_studycond = ilStudyAccess::_hasConditions($this->obj_id);
 		if ($this->has_studycond)
@@ -101,7 +101,7 @@ abstract class ilRegistrationGUI
 			$this->matches_studycond = true;
 			$this->describe_studycond = "";
 		}
-		// fim.
+// fau.
 
 		// Init participants
 		$this->initParticipants();

@@ -877,7 +877,7 @@ class ilObjGroupGUI extends ilContainerGUI
 		{
 			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
 
-			// fim: [memcond] eventually redirect to condition settings after update
+// fau: studyCond - eventually redirect to condition settings after update
 			if ($this->update_for_memcond)
 			{
 				$this->ctrl->redirectByClass('ilstudycondgui');
@@ -886,19 +886,19 @@ class ilObjGroupGUI extends ilContainerGUI
 			{
 				$this->ctrl->redirect($this,'edit');
 			}
-			// fim.
+// fau.
 
 			return true;
 		}
 	}
-	
-	// fim: [memcond] new function updateForMemcond
+
+// fau: studyCond - new function updateForMemcond
 	function updateForMemcondObject()
 	{
 		$this->update_for_memcond = true;
 		$this->updateObject();
 	}
-	// fim.
+// fau.
 	
 	
 	/**
@@ -1505,7 +1505,7 @@ class ilObjGroupGUI extends ilContainerGUI
 // fau.
 		else
 		{
-			// fim: [memcond] generate text for suscription with condition
+// fau: studyCond - generate text for suscription with condition
 			if (ilStudyAccess::_hasConditions($this->object->getId()))
 			{
 				$ctext = ilStudyAccess::_getConditionsText($this->object->getId());
@@ -1537,9 +1537,9 @@ class ilObjGroupGUI extends ilContainerGUI
 				$registration_text = "";
 				$registration_type = $this->object->getRegistrationType();
 			}
-			// fim.
+// fau.
 
-			// fim: [memcond] use registration type and text from above
+// fau: studyCond - use registration type and text from above
 			switch($registration_type)
 			{
 				case GRP_REGISTRATION_DIRECT:
@@ -1558,7 +1558,7 @@ class ilObjGroupGUI extends ilContainerGUI
 					break;
 					
 			}
-			// fim.
+// fau.
 			/*
 			$info->addProperty($this->lng->txt('group_registration_time'),
 				ilDatePresentation::formatPeriod(

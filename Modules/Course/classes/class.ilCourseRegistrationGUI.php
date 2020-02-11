@@ -41,7 +41,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 		
 		$this->parent_gui = $a_parent_gui;
 
-		// fim: [memcond] set the actual subscription type according to the studydata condition
+// fau: studyCond - set the actual subscription type according to the studydata condition
 		if ($this->matches_studycond)
 		{
 		    $this->subscription_type = $this->container->getSubscriptionType();
@@ -50,7 +50,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 		{
 			$this->subscription_type = IL_CRS_SUBSCRIPTION_CONFIRMATION;
 		}
-		// fim.
+// fau.
 	}
 	
 	/**
@@ -463,16 +463,16 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 			return true;
 		}
 
-		//fim: [memcond] check actual subscription type
+// fau: studyCond - check actual subscription type
 		switch($this->subscription_type)
-		// fim.
+// fau.
 		{
 			case IL_CRS_SUBSCRIPTION_DIRECT:
 
 // fau: fairSub - allow "request" info if waiting list is active
 // fau.
 
-				// fim: [memcond] set direct subscription info for studycond
+// fau: studyCond - set direct subscription info for studycond
 				$txt = new ilCustomInputGUI($this->lng->txt('mem_reg_type'));
 				if ($this->has_studycond)
 				{
@@ -482,13 +482,13 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 				{
 					$txt->setHtml($this->lng->txt('crs_subscription_options_direct'));
 				}
-				// fim.
+// fau.
 
 				$this->form->addItem($txt);
 				break;
 
 			case IL_CRS_SUBSCRIPTION_PASSWORD:
-				// fim: [memcond] set password subscription info for studycond
+// fau: studyCond - set password subscription info for studycond
 				$txt = new ilCustomInputGUI($this->lng->txt('mem_reg_type'));
 				if ($this->has_studycond)
 				{
@@ -498,7 +498,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 				{
 					$txt->setHtml($this->lng->txt('crs_subscription_options_password'));
 				}
-				// fim.
+// fau.
 
 				$pass = new ilTextInputGUI($this->lng->txt('passwd'),'grp_passw');
 				$pass->setInputType('password');
@@ -515,7 +515,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 
 // fau: fairSub - allow "request" info if waiting list is active
 // fau.
-				// fim: [memcond] set confirmation subscription info for studycond
+// fau: studyCond - set confirmation subscription info for studycond
 				$txt = new ilCustomInputGUI($this->lng->txt('mem_reg_type'));
 				if ($this->has_studycond and $this->container->getSubscriptionType() == IL_CRS_SUBSCRIPTION_DIRECT)
 				{
@@ -529,7 +529,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 				{
 					$txt->setHtml($this->lng->txt('crs_subscription_options_confirmation'));
 				}
-				// fim.
+// fau.
 			
 				$sub = new ilTextAreaInputGUI($this->lng->txt('crs_reg_subject'),'subject');
 				$sub->setValue($_POST['subject']);
@@ -748,9 +748,9 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 			$this->join_error = $this->lng->txt('mem_error_preconditions');
 			return false;
 		}
-		// fim: [memcond] check actual subscription type
+// fau: studyCond - check actual subscription type
 		if($this->subscription_type == IL_CRS_SUBSCRIPTION_PASSWORD)
-		// fim.
+// fau.
 		{
 			if(!strlen($pass = ilUtil::stripSlashes($_POST['grp_passw'])))
 			{
@@ -826,7 +826,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
 	}
 
 // fau: fairSub - add subscription requests and requests in fair time to waiting list
-	// fim: [memcond] use condition based subscription type
+// fau: studyCond - use condition based subscription type
 	// fim: [memfix] avoid failures on heavy concurrency
 	/**
 	 * add user 

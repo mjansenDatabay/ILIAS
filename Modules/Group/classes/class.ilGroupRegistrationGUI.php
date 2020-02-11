@@ -60,7 +60,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 	{
 		parent::__construct($a_container);
 
-		// fim: [memcond] set the actual registration type according to the studydata condition
+// fau: studyCond - set the actual registration type according to the studydata condition
 		if ($this->matches_studycond
 		or $this->container->getRegistrationType() == GRP_REGISTRATION_DEACTIVATED)
 		{
@@ -70,7 +70,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 		{
 			$this->registration_type = GRP_REGISTRATION_REQUEST;
 		}
-		// fim.
+// fau.
 	}
 	
 	/**
@@ -389,9 +389,9 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 		}
 // fau.
 
-		//fim: [memcond] check actual registration type
+// fau: studyCond - check actual registration type
 		switch($this->registration_type)
-		// fim.
+// fau.
 		{
 			case GRP_REGISTRATION_DEACTIVATED:
 				$reg = new ilNonEditableValueGUI($this->lng->txt('mem_reg_type'));
@@ -405,7 +405,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 				break;
 				
 			case GRP_REGISTRATION_PASSWORD:
-				// fim: [memcond] set password subscription info for studycond
+// fau: studyCond - set password subscription info for studycond
 				$txt = new ilCustomInputGUI($this->lng->txt('mem_reg_type'));
 				if ($this->has_studycond)
 				{
@@ -415,7 +415,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 				{
 					$txt->setHtml($this->lng->txt('grp_pass_request'));
 				}
-				// fim.
+// fau.
 
 				$pass = new ilTextInputGUI($this->lng->txt('passwd'),'grp_passw');
 				$pass->setInputType('password');
@@ -433,7 +433,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 // fau: fairSub - allow "request" info if waiting list is active
 // fau.
 
-				// fim: [memcond] set confirmation subscription info for studycond
+// fau: studyCond - set confirmation subscription info for studycond
 				$txt = new ilCustomInputGUI($this->lng->txt('mem_reg_type'));
 				if ($this->has_studycond and $this->container->getRegistrationType() == GRP_REGISTRATION_DIRECT)
 				{
@@ -447,7 +447,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 				{
 					$txt->setHtml($this->lng->txt('grp_reg_request'));
 				}
-				// fim.
+// fau.
 
 				$sub = new ilTextAreaInputGUI($this->lng->txt('grp_reg_subject'),'subject');
 				$sub->setValue($_POST['subject']);
@@ -477,7 +477,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 
 // fau: fairSub - allow "request" info if waiting list is active
 // fau.
-				// fim: [memcond] set subscription subscription info for studycond
+// fau: studyCond - set subscription subscription info for studycond
 				$txt = new ilCustomInputGUI($this->lng->txt('mem_reg_type'));
 				if ($this->has_studycond)
 				{
@@ -488,7 +488,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 					$txt->setHtml($this->lng->txt('group_req_direct'));
 				}
 				$txt->setInfo($this->lng->txt('grp_reg_direct_info_screen'));
-				// fim.
+// fau.
 				
 				$this->form->addItem($txt);
 				break;
@@ -542,9 +542,9 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 			$this->join_error = $this->lng->txt('mem_error_preconditions');
 			return false;
 		}
-		// fim: [memcond] check actual registration type
+// fau: studyCond - check actual registration type
 		if($this->registration_type == GRP_REGISTRATION_PASSWORD)
-		// fim.
+// fau.
 		{
 			if(!strlen($pass = ilUtil::stripSlashes($_POST['grp_passw'])))
 			{
@@ -575,7 +575,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
 	}
 
 // fau: fairSub - add subscription requests and requests in fair time to waiting list
-	// fim: [memcond] use condition based subscription type
+// fau: studyCond - use condition based subscription type
 	// fim: [memfix] avoid failures on heavy concurrency
 	/**
 	 * add user 

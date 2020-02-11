@@ -503,7 +503,7 @@ class ilObjCourseGUI extends ilContainerGUI
 					break;
 				}
 // fau.
-				// fim: [memcond] generate text for suscription with condition
+// fau: studyCond - generate text for suscription with condition
 				if (ilStudyAccess::_hasConditions($this->object->getId()))
 				{
 					$ctext = ilStudyAccess::_getConditionsText($this->object->getId());
@@ -535,7 +535,7 @@ class ilObjCourseGUI extends ilContainerGUI
 					$subscription_text = "";
 					$subscription_type = $this->object->getSubscriptionType();
 				}
-				// fim.
+// fau.
 
 				switch($this->object->getSubscriptionType())
 				{
@@ -552,9 +552,9 @@ class ilObjCourseGUI extends ilContainerGUI
 		}
 		
 		// subscription
-		// fim: [memcond] add text for subscription with condition
+// fau: studyCond - add text for subscription with condition
 		$info->addProperty($this->lng->txt("crs_info_reg"),$subscription_text.$txt);
-		// fim.
+// fau.
 
 // fau: campusSub - don't show subscription period for mycampus
 		if($this->object->getSubscriptionLimitationType() != IL_CRS_SUBSCRIPTION_DEACTIVATED
@@ -1376,15 +1376,15 @@ class ilObjCourseGUI extends ilContainerGUI
 
 		$ilUser = $DIC['ilUser'];
 		ilChangeEvent::_recordWriteEvent($this->object->getId(), $ilUser->getId(), 'update');
-		ilChangeEvent::_catchupWriteEvents($this->object->getId(), $ilUser->getId());			
+		ilChangeEvent::_catchupWriteEvents($this->object->getId(), $ilUser->getId());
 
-		// fim: [memcond] eventually redirect to condition settings after update
+// fau: studyCond - eventually redirect to condition settings after update
 		if ($this->update_for_memcond)
 		{
 			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
 			$this->ctrl->redirectByClass('ilstudycondgui');
 		}
-		// fim.
+// fau.
 
 		// lp sync confirmation required
 		if($show_lp_sync_confirmation)
@@ -1405,16 +1405,13 @@ class ilObjCourseGUI extends ilContainerGUI
 		return $this->afterUpdate();
 	}
 
-	/**
-	 * fim: [memcond] new function updateForMemcond
-	 *
-	 */
+// fau: studyCond - new function updateForMemcond
 	function updateForMemcondObject()
 	{
 	    $this->update_for_memcond = true;
 		$this->updateObject();
 	}
-	// fim.
+// fau.
 
 	protected function confirmLPSync()
 	{
@@ -2871,7 +2868,7 @@ class ilObjCourseGUI extends ilContainerGUI
 				break;
 			// fim.
 
-			// fim: [memcond] add command class
+// fau: studyCond - add command class
 			case 'ilstudycondgui':
 				include_once("./Services/StudyData/classes/class.ilStudyCondGUI.php");
 				$cond_gui = new ilStudyCondGUI($this, 'edit');
@@ -2880,7 +2877,7 @@ class ilObjCourseGUI extends ilContainerGUI
 				$this->setSubTabs('properties');
 				$this->tabs_gui->setTabActive('settings');
 				break;
-			// fim.
+// fau.
 
 // fau: objectSub - object selection in properties form
 			case "ilpropertyformgui":
