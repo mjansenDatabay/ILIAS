@@ -1,5 +1,5 @@
 <?php
-/* fau: studyData -  new class. */
+/* fim: [privacy] -  new class. */
 
 /**
 * Class lStudyExportRequestGUI

@@ -615,7 +615,7 @@ class ilContainer extends ilObject
         $mom_noti = new ilMembershipNotifications($this->getRefId());
         $mom_noti->cloneSettings($new_obj->getRefId());
 
-// fau: studyData - clone conditions when container is cloned
+// fau: studyCond - clone conditions when container is cloned
         ilStudyAccess::_cloneConditions($this->getId(), $new_obj->getId());
 // fau.
 
@@ -759,7 +759,7 @@ class ilContainer extends ilObject
 		// delete translations
 		$this->obj_trans->delete();
 
-// fau: studyData - delete conditions when the container is deleted
+// fau: studyCond - delete conditions when the container is deleted
         ilStudyAccess::_deleteConditions($this->getId());
 // fau.
 		return true;

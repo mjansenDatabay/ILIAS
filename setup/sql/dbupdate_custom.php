@@ -120,7 +120,7 @@
 <#5>
 <?php
 	/**
-	* fau: studyData - Add the support for study data based subscription conditions.
+	* fau: studyCond - Add the support for study data based subscription conditions.
 	*/
 	if(!$ilDB->tableExists('il_sub_studycond'))
 	{
@@ -226,7 +226,7 @@
 <#9>
 <?php
 	/**
-	 * fau: studyData - Create the table for studydata conditions.
+	 * fau: studyCond - Create the table for studydata conditions.
 	 */
 	if (!$ilDB->tableExists('il_studycond'))
 	{
@@ -578,7 +578,7 @@
 <#34>
 <?php
     /**
-     * fau: studyData - optimize queries on study conditions.
+     * fau: studyCond - optimize queries on study conditions.
      */
     if (!$ilDB->indexExistsByFields('il_studycond', array('ref_id')))
     {
@@ -1012,12 +1012,18 @@ if(!$ilDB->tableColumnExists('usr_study','study_type'))
         array('type' => 'text', 'length' => 1, 'notnull' => false, 'default' => null)
     );
 }
+/**
+ * fau: studyCond - add the column for study type.
+ */
 if(!$ilDB->tableColumnExists('il_studycond','study_type'))
 {
     $ilDB->addTableColumn('il_studycond', 'study_type',
         array('type' => 'text', 'length' => 1, 'notnull' => false, 'default' => null)
     );
 }
+/**
+ * fau: studyCond - add the column for study type.
+ */
 if(!$ilDB->tableColumnExists('il_sub_studycond','study_type'))
 {
     $ilDB->addTableColumn('il_sub_studycond', 'study_type',
@@ -1066,7 +1072,7 @@ if(!$ilDB->tableExists('study_doc_prog'))
 <#65>
 <?php
 /**
- * fau: studyData - create the table for study doc conditions
+ * fau: studyCond - create the table for study doc conditions
  */
 if(!$ilDB->tableExists('study_doc_cond'))
 {
@@ -1085,7 +1091,7 @@ if(!$ilDB->tableExists('study_doc_cond'))
 <#66>
 <?php
 /**
- * fau: studyData - rename the table for study course conditions
+ * fau: studyCond - rename the table for study course conditions
  */
 if(!$ilDB->tableExists('study_course_cond') && $ilDB->tableExists('il_sub_studycond'))
 {
@@ -1096,7 +1102,7 @@ if(!$ilDB->tableExists('study_course_cond') && $ilDB->tableExists('il_sub_studyc
 <#67>
 <?php
 /**
- * fau: studyData - add school_id to course conditions
+ * fau: studyCond - add school_id to course conditions
  */
 if(!$ilDB->tableColumnExists('study_course_cond','school_id'))
 {
@@ -1108,7 +1114,7 @@ if(!$ilDB->tableColumnExists('study_course_cond','school_id'))
 <#68>
 <?php
 /**
- * fau: studyData - drop the old studycond table
+ * fau: studyCond - drop the old studycond table
  */
 if($ilDB->tableExists('il_studycond'))
 {

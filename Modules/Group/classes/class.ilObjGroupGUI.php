@@ -23,7 +23,7 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 * @ilCtrl_Calls ilObjGroupGUI: ilLTIProviderObjectSettingGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilObjectMetaDataGUI, ilObjectTranslationGUI
  *
- * fau: studyData - added ilStudyCondGUI to call structure
+ * fau: studyCond - added ilStudyCondGUI to call structure
  * @ilCtrl_Calls ilObjGroupGUI: ilStudyCondGUI
  * fau.
  * fau: objectSub - added ilPropertyFormGUI to call structure
@@ -2087,8 +2087,8 @@ class ilObjGroupGUI extends ilContainerGUI
 			$form->addItem($lim);
 
 
-			// fim: [memcond] add studycond setting
-			$stpl = new ilTemplate("tpl.show_subscribers_studycond.html", true, true, "Services/Membership");
+// fau: studyCond - add studycond setting
+			$stpl = new ilTemplate("tpl.show_mem_study_cond.html", true, true, "Services/StudyData");
 			if ($a_mode == 'edit')
 			{
 				$stpl->setCurrentBlock('condition');
@@ -2105,7 +2105,7 @@ class ilObjGroupGUI extends ilContainerGUI
 			$studycond = new ilCustomInputGUI($this->lng->txt('studycond_condition'));
 			$studycond->setHtml($stpl->get());
 			$form->addItem($studycond);
-			// fim.
+// fau.
 
 			// Group presentation
 			$parent_membership_ref_id = 0;

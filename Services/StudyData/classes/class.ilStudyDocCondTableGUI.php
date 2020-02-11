@@ -1,5 +1,5 @@
 <?php
-/* fau: studyData - new table class. */
+/* fau: studyCond - new table class. */
 
 require_once 'Services/Table/classes/class.ilTable2GUI.php';
 require_once "Services/StudyData/classes/class.ilStudyDocCond.php";

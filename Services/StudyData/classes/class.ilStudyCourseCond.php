@@ -1,5 +1,5 @@
 <?php
-/* fau: studyData - new class ilStudyCourseCond. */
+/* fau: studyCond - new class ilStudyCourseCond. */
 
 require_once(__DIR__ . '/abstract/class.ilStudyCond.php');
 

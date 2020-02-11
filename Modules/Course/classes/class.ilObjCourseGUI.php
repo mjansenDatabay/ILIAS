@@ -1717,8 +1717,8 @@ class ilObjCourseGUI extends ilContainerGUI
 		$form->addItem($cancel);
 
 
-		// fim: [memcond] add studycond setting
-		$stpl = new ilTemplate("tpl.show_subscribers_studycond.html", true, true, "Services/Membership");
+// fau: studyCond - add studycond setting
+		$stpl = new ilTemplate("tpl.show_mem_study_cond.html", true, true, "Services/StudyData");
 		$stpl->setCurrentBlock('condition');
 		$stpl->setVariable("CONDITION_TEXT", nl2br(ilStudyAccess::_getConditionsText($this->object->getId())));
 		$stpl->setVariable("LINK_CONDITION", $this->ctrl->getLinkTargetByClass('ilstudycondgui', ''));
@@ -1728,7 +1728,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		$studycond = new ilCustomInputGUI($this->lng->txt('studycond_condition'));
 		$studycond->setHtml($stpl->get());
 		$form->addItem($studycond);
-		// fim.
+// fau.
 
 		// Max members
 		$lim = new ilCheckboxInputGUI($this->lng->txt('crs_subscription_max_members_short'),'subscription_membership_limitation');

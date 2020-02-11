@@ -1,5 +1,5 @@
 <?php
-/* fau: studyData - new class for handling conditions. */
+/* fau: studyCond - new class for handling conditions. */
 
 include_once "Services/StudyData/classes/class.ilStudyCourseCond.php";
 include_once "Services/StudyData/classes/class.ilStudyDocCond.php";
@@ -143,7 +143,7 @@ class ilStudyCondGUI
 			$ilToolbar->addButtonInstance($back);
 		}
 
-		$tpl = new ilTemplate("tpl.list_subscribers_studycond.html", true, true, "Services/Membership");
+		$tpl = new ilTemplate("tpl.list_study_cond.html", true, true, "Services/StudyData");
  		$tpl->setVariable("CONDITIONS_HEADLINE", $this->getHeadline());
  		$tpl->setVariable("CONDITIONS_COMBI_INFO",$this->getInfo());
 		$tpl->setVariable("CONDITIONS_CONTENT", $a_html);

@@ -1,5 +1,5 @@
 <?php
-/* fau: studyData - new class ilStudyCond. */
+/* fau: studyCond - new class ilStudyCond. */
 
 /**
  * Basee class for all study related conditions
