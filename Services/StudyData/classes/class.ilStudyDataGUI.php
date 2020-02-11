@@ -243,6 +243,7 @@ class ilStudyDataGUI
 			$study->school_id = $this->form->getInput('study'.$study_no.'_school_id');
             $study->study_type = $this->form->getInput('study'.$study_no.'_study_type');
 
+            // not selected value is coded as -1
             if ($study->school_id < 0 ) {
                 $study->school_id  = null;
             }
@@ -255,23 +256,27 @@ class ilStudyDataGUI
 				$subject->subject_id = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_subject_id');
 				$subject->semester = $this->form->getInput('study'.$study_no.'_subject'.$subject_no.'_semester');
 				
-				if ($subject->subject_id > 0 and $subject->semester > 0)
+				if (!empty($subject->subject_id) and !empty($subject->semester))
 				{
+				    // all set: add
 					$study->subjects[] = $subject;
 				}
-				elseif ($subject->subject_id > 0 or $subject->semester > 0)
+				elseif (!empty($subject->subject_id) or !empty($subject->semester))
 				{
+				    // one not set: reject
 					ilUtil::sendFailure($this->lng->txt("studydata_msg_incomplete"), false);
 					return false;
 				}
 			}
 			
-			if (!empty($study->ref_semester) and $study->degree_id > 0 and $study->school_id >= 0 and !empty($study->subjects))
+			if (!empty($study->ref_semester) and !empty($study->degree_id) and !empty($study->school_id) and !empty($study->subjects))
 			{
+			    // all set: add
 				$studydata[] = $study;
 			}
-			elseif (!empty($study->ref_semester ) or $study->degree_id > 0  or $study->school_id >= 0 or !empty($study->subjects))
+			elseif (!empty($study->ref_semester) or !empty($study->degree_id) or !empty($study->school_id) or !empty($study->subjects))
 			{
+			    // one not set: reject
 				ilUtil::sendFailure($this->lng->txt("studydata_msg_incomplete"), false);
 				return false;				
 			}
