@@ -1,6 +1,6 @@
 <?php
 
-/* fau: studyData - new class ilStudyCourseData. */
+/* fau: studyData - new class ilStudyDocData. */
 
 require_once(__DIR__ . '/abstract/class.ilStudyData.php');
 require_once(__DIR__ . '/class.ilStudyCourseSubject.php');
@@ -71,6 +71,8 @@ class ilStudyDocData extends ilStudyData
      */
     public function getText() : string
     {
+        require_once('Services/StudyData/classes/class.ilStudyOptionDocProgram.php');
+
         global $DIC;
         $lng = $DIC->language();
 
