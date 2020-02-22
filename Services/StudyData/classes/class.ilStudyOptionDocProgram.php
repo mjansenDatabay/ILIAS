@@ -8,12 +8,6 @@ require_once(__DIR__ . '/abstract/class.ilStudyOption.php');
  */
 class ilStudyOptionDocProgram extends ilStudyOption
 {
-    /** @var integer */
-    public $id;
-
-    /** @var string */
-    public $text;
-
     /** @var ilDateTime|null */
     public $end;
 
@@ -42,7 +36,7 @@ class ilStudyOptionDocProgram extends ilStudyOption
         while ($row = $ilDB->fetchAssoc($result)) {
             $option = new static;
             $option->id = $row['prog_id'];
-            $option->text = $row['prog_text'];
+            $option->title = $row['prog_text'];
             if (!empty($row['prog_end'])) {
                 try {
                     $option->end = new ilDateTime($row['prog_end'], IL_CAL_DATETIME);
@@ -85,7 +79,7 @@ class ilStudyOptionDocProgram extends ilStudyOption
 
         $query = "REPLACE INTO study_doc_prog(prog_id, prog_text, prog_end) VALUES ("
             . $ilDB->quote($this->id, 'integer') . ', '
-            . $ilDB->quote($this->text, 'text') . ', '
+            . $ilDB->quote($this->title, 'text') . ', '
             . $ilDB->quote($prog_end, 'text') . ')';
 
         echo $query;
@@ -107,9 +101,10 @@ class ilStudyOptionDocProgram extends ilStudyOption
      */
     protected function getText() : string
     {
-        $text = $this->text. ' [' . $this->id . ']';
+        global $DIC;
+        $lng = $DIC->language();
 
-        return $text;
+        return (empty($this->title) ? $lng->txt('studydata_unknown_doc_program') : $this->title) . ' [' . $this->id . ']';
     }
 
     /**

@@ -37,11 +37,13 @@ class ilStudyDocData extends ilStudyData
             $prog = new static;
             $prog->user_id = $row['usr_id'];
             $prog->prog_id = $row['prog_id'];
-            try {
-               $prog->prog_approval = new ilDate($row['prog_approval'], IL_CAL_DATE);
-            }
-            catch (Exception $e) {
-                $prog->prog_approval = null;
+            if (isset($row['prog_approval'])) {
+                try {
+                    $prog->prog_approval = new ilDate($row['prog_approval'], IL_CAL_DATE);
+                }
+                catch (Exception $e) {
+                    $prog->prog_approval = null;
+                }
             }
             $progs[] = $prog;
         }

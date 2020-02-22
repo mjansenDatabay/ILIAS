@@ -6,6 +6,12 @@
  */
 abstract class ilStudyOption
 {
+    /** @var integer */
+    public $id;
+
+    /** @var string */
+    public $title;
+
     /**
      * Static cache
      * (needs to be redefined in all child classes, access with static::$cache)
@@ -70,9 +76,10 @@ abstract class ilStudyOption
      * This does not need to use a cache
      *
      * @param int $emptyId   add a 'please select' at the beginning with that id
+     * @param int $chosenId   add a 'unknown option' at the end if that id is not in the list
      * @return array    id => text
      */
-    public static function _getSelectOptions(int $emptyId = null): array {
+    public static function _getSelectOptions(int $emptyId = null, $chosenId = null): array {
         global $DIC;
         $lng = $DIC->language();
 
@@ -82,10 +89,16 @@ abstract class ilStudyOption
             $return[$emptyId] = $lng->txt("please_select");
         }
 
-        foreach (static::_getAll() as $option) {
+        $options = static::_getAll();
+        foreach ($options as $option) {
             $return[$option->getId()] = $option->getSelectText();
         }
 
+        if (isset($chosenId) && !isset($options[$chosenId]) && (!isset($emptyId) || $chosenId != $emptyId )) {
+            $option = new static;
+            $option->id = $chosenId;
+            $return[$option->getId()] = $option->getSelectText();
+        }
         return $return;
     }
 
@@ -132,11 +145,19 @@ abstract class ilStudyOption
      * @return string
      */
     public static function _lookupText($id): string {
+        if (!isset($id)) {
+            return '';
+        }
+
         $option = static::_get($id);
 
         if (isset($option)) {
             return $option->getText();
         }
-        return '';
+        else {
+            $option = new static;
+            $option->id = $id;
+            return $option->getText();
+        }
     }
 }

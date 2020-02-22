@@ -8,12 +8,6 @@ require_once(__DIR__ . '/abstract/class.ilStudyOption.php');
  */
 class ilStudyOptionDegree extends ilStudyOption
 {
-    /** @var integer */
-    public $id;
-
-    /** @var string */
-    public $title;
-
     /** @inheritdoc */
     protected static $cache;
 
@@ -93,6 +87,9 @@ class ilStudyOptionDegree extends ilStudyOption
      */
     protected function getText() : string
     {
-        return $this->title. ' [' . $this->id . ']';
+        global $DIC;
+        $lng = $DIC->language();
+
+        return (empty($this->title) ? $lng->txt('studydata_unknown_degree') : $this->title) . ' [' . $this->id . ']';
     }
 }

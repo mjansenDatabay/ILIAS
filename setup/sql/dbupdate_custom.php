@@ -1079,7 +1079,7 @@ if(!$ilDB->tableExists('study_doc_cond'))
     $ilDB->createTable('study_doc_cond', array(
         'cond_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
         'obj_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
-        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null),
         'min_approval_date' => array('type' => 'date', 'notnull' => false, 'default' => null),
         'max_approval_date' => array('type' => 'date', 'notnull' => false, 'default' => null),
     ));
@@ -1128,4 +1128,35 @@ if($ilDB->tableExists('il_studycond_seq'))
 <#69>
 <?php
 $ilCtrlStructureReader->getStructure();
+?>
+<#70>
+<?php
+/**
+ * fau: studyCond - streamline null values in conditions
+ */
+$query = "UPDATE study_course_cond set subject_id = NULL WHERE subject_id = 0";
+$ilDB->manipulate($query);
+
+$query = "UPDATE study_course_cond set degree_id = NULL WHERE degree_id = 0";
+$ilDB->manipulate($query);
+
+$query = "UPDATE study_course_cond set min_semester = NULL WHERE min_semester = 0";
+$ilDB->manipulate($query);
+
+$query = "UPDATE study_course_cond set max_semester = NULL WHERE max_semester = 0";
+$ilDB->manipulate($query);
+
+$query = "UPDATE study_course_cond set ref_semester = NULL WHERE ref_semester = ''";
+$ilDB->manipulate($query);
+
+$query = "UPDATE study_course_cond set study_type = NULL WHERE study_type = ''";
+$ilDB->manipulate($query);
+?>
+<#71>
+<?php
+/**
+ * fau: studyCond - streamline null values in data
+ */
+$query = "UPDATE usr_study set degree_id = NULL WHERE degree_id = 0";
+$ilDB->manipulate($query);
 ?>

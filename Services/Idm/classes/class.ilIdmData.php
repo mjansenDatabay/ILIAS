@@ -152,7 +152,7 @@ class ilIdmData
         {
             $option = new ilStudyOptionDocProgram();
             $option->id = (int) $row['prog_code'];
-            $option->text = (string) $row['prog_text'];
+            $option->title = (string) $row['prog_text'];
             if (!empty($row['prog_end_date']) && $row['prog_end_date'] != '9999-12-31 00:00:00') {
                 try {
                     $option->end = new ilDateTime($row['prog_end_date'], IL_CAL_DATETIME);

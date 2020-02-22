@@ -342,6 +342,10 @@ common#:#studydata_promotion_approval#:#zugelassen
 common#:#studydata_promotion_program#:#Strukturiertes Promotionsprogramm
 common#:#studydata_promotion_approval_date#:#Zulassungsdatum
 common#:#studydata_doc_prog_until#:#bis
+common#:#studydata_unknown_school#:#Unbekannte Fakultät
+common#:#studydata_unknown_subject#:#Unbekanntes Fach
+common#:#studydata_unknown_degree#:#Unbekannter Abschluss
+common#:#studydata_unknown_doc_program#:#Unbekanntes Promotionsprogramm
 common#:#sub_added_to_waiting_list#:#Sie wurden auf die Warteliste gesetzt. <br />Sie haben Platz %s auf der Warteliste.
 common#:#sub_fair_date#:#Chancengleich bis
 common#:#sub_fair_date_info#:#Bis zu diesem Zeitpunkt werden alle Anmeldungen chancengleich auf der Warteliste gesammelt und die freien Plätze danach ausgelost. Alle nachfolgenden Anmeldungen erhalten höhere Wartelistenplätze. Beim Aufrücken von der Warteliste wird ebenfalls zwischen chancengleichen Anmeldungen gelost.

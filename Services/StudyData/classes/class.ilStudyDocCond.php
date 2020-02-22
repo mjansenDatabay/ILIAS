@@ -83,7 +83,7 @@ class ilStudyDocCond extends ilStudyCond
         $lng = $DIC->language();
 
         $ctext = [];
-        if ($this->prog_id)
+        if (isset($this->prog_id))
         {
             require_once('Services/StudyData/classes/class.ilStudyOptionDocProgram.php');
             $ctext[] = ilStudyOptionDocProgram::_lookupText($this->prog_id);
@@ -190,7 +190,7 @@ class ilStudyDocCond extends ilStudyCond
             // all defined criteria must be satisfied
             // continue with next doc program on failure
 
-            if ($this->prog_id and ($this->prog_id != $doc->prog_id)) {
+            if (isset($this->prog_id) and (!isset($doc->prog_id)  or $this->prog_id != $doc->prog_id)) {
                 continue; // failed
             }
 

@@ -100,23 +100,23 @@ class ilStudyCourseCond extends ilStudyCond
 
         $reftext = ilStudyCourseData::_getRefSemesterText($this->ref_semester);
         $ctext = [];
-        if ($this->subject_id)
+        if (isset($this->subject_id))
         {
             $ctext[] = ilStudyOptionSubject::_lookupText($this->subject_id);
         }
-        if ($this->degree_id)
+        if (isset($this->degree_id))
         {
             $ctext[] = ilStudyOptionDegree::_lookupText($this->degree_id);
         }
-        if ($this->min_semester and $this->max_semester)
+        if (isset($this->min_semester) and isset($this->max_semester))
         {
             $ctext[] = sprintf($lng->txt('studycond_min_max_semester'), $this->min_semester, $this->max_semester, $reftext);
         }
-        elseif ($this->min_semester)
+        elseif (isset($this->min_semester))
         {
             $ctext[] = sprintf($lng->txt('studycond_min_semester'), $this->min_semester, $reftext);
         }
-        elseif ($this->max_semester)
+        elseif (isset($this->max_semester))
         {
             $ctext[] = sprintf($lng->txt('studycond_max_semester'), $this->max_semester, $reftext);
         }
@@ -185,7 +185,7 @@ class ilStudyCourseCond extends ilStudyCond
     {
         $this->cond_id = $a_row['cond_id'];
         $this->obj_id = $a_row['obj_id'];
-        $this->school_id = $a_row['subject_id'];
+        $this->school_id = $a_row['school_id'];
         $this->subject_id = $a_row['subject_id'];
         $this->degree_id = $a_row['degree_id'];
         $this->min_semester = $a_row['min_semester'];
@@ -202,9 +202,12 @@ class ilStudyCourseCond extends ilStudyCond
      */
     public function check(array $data) : bool
     {
+        //log_var( $this, 'cond');
         $cond_offset = ilStudyAccess::_getRunningSemesterOffset($this->ref_semester);
 
         foreach ($data as $study) {
+            //log_var($study, 'study');
+
             // check the criteria for each study
             // all defined criteria must be satisfied
             // continue with next study on failure
@@ -213,22 +216,26 @@ class ilStudyCourseCond extends ilStudyCond
             // too old or new ref_semester will fail all conditions
             $stud_offset = ilStudyAccess::_getRunningSemesterOffset($study->ref_semester);
             if ($stud_offset < -1 or $stud_offset > 1) {
+                //log_line('offset_failed');
                 continue; // failed
             }
 
             // check school
             // use modulus 10 because e.g. PhilFak has the coding 1, 11, 21 etc.
-            if ($this->school_id and ($this->school_id % 10 != $study->school_id % 10)) {
+            if (isset($this->school_id) and (!isset($study->school_id) or $this->school_id % 10 != $study->school_id % 10)) {
+                //log_line('school_failed');
                 continue; // failed
             }
 
             // check degree
-            if ($this->degree_id and ($this->degree_id != $study->degree_id)) {
+            if (isset($this->degree_id) and (!isset($study->degree_id) or $this->degree_id != $study->degree_id)) {
+                //log_line('degree_failed');
                 continue; // failed
             }
 
             // check type
-            if ($this->study_type and ($this->study_type != $study->study_type)) {
+            if (isset($this->study_type) and (!isset($study->study_type) or $this->study_type != $study->study_type)) {
+                //log_line('type_failed');
                 continue; // failed
             }
 
@@ -236,26 +243,24 @@ class ilStudyCourseCond extends ilStudyCond
             // only one subject/semester combination must fit
             $subject_semester_passed = false;
             foreach ($study->subjects as $subject) {
-                if ($this->subject_id and ($this->subject_id != $subject->subject_id))
-                {
+                if (isset($this->subject_id) and (!isset($subject->subject_id) or $this->subject_id != $subject->subject_id)) {
+                    //log_line('subject_failed');
                     continue; // failed
                 }
 
-                if ($this->min_semester) {
-                    if (empty($subject->semester) or ($this->min_semester + $cond_offset > $subject->semester + $stud_offset))
-                    {
-                        continue; // failed
-                    }
+                if (isset($this->min_semester) and (!isset($subject->semester) or $this->min_semester + $cond_offset > $subject->semester + $stud_offset)) {
+                    //log_line('min_semester_failed');
+                    continue; // failed
                 }
 
-                if ($this->max_semester) {
-                    if (empty($subject->semester) or ($this->max_semester + $cond_offset < $subject->semester + $stud_offset)) {
-                        continue; // failed
-                    }
+                if (isset($this->max_semester) and (!isset($subject->semester) or $this->max_semester + $cond_offset < $subject->semester + $stud_offset)) {
+                    //log_line('max_semester_failed');
+                    continue; // failed
                 }
 
                 // this subject/semester combination fits
                 $subject_semester_passed = true;
+                //log_line('subject_semester_passed');
                 break;
             }
 
@@ -266,6 +271,7 @@ class ilStudyCourseCond extends ilStudyCond
         }
 
         // none of the studies fits
+        //log_line('none fits');
         return false;
     }
 

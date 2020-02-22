@@ -219,8 +219,7 @@ class ilStudyCondGUI
 	{
 		$condition = new ilStudyCourseCond((int) $_GET["cond_id"]);
 
-		$this->initCourseForm("edit");
-		$this->getCourseValues($condition);
+		$this->initCourseForm("edit", $this->getCourseValues($condition));
 		$this->show($this->form_gui->getHtml());
 	}
 
@@ -231,9 +230,7 @@ class ilStudyCondGUI
     protected function editDocCond()
     {
         $condition = new ilStudyDocCond((int) $_GET["cond_id"]);
-
-        $this->initDocForm("edit");
-        $this->getDocValues($condition);
+        $this->initDocForm("edit",  $this->getDocValues($condition));
         $this->show($this->form_gui->getHtml());
     }
 
@@ -366,32 +363,36 @@ class ilStudyCondGUI
 
 
     /**
-	* Get the values of a web form into property gui
-	* @param    ilStudyCourseCond  $a_condition
-	*/
+	 * Get the values of a web form into property gui
+	 * @param    ilStudyCourseCond  $a_condition
+     * @return array;
+	 */
 	private function getCourseValues($a_condition)
 	{
-		$form_gui = $this->form_gui;
+		$values = [];
+		$values["subject_id"] = $a_condition->subject_id;
+        $values["degree_id"] = $a_condition->degree_id;
+		$values["min_semester"] = $a_condition->min_semester;
+		$values["max_semester"] = $a_condition->max_semester;
+		$values["ref_semester"] = $a_condition->ref_semester;
+		$values["study_type"] = $a_condition->study_type;
 
-		$form_gui->getItemByPostVar("subject_id")->setValue($a_condition->subject_id);
-		$form_gui->getItemByPostVar("degree_id")->setValue($a_condition->degree_id);
-		$form_gui->getItemByPostVar("min_semester")->setValue($a_condition->min_semester);
-		$form_gui->getItemByPostVar("max_semester")->setValue($a_condition->max_semester);
-		$form_gui->getItemByPostVar("ref_semester")->setValue($a_condition->ref_semester);
-		$form_gui->getItemByPostVar("study_type")->setValue($a_condition->study_type);
+		return $values;
 	}
 
     /**
      * Get the values of a web form into property gui
      * @param    ilStudyDocCond  $a_condition
+     * @return  array
      */
     private function getDocValues($a_condition)
     {
-        $form_gui = $this->form_gui;
+        $values = [];
+        $values['prog_id'] = $a_condition->prog_id;
+        $values['min_approval_date'] = $a_condition->min_approval_date;
+        $values['max_approval_date'] =  $a_condition->max_approval_date;
 
-        $form_gui->getItemByPostVar("prog_id")->setValue($a_condition->prog_id);
-        $form_gui->getItemByPostVar("min_approval_date")->setDate($a_condition->min_approval_date);
-        $form_gui->getItemByPostVar("max_approval_date")->setDate($a_condition->max_approval_date);
+        return $values;
     }
 
 
@@ -404,12 +405,23 @@ class ilStudyCondGUI
 	{
 		$form_gui = $this->form_gui;
 
-		$a_condition->subject_id = $form_gui->getInput("subject_id");
-		$a_condition->degree_id = $form_gui->getInput("degree_id");
-		$a_condition->min_semester = $form_gui->getInput("min_semester");
-		$a_condition->max_semester = $form_gui->getInput("max_semester");
-		$a_condition->ref_semester = $form_gui->getInput("ref_semester");
-		$a_condition->study_type = $form_gui->getInput("study_type");
+		$subject_id =  $form_gui->getInput("subject_id");
+		$a_condition->subject_id = ($subject_id < 0 ? null : $subject_id);
+
+		$degree_id = $form_gui->getInput("degree_id");
+		$a_condition->degree_id = ($degree_id < 0 ? null : $degree_id);
+
+		$min_semester = $form_gui->getInput("min_semester");
+		$a_condition->min_semester = (empty($min_semester) ? null : $min_semester);
+
+        $max_semester = $form_gui->getInput("max_semester");
+		$a_condition->max_semester = (empty($max_semester) ? null : $max_semester);
+
+        $ref_semester = $form_gui->getInput("ref_semester");
+		$a_condition->ref_semester = (empty($ref_semester) ? null : $ref_semester);
+
+		$study_type = $form_gui->getInput("study_type");
+		$a_condition->study_type = (empty($study_type) ? null : $study_type);
 	}
 
     /**
@@ -420,7 +432,9 @@ class ilStudyCondGUI
     {
         $this->form_gui->setValuesByPost();
 
-        $a_condition->prog_id = $this->form_gui->getInput("prog_id");
+        $prog_id = $this->form_gui->getInput("prog_id");
+        $a_condition->prog_id = ($prog_id < 0  ? null : $prog_id);
+
 
         /** @var ilDateTimeInputGUI $item */
         $item = $this->form_gui->getItemByPostVar('min_approval_date');
@@ -434,10 +448,11 @@ class ilStudyCondGUI
 
 
     /**
-	* Initialize the form GUI
-	* @param    int     form mode ("create" or "edit")
-	*/
-	private function initCourseForm($a_mode)
+	 * Initialize the form GUI
+	 * @param    int     $a_mode form mode ("create" or "edit")
+     * @param   array   $a_values
+	 */
+	private function initCourseForm($a_mode, $a_values = [])
 	{
 		require_once("Services/StudyData/classes/class.ilStudyCourseData.php");
         require_once("Services/StudyData/classes/class.ilStudyOptionSubject.php");
@@ -449,37 +464,43 @@ class ilStudyCondGUI
 		// subject
 		$item = new ilSelectInputGUI($this->lng->txt("studycond_field_subject"), "subject_id");
 		$item->setInfo($this->lng->txt("studycond_field_subject_info"));
-		$item->setOptions(ilStudyOptionSubject::_getSelectOptions(0));
+		$item->setOptions(ilStudyOptionSubject::_getSelectOptions(-1, $a_values['subject_id']));
+		$item->setValue($a_values['subject_id']);
 		$this->form_gui->addItem($item);
 
 		// degree
 		$item = new ilSelectInputGUI($this->lng->txt("studycond_field_degree"), "degree_id");
 		$item->setInfo($this->lng->txt("studycond_field_degree_info"));
-		$item->setOptions(ilStudyOptionDegree::_getSelectOptions(0));
+		$item->setOptions(ilStudyOptionDegree::_getSelectOptions(-1, $a_values['degree_id']));
+		$item->setValue($a_values['degree_id']);
 		$this->form_gui->addItem($item);
 
         // study_type
         $item = new ilSelectInputGUI($this->lng->txt("studydata_type"), "study_type");
         $item->setOptions(ilStudyCourseData::_getStudyTypeSelectOptions());
         $item->setInfo($this->lng->txt("studycond_field_studytype_info"));
+        $item->setValue($a_values['study_type']);
         $this->form_gui->addItem($item);
 
         // min semester
 		$item = new ilNumberInputGUI($this->lng->txt("studycond_field_min_semester"), "min_semester");
 		$item->setInfo($this->lng->txt("studycond_field_min_semester_info"));
 		$item->setSize(2);
+        $item->setValue($a_values['min_semester']);
 		$this->form_gui->addItem($item);
 
 		// max semester
 		$item = new ilNumberInputGUI($this->lng->txt("studycond_field_max_semester"), "max_semester");
 		$item->setInfo($this->lng->txt("studycond_field_max_semester_info"));
 		$item->setSize(2);
+        $item->setValue($a_values['max_semester']);
 		$this->form_gui->addItem($item);
 
 		// ref semester
 		$item = new ilSelectInputGUI($this->lng->txt("studycond_field_ref_semester"), "ref_semester");
 		$item->setInfo($this->lng->txt("studycond_field_ref_semester_info"));
 		$item->setOptions(ilStudyCourseData::_getSemesterSelectOptions());
+		$item->setValue($a_values['ref_semester']);
 		$this->form_gui->addItem($item);
 
         // save and cancel commands
@@ -499,9 +520,10 @@ class ilStudyCondGUI
 
     /**
      * Initialize the form GUI
-     * @param    int     form mode ("create" or "edit")
+     * @param    int        $a_mode form mode ("create" or "edit")
+     * @param    array      $a_values
      */
-    private function initDocForm($a_mode)
+    private function initDocForm($a_mode, $a_values = [])
     {
         require_once("Services/StudyData/classes/class.ilStudyOptionDocProgram.php");
 
@@ -510,17 +532,20 @@ class ilStudyCondGUI
 
         // subject
         $item = new ilSelectInputGUI($this->lng->txt("studycond_field_doc_program"), "prog_id");
-        $item->setOptions(ilStudyOptionDocProgram::_getSelectOptions(-1));
+        $item->setOptions(ilStudyOptionDocProgram::_getSelectOptions(-1, $a_values['prog_id']));
+        $item->setValue($a_values['prog_id']);
         $this->form_gui->addItem($item);
 
         // min approval date
         $item = new ilDateTimeInputGUI($this->lng->txt('studycond_field_min_approval_date'), 'min_approval_date');
         $item->setShowTime(false);
+        $item->setDate($a_values['min_approval_date']);
         $this->form_gui->addItem($item);
 
         // max approval date
         $item = new ilDateTimeInputGUI($this->lng->txt('studycond_field_max_approval_date'), 'max_approval_date');
         $item->setShowTime(false);
+        $item->setDate($a_values['max_approval_date']);
         $this->form_gui->addItem($item);
 
 
