@@ -23,8 +23,12 @@ class ilTestTaxonomyFilterLabelTranslater
 	private $taxonomyTreeLabels = null;
 	private $taxonomyNodeLabels = null;
 
-	// fau: taxDesc - class variable for node descriptions
+// fau: taxDesc - class variable for node descriptions
 	private $taxonomyNodeDescriptions = null;
+// fau.
+
+// fau: taxDesc - class variable for parent relation
+    private $taxononyTreeParentIds = null;
 // fau.
 
 	// fau: taxFilter/typeFilter - class variable
@@ -44,8 +48,9 @@ class ilTestTaxonomyFilterLabelTranslater
 		$this->taxonomyTreeLabels = array();
 		$this->taxonomyNodeLabels = array();
 
-// fau: taxDesc - init node descriptions
+// fau: taxDesc - init node descriptions and parents
 		$this->taxonomyNodeDescriptions = array();
+        $this->taxononyTreeParentIds = array();
 // fau.
 
 		// fau: taxFilter/typeFilter - init node descriptions
@@ -119,17 +124,21 @@ class ilTestTaxonomyFilterLabelTranslater
 
 	private function loadTaxonomyNodeLabels()
 	{
+ // fau: taxDesc - load tax node descriptions and parents for full taxonomies
+
+        $IN_tree_ids = $this->db->in('tax_tree.tax_tree_id', array_unique($this->taxonomyTreeIds), false, 'integer');
 		$IN_nodeIds = $this->db->in('tax_node.obj_id', $this->taxonomyNodeIds, false, 'integer');
 
-// fau: taxDesc - load tax node descriptions
 		$query = "
 					SELECT		tax_node.obj_id tax_node_id,
 								tax_node.title tax_node_title,
-								tax_node.description tax_node_description
+								tax_node.description tax_node_description,
+								tax_tree.parent tax_tree_parent
 
 					FROM		tax_node
+					INNER JOIN  tax_tree ON (tax_tree.tax_tree_id = tax_node.tax_id AND tax_tree.child = tax_node.obj_id)
 
-					WHERE		$IN_nodeIds
+					WHERE		$IN_tree_ids
 				";
 
 		$res = $this->db->query($query);
@@ -138,6 +147,7 @@ class ilTestTaxonomyFilterLabelTranslater
 		{
 			$this->taxonomyNodeLabels[ $row['tax_node_id'] ] = $row['tax_node_title'];
 			$this->taxonomyNodeDescription[ $row['tax_node_id'] ] = $row['tax_node_description'];
+			$this->taxononyTreeParentIds[ $row['tax_node_id'] ] = $row['tax_tree_parent'];
 		}
 // fau.
 	}
@@ -162,7 +172,15 @@ class ilTestTaxonomyFilterLabelTranslater
 
 	public function getTaxonomyNodeLabel($taxonomyTreeId)
 	{
-		return $this->taxonomyNodeLabels[$taxonomyTreeId];
+// fau: taxDesc - get the path as taxonomy label
+	    $nodeId = $taxonomyTreeId;
+	    $path = [];
+	    while ($parentId = $this->taxononyTreeParentIds[$nodeId]) {
+	        $path[] =  $this->taxonomyNodeLabels[$nodeId];
+	        $nodeId = $parentId;
+        }
+		return implode( ' / ', array_reverse($path));
+// fau.
 	}
 
 // fau: taxDesc - get node description
