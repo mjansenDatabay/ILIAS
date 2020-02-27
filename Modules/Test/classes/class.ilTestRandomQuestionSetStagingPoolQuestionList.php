@@ -374,7 +374,7 @@ class ilTestRandomQuestionSetStagingPoolQuestionList implements Iterator
 				$groupQuestions = $validGroups[array_rand($validGroups)];
 
 				// choose the selected amount of questions and keep their order
-				$selectedKeys = array_rand($groupQuestions, $this->getSelectSize());
+				$selectedKeys = (array) array_rand($groupQuestions, $this->getSelectSize());
 				$selectedQuestions = array_values(array_intersect_key($groupQuestions, array_flip($selectedKeys)));
 				return $selectedQuestions;
 			}
@@ -382,7 +382,7 @@ class ilTestRandomQuestionSetStagingPoolQuestionList implements Iterator
 		elseif (count($this->questions) >= $this->getSelectSize())
 		{
 			// choose the selected amount of questions and keep their order
-			$selectedKeys = array_rand($this->questions, $this->getSelectSize());
+			$selectedKeys = (array) array_rand($this->questions, $this->getSelectSize());
 			$selectedQuestions = array_values(array_intersect_key($this->questions, array_flip($selectedKeys)));
 			return $selectedQuestions;
 		}
