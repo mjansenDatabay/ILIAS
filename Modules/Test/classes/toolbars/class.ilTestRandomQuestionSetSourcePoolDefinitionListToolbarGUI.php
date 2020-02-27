@@ -53,11 +53,16 @@ class ilTestRandomQuestionSetSourcePoolDefinitionListToolbarGUI extends ilToolba
 	{
 		$this->setFormAction( $this->ctrl->getFormAction($this->questionSetConfigGUI) );
 
-		if( $this->questionSetConfig->doesSelectableQuestionPoolsExist() )
-		{
-			$this->populateNewQuestionSelectionRuleInputs();
-		}
-	}
+// fau: optimizeRandomRuleSelect - don't check for selectable pools
+//		if( $this->questionSetConfig->doesSelectableQuestionPoolsExist() )
+//		{
+//			$this->populateNewQuestionSelectionRuleInputs();
+//		}
+// fau.
+
+        $this->populateNewQuestionSelectionRuleInputs();
+
+    }
 	
 	private function buildSourcePoolSelectOptionsArray($availablePools)
 	{

@@ -364,6 +364,10 @@ class ilTestRandomQuestionSetConfigStateMessageHandler
 			return false;
 		}
 
+// fau: optimizeRandomRuleSelect - don't check for selectable pools - don't check for seletable pools
+		return false;
+// fau.
+
 		if( $this->questionSetConfig->doesSelectableQuestionPoolsExist() )
 		{
 			return false;
