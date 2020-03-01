@@ -431,7 +431,7 @@ class ilTestRandomQuestionSetSourcePoolDefinition
 				// fau.
 // fau: taxGroupFilter - read from db
 				case 'origin_group_tax_fi':	$this->setOriginalGroupTaxId($value);	break;
-				case 'mapped_group_tax_fi': $this->setMappedGroupTaxId(($value));	break;
+				case 'mapped_group_tax_fi': $this->setMappedGroupTaxId($value);	break;
 // fau.
 // fau: randomSetOrder - read from db
 				case 'order_by':			$this->setOrderBy($value);		break;

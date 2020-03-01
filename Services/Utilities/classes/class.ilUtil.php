@@ -4449,9 +4449,10 @@ class ilUtil
 		}
 
 // fau: treeQuery - respect the root id parameter
+// fau: optimizeRandomRuleSelects - check for node and grand childs
 		if ($a_root_id)
 		{
-			$where .= ' AND '. $tree->getGrandChildCondition((int) $a_root_id) . "  ";
+			$where .= ' AND (tree.child = ' . $ilDB->quote((int) $a_root_id, 'integer') . ' OR ' . $tree->getGrandChildCondition((int) $a_root_id) . ")  ";
 
 			$tree_join = " LEFT JOIN tree ON obr.ref_id = tree.child ";
 			$tree_cond = " AND tree = 1 ";

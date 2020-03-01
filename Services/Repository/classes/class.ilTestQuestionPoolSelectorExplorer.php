@@ -43,7 +43,11 @@ class ilTestQuestionPoolSelectorExplorer extends ilRepositorySelectorExplorerGUI
 	
 	public function isNodeClickable($a_node)
 	{
-		if( $a_node['type'] != 'qpl' )
+// fau: optimizeRandomRuleSelect - check only default clickable in exlorer
+        return parent::isNodeClickable($a_node);
+// fau.
+
+        if( $a_node['type'] != 'qpl' )
 		{
 			return parent::isNodeClickable($a_node);
 		}
@@ -53,6 +57,10 @@ class ilTestQuestionPoolSelectorExplorer extends ilRepositorySelectorExplorerGUI
 	
 	public function isNodeVisible($a_node)
 	{
+// fau: optimizeRandomRuleSelect - check only default visible in exlorer
+        return parent::isNodeVisible($a_node);
+// fau.
+
 		if( $a_node['type'] != 'qpl' )
 		{
 			return parent::isNodeVisible($a_node);

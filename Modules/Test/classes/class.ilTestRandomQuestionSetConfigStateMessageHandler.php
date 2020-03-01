@@ -255,10 +255,12 @@ class ilTestRandomQuestionSetConfigStateMessageHandler
 		{
 			$this->setValidationFailed(true);
 			$this->addValidationReport( $this->lng->txt('tst_msg_rand_quest_set_has_double_originals') );
-			$this->addValidationReport( "<br />{$this->buildQuestionStageRebuildLink()}" );
+			$this->addValidationReport( '<br /><a href="'
+                    . $this->ctrl->getLinkTarget($this->getTargetGUI(), ilTestRandomQuestionSetConfigGUI::CMD_BUILD_QUESTION_STAGE).'">'
+                    . $this->lng->txt('tst_btn_rebuild_random_question_stage').'</a>');
 			$this->addValidationReport( "<br><small>".$this->lng->txt('tst_msg_rand_quest_set_sync_duration')."</small>" );
 		}
-// fau.
+        // fau.
 		elseif( $this->questionSetConfig->getLastQuestionSyncTimestamp() )
 		{
 			$message = $this->lng->txt('tst_msg_rand_quest_set_pass_buildable');
@@ -363,6 +365,10 @@ class ilTestRandomQuestionSetConfigStateMessageHandler
 		{
 			return false;
 		}
+
+// fau: optimizeRandomRuleSelect - don't check for selectable pools - don't check for seletable pools
+		return false;
+// fau.
 
 		if( $this->questionSetConfig->doesSelectableQuestionPoolsExist() )
 		{

@@ -280,6 +280,9 @@ class ilTestRandomQuestionSetStagingPoolBuilder
 					$definition->setMappedGroupTaxId(
 						$taxonomiesKeysMap->getMappedTaxonomyId($definition->getOriginalGroupTaxId()));
 				}
+				else {
+                    $definition->setMappedGroupTaxId(null);
+                }
 // fau.
 			}
 		}
