@@ -1041,16 +1041,25 @@ class ilStartUpGUI
 				case ilAuthStatus::STATUS_AUTHENTICATION_FAILED:
 // fau: loginFailed - add contact and sso message
 					$message = $status->getTranslatedReason();
-					$message .= '<p class="small">'.$this->lng->txt('err_inactive_contact').'</p>';
-					if ($GLOBALS['DIC']['ilSetting']->get("shib_active"))
+					if ($GLOBALS['DIC']['ilSetting']->get("shib_active") && ilObjUser::_checkExternalAuthAccount('shibboleth', $credentials->getUsername()))
 					{
-						if (ilObjUser::_checkExternalAuthAccount('shibboleth', $credentials->getUsername()))
-						{
-							$message .= '<p class="small">'.$this->lng->txt('err_inactive_sso').'</p>';
-						}
+                        // account with shibboleth authentication
+                        // animate users to use SSO before contacting StudOn
+					    $message .= '<p class="small">'.$this->lng->txt('err_inactive_sso').'</p>';
+                        $message .= '<p class="small">'.$this->lng->txt('err_wrong_login_contact').'</p>';
 					}
+					elseif ($status->getReason() == 'err_wrong_login') {
+                        // account with local auth, username or password wrong, not yet inactive
+                        // animate users to use assistent before contacting StudOn
+                        $message .= '<p class="small">'.$this->lng->txt('err_wrong_login_assist').'</p>';
+                        $message .= '<p class="small">'.$this->lng->txt('err_wrong_login_contact').'</p>';
+                    }
+					else  {
+                        $message .= '<p class="small">'.$this->lng->txt('err_inactive_contact').'</p>';
+                    }
 
-					ilUtil::sendFailure($message);
+
+                    ilUtil::sendFailure($message);
 // fau.
 					return $this->showLoginPage($form);
 			}
