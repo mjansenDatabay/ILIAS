@@ -1053,7 +1053,7 @@ if(!$ilDB->tableExists('usr_doc_prog'))
 {
     $ilDB->createTable('usr_doc_prog', array(
         'usr_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
-        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0),
+        'prog_id' => array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null),
         'prog_approval' => array('type' => 'date', 'notnull' => false, 'default' => null),
     ));
     $ilDB->addPrimaryKey('usr_doc_prog',array('usr_id'));
