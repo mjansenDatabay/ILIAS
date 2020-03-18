@@ -524,6 +524,7 @@ crs#:#crs_reg_univis#:#like in UnivIS
 crs#:#crs_reg_univis_info#:#The registrationperiod will be overtaken from UnivIS.
 crs#:#crs_reg_user_generic_failure#:#You could not be accepted!
 crs#:#crs_reg_user_on_waiting_list#:#You are already on the waiting list of this course!
+crs#:#crs_reg_user_already_assigned#:#ou are already participant of this course.
 crs#:#crs_removed_from_lot_list#:#You have been unsubscribed for the lottery of the course "%s".
 crs#:#crs_show_mem_limit_label#:#Notifications:
 crs#:#crs_show_mem_limit_option#:#show limitation and free slots by listing of the course

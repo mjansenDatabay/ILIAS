@@ -485,6 +485,7 @@ crs#:#crs_reg_univis#:#Wie in UnivIS
 crs#:#crs_reg_univis_info#:#Der Anmeldezeitraum wird aus Univis übernommen.
 crs#:#crs_reg_user_generic_failure#:#Sie konnten nicht aufgenommen werden!
 crs#:#crs_reg_user_on_waiting_list#:#Sie sind bereits auf der Warteliste dieses Kurses eingetragen!
+crs#:#crs_reg_user_already_assigned#:#Sie sind bereits Teilnehmer in diesem Kurs.
 crs#:#crs_show_mem_limit_label#:#Anzeigen
 crs#:#crs_show_mem_limit_option#:#Begrenzung und freie Plätze bei Auflistung des Kurses anzeigen. Auf der Info- oder Beitreten-Seite werden sie immer angezeigt.
 crs#:#crs_subscribe_events_not_possible#:#Die direkte Sitzungsanmeldung ist nur beim direkten Beitritt oder Beitritt mit Passwort ohne begrenzte Teilnehmerzahl im Kurs möglich.
