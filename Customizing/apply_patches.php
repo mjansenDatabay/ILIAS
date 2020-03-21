@@ -10,11 +10,6 @@ include_once("./Customizing/classes/class.ilPatchUtils.php");
 $p = new ilPatchUtils();
 $p->login();
 
-/*******************
- * Studydata actions
- *******************/
-
-//$p->applyPatch('ilStudyDataPatches.updateStudyDataOptions');
 
 /*****************
 * Specific actions

@@ -378,6 +378,8 @@ common#:#studydata_unknown_school#:#Unknown Faculty
 common#:#studydata_unknown_subject#:#Unknown Suject
 common#:#studydata_unknown_degree#:#Unknown Degree
 common#:#studydata_unknown_doc_program#:#Unknown Promotion Program
+common#:#studydata_options_update#:#Update Study Data Options
+common#:#studydata_options_update_info#:#Updates the lists for degrees, schools, subjects and structured promotion programs from the IDM database
 common#:#sub_added_to_waiting_list#:#You have been assigned to the waiting list. You are assigned to position %s on the waiting list.
 common#:#sub_fair_date#:#Equal Chances Until
 common#:#sub_fair_date_info#:#All registrations will be equally collected on the waiting list and the free places will be filled by lot afterwards. Later registrations will get higher waiting positions. A later filling from the waiting list will also respect the equal chances.

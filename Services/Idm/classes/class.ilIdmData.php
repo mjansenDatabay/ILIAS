@@ -135,13 +135,14 @@ class ilIdmData
 
     /**
      * Update the list of doc programmes
+     * @return int count of written options
      */
     public function updateDocPrograms()
     {
         require_once "Services/StudyData/classes/class.ilStudyOptionDocProgram.php";
 
         if (!isset($this->idmDB)) {
-            return;
+            return 0;
         }
 
         $query = "SELECT * FROM doc_programmes";
@@ -163,21 +164,25 @@ class ilIdmData
             $options[] = $option;
         }
 
-        ilStudyOptionDocProgram::_delete();
-        foreach ($options as $option) {
-            $option->write();
+        if (count($options) > 0) {
+            ilStudyOptionDocProgram::_delete();
+            foreach ($options as $option) {
+                $option->write();
+            }
         }
+        return count($options);
     }
 
     /**
      * Update the list of degrees
+     * @return int count of written options
      */
     public function updateStudyDegrees()
     {
         require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
 
         if (!isset($this->idmDB)) {
-            return;
+            return 0;
         }
 
         $query = "SELECT * FROM study_degrees";
@@ -192,21 +197,25 @@ class ilIdmData
             $options[] = $option;
         }
 
-        ilStudyOptionDegree::_delete();
-        foreach ($options as $option) {
-            $option->write();
+        if (count($options) > 0) {
+            ilStudyOptionDegree::_delete();
+            foreach ($options as $option) {
+                $option->write();
+            }
         }
+        return count($options);
     }
 
     /**
      * Update the list of schools
+     * @return int count of written options
      */
     public function updateStudySchools()
     {
         require_once "Services/StudyData/classes/class.ilStudyOptionSchool.php";
 
         if (!isset($this->idmDB)) {
-            return;
+            return 0;
         }
 
         $query = "SELECT * FROM study_schools";
@@ -221,21 +230,25 @@ class ilIdmData
             $options[] = $option;
         }
 
-        ilStudyOptionSchool::_delete();
-        foreach ($options as $option) {
-            $option->write();
+        if (count($options) > 0) {
+            ilStudyOptionSchool::_delete();
+            foreach ($options as $option) {
+                $option->write();
+            }
         }
+        return count($options);
     }
 
     /**
      * Update the list of subjects
+     * @return int count of written options
      */
     public function updateStudySubjects()
     {
         require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
 
         if (!isset($this->idmDB)) {
-            return;
+            return 0;
         }
 
         $query = "SELECT * FROM study_subjects";
@@ -250,10 +263,13 @@ class ilIdmData
             $options[] = $option;
         }
 
-        ilStudyOptionSubject::_delete();
-        foreach ($options as $option) {
-            $option->write();
+        if (count($options) > 0) {
+            ilStudyOptionSubject::_delete();
+            foreach ($options as $option) {
+                $option->write();
+            }
         }
+        return count($options);
     }
 
     /**
