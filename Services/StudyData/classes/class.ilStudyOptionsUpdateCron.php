@@ -74,6 +74,9 @@ class ilStudyOptionsUpdateCron extends ilCronJob
         if ($degrees == 0 || $schools == 0 || $subjects == 0 || $programs == 0 ) {
             $status = ilCronJobResult::STATUS_FAIL;
         }
+        else {
+            $status = ilCronJobResult::STATUS_OK;
+        }
 
 		$result = new ilCronJobResult();
 		$result->setStatus($status);
