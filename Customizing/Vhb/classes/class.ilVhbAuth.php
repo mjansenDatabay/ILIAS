@@ -392,6 +392,10 @@ class ilVhbAuth
 		{
 			$this->user_obj->setAuthMode($a_auth_mode);
 		}
+		if ($this->isExternal())
+		{
+			$this->user_obj->setExternalAccount($this->data['login'].'@vhb.org');
+		}
 		
 		// set other posted user data
 		$this->user_obj->setGender($this->data["sex"] == "weiblich" ? "f" : "m");
