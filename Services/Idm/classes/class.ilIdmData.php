@@ -134,7 +134,7 @@ class ilIdmData
     }
 
     /**
-     * Update the doc programmes
+     * Update the list of doc programmes
      */
     public function updateDocPrograms()
     {
@@ -169,6 +169,92 @@ class ilIdmData
         }
     }
 
+    /**
+     * Update the list of degrees
+     */
+    public function updateStudyDegrees()
+    {
+        require_once "Services/StudyData/classes/class.ilStudyOptionDegree.php";
+
+        if (!isset($this->idmDB)) {
+            return;
+        }
+
+        $query = "SELECT * FROM study_degrees";
+        $result = $this->idmDB->query($query);
+
+        $options = [];
+        while ($row = $this->idmDB->fetchAssoc($result))
+        {
+            $option = new ilStudyOptionDegree();
+            $option->id = (int) $row['degree_id'];
+            $option->title = (string) $row['degree_title'];
+            $options[] = $option;
+        }
+
+        ilStudyOptionDegree::_delete();
+        foreach ($options as $option) {
+            $option->write();
+        }
+    }
+
+    /**
+     * Update the list of schools
+     */
+    public function updateStudySchools()
+    {
+        require_once "Services/StudyData/classes/class.ilStudyOptionSchool.php";
+
+        if (!isset($this->idmDB)) {
+            return;
+        }
+
+        $query = "SELECT * FROM study_schools";
+        $result = $this->idmDB->query($query);
+
+        $options = [];
+        while ($row = $this->idmDB->fetchAssoc($result))
+        {
+            $option = new ilStudyOptionSchool();
+            $option->id = (int) $row['school_id'];
+            $option->title = (string) $row['school_title'];
+            $options[] = $option;
+        }
+
+        ilStudyOptionSchool::_delete();
+        foreach ($options as $option) {
+            $option->write();
+        }
+    }
+
+    /**
+     * Update the list of subjects
+     */
+    public function updateStudySubjects()
+    {
+        require_once "Services/StudyData/classes/class.ilStudyOptionSubject.php";
+
+        if (!isset($this->idmDB)) {
+            return;
+        }
+
+        $query = "SELECT * FROM study_subjects";
+        $result = $this->idmDB->query($query);
+
+        $options = [];
+        while ($row = $this->idmDB->fetchAssoc($result))
+        {
+            $option = new ilStudyOptionSubject();
+            $option->id = (int) $row['subject_id'];
+            $option->title = (string) $row['subject_title'];
+            $options[] = $option;
+        }
+
+        ilStudyOptionSubject::_delete();
+        foreach ($options as $option) {
+            $option->write();
+        }
+    }
 
     /**
      * Set the properties from an array of raw data

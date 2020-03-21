@@ -68,7 +68,6 @@ class ilStudyOptionDegree extends ilStudyOption
             . $ilDB->quote($this->id, 'integer') . ', '
             . $ilDB->quote($this->title, 'text'). ')';
 
-        echo $query;
         $ilDB->manipulate($query);
     }
 

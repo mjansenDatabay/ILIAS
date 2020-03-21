@@ -82,7 +82,6 @@ class ilStudyOptionDocProgram extends ilStudyOption
             . $ilDB->quote($this->title, 'text') . ', '
             . $ilDB->quote($prog_end, 'text') . ')';
 
-        echo $query;
         $ilDB->manipulate($query);
     }
 

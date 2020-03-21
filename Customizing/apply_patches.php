@@ -14,7 +14,6 @@ $p->login();
  * Studydata actions
  *******************/
 
-//$p->applyPatch('ilStudyDataPatches.updateStudyDataCodes');
 //$p->applyPatch('ilStudyDataPatches.updateStudyDataOptions');
 
 /*****************
