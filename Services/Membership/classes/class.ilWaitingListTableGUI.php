@@ -534,8 +534,8 @@ class ilWaitingListTableGUI extends ilTable2GUI
 			if (isset($a_user_data[$usr_id])) {
 				$a_user_data[$usr_id]['sub_time'] = $wait_usr_data['time'];
 // fau: fairSub - add further data to waiting list table
-                $a_user_data[$usr_id]['subject'] = $wait_usr_data['subject'];
-                $a_user_data[$usr_id]['to_confirm'] = $wait_usr_data['to_confirm'];
+				$a_user_data[$usr_id]['subject'] = $wait_usr_data['subject'];
+				$a_user_data[$usr_id]['to_confirm'] = $wait_usr_data['to_confirm'];
 // fau.
 			}
 		}

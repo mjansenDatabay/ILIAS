@@ -16,4 +16,3 @@ define("ILIAS_VERSION_NUMERIC", "5.4.6");			// must be always x.y.z: x, y and z 
 // please increase a suffix number if a css or js file is locally changed!
 define("ILIAS_VERSION_SUFFIX", ILIAS_VERSION_NUMERIC . ".29");
 // fau.
-?>
