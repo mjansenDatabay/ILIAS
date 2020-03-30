@@ -43,11 +43,9 @@ class ilAppointmentPresentationBookingPoolGUI extends ilAppointmentPresentationG
 			{
 				$this->addInfoProperty($this->lng->txt("description"), $b_obj->getDescription());
 			}
-
-// fau: fixAppointmentPresentation - add appointment argument
-			$this->addObjectLinks($obj_id, (array) $a_app);
+// fau: fixAppointmentPresentation - ensure that appointment is array
+			$this->addObjectLinks($obj_id, (array) $this->appointment);
 // fau.
-
 			//object info (course, grp...)
 			//$this->addContainerInfo($obj_id);
 
