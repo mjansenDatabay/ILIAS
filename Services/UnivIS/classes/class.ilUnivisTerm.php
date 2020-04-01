@@ -248,6 +248,23 @@ class ilUnivisTerm extends ilUnivisData
 		return $return;
 	}
 
+	/**
+	 * Check if the term is complete and can be used for conflict recognition
+	 */
+	function isComplete()
+	{
+		if (!empty($this->data['startdate']) && !empty($this->data['enddate']))
+		{
+			return true;
+		}
+
+		if (!empty($this->data['semester']) && !empty($this->data['repeat']))
+		{
+			return true;
+		}
+
+		return false;
+	}
 
     /**
 	* Get all terms of a lecture
