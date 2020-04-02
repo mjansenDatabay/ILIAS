@@ -16,14 +16,11 @@ ilInitialisation::initILIAS();
 
 global $ilCtrl, $ilBench;
 
-if (DEVMODE)
-{
-	echo "Calling repository.php is deprecated.<br />";
-	echo "Use ilias.php?baseClass=ilRepositoryGUI instead!";
+if (DEVMODE) {
+    echo "Calling repository.php is deprecated.<br />";
+    echo "Use ilias.php?baseClass=ilRepositoryGUI instead!";
 }
 $ilCtrl->setTargetScript("ilias.php");
 $ilCtrl->initBaseClass("ilRepositoryGUI");
 $ilCtrl->callBaseClass();
 $ilBench->save();
-
-?>

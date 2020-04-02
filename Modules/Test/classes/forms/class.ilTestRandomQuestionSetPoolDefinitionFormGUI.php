@@ -10,375 +10,355 @@ require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
  * @version		$Id$
  *
  * @package		Modules/Test
- * 
+ *
  * @ilCtrl_Calls ilTestRandomQuestionSetPoolDefinitionFormGUI: ilFormPropertyDispatchGUI
  */
 class ilTestRandomQuestionSetPoolDefinitionFormGUI extends ilPropertyFormGUI
 {
-	/**
-	 * global $ilCtrl object
-	 * 
-	 * @var ilCtrl
-	 */
-	public $ctrl = null;
-	
-	/**
-	 * global $lng object
-	 * 
-	 * @var ilLanguage
-	 */
-	public $lng = null;
-	
-	/**
-	 * object instance for current test
-	 *
-	 * @var ilObjTest
-	 */
-	public $testOBJ = null;
-	
-	/**
-	 * global $lng object
-	 * 
-	 * @var ilTestRandomQuestionSetConfigGUI
-	 */
-	public $questionSetConfigGUI = null;
-	
-	/**
-	 * global $lng object
-	 * 
-	 * @var ilTestRandomQuestionSetConfig
-	 */
-	public $questionSetConfig = null;
+    /**
+     * global $ilCtrl object
+     *
+     * @var ilCtrl
+     */
+    public $ctrl = null;
+    
+    /**
+     * global $lng object
+     *
+     * @var ilLanguage
+     */
+    public $lng = null;
+    
+    /**
+     * object instance for current test
+     *
+     * @var ilObjTest
+     */
+    public $testOBJ = null;
+    
+    /**
+     * global $lng object
+     *
+     * @var ilTestRandomQuestionSetConfigGUI
+     */
+    public $questionSetConfigGUI = null;
+    
+    /**
+     * global $lng object
+     *
+     * @var ilTestRandomQuestionSetConfig
+     */
+    public $questionSetConfig = null;
 
-	private $saveCommand = null;
+    private $saveCommand = null;
 
-	/**
-	 * @var null|string
-	 */
-	private $saveAndNewCommand = null;
-	
-	public function __construct(ilCtrl $ctrl, ilLanguage $lng, ilObjTest $testOBJ, ilTestRandomQuestionSetConfigGUI $questionSetConfigGUI, ilTestRandomQuestionSetConfig $questionSetConfig)
-	{
-		parent::__construct();
+    /**
+     * @var null|string
+     */
+    private $saveAndNewCommand = null;
+    
+    public function __construct(ilCtrl $ctrl, ilLanguage $lng, ilObjTest $testOBJ, ilTestRandomQuestionSetConfigGUI $questionSetConfigGUI, ilTestRandomQuestionSetConfig $questionSetConfig)
+    {
+        parent::__construct();
 
-		$this->ctrl = $ctrl;
-		$this->lng = $lng;
-		$this->testOBJ = $testOBJ;
-		$this->questionSetConfigGUI = $questionSetConfigGUI;
-		$this->questionSetConfig = $questionSetConfig;
-	}
+        $this->ctrl = $ctrl;
+        $this->lng = $lng;
+        $this->testOBJ = $testOBJ;
+        $this->questionSetConfigGUI = $questionSetConfigGUI;
+        $this->questionSetConfig = $questionSetConfig;
+    }
 
-	public function setSaveCommand($saveCommand)
-	{
-		$this->saveCommand = $saveCommand;
-	}
+    public function setSaveCommand($saveCommand)
+    {
+        $this->saveCommand = $saveCommand;
+    }
 
-	public function getSaveCommand()
-	{
-		return $this->saveCommand;
-	}
+    public function getSaveCommand()
+    {
+        return $this->saveCommand;
+    }
 
-	/**
-	 * @param null|string $saveAndNewCommand
-	 */
-	public function setSaveAndNewCommand($saveAndNewCommand)
-	{
-		$this->saveAndNewCommand = $saveAndNewCommand;
-	}
+    /**
+     * @param null|string $saveAndNewCommand
+     */
+    public function setSaveAndNewCommand($saveAndNewCommand)
+    {
+        $this->saveAndNewCommand = $saveAndNewCommand;
+    }
 
-	/**
-	 * @return null|string
-	 */
-	public function getSaveAndNewCommand()
-	{
-		return $this->saveAndNewCommand;
-	}
-	
-	public function build(ilTestRandomQuestionSetSourcePoolDefinition $sourcePool, $availableTaxonomyIds)
-	{
-		$this->setFormAction( $this->ctrl->getFormAction($this->questionSetConfigGUI) );
-		
-		$this->setTitle( $this->lng->txt('tst_rnd_quest_set_cfg_pool_form') );
-		$this->setId('tstRndQuestSetCfgPoolForm');
-		
-		$this->addCommandButton(
-			$this->getSaveCommand(), $this->lng->txt('save_and_back')
-		);
+    /**
+     * @return null|string
+     */
+    public function getSaveAndNewCommand()
+    {
+        return $this->saveAndNewCommand;
+    }
+    
+    public function build(ilTestRandomQuestionSetSourcePoolDefinition $sourcePool, $availableTaxonomyIds)
+    {
+        $this->setFormAction($this->ctrl->getFormAction($this->questionSetConfigGUI));
+        
+        $this->setTitle($this->lng->txt('tst_rnd_quest_set_cfg_pool_form'));
+        $this->setId('tstRndQuestSetCfgPoolForm');
+        
+        $this->addCommandButton(
+            $this->getSaveCommand(),
+            $this->lng->txt('save_and_back')
+        );
 
-		if(null !== $this->getSaveAndNewCommand())
-		{
-			$this->addCommandButton(
-				$this->getSaveAndNewCommand(), $this->lng->txt('tst_save_and_create_new_rule')
-			);
-		}
-		
-		$this->addCommandButton(
-			ilTestRandomQuestionSetConfigGUI::CMD_SHOW_SRC_POOL_DEF_LIST, $this->lng->txt('cancel')
-		);
+        if (null !== $this->getSaveAndNewCommand()) {
+            $this->addCommandButton(
+                $this->getSaveAndNewCommand(),
+                $this->lng->txt('tst_save_and_create_new_rule')
+            );
+        }
+        
+        $this->addCommandButton(
+            ilTestRandomQuestionSetConfigGUI::CMD_SHOW_SRC_POOL_DEF_LIST,
+            $this->lng->txt('cancel')
+        );
 
-		$hiddenDefId = new ilHiddenInputGUI('src_pool_def_id');
-		$hiddenDefId->setValue( $sourcePool->getId() );
-		$this->addItem($hiddenDefId);
+        $hiddenDefId = new ilHiddenInputGUI('src_pool_def_id');
+        $hiddenDefId->setValue($sourcePool->getId());
+        $this->addItem($hiddenDefId);
 
-		$hiddenPoolId = new ilHiddenInputGUI('quest_pool_id');
-		$hiddenPoolId->setValue( $sourcePool->getPoolId() );
-		$this->addItem($hiddenPoolId);
+        $hiddenPoolId = new ilHiddenInputGUI('quest_pool_id');
+        $hiddenPoolId->setValue($sourcePool->getPoolId());
+        $this->addItem($hiddenPoolId);
 
-		$nonEditablePoolLabel = new ilNonEditableValueGUI(
-				$this->lng->txt('tst_inp_source_pool_label'), 'quest_pool_label'
-		);
-		$nonEditablePoolLabel->setValue( $sourcePool->getPoolInfoLabel($this->lng) );
+        $nonEditablePoolLabel = new ilNonEditableValueGUI(
+            $this->lng->txt('tst_inp_source_pool_label'),
+            'quest_pool_label'
+        );
+        $nonEditablePoolLabel->setValue($sourcePool->getPoolInfoLabel($this->lng));
 
-		$this->addItem($nonEditablePoolLabel);
-		
-		
-		if( count($availableTaxonomyIds) )
-		{
-			// fau: taxFilter/typeFilter  - edit multiple taxonomy and node selections
-			require_once 'Services/Taxonomy/classes/class.ilTaxSelectInputGUI.php';
+        $this->addItem($nonEditablePoolLabel);
+        
+        
+        if (count($availableTaxonomyIds)) {
+            // fau: taxFilter/typeFilter  - edit multiple taxonomy and node selections
+            require_once 'Services/Taxonomy/classes/class.ilTaxSelectInputGUI.php';
 
-			// this is needed by ilTaxSelectInputGUI in some cases
-			require_once 'Services/UIComponent/Overlay/classes/class.ilOverlayGUI.php';
-			ilOverlayGUI::initJavaScript();
+            // this is needed by ilTaxSelectInputGUI in some cases
+            require_once 'Services/UIComponent/Overlay/classes/class.ilOverlayGUI.php';
+            ilOverlayGUI::initJavaScript();
 
-			$filter = $sourcePool->getOriginalTaxonomyFilter();
-			foreach($availableTaxonomyIds as $taxId)
-			{
-				$taxonomy = new ilObjTaxonomy($taxId);
-				$taxLabel = sprintf($this->lng->txt('tst_inp_source_pool_filter_tax_x'), $taxonomy->getTitle());
+            $filter = $sourcePool->getOriginalTaxonomyFilter();
+            foreach ($availableTaxonomyIds as $taxId) {
+                $taxonomy = new ilObjTaxonomy($taxId);
+                $taxLabel = sprintf($this->lng->txt('tst_inp_source_pool_filter_tax_x'), $taxonomy->getTitle());
 
-				$taxCheckbox = new ilCheckboxInputGUI($taxLabel,"filter_tax_id_$taxId");
-
+                $taxCheckbox = new ilCheckboxInputGUI($taxLabel, "filter_tax_id_$taxId");
 
 
-				$this->ctrl->setParameterByClass('iltaxselectinputgui', 'src_pool_def_id', $sourcePool->getId());
-				$this->ctrl->setParameterByClass('iltaxselectinputgui', 'quest_pool_id', $sourcePool->getPoolId());
-				$taxSelect = new ilTaxSelectInputGUI($taxId, "filter_tax_nodes_$taxId", true);
-				$taxSelect->setRequired(true);
 
-				if (isset($filter[$taxId]))
-				{
-					$taxCheckbox->setChecked(true);
-					$taxSelect->setValue($filter[$taxId]);
-				}
-				$taxCheckbox->addSubItem($taxSelect);
-				$this->addItem($taxCheckbox);
-			}
-			
-			#$taxRadio = new ilRadioGroupInputGUI(
-			#		$this->lng->txt('tst_inp_source_pool_filter_tax'), 'filter_tax'
-			#);
+                $this->ctrl->setParameterByClass('iltaxselectinputgui', 'src_pool_def_id', $sourcePool->getId());
+                $this->ctrl->setParameterByClass('iltaxselectinputgui', 'quest_pool_id', $sourcePool->getPoolId());
+                $taxSelect = new ilTaxSelectInputGUI($taxId, "filter_tax_nodes_$taxId", true);
+                $taxSelect->setRequired(true);
 
-			#$taxRadio->setRequired(true);
+                if (isset($filter[$taxId])) {
+                    $taxCheckbox->setChecked(true);
+                    $taxSelect->setValue($filter[$taxId]);
+                }
+                $taxCheckbox->addSubItem($taxSelect);
+                $this->addItem($taxCheckbox);
+            }
+            
+            #$taxRadio = new ilRadioGroupInputGUI(
+            #		$this->lng->txt('tst_inp_source_pool_filter_tax'), 'filter_tax'
+            #);
 
-			#$taxRadio->addOption(new ilRadioOption(
-			#		$this->lng->txt('tst_inp_source_pool_no_tax_filter'), 0
-			#));
+            #$taxRadio->setRequired(true);
 
-			#$taxRadio->setValue(0);
+            #$taxRadio->addOption(new ilRadioOption(
+            #		$this->lng->txt('tst_inp_source_pool_no_tax_filter'), 0
+            #));
 
-			#require_once 'Services/Taxonomy/classes/class.ilTaxSelectInputGUI.php';
+            #$taxRadio->setValue(0);
 
-			#foreach($availableTaxonomyIds as $taxId)
-			#{
-			#	$taxonomy = new ilObjTaxonomy($taxId);
-			#	$label = sprintf($this->lng->txt('tst_inp_source_pool_filter_tax_x'), $taxonomy->getTitle());
+            #require_once 'Services/Taxonomy/classes/class.ilTaxSelectInputGUI.php';
 
-			#	$taxRadioOption = new ilRadioOption($label, $taxId);
+            #foreach($availableTaxonomyIds as $taxId)
+            #{
+            #	$taxonomy = new ilObjTaxonomy($taxId);
+            #	$label = sprintf($this->lng->txt('tst_inp_source_pool_filter_tax_x'), $taxonomy->getTitle());
 
-			#	$taxRadio->addOption($taxRadioOption);
+            #	$taxRadioOption = new ilRadioOption($label, $taxId);
 
-			#	$taxSelect = new ilTaxSelectInputGUI($taxId, "filter_tax_$taxId", false);
-			#	$taxSelect->setRequired(true);
-			#	$taxRadioOption->addSubItem($taxSelect);
+            #	$taxRadio->addOption($taxRadioOption);
 
-			#	if( $taxId == $sourcePool->getOriginalFilterTaxId() )
-			#	{
-			#		$taxRadio->setValue( $sourcePool->getOriginalFilterTaxId() );
-			#		$taxSelect->setValue( $sourcePool->getOriginalFilterTaxNodeId() );
-			#	}
-			#}
+            #	$taxSelect = new ilTaxSelectInputGUI($taxId, "filter_tax_$taxId", false);
+            #	$taxSelect->setRequired(true);
+            #	$taxRadioOption->addSubItem($taxSelect);
 
-			#$this->addItem($taxRadio);
-			// fau.
-		}
-		else
-		{
-			$hiddenNoTax = new ilHiddenInputGUI('filter_tax');
-			$hiddenNoTax->setValue(0);
-			$this->addItem($hiddenNoTax);
+            #	if( $taxId == $sourcePool->getOriginalFilterTaxId() )
+            #	{
+            #		$taxRadio->setValue( $sourcePool->getOriginalFilterTaxId() );
+            #		$taxSelect->setValue( $sourcePool->getOriginalFilterTaxNodeId() );
+            #	}
+            #}
 
-			$nonEditableNoTax = new ilNonEditableValueGUI(
-				$this->lng->txt('tst_inp_source_pool_filter_tax'), 'no_tax_label'
-			);
-			$nonEditableNoTax->setValue( $this->lng->txt('tst_inp_no_available_tax_hint') );
-			$this->addItem($nonEditableNoTax);
-		}
+            #$this->addItem($taxRadio);
+            // fau.
+        } else {
+            $hiddenNoTax = new ilHiddenInputGUI('filter_tax');
+            $hiddenNoTax->setValue(0);
+            $this->addItem($hiddenNoTax);
 
-		// fau: taxFilter/typeFilter - show type filter selection
-		$typeFilterOptions = array();
-		require_once ("./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php");
-		foreach( ilObjQuestionPool::_getQuestionTypes(true) as $translation => $data )
-		{
-			$typeFilterOptions[$data['question_type_id']] = $translation;
-		}
-		$filterIds = $sourcePool->getTypeFilter();
-		$typeCheckbox = new ilCheckboxInputGUI($this->lng->txt('tst_filter_question_type_enabled'),'filter_type_enabled');
-		$typeCheckbox->setChecked(!empty($filterIds));
-		$typeFilter = new ilSelectInputGUI($this->lng->txt('tst_filter_question_type'), 'filter_type');
-		$typeFilter->setRequired(true);
-		$typeFilter->setMulti(true);
-		$typeFilter->setOptions($typeFilterOptions);
-		$typeFilter->setValue($filterIds);
-		$typeCheckbox->addSubItem($typeFilter);
-		$this->addItem($typeCheckbox);
-		// fau.
-		
-		if( $this->questionSetConfig->isQuestionAmountConfigurationModePerPool() )
-		{
+            $nonEditableNoTax = new ilNonEditableValueGUI(
+                $this->lng->txt('tst_inp_source_pool_filter_tax'),
+                'no_tax_label'
+            );
+            $nonEditableNoTax->setValue($this->lng->txt('tst_inp_no_available_tax_hint'));
+            $this->addItem($nonEditableNoTax);
+        }
+
+        // fau: taxFilter/typeFilter - show type filter selection
+        $typeFilterOptions = array();
+        require_once("./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php");
+        foreach (ilObjQuestionPool::_getQuestionTypes(true) as $translation => $data) {
+            $typeFilterOptions[$data['question_type_id']] = $translation;
+        }
+        $filterIds = $sourcePool->getTypeFilter();
+        $typeCheckbox = new ilCheckboxInputGUI($this->lng->txt('tst_filter_question_type_enabled'), 'filter_type_enabled');
+        $typeCheckbox->setChecked(!empty($filterIds));
+        $typeFilter = new ilSelectInputGUI($this->lng->txt('tst_filter_question_type'), 'filter_type');
+        $typeFilter->setRequired(true);
+        $typeFilter->setMulti(true);
+        $typeFilter->setOptions($typeFilterOptions);
+        $typeFilter->setValue($filterIds);
+        $typeCheckbox->addSubItem($typeFilter);
+        $this->addItem($typeCheckbox);
+        // fau.
+        
+        if ($this->questionSetConfig->isQuestionAmountConfigurationModePerPool()) {
 
 // fau: taxGroupFilter - add option for group slection
-			if ( count($availableTaxonomyIds) )
-			{
-				$groupFilter = new ilCheckboxInputGUI($this->lng->txt('tst_group_filter'), 'tst_group_filter');
-				$groupFilter->setInfo($this->lng->txt('tst_group_filter_info'));
-				$groupFilter->setChecked((bool) $sourcePool->getOriginalGroupTaxId());
-				$this->addItem($groupFilter);
+            if (count($availableTaxonomyIds)) {
+                $groupFilter = new ilCheckboxInputGUI($this->lng->txt('tst_group_filter'), 'tst_group_filter');
+                $groupFilter->setInfo($this->lng->txt('tst_group_filter_info'));
+                $groupFilter->setChecked((bool) $sourcePool->getOriginalGroupTaxId());
+                $this->addItem($groupFilter);
 
-				$groupFilterTax = new ilSelectInputGUI($this->lng->txt('tst_group_filter_tax'), 'tst_group_filter_tax');
-				$groupFilterTax->setInfo($this->lng->txt('tst_group_filter_tax_info'));
-				$options = array();
-				foreach($availableTaxonomyIds as $taxId)
-				{
-					$taxonomy = new ilObjTaxonomy($taxId);
-					$options[$taxId] = $taxonomy->getTitle();
-				}
-				$groupFilterTax->setOptions($options);
-				$groupFilterTax->setValue($sourcePool->getOriginalGroupTaxId());
-				$groupFilter->addSubItem($groupFilterTax);
+                $groupFilterTax = new ilSelectInputGUI($this->lng->txt('tst_group_filter_tax'), 'tst_group_filter_tax');
+                $groupFilterTax->setInfo($this->lng->txt('tst_group_filter_tax_info'));
+                $options = array();
+                foreach ($availableTaxonomyIds as $taxId) {
+                    $taxonomy = new ilObjTaxonomy($taxId);
+                    $options[$taxId] = $taxonomy->getTitle();
+                }
+                $groupFilterTax->setOptions($options);
+                $groupFilterTax->setValue($sourcePool->getOriginalGroupTaxId());
+                $groupFilter->addSubItem($groupFilterTax);
 
-				$warning = new ilNonEditableValueGUI();
-				$warning->setInfo($this->lng->txt('tst_group_filter_info_warning'));
-				$groupFilter->addSubItem($warning);
-			}
-// fau.
+                $warning = new ilNonEditableValueGUI();
+                $warning->setInfo($this->lng->txt('tst_group_filter_info_warning'));
+                $groupFilter->addSubItem($warning);
+            }
+            // fau.
 
-			$questionAmountPerSourcePool = new ilNumberInputGUI(
-					$this->lng->txt('tst_inp_quest_amount_per_source_pool'), 'question_amount_per_pool'
-			);
-			
-			$questionAmountPerSourcePool->setRequired(true);
-			$questionAmountPerSourcePool->allowDecimals(false);
-			$questionAmountPerSourcePool->setMinValue(0);
-			$questionAmountPerSourcePool->setMinvalueShouldBeGreater(true);
-			$questionAmountPerSourcePool->setSize(4);
-			
-			if( $sourcePool->getQuestionAmount() )
-			{
-				$questionAmountPerSourcePool->setValue( $sourcePool->getQuestionAmount() );
-			}
-			
-			$this->addItem($questionAmountPerSourcePool);
+            $questionAmountPerSourcePool = new ilNumberInputGUI(
+                $this->lng->txt('tst_inp_quest_amount_per_source_pool'),
+                'question_amount_per_pool'
+            );
+            
+            $questionAmountPerSourcePool->setRequired(true);
+            $questionAmountPerSourcePool->allowDecimals(false);
+            $questionAmountPerSourcePool->setMinValue(0);
+            $questionAmountPerSourcePool->setMinvalueShouldBeGreater(true);
+            $questionAmountPerSourcePool->setSize(4);
+            
+            if ($sourcePool->getQuestionAmount()) {
+                $questionAmountPerSourcePool->setValue($sourcePool->getQuestionAmount());
+            }
+            
+            $this->addItem($questionAmountPerSourcePool);
 
-// fau: randomSetOrder - add order_by
-			$orderBy = new ilSelectInputGUI($this->lng->txt('tst_filter_order_by'), 'tst_filter_order_by');
-			$orderBy->setInfo($this->lng->txt('tst_filter_order_by_info'));
-			$options = array(
-				'' => $this->lng->txt('tst_filter_order_undefined'),
-				'random' => $this->lng->txt('tst_filter_order_random'),
-				'title' => $this->lng->txt('tst_filter_order_title'),
-				'description' => $this->lng->txt('tst_filter_order_description'),
-			);
-			$orderBy->setOptions($options);
-			$orderBy->setValue((string) $sourcePool->getOrderBy());
-			$this->addItem($orderBy);
-// fau.
+            // fau: randomSetOrder - add order_by
+            $orderBy = new ilSelectInputGUI($this->lng->txt('tst_filter_order_by'), 'tst_filter_order_by');
+            $orderBy->setInfo($this->lng->txt('tst_filter_order_by_info'));
+            $options = array(
+                '' => $this->lng->txt('tst_filter_order_undefined'),
+                'random' => $this->lng->txt('tst_filter_order_random'),
+                'title' => $this->lng->txt('tst_filter_order_title'),
+                'description' => $this->lng->txt('tst_filter_order_description'),
+            );
+            $orderBy->setOptions($options);
+            $orderBy->setValue((string) $sourcePool->getOrderBy());
+            $this->addItem($orderBy);
+            // fau.
+        }
+    }
+    
+    public function applySubmit(ilTestRandomQuestionSetSourcePoolDefinition $sourcePoolDefinition, $availableTaxonomyIds)
+    {
+        // fau: taxFilter/typeFilter - submit multiple taxonomy and node selections - submit type selections
+        $filter = array();
+        foreach ($availableTaxonomyIds as $taxId) {
+            if ($this->getItemByPostVar("filter_tax_id_$taxId")->getChecked()) {
+                $nodeIds = (array) $this->getItemByPostVar("filter_tax_nodes_$taxId")->getValue();
+                if (!empty($nodeIds)) {
+                    foreach ($nodeIds as $nodeId) {
+                        $filter[(int) $taxId][] = (int) $nodeId;
+                    }
+                }
+            }
+        }
+        $sourcePoolDefinition->setOriginalTaxonomyFilter($filter);
+        // fau: taxGroupFilter - remember the taxonomy filter
+        $taxFilter = $filter;
+        // fau.
 
-		}
-	}
-	
-	public function applySubmit(ilTestRandomQuestionSetSourcePoolDefinition $sourcePoolDefinition, $availableTaxonomyIds)
-	{
-		// fau: taxFilter/typeFilter - submit multiple taxonomy and node selections - submit type selections
-		$filter = array();
-		foreach($availableTaxonomyIds as $taxId)
-		{
-			if ($this->getItemByPostVar("filter_tax_id_$taxId")->getChecked())
-			{
-				$nodeIds = (array) $this->getItemByPostVar("filter_tax_nodes_$taxId")->getValue();
-				if (!empty($nodeIds))
-				{
-					foreach ($nodeIds as $nodeId)
-					{
-						$filter[(int) $taxId][] = (int) $nodeId;
-					}
-				}
-			}
-		}
-		$sourcePoolDefinition->setOriginalTaxonomyFilter($filter);
-// fau: taxGroupFilter - remember the taxonomy filter
-		$taxFilter = $filter;
-// fau.
+        #switch( true )
+        #{
+        #	case $this->getItemByPostVar('source_pool_filter_tax') === null:
 
-		#switch( true )
-		#{
-		#	case $this->getItemByPostVar('source_pool_filter_tax') === null:
+        #	case !in_array($this->getItemByPostVar('filter_tax')->getValue(), $availableTaxonomyIds):
 
-		#	case !in_array($this->getItemByPostVar('filter_tax')->getValue(), $availableTaxonomyIds):
+        #		$sourcePoolDefinition->setOriginalFilterTaxId(null);
+        #		$sourcePoolDefinition->setOriginalFilterTaxNodeId(null);
+        #		break;
 
-		#		$sourcePoolDefinition->setOriginalFilterTaxId(null);
-		#		$sourcePoolDefinition->setOriginalFilterTaxNodeId(null);
-		#		break;
+        #	default:
 
-		#	default:
+        #		$taxId = $this->getItemByPostVar('filter_tax')->getValue();
 
-		#		$taxId = $this->getItemByPostVar('filter_tax')->getValue();
+        #		$sourcePoolDefinition->setOriginalFilterTaxId( $taxId );
 
-		#		$sourcePoolDefinition->setOriginalFilterTaxId( $taxId );
+        #		$sourcePoolDefinition->setOriginalFilterTaxNodeId( $this->getItemByPostVar("filter_tax_$taxId")->getValue() );
+        #}
 
-		#		$sourcePoolDefinition->setOriginalFilterTaxNodeId( $this->getItemByPostVar("filter_tax_$taxId")->getValue() );
-		#}
+        $filter = array();
+        if ($this->getItemByPostVar("filter_type_enabled")->getChecked()) {
+            $filter = $this->getItemByPostVar("filter_type")->getMultiValues();
+        }
+        $sourcePoolDefinition->setTypeFilter($filter);
+        // fau.
 
-		$filter = array();
-		if ($this->getItemByPostVar("filter_type_enabled")->getChecked())
-		{
-			$filter = $this->getItemByPostVar("filter_type")->getMultiValues();
-		}
-		$sourcePoolDefinition->setTypeFilter($filter);
-		// fau.
+        if ($this->questionSetConfig->isQuestionAmountConfigurationModePerPool()) {
+            $sourcePoolDefinition->setQuestionAmount($this->getItemByPostVar('question_amount_per_pool')->getValue());
 
-		if( $this->questionSetConfig->isQuestionAmountConfigurationModePerPool() )
-		{
-			$sourcePoolDefinition->setQuestionAmount( $this->getItemByPostVar('question_amount_per_pool')->getValue() );
+            // fau: taxGroupFilter - submit group setting
+            if (count($availableTaxonomyIds)) {
+                $groupFilter = $this->getItemByPostVar('tst_group_filter')->getChecked();
+                $groupTaxId = $this->getItemByPostVar('tst_group_filter_tax')->getValue();
 
-// fau: taxGroupFilter - submit group setting
-			if ( count($availableTaxonomyIds) )
-			{
-
-				$groupFilter = $this->getItemByPostVar('tst_group_filter')->getChecked();
-				$groupTaxId = $this->getItemByPostVar('tst_group_filter_tax')->getValue();
-
-				if ($groupFilter && in_array($groupTaxId, array_keys($taxFilter)))
-				{
-					$sourcePoolDefinition->setOriginalGroupTaxId($groupTaxId);
-				}
-				else
-				{
-					$sourcePoolDefinition->setOriginalGroupTaxId(null);
-				}
-			}
-// fau.
-		}
-// fau: ramdomSetOrder - submit order_by
-		$orderByItem = $this->getItemByPostVar('tst_filter_order_by');
-		if (is_object($orderByItem) && !empty($orderByItem->getValue()))
-		{
-			$sourcePoolDefinition->setOrderBy($orderByItem->getValue());
-		}
-		else
-		{
-			$sourcePoolDefinition->setOrderBy(null);
-		}
-// fau.
-	}
+                if ($groupFilter && in_array($groupTaxId, array_keys($taxFilter))) {
+                    $sourcePoolDefinition->setOriginalGroupTaxId($groupTaxId);
+                } else {
+                    $sourcePoolDefinition->setOriginalGroupTaxId(null);
+                }
+            }
+            // fau.
+        }
+        // fau: ramdomSetOrder - submit order_by
+        $orderByItem = $this->getItemByPostVar('tst_filter_order_by');
+        if (is_object($orderByItem) && !empty($orderByItem->getValue())) {
+            $sourcePoolDefinition->setOrderBy($orderByItem->getValue());
+        } else {
+            $sourcePoolDefinition->setOrderBy(null);
+        }
+        // fau.
+    }
 }

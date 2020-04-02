@@ -102,9 +102,9 @@ class ilFileVersionsTableGUI extends ilTable2GUI
         $username = trim($name["title"] . " " . $name["firstname"] . " " . $name["lastname"]);
 
         // get file size
-// fau: fixFileVersionDir - workaround for mantis #22761 and #26540
+        // fau: fixFileVersionDir - workaround for mantis #22761 and #26540
         $directory = LegacyPathHelper::createRelativePath($this->file->getDirectoryWithFallback($version, $filename));
-// fau.
+        // fau.
         $filepath = ilFileUtils::getValidFilename(rtrim($directory, "/") . "/" . $filename); // TODO remove after migration to filesystem
         $filesize = 0;
         if ($this->dic->filesystem()->storage()->has($filepath)) {

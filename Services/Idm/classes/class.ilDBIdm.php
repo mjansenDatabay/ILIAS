@@ -11,54 +11,48 @@
 class ilDBIdm extends ilDBPdoMySQLInnoDB
 {
 
-	/** @var  ilDBIdm $instance */
-	private static $instance;
+    /** @var  ilDBIdm $instance */
+    private static $instance;
 
 
-	/**
-	 * Get the idm database connection instance
-	 * @return ilDBIdm | null
-	 */
-	public static function getInstance()
-	{
-		try
-		{
-			if (!ilCust::get('idm_host'))
-			{
-				return null;
-			}
+    /**
+     * Get the idm database connection instance
+     * @return ilDBIdm | null
+     */
+    public static function getInstance()
+    {
+        try {
+            if (!ilCust::get('idm_host')) {
+                return null;
+            }
 
-			if (!isset(self::$instance))
-			{
-				$instance = new ilDBIdm;
+            if (!isset(self::$instance)) {
+                $instance = new ilDBIdm;
 
-				$instance->setDBHost(ilCust::get('idm_host'));
-				$instance->setDBPort(ilCust::get('idm_port'));
-				$instance->setDBUser(ilCust::get('idm_user'));
-				$instance->setDBPassword(ilCust::get('idm_pass'));
-				$instance->setDBName(ilCust::get('idm_name'));
-				if (!$instance->connect(true))
-				{
-					return null;
-				}
-				self::$instance = $instance;
-			}
+                $instance->setDBHost(ilCust::get('idm_host'));
+                $instance->setDBPort(ilCust::get('idm_port'));
+                $instance->setDBUser(ilCust::get('idm_user'));
+                $instance->setDBPassword(ilCust::get('idm_pass'));
+                $instance->setDBName(ilCust::get('idm_name'));
+                if (!$instance->connect(true)) {
+                    return null;
+                }
+                self::$instance = $instance;
+            }
 
-			return self::$instance;
-		}
-		catch (Exception $e)
-		{
-			return null;
-		}
-	}
+            return self::$instance;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 
-	/**
-	 * Connect
-	 * set the parameter 'new_link' (allowed by patch in PEAR:MDB2)
-	 * don't set the parameter 'use transactions'
-	 */
-	function doConnect()
-	{
-		$this->db = MDB2::factory($this->getDSN(), array("new_link" => true));
-	}
+    /**
+     * Connect
+     * set the parameter 'new_link' (allowed by patch in PEAR:MDB2)
+     * don't set the parameter 'use transactions'
+     */
+    public function doConnect()
+    {
+        $this->db = MDB2::factory($this->getDSN(), array("new_link" => true));
+    }
 }

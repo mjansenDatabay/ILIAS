@@ -33,10 +33,10 @@ class ilStudyCourseSubject
         $ilDB = $DIC->database();
 
         $query = 'SELECT usr_id, study_no, subject_no, subject_id, semester'
-            .' FROM usr_subject'
-            .' WHERE usr_id='. $ilDB->quote($user_id,'integer')
-            .' AND study_no='. $ilDB->quote($study_no,'integer')
-            .' ORDER BY subject_no ASC';
+            . ' FROM usr_subject'
+            . ' WHERE usr_id=' . $ilDB->quote($user_id, 'integer')
+            . ' AND study_no=' . $ilDB->quote($study_no, 'integer')
+            . ' ORDER BY subject_no ASC';
         $result = $ilDB->query($query);
 
         $subjects = [];
@@ -63,10 +63,10 @@ class ilStudyCourseSubject
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "DELETE FROM usr_subject WHERE usr_id = ". $ilDB->quote($user_id,'integer');
+        $query = "DELETE FROM usr_subject WHERE usr_id = " . $ilDB->quote($user_id, 'integer');
 
         if (isset($study_no)) {
-            $query .= " AND study_no = ". $ilDB->quote($study_no,'integer');
+            $query .= " AND study_no = " . $ilDB->quote($study_no, 'integer');
         }
         $ilDB->manipulate($query);
     }
@@ -96,7 +96,8 @@ class ilStudyCourseSubject
         global $DIC;
         $ilDB = $DIC->database();
 
-        $ilDB->replace('usr_subject',
+        $ilDB->replace(
+            'usr_subject',
             [
                 'usr_id' => ['integer', $this->user_id],
                 'study_no' => ['integer', $this->study_no],
@@ -109,5 +110,4 @@ class ilStudyCourseSubject
             ]
         );
     }
-
 }

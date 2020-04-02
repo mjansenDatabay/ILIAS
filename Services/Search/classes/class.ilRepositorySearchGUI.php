@@ -632,12 +632,12 @@ class ilRepositorySearchGUI
                         $ul->setDataSourceSubmitOnSelection(true);
                         $ul->setDataSourceSubmitUrl(
                             $this->ctrl->getLinkTarget(
-                                    $this,
-                                    'showSearchSelected',
-                                    '',
-                                    false,
-                                    false
-                                )
+                                $this,
+                                'showSearchSelected',
+                                '',
+                                false,
+                                false
+                            )
                         );
                         $ul->setDataSource($ilCtrl->getLinkTarget(
                             $this,
@@ -676,22 +676,20 @@ class ilRepositorySearchGUI
         }
         $kind->addOption($users);
 
-// fau: searchMatriculations - allow to search users by a list of matriculation numbers
-		if (ilPrivacySettings::_checkExtendedAccess())
-		{
-			// Matriculations
-			$matr = new ilRadioOption($this->lng->txt('search_for_matriculations'),'matr');
-			$numbers = new ilTextAreaInputGUI($this->lng->txt('search_matriculations'),'rep_query[matr][numbers]');
-			$numbers->setInfo($this->lng->txt('search_matriculations_info'));
-			$matr->addSubItem($numbers);
-			$kind->addOption($matr);
-		}
-// fau.
+        // fau: searchMatriculations - allow to search users by a list of matriculation numbers
+        if (ilPrivacySettings::_checkExtendedAccess()) {
+            // Matriculations
+            $matr = new ilRadioOption($this->lng->txt('search_for_matriculations'), 'matr');
+            $numbers = new ilTextAreaInputGUI($this->lng->txt('search_matriculations'), 'rep_query[matr][numbers]');
+            $numbers->setInfo($this->lng->txt('search_matriculations_info'));
+            $matr->addSubItem($numbers);
+            $kind->addOption($matr);
+        }
+        // fau.
 
         // fim: [privacy] search for roles, courses and groups only with extended access
         include_once('Services/PrivacySecurity/classes/class.ilPrivacySettings.php');
-        if (ilPrivacySettings::_checkExtendedAccess())
-        {
+        if (ilPrivacySettings::_checkExtendedAccess()) {
             // Role
             $roles = new ilRadioOption($this->lng->txt('search_for_role_members'), 'role');
             $role = new ilTextInputGUI($this->lng->txt('search_role_title'), 'rep_query[role][title]');
@@ -791,9 +789,9 @@ class ilRepositorySearchGUI
         $this->result_obj->filter(ROOT_FOLDER_ID, QP_COMBINATION_OR);
 
         // User access filter
-// fau: searchMatriculations - 	treat the search result
+        // fau: searchMatriculations - 	treat the search result
         if ($this->search_type == 'usr' || $this->search_type == 'matr') {
-// fau.
+            // fau.
             $callable_name = '';
             if (is_callable($this->user_filter, true, $callable_name)) {
                 $result_ids = call_user_func_array($this->user_filter, [$this->result_obj->getResultIds()]);
@@ -895,11 +893,11 @@ class ilRepositorySearchGUI
         }
     }
 
-// fau: searchMatriculations - new function __performMatriculationSearch()
+    // fau: searchMatriculations - new function __performMatriculationSearch()
     /**
      * Search by a list of matriculation numbers
      */
-    function __performMatriculationSearch()
+    public function __performMatriculationSearch()
     {
         if (ilPrivacySettings::_checkExtendedAccess()) {
             include_once 'Services/Search/classes/List/class.ilListMatriculationSearch.php';
@@ -910,12 +908,11 @@ class ilRepositorySearchGUI
             $this->__storeEntries($matrSearch->performSearch());
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
-// fau.
+    // fau.
 
     /**
      * Search groups
@@ -1106,7 +1103,7 @@ class ilRepositorySearchGUI
                 break;
 // fau: searchMatriculations - show the search result
             case "matr":
-                $this->showSearchUserTable($_SESSION['rep_search']['matr'],'showSearchResults');
+                $this->showSearchUserTable($_SESSION['rep_search']['matr'], 'showSearchResults');
                 break;
 // fau.
             case 'grp':

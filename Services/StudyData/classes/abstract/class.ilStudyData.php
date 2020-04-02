@@ -16,7 +16,7 @@ abstract class ilStudyData
 
 
     /** @var integer */
-    public  $user_id;
+    public $user_id;
 
 
     /**
@@ -24,14 +24,14 @@ abstract class ilStudyData
      * @param integer   $user_id
      * @return static[]
      */
-    abstract public static function _read($user_id): array;
+    abstract public static function _read($user_id) : array;
 
     /**
      * Check if a user has data
      * @param $user_id
      * @return int
      */
-    abstract public static function _count($user_id): int;
+    abstract public static function _count($user_id) : int;
 
     /**
      * Delete the data of a user
@@ -42,7 +42,7 @@ abstract class ilStudyData
     /**
      * Get the textual description of the data
      */
-    abstract public function getText(): string;
+    abstract public function getText() : string;
 
     /**
      * Write the data of an option
@@ -54,7 +54,8 @@ abstract class ilStudyData
      * @param int $user_id
      * @return static[]
      */
-    public static function _get($user_id) {
+    public static function _get($user_id)
+    {
         if (!isset(static::$cache[$user_id])) {
             static::$cache[$user_id] = static::_read($user_id);
         }
@@ -66,13 +67,14 @@ abstract class ilStudyData
      * @param $user_id
      * @return bool
      */
-   public static function _has($user_id): bool {
+    public static function _has($user_id) : bool
+    {
         if (!empty(static::$cache[$user_id])) {
             return true;
         }
 
         return (static::_count($user_id)) > 0;
-   }
+    }
 
 
     /**
@@ -80,8 +82,9 @@ abstract class ilStudyData
      * @param $from_user_id
      * @param $to_user_id
      */
-    public static function _clone($from_user_id, $to_user_id) {
-        foreach(static::_get($from_user_id) as $data) {
+    public static function _clone($from_user_id, $to_user_id)
+    {
+        foreach (static::_get($from_user_id) as $data) {
             $clone = clone $data;
             $clone->user_id = $to_user_id;
             $clone->write();

@@ -42,13 +42,12 @@ class ilStudyCourseCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT * FROM study_course_cond ".
-            "WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
+        $query = "SELECT * FROM study_course_cond " .
+            "WHERE obj_id = " . $ilDB->quote($obj_id, 'integer');
         $result = $ilDB->query($query);
 
         $conditions = [];
-        while ($row = $ilDB->fetchAssoc($result))
-        {
+        while ($row = $ilDB->fetchAssoc($result)) {
             $cond = new static;
             $cond->setRowData($row);
             $conditions[] = $cond;
@@ -64,8 +63,8 @@ class ilStudyCourseCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT count(*) num FROM study_course_cond ".
-            "WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
+        $query = "SELECT count(*) num FROM study_course_cond " .
+            "WHERE obj_id = " . $ilDB->quote($obj_id, 'integer');
         $result = $ilDB->query($query);
 
         if ($row = $ilDB->fetchAssoc($result)) {
@@ -82,7 +81,7 @@ class ilStudyCourseCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "DELETE FROM study_course_cond WHERE obj_id = ".$ilDB->quote($obj_id, 'integer');
+        $query = "DELETE FROM study_course_cond WHERE obj_id = " . $ilDB->quote($obj_id, 'integer');
         $ilDB->manipulate($query);
     }
 
@@ -100,32 +99,24 @@ class ilStudyCourseCond extends ilStudyCond
 
         $reftext = ilStudyCourseData::_getRefSemesterText($this->ref_semester);
         $ctext = [];
-        if (isset($this->subject_id))
-        {
+        if (isset($this->subject_id)) {
             $ctext[] = ilStudyOptionSubject::_lookupText($this->subject_id);
         }
-        if (isset($this->degree_id))
-        {
+        if (isset($this->degree_id)) {
             $ctext[] = ilStudyOptionDegree::_lookupText($this->degree_id);
         }
-        if (isset($this->min_semester) and isset($this->max_semester))
-        {
+        if (isset($this->min_semester) and isset($this->max_semester)) {
             $ctext[] = sprintf($lng->txt('studycond_min_max_semester'), $this->min_semester, $this->max_semester, $reftext);
-        }
-        elseif (isset($this->min_semester))
-        {
+        } elseif (isset($this->min_semester)) {
             $ctext[] = sprintf($lng->txt('studycond_min_semester'), $this->min_semester, $reftext);
-        }
-        elseif (isset($this->max_semester))
-        {
+        } elseif (isset($this->max_semester)) {
             $ctext[] = sprintf($lng->txt('studycond_max_semester'), $this->max_semester, $reftext);
         }
-        if ($type_text = ilStudyCourseData::_getStudyTypeText($this->study_type))
-        {
+        if ($type_text = ilStudyCourseData::_getStudyTypeText($this->study_type)) {
             $ctext[] = $type_text;
         }
 
-        return implode($lng->txt('studycond_criteria_delimiter') .' ', $ctext);
+        return implode($lng->txt('studycond_criteria_delimiter') . ' ', $ctext);
     }
 
 
@@ -137,12 +128,11 @@ class ilStudyCourseCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT * FROM study_course_cond ".
-            "WHERE cond_id = ".$ilDB->quote($this->cond_id, 'integer');
+        $query = "SELECT * FROM study_course_cond " .
+            "WHERE cond_id = " . $ilDB->quote($this->cond_id, 'integer');
 
         $result = $ilDB->query($query);
-        if ($row = $ilDB->fetchAssoc($result))
-        {
+        if ($row = $ilDB->fetchAssoc($result)) {
             $this->setRowData($row);
         }
     }
@@ -157,21 +147,21 @@ class ilStudyCourseCond extends ilStudyCond
         $ilDB = $DIC->database();
 
         if (empty($this->cond_id)) {
-           $this->cond_id = $ilDB->nextId('study_course_cond');
+            $this->cond_id = $ilDB->nextId('study_course_cond');
         }
 
         $query = "REPLACE INTO study_course_cond ("
-            ."cond_id, obj_id, school_id, subject_id, degree_id, max_semester, min_semester, ref_semester, study_type) "
-            ."VALUES("
-            .$ilDB->quote($this->cond_id, 'integer').", "
-            .$ilDB->quote($this->obj_id, 'integer') .", "
-            .$ilDB->quote($this->school_id, 'integer') .", "
-            .$ilDB->quote($this->subject_id, 'integer') .", "
-            .$ilDB->quote($this->degree_id, 'integer') .", "
-            .$ilDB->quote($this->max_semester, 'integer') .", "
-            .$ilDB->quote($this->min_semester, 'integer') .", "
-            .$ilDB->quote($this->ref_semester, 'text') .", "
-            .$ilDB->quote($this->study_type, 'text') .")";
+            . "cond_id, obj_id, school_id, subject_id, degree_id, max_semester, min_semester, ref_semester, study_type) "
+            . "VALUES("
+            . $ilDB->quote($this->cond_id, 'integer') . ", "
+            . $ilDB->quote($this->obj_id, 'integer') . ", "
+            . $ilDB->quote($this->school_id, 'integer') . ", "
+            . $ilDB->quote($this->subject_id, 'integer') . ", "
+            . $ilDB->quote($this->degree_id, 'integer') . ", "
+            . $ilDB->quote($this->max_semester, 'integer') . ", "
+            . $ilDB->quote($this->min_semester, 'integer') . ", "
+            . $ilDB->quote($this->ref_semester, 'text') . ", "
+            . $ilDB->quote($this->study_type, 'text') . ")";
         $ilDB->manipulate($query);
     }
 
@@ -283,7 +273,7 @@ class ilStudyCourseCond extends ilStudyCond
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "DELETE FROM study_course_cond WHERE cond_id = ".$ilDB->quote($this->cond_id, 'integer');
+        $query = "DELETE FROM study_course_cond WHERE cond_id = " . $ilDB->quote($this->cond_id, 'integer');
         $ilDB->manipulate($query);
     }
 }

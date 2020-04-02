@@ -15,4 +15,3 @@ require_once "./include/inc.header.php";
 require_once "./Services/MediaObjects/classes/class.ilLimitedMediaPlayerGUI.php";
 $player = new ilLimitedMediaPlayerGUI();
 $player->executeCommand();
-?>

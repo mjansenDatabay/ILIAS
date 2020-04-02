@@ -15,7 +15,7 @@ abstract class ilStudyCond
 
 
     /** @var integer */
-    public  $obj_id;
+    public $obj_id;
 
     /** @var integer */
     public $cond_id;
@@ -28,8 +28,7 @@ abstract class ilStudyCond
      */
     public function __construct($a_cond_id = null)
     {
-        if ($this->cond_id = $a_cond_id)
-        {
+        if ($this->cond_id = $a_cond_id) {
             $this->read();
         }
     }
@@ -40,7 +39,7 @@ abstract class ilStudyCond
      * @param integer   $obj_id
      * @return static[]
      */
-    abstract public static function _read($obj_id): array;
+    abstract public static function _read($obj_id) : array;
 
 
     /**
@@ -48,7 +47,7 @@ abstract class ilStudyCond
      * @param $obj_id
      * @return int
      */
-    abstract public static function _count($obj_id): int;
+    abstract public static function _count($obj_id) : int;
 
 
     /**
@@ -61,7 +60,7 @@ abstract class ilStudyCond
     /**
      * Get the textual description of the condition
      */
-    abstract public function getText(): string;
+    abstract public function getText() : string;
 
 
     /**
@@ -86,7 +85,7 @@ abstract class ilStudyCond
      * @param ilStudyData[] $data
      * @return bool
      */
-    abstract public function check(array $data): bool;
+    abstract public function check(array $data) : bool;
 
 
     /**
@@ -107,14 +106,14 @@ abstract class ilStudyCond
      * @param $obj_id
      * @return bool
      */
-   public static function _has($obj_id): bool
-   {
+    public static function _has($obj_id) : bool
+    {
         if (!empty(static::$cache[$obj_id])) {
             return true;
         }
 
         return (static::_count($obj_id)) > 0;
-   }
+    }
 
 
     /**
@@ -124,7 +123,7 @@ abstract class ilStudyCond
      */
     public static function _clone($from_obj_id, $to_obj_id)
     {
-        foreach(static::_get($from_obj_id) as $data) {
+        foreach (static::_get($from_obj_id) as $data) {
             $clone = clone $data;
             $clone->cond_id = null;
             $clone->obj_id = $to_obj_id;

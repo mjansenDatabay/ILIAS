@@ -29,7 +29,7 @@ class ilStudyDocData extends ilStudyData
 
         $query = 'SELECT usr_id, prog_id, prog_approval'
             . ' FROM usr_doc_prog'
-            . ' WHERE usr_id='. $ilDB->quote($user_id,'integer');
+            . ' WHERE usr_id=' . $ilDB->quote($user_id, 'integer');
         $result = $ilDB->query($query);
 
         $progs = [];
@@ -40,8 +40,7 @@ class ilStudyDocData extends ilStudyData
             if (isset($row['prog_approval'])) {
                 try {
                     $prog->prog_approval = new ilDate($row['prog_approval'], IL_CAL_DATE);
-                }
-                catch (Exception $e) {
+                } catch (Exception $e) {
                     $prog->prog_approval = null;
                 }
             }
@@ -59,7 +58,7 @@ class ilStudyDocData extends ilStudyData
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT count(*) num FROM usr_doc_prog WHERE usr_id = ". $ilDB->quote($user_id,'integer');
+        $query = "SELECT count(*) num FROM usr_doc_prog WHERE usr_id = " . $ilDB->quote($user_id, 'integer');
         $result = $ilDB->query($query);
 
         if ($row = $ilDB->fetchAssoc($result)) {
@@ -102,7 +101,7 @@ class ilStudyDocData extends ilStudyData
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "DELETE FROM usr_doc_prog WHERE usr_id = ". $ilDB->quote($user_id,'integer');
+        $query = "DELETE FROM usr_doc_prog WHERE usr_id = " . $ilDB->quote($user_id, 'integer');
         $ilDB->manipulate($query);
     }
 
@@ -119,7 +118,8 @@ class ilStudyDocData extends ilStudyData
             $approval_str = $this->prog_approval->get(IL_CAL_DATE);
         }
 
-        $ilDB->replace('usr_doc_prog',
+        $ilDB->replace(
+            'usr_doc_prog',
             [
                 'usr_id' => ['integer', $this->user_id],
             ],

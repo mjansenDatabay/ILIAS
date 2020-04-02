@@ -40,39 +40,32 @@
 
 function DEBUG($message)
 {
-    if (DEBUG == true)
-    {
-        echo $message.'<br />';
+    if (DEBUG == true) {
+        echo $message . '<br />';
     }
 }
 
 function U2T3_DEBUG_PARSER($depth, $message)
 {
-    if (DEBUG == true)
-	{
-		global $depth;
-		for ($i = 0; $i < $depth; $i++)
-		{
-		    echo "&nbsp;&nbsp;";
-		}
-		echo $message.'<br />';
+    if (DEBUG == true) {
+        global $depth;
+        for ($i = 0; $i < $depth; $i++) {
+            echo "&nbsp;&nbsp;";
+        }
+        echo $message . '<br />';
     }
 }
 
 function U2T3_DEBUG($message)
 {
-    if (DEBUG == true)
-	{
-		echo $message.'<br />';
+    if (DEBUG == true) {
+        echo $message . '<br />';
     }
 }
 
 function U2T3_ERROR($error_message)
 {
-    if (DEVMODE == true)
-	{
-		echo "Error: " . $error_message;
-	}
+    if (DEVMODE == true) {
+        echo "Error: " . $error_message;
+    }
 }
-
-?>

@@ -9,95 +9,90 @@ require_once 'Services/Contact/classes/class.ilAbstractMailMemberRoles.php';
  */
 class ilMailMemberCourseRoles extends ilAbstractMailMemberRoles
 {
-	/**
-	 * @var ilLanguage
-	 */
-	protected $lng;
+    /**
+     * @var ilLanguage
+     */
+    protected $lng;
 
-	/**
-	 * @var ilRbacReview
-	 */
-	protected $rbacreview;
+    /**
+     * @var ilRbacReview
+     */
+    protected $rbacreview;
 
-	/**
-	 * ilMailMemberCourseRoles constructor.
-	 */
-	public function __construct()
-	{
-		global $DIC;
+    /**
+     * ilMailMemberCourseRoles constructor.
+     */
+    public function __construct()
+    {
+        global $DIC;
 
-		$this->lng        = $DIC['lng'];
-		$this->rbacreview = $DIC['rbacreview'];
-	}
+        $this->lng        = $DIC['lng'];
+        $this->rbacreview = $DIC['rbacreview'];
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getRadioOptionTitle()
-	{
-		return $this->lng->txt('mail_crs_roles');
-	}
+    /**
+     * @return string
+     */
+    public function getRadioOptionTitle()
+    {
+        return $this->lng->txt('mail_crs_roles');
+    }
 
-	/**
-	 * @param $ref_id
-	 * @return array sorted_roles
-	 */
-	public function getMailRoles($ref_id)
-	{
-		$role_ids = $this->rbacreview->getLocalRoles($ref_id);
+    /**
+     * @param $ref_id
+     * @return array sorted_roles
+     */
+    public function getMailRoles($ref_id)
+    {
+        $role_ids = $this->rbacreview->getLocalRoles($ref_id);
 
-		// Sort by relevance
-		$sorted_role_ids = array();
-		$counter         = 3;
+        // Sort by relevance
+        $sorted_role_ids = array();
+        $counter         = 3;
 
-		foreach($role_ids as $role_id)
-		{
-// fau: mailToRoleAddress - always use the role title for standard roles
-			$role_title = ilObject::_lookupTitle($role_id);
-			if (substr($role_title, 0, 7) == 'il_crs_')
-			{
-				$mailbox = '#'.$role_title;
-			}
-			else
-			{
-				$mailbox    = $this->getMailboxRoleAddress($role_id);
-			}
-// fau.
+        foreach ($role_ids as $role_id) {
+            // fau: mailToRoleAddress - always use the role title for standard roles
+            $role_title = ilObject::_lookupTitle($role_id);
+            if (substr($role_title, 0, 7) == 'il_crs_') {
+                $mailbox = '#' . $role_title;
+            } else {
+                $mailbox    = $this->getMailboxRoleAddress($role_id);
+            }
+            // fau.
 
-			switch(substr($role_title, 0, 8))
-			{
-				case 'il_crs_a':
+            switch (substr($role_title, 0, 8)) {
+                case 'il_crs_a':
 // fau: mailToMembers - identify admins for mail roles
-					$sorted_role_ids[2]['is_admin']          = true;
+                    $sorted_role_ids[2]['is_admin']          = true;
 // fau.
-					$sorted_role_ids[2]['role_id']           = $role_id;
-					$sorted_role_ids[2]['mailbox']           = $mailbox;
-					$sorted_role_ids[2]['form_option_title'] = $this->lng->txt('send_mail_admins');
-					break;
+                    $sorted_role_ids[2]['role_id']           = $role_id;
+                    $sorted_role_ids[2]['mailbox']           = $mailbox;
+                    $sorted_role_ids[2]['form_option_title'] = $this->lng->txt('send_mail_admins');
+                    break;
 
-				case 'il_crs_t':
-					$sorted_role_ids[1]['role_id']           = $role_id;
-					$sorted_role_ids[1]['mailbox']           = $mailbox;
-					$sorted_role_ids[1]['form_option_title'] = $this->lng->txt('send_mail_tutors');
-					break;
+                case 'il_crs_t':
+                    $sorted_role_ids[1]['role_id']           = $role_id;
+                    $sorted_role_ids[1]['mailbox']           = $mailbox;
+                    $sorted_role_ids[1]['form_option_title'] = $this->lng->txt('send_mail_tutors');
+                    break;
 
-				case 'il_crs_m':
-					$sorted_role_ids[0]['role_id']           = $role_id;
-					$sorted_role_ids[0]['mailbox']           = $mailbox;
-					$sorted_role_ids[0]['form_option_title'] = $this->lng->txt('send_mail_members');
-					break;
+                case 'il_crs_m':
+                    $sorted_role_ids[0]['role_id']           = $role_id;
+                    $sorted_role_ids[0]['mailbox']           = $mailbox;
+                    $sorted_role_ids[0]['form_option_title'] = $this->lng->txt('send_mail_members');
+                    break;
 
-				default:
-					$sorted_role_ids[$counter]['role_id']           = $role_id;
-					$sorted_role_ids[$counter]['mailbox']           = $mailbox;
-					$sorted_role_ids[$counter]['form_option_title'] = $role_title;
+                default:
+                    $sorted_role_ids[$counter]['role_id']           = $role_id;
+                    $sorted_role_ids[$counter]['mailbox']           = $mailbox;
+                    $sorted_role_ids[$counter]['form_option_title'] = $role_title;
 
-					$counter++;
-					break;
-			}
-		}
-		ksort($sorted_role_ids, SORT_NUMERIC);
+                    $counter++;
+                    break;
+            }
+        }
+        ksort($sorted_role_ids, SORT_NUMERIC);
 
-		return $sorted_role_ids;
-	}
+        return $sorted_role_ids;
+    }
 }

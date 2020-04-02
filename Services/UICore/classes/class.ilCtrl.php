@@ -1227,8 +1227,8 @@ class ilCtrl
         $this->redirectToURL($script);
     }
 
-// fau: traceRedirects - show redirect link instead of redirecting
-// fau: redirectByHtml - new parameter to redirect by HTML instead of HTTP
+    // fau: traceRedirects - show redirect link instead of redirecting
+    // fau: redirectByHtml - new parameter to redirect by HTML instead of HTTP
     /**
      * Redirect to a given URL
      * @param bool $a_script
@@ -1283,59 +1283,52 @@ class ilCtrl
                 $http->saveResponse($http->response()->withBody($stream));
                 break;
             default:
-                if (ilCust::get('ilias_trace_redirects'))
-				{
-					$body =
-						'<br/><pre>'
-						.'Redirect: <a href="'.htmlspecialchars($a_script).'">'.htmlspecialchars($a_script).'</a><br /><br />'
-						.$this->getBacktrace()
-						.'<br/>$_GET:</br/>' . print_r($_GET, true)
-						.'<br/>$_POST:</br/>' .  print_r($_POST, true)
-						.'<br/>$_COOKIE:</br/>' .  print_r($_COOKIE, true)
-						.'<br/>$_SESSION:</br/>' .  print_r($_SESSION, true)
-						.'</pre>';
-					$http->saveResponse($http->response()->withBody(\ILIAS\Filesystem\Stream\Streams::ofString($body)));
-				}
-				elseif ($a_html_redirect)
-				{
-					$body =
-						'<html><head>'
-						.'<meta http-equiv="refresh" content="0; URL='.htmlspecialchars($a_script).'" />'
-						.'</head></html>';
-					$http->saveResponse($http->response()->withBody(\ILIAS\Filesystem\Stream\Streams::ofString($body)));
-				}
-				else
-				{
-					$http->saveResponse($http->response()->withAddedHeader("Location", $a_script));
-				}
-				break;
-		}
-		$http->sendResponse();
-		exit;
-	}
-// fau.
+                if (ilCust::get('ilias_trace_redirects')) {
+                    $body =
+                        '<br/><pre>'
+                        . 'Redirect: <a href="' . htmlspecialchars($a_script) . '">' . htmlspecialchars($a_script) . '</a><br /><br />'
+                        . $this->getBacktrace()
+                        . '<br/>$_GET:</br/>' . print_r($_GET, true)
+                        . '<br/>$_POST:</br/>' . print_r($_POST, true)
+                        . '<br/>$_COOKIE:</br/>' . print_r($_COOKIE, true)
+                        . '<br/>$_SESSION:</br/>' . print_r($_SESSION, true)
+                        . '</pre>';
+                    $http->saveResponse($http->response()->withBody(\ILIAS\Filesystem\Stream\Streams::ofString($body)));
+                } elseif ($a_html_redirect) {
+                    $body =
+                        '<html><head>'
+                        . '<meta http-equiv="refresh" content="0; URL=' . htmlspecialchars($a_script) . '" />'
+                        . '</head></html>';
+                    $http->saveResponse($http->response()->withBody(\ILIAS\Filesystem\Stream\Streams::ofString($body)));
+                } else {
+                    $http->saveResponse($http->response()->withAddedHeader("Location", $a_script));
+                }
+                break;
+        }
+        $http->sendResponse();
+        exit;
+    }
+    // fau.
 
-// fau: traceRedirects - new function getBacktrace()
-	/**
-	 * Return a backtrace with mst important information
-	 * @return string
-	 */
-	protected function getBacktrace()
-	{
-		$backtrace = '';
-		$i = 0;
-		foreach (debug_backtrace() as $step)
-		{
-			if ($i > 0)
-			{
-				$backtrace .= '['.$i.'] '.$step['file'].' '.$step['line'].': '.$step['function']."()\n";
-			}
-			$i++;
-		}
-		$backtrace .=  '['.$i.'] '.$_SERVER['REQUEST_URI'];
-		return $backtrace;
-	}
-// fau.
+    // fau: traceRedirects - new function getBacktrace()
+    /**
+     * Return a backtrace with mst important information
+     * @return string
+     */
+    protected function getBacktrace()
+    {
+        $backtrace = '';
+        $i = 0;
+        foreach (debug_backtrace() as $step) {
+            if ($i > 0) {
+                $backtrace .= '[' . $i . '] ' . $step['file'] . ' ' . $step['line'] . ': ' . $step['function'] . "()\n";
+            }
+            $i++;
+        }
+        $backtrace .=  '[' . $i . '] ' . $_SERVER['REQUEST_URI'];
+        return $backtrace;
+    }
+    // fau.
 
     /**
      * Redirect to other gui class using class name
@@ -1830,7 +1823,7 @@ class ilCtrl
             " parent = " . $ilDB->quote($a_parent, "text") . " AND " .
             " child = " . $ilDB->quote($a_child, "text") . " AND " .
             " comp_prefix = " . $ilDB->quote($a_comp_prefix, "text")
-            );
+        );
         if ($rec = $ilDB->fetchAssoc($set)) {
             return;
         }

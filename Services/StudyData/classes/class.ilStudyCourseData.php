@@ -9,9 +9,9 @@ require_once(__DIR__ . '/class.ilStudyCourseSubject.php');
 */
 class ilStudyCourseData extends ilStudyData
 {
-	const TYPE_FULL = "V";
-	const TYPE_PART = "T";
-	const TYPE_NONE  = "";
+    const TYPE_FULL = "V";
+    const TYPE_PART = "T";
+    const TYPE_NONE  = "";
 
     /** @inheritdoc */
     protected static $cache;
@@ -45,7 +45,7 @@ class ilStudyCourseData extends ilStudyData
 
         $query = 'SELECT usr_id, study_no, school_id, degree_id, ref_semester, study_type'
             . ' FROM usr_study'
-            . ' WHERE usr_id='. $ilDB->quote($user_id,'integer')
+            . ' WHERE usr_id=' . $ilDB->quote($user_id, 'integer')
             . ' ORDER BY study_no ASC';
         $result = $ilDB->query($query);
 
@@ -61,7 +61,7 @@ class ilStudyCourseData extends ilStudyData
             $course->subjects = ilStudyCourseSubject::_read($user_id, $course->study_no);
             $courses[] = $course;
         }
-       return $courses;
+        return $courses;
     }
 
     /**
@@ -72,7 +72,7 @@ class ilStudyCourseData extends ilStudyData
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "SELECT count(*) num FROM usr_study WHERE usr_id = ". $ilDB->quote($user_id,'integer');
+        $query = "SELECT count(*) num FROM usr_study WHERE usr_id = " . $ilDB->quote($user_id, 'integer');
         $result = $ilDB->query($query);
 
         if ($row = $ilDB->fetchAssoc($result)) {
@@ -89,7 +89,7 @@ class ilStudyCourseData extends ilStudyData
         global $DIC;
         $ilDB = $DIC->database();
 
-        $query = "DELETE FROM usr_study WHERE usr_id = ". $ilDB->quote($user_id,'integer');
+        $query = "DELETE FROM usr_study WHERE usr_id = " . $ilDB->quote($user_id, 'integer');
         $ilDB->manipulate($query);
 
         ilStudyCourseSubject::_delete($user_id);
@@ -135,7 +135,8 @@ class ilStudyCourseData extends ilStudyData
         global $DIC;
         $ilDB = $DIC->database();
 
-        $ilDB->replace('usr_study',
+        $ilDB->replace(
+            'usr_study',
             [
                 'usr_id' => ['integer', $this->user_id],
                 'study_no' => ['integer', $this->study_no]
@@ -154,89 +155,81 @@ class ilStudyCourseData extends ilStudyData
     }
 
 
-	/**
-	 * Get an array of option for a study type
-	 *
-	 * @return array	type_code => type title
-	 */
-	static function _getStudyTypeSelectOptions()
-	{
-		global $lng;
-		return [
-			self::TYPE_NONE => $lng->txt("please_select"),
-			self::TYPE_FULL => $lng->txt('studydata_type_full'),
-			self::TYPE_PART => $lng->txt('studydata_type_part')
-		];
-	}
+    /**
+     * Get an array of option for a study type
+     *
+     * @return array	type_code => type title
+     */
+    public static function _getStudyTypeSelectOptions()
+    {
+        global $lng;
+        return [
+            self::TYPE_NONE => $lng->txt("please_select"),
+            self::TYPE_FULL => $lng->txt('studydata_type_full'),
+            self::TYPE_PART => $lng->txt('studydata_type_part')
+        ];
+    }
 
-	/**
-	 * get an array of option for a semester
-	 * 
-	 * @return array	semester code (e.g. 20112) => semester title (2011 SS)
-	 */
-	static function _getSemesterSelectOptions()
-	{
-	    global $lng;
-	
-		$options[''] = $lng->txt("please_select");
-		for ($year = 2010; $year < date('Y') + 10; $year++)
-		{
-	        $options[(string) $year . '1'] = sprintf('%s SS', $year);
-	        $options[(string) $year . '2'] = sprintf('%s / %s WS', $year, $year + 1);
-		}
-		return $options;
-	}
-
+    /**
+     * get an array of option for a semester
+     *
+     * @return array	semester code (e.g. 20112) => semester title (2011 SS)
+     */
+    public static function _getSemesterSelectOptions()
+    {
+        global $lng;
+    
+        $options[''] = $lng->txt("please_select");
+        for ($year = 2010; $year < date('Y') + 10; $year++) {
+            $options[(string) $year . '1'] = sprintf('%s SS', $year);
+            $options[(string) $year . '2'] = sprintf('%s / %s WS', $year, $year + 1);
+        }
+        return $options;
+    }
 
 
-	/**
-	 * get the text for a reference semester
-	 * 
-	 * @param 	string	semester specification (e.g. 20112)
-	 * @return 	string	textual description 
-	 */
-	static function _getRefSemesterText($a_ref_semester)
-	{
-		global $DIC;
-		$lng = $DIC->language();
-		
-		if (substr($a_ref_semester, 4) == '1')
-		{
-			$reftext = sprintf($lng->txt('studydata_ref_semester_summer'), substr($a_ref_semester, 0, 4));
-		}
-		elseif (substr($a_ref_semester, 4) == '2')
-		{
-			$sem = (int) substr($a_ref_semester, 0, 4);
-			$reftext = sprintf($lng->txt('studydata_ref_semester_winter'), $sem, $sem + 1);  
-		}
-		else
-		{
-			$reftext = sprintf($lng->txt('studydata_ref_semester_any'));	
-		}
 
-		return $reftext;
-	}
+    /**
+     * get the text for a reference semester
+     *
+     * @param 	string	semester specification (e.g. 20112)
+     * @return 	string	textual description
+     */
+    public static function _getRefSemesterText($a_ref_semester)
+    {
+        global $DIC;
+        $lng = $DIC->language();
+        
+        if (substr($a_ref_semester, 4) == '1') {
+            $reftext = sprintf($lng->txt('studydata_ref_semester_summer'), substr($a_ref_semester, 0, 4));
+        } elseif (substr($a_ref_semester, 4) == '2') {
+            $sem = (int) substr($a_ref_semester, 0, 4);
+            $reftext = sprintf($lng->txt('studydata_ref_semester_winter'), $sem, $sem + 1);
+        } else {
+            $reftext = sprintf($lng->txt('studydata_ref_semester_any'));
+        }
 
-	/**
-	 * get the text for a study type
-	 * @param  string $a_study_type
-	 * @return string
-	 */
-	static function _getStudyTypeText($a_study_type)
-	{
-		global $DIC;
-		$lng = $DIC->language();
+        return $reftext;
+    }
 
-		switch ($a_study_type)
-		{
-			case self::TYPE_PART:
-				return $lng->txt('studydata_type_part');
+    /**
+     * get the text for a study type
+     * @param  string $a_study_type
+     * @return string
+     */
+    public static function _getStudyTypeText($a_study_type)
+    {
+        global $DIC;
+        $lng = $DIC->language();
 
-			case ilStudyCourseData::TYPE_FULL:
-				return $lng->txt('studydata_type_full');
+        switch ($a_study_type) {
+            case self::TYPE_PART:
+                return $lng->txt('studydata_type_part');
 
-		}
-		return '';
-	}
+            case ilStudyCourseData::TYPE_FULL:
+                return $lng->txt('studydata_type_full');
+
+        }
+        return '';
+    }
 }
-

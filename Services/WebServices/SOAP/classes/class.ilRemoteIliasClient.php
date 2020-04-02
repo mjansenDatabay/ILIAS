@@ -16,75 +16,69 @@ include_once 'Services/WebServices/SOAP/classes/class.ilSoapClient.php';
 */
 class ilRemoteIliasClient extends ilSoapClient
 {
+    private static $instance;
 
-	private static $instance;
+    public $user;
+    public $password;
+    public $client_id;
+    public $sid = false;
 
-	var $user;
-	var $password;
-	var $client_id;
-	var $sid = false;
+    /**
+    * singleton method
+    */
+    public static function _getInstance()
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self;
+        }
 
-	/**
-	* singleton method
-	*/
-	public static function _getInstance()
-	{
-	   if (!isset(self::$instance))
-		{
-	       self::$instance = new self;
-	   }
+        return self::$instance;
+    }
 
-	   return self::$instance;
-	}
+    /**
+    * private constructor
+    */
+    public function __construct($a_uri = '')
+    {
+        $this->user = ilCust::get('remote_soap_user');
+        $this->password = ilCust::get('remote_soap_password');
+        $this->client_id = ilCust::get('remote_soap_client_id');
 
-	/**
-	* private constructor
-	*/
-	public function __construct($a_uri = '')
-	{
-		$this->user = ilCust::get('remote_soap_user');
-		$this->password = ilCust::get('remote_soap_password');
-		$this->client_id = ilCust::get('remote_soap_client_id');
-
-		parent::__construct(ilCust::get('remote_soap_server'));
-	}
+        parent::__construct(ilCust::get('remote_soap_server'));
+    }
 
 
-	/**
-	* login to remote service
-	*
-	* @return mixed		soap session id or false
-	*/
-	public function login()
-	{
-		//already logged in
-		if ($this->sid)
-		{
-	        return $this->sid;
-		}
+    /**
+    * login to remote service
+    *
+    * @return mixed		soap session id or false
+    */
+    public function login()
+    {
+        //already logged in
+        if ($this->sid) {
+            return $this->sid;
+        }
 
-		// init soap client
-		if (!$this->init())
-		{
-	        return false;
-		}
+        // init soap client
+        if (!$this->init()) {
+            return false;
+        }
 
-		// login to soap server
-		$this->sid = $this->call('login', array($this->client_id, $this->user, $this->password));
+        // login to soap server
+        $this->sid = $this->call('login', array($this->client_id, $this->user, $this->password));
 
-		return $this->sid;
-	}
+        return $this->sid;
+    }
 
-	/**
-	* logout from remote service
-	*/
-	public function logout()
-	{
-		if ($this->call('logout', array($this->sid)));
-		{
-	        $this->sid = false;
-		}
-	}
+    /**
+    * logout from remote service
+    */
+    public function logout()
+    {
+        if ($this->call('logout', array($this->sid)));
+        {
+            $this->sid = false;
+        }
+    }
 }
-		
-?>

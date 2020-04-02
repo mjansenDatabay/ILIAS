@@ -34,7 +34,7 @@ abstract class ilStudyOption
      * @param int[] $ids
      * @return static[]  indexed by id
      */
-    abstract protected static function _read(array $ids = null): array;
+    abstract protected static function _read(array $ids = null) : array;
 
     /**
      * Delete options given by ids (or null if ids are empty)
@@ -54,20 +54,21 @@ abstract class ilStudyOption
      * Get the id of an option
      * @return int
      */
-    abstract protected function getId(): int;
+    abstract protected function getId() : int;
 
     /**
      * Get the text of an option
      * @return string
      */
-    abstract protected function getText(): string;
+    abstract protected function getText() : string;
 
     /**
      * Get the text for the select options
      * Can be overridden to vary between texts displayed and in select field
      * @return string
      */
-    protected function getSelectText() {
+    protected function getSelectText()
+    {
         return $this->getText();
     }
 
@@ -79,7 +80,8 @@ abstract class ilStudyOption
      * @param int $chosenId   add a 'unknown option' at the end if that id is not in the list
      * @return array    id => text
      */
-    public static function _getSelectOptions(int $emptyId = null, $chosenId = null): array {
+    public static function _getSelectOptions(int $emptyId = null, $chosenId = null) : array
+    {
         global $DIC;
         $lng = $DIC->language();
 
@@ -94,7 +96,7 @@ abstract class ilStudyOption
             $return[$option->getId()] = $option->getSelectText();
         }
 
-        if (isset($chosenId) && !isset($options[$chosenId]) && (!isset($emptyId) || $chosenId != $emptyId )) {
+        if (isset($chosenId) && !isset($options[$chosenId]) && (!isset($emptyId) || $chosenId != $emptyId)) {
             $option = new static;
             $option->id = $chosenId;
             $return[$option->getId()] = $option->getSelectText();
@@ -106,8 +108,8 @@ abstract class ilStudyOption
      * Get all options (with cache)
      * @return static[]
      */
-    protected static function _getAll() {
-
+    protected static function _getAll()
+    {
         if (!static::$allCached) {
             static::$cache = static::_read();
             static::$allCached = true;
@@ -120,7 +122,8 @@ abstract class ilStudyOption
      * @param int $id
      * @return static|null
      */
-    public static function _get($id = null) {
+    public static function _get($id = null)
+    {
         if (isset(static::$cache[$id])) {
             return static::$cache[$id];
         }
@@ -144,7 +147,8 @@ abstract class ilStudyOption
      * @param int|null $id
      * @return string
      */
-    public static function _lookupText($id): string {
+    public static function _lookupText($id) : string
+    {
         if (!isset($id)) {
             return '';
         }
@@ -153,8 +157,7 @@ abstract class ilStudyOption
 
         if (isset($option)) {
             return $option->getText();
-        }
-        else {
+        } else {
             $option = new static;
             $option->id = $id;
             return $option->getText();

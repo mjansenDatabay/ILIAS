@@ -10,10 +10,10 @@
 
 // fau: shortRssLink - process parameters from the shortened link
 if ($_GET['user_id'] == '0') {
-	$_GET['user_id'] = '';
+    $_GET['user_id'] = '';
 }
 if ($_GET['ref_id'] == '0') {
-	$_GET['ref_id'] = '';
+    $_GET['ref_id'] = '';
 }
 // fau.
 
@@ -27,21 +27,15 @@ ilContext::init(ilContext::CONTEXT_RSS);
 require_once("Services/Init/classes/class.ilInitialisation.php");
 ilInitialisation::initILIAS();
 
-if ($_GET["user_id"] != "")
-{
-	include_once("./Services/Feeds/classes/class.ilUserFeedWriter.php");
-	$writer = new ilUserFeedWriter($_GET["user_id"], $_GET["hash"]);
-	$writer->showFeed();
+if ($_GET["user_id"] != "") {
+    include_once("./Services/Feeds/classes/class.ilUserFeedWriter.php");
+    $writer = new ilUserFeedWriter($_GET["user_id"], $_GET["hash"]);
+    $writer->showFeed();
+} elseif ($_GET["ref_id"] != "") {
+    include_once("./Services/Feeds/classes/class.ilObjectFeedWriter.php");
+    $writer = new ilObjectFeedWriter($_GET["ref_id"], false, $_GET["purpose"]);
+    $writer->showFeed();
+} elseif ($_GET["blog_id"] != "") {
+    include_once("Modules/Blog/classes/class.ilObjBlog.php");
+    ilObjBlog::deliverRSS($_GET["blog_id"]);
 }
-else if ($_GET["ref_id"] != "")
-{
-	include_once("./Services/Feeds/classes/class.ilObjectFeedWriter.php");
-	$writer = new ilObjectFeedWriter($_GET["ref_id"], false, $_GET["purpose"]);
-	$writer->showFeed();
-}
-else if ($_GET["blog_id"] != "")
-{
-	include_once("Modules/Blog/classes/class.ilObjBlog.php");
-	ilObjBlog::deliverRSS($_GET["blog_id"]);
-}
-?>

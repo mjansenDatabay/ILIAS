@@ -10,295 +10,272 @@
  */
 class ilTestGradingMessageBuilder
 {
-	/**
-	 * @var ilLanguage
-	 */
-	private $lng;
+    /**
+     * @var ilLanguage
+     */
+    private $lng;
 
-	/**
-	 * @var ilObjTest
-	 */
-	private $testOBJ;
+    /**
+     * @var ilObjTest
+     */
+    private $testOBJ;
 
-	/**
-	 * @var ilTemplate
-	 */
-	private $tpl;
+    /**
+     * @var ilTemplate
+     */
+    private $tpl;
 
-	/**
-	 * @var array
-	 */
-	private $resultData;
+    /**
+     * @var array
+     */
+    private $resultData;
 
-	/**
-	 * @var integer
-	 */
-	private $activeId;
+    /**
+     * @var integer
+     */
+    private $activeId;
 
-// fau: testGradingMessage - initialize the message text
-	private $messageText = array();
-// fau.
+    // fau: testGradingMessage - initialize the message text
+    private $messageText = array();
+    // fau.
 
-	/**
-	 * @param ilLanguage $lng
-	 * @param ilObjTest $testOBJ
-	 */
-	public function __construct(ilLanguage $lng, ilObjTest $testOBJ)
-	{
-		$this->lng = $lng;
-		$this->testOBJ = $testOBJ;
-	}
+    /**
+     * @param ilLanguage $lng
+     * @param ilObjTest $testOBJ
+     */
+    public function __construct(ilLanguage $lng, ilObjTest $testOBJ)
+    {
+        $this->lng = $lng;
+        $this->testOBJ = $testOBJ;
+    }
 
-	public function setActiveId($activeId)
-	{
-		$this->activeId = $activeId;
-	}
+    public function setActiveId($activeId)
+    {
+        $this->activeId = $activeId;
+    }
 
-	public function getActiveId()
-	{
-		return $this->activeId;
-	}
+    public function getActiveId()
+    {
+        return $this->activeId;
+    }
 
-	public function buildMessage()
-	{
-		$this->loadResultData();
-		
-		if( $this->testOBJ->isShowGradingStatusEnabled() )
-		{
-			$this->addMessagePart($this->buildGradingStatusMsg());
-		}
+    public function buildMessage()
+    {
+        $this->loadResultData();
+        
+        if ($this->testOBJ->isShowGradingStatusEnabled()) {
+            $this->addMessagePart($this->buildGradingStatusMsg());
+        }
 
-		if( $this->testOBJ->areObligationsEnabled() )
-		{
-			$this->addMessagePart($this->buildObligationsMsg());
-		}
-		
-		if( $this->testOBJ->isShowGradingMarkEnabled() )
-		{
-			$this->addMessagePart($this->buildGradingMarkMsg());
-		}
+        if ($this->testOBJ->areObligationsEnabled()) {
+            $this->addMessagePart($this->buildObligationsMsg());
+        }
+        
+        if ($this->testOBJ->isShowGradingMarkEnabled()) {
+            $this->addMessagePart($this->buildGradingMarkMsg());
+        }
 
-		if( $this->testOBJ->getECTSOutput() )
-		{
-			$this->addMessagePart($this->buildEctsGradeMsg());
-		}
-	}
+        if ($this->testOBJ->getECTSOutput()) {
+            $this->addMessagePart($this->buildEctsGradeMsg());
+        }
+    }
 
-	private function addMessagePart($msgPart)
-	{
-// fau: testGradingMessage -  avoid spaces for empty grading status message
-		if (!empty($msgPart))
-		{
-			$this->messageText[] = $msgPart;
-		}
-// fau.
-	}
+    private function addMessagePart($msgPart)
+    {
+        // fau: testGradingMessage -  avoid spaces for empty grading status message
+        if (!empty($msgPart)) {
+            $this->messageText[] = $msgPart;
+        }
+        // fau.
+    }
 
-	private function getFullMessage()
-	{
-		return implode(' ', $this->messageText);
-	}
+    private function getFullMessage()
+    {
+        return implode(' ', $this->messageText);
+    }
 
-	private function isPassed()
-	{
-		return (bool)$this->resultData['passed'];
-	}
+    private function isPassed()
+    {
+        return (bool) $this->resultData['passed'];
+    }
 
-	public function sendMessage()
-	{
-		if( !$this->testOBJ->isShowGradingStatusEnabled() )
-		{
-			ilUtil::sendInfo($this->getFullMessage());
-		}
-		elseif( $this->isPassed() )
-		{
-			ilUtil::sendSuccess($this->getFullMessage());
-		}
-		else
-		{
-			ilUtil::sendFailure($this->getFullMessage());
-		}
-	}
-	
-	private function loadResultData()
-	{
-		$this->resultData = $this->testOBJ->getResultsForActiveId($this->getActiveId());
+    public function sendMessage()
+    {
+        if (!$this->testOBJ->isShowGradingStatusEnabled()) {
+            ilUtil::sendInfo($this->getFullMessage());
+        } elseif ($this->isPassed()) {
+            ilUtil::sendSuccess($this->getFullMessage());
+        } else {
+            ilUtil::sendFailure($this->getFullMessage());
+        }
+    }
+    
+    private function loadResultData()
+    {
+        $this->resultData = $this->testOBJ->getResultsForActiveId($this->getActiveId());
 
-		if( $this->testOBJ->getECTSOutput() )
-		{
-			$ectsMark = $this->testOBJ->getECTSGrade(
-				$this->testOBJ->getTotalPointsPassedArray(),
-				$this->resultData['reached_points'],
-				$this->resultData['max_points']
-			);
+        if ($this->testOBJ->getECTSOutput()) {
+            $ectsMark = $this->testOBJ->getECTSGrade(
+                $this->testOBJ->getTotalPointsPassedArray(),
+                $this->resultData['reached_points'],
+                $this->resultData['max_points']
+            );
 
-			$this->resultData['ects_grade'] = strtoupper($ectsMark);
-		}
-	}
+            $this->resultData['ects_grade'] = strtoupper($ectsMark);
+        }
+    }
 
-	private function buildGradingStatusMsg()
-	{
-// fau: testGradingMessage - build grading status message only if no specific mark message is configured
-		if( $this->isPassed())
-		{
-			$markMsg = $this->testOBJ->getMarkTstPassed();
-			return empty($markMsg) ? $this->lng->txt('grading_status_passed_msg') : '';
-		}
+    private function buildGradingStatusMsg()
+    {
+        // fau: testGradingMessage - build grading status message only if no specific mark message is configured
+        if ($this->isPassed()) {
+            $markMsg = $this->testOBJ->getMarkTstPassed();
+            return empty($markMsg) ? $this->lng->txt('grading_status_passed_msg') : '';
+        }
 
-		$markMsg = $this->testOBJ->getMarkTstFailed();
-		return empty($markMsg) ? $this->lng->txt('grading_status_failed_msg') : '';
-// fau.
-	}
+        $markMsg = $this->testOBJ->getMarkTstFailed();
+        return empty($markMsg) ? $this->lng->txt('grading_status_failed_msg') : '';
+        // fau.
+    }
 
-// fau: testGradingMessage - allow public call and use test specific mark messages
-	public function buildGradingMarkMsg()
-	{
-		if ($this->isPassed())
-		{
-			$markMsg = $this->testOBJ->prepareTextareaOutput($this->testOBJ->getMarkTstPassed());
-		}
-		else
-		{
-			$markMsg = $this->testOBJ->prepareTextareaOutput($this->testOBJ->getMarkTstFailed());
-		}
+    // fau: testGradingMessage - allow public call and use test specific mark messages
+    public function buildGradingMarkMsg()
+    {
+        if ($this->isPassed()) {
+            $markMsg = $this->testOBJ->prepareTextareaOutput($this->testOBJ->getMarkTstPassed());
+        } else {
+            $markMsg = $this->testOBJ->prepareTextareaOutput($this->testOBJ->getMarkTstFailed());
+        }
 
-		if (empty($markMsg))
-		{
-			$markMsg = $this->lng->txt('grading_mark_msg');
-		}
+        if (empty($markMsg)) {
+            $markMsg = $this->lng->txt('grading_mark_msg');
+        }
 
-		$markMsg = str_replace("[mark]", $this->getMarkOfficial(), $markMsg);
-		$markMsg = str_replace("[markshort]", $this->getMarkShort(), $markMsg);
-		$markMsg = str_replace("[percentage]", $this->getPercentage(), $markMsg);
-		$markMsg = str_replace("[reached]", $this->getReachedPoints(), $markMsg);
-		$markMsg = str_replace("[max]", $this->getMaxPoints(), $markMsg);
+        $markMsg = str_replace("[mark]", $this->getMarkOfficial(), $markMsg);
+        $markMsg = str_replace("[markshort]", $this->getMarkShort(), $markMsg);
+        $markMsg = str_replace("[percentage]", $this->getPercentage(), $markMsg);
+        $markMsg = str_replace("[reached]", $this->getReachedPoints(), $markMsg);
+        $markMsg = str_replace("[max]", $this->getMaxPoints(), $markMsg);
 
-		return $markMsg;
-	}
-// fau.
+        return $markMsg;
+    }
+    // fau.
 
-	private function getMarkOfficial()
-	{
-		return $this->resultData['mark_official'];
-	}
+    private function getMarkOfficial()
+    {
+        return $this->resultData['mark_official'];
+    }
 
-	private function getMarkShort()
-	{
-		return $this->resultData['mark_short'];
-	}
+    private function getMarkShort()
+    {
+        return $this->resultData['mark_short'];
+    }
 
-	private function getPercentage()
-	{
-		$percentage = 0;
+    private function getPercentage()
+    {
+        $percentage = 0;
 
-		if( $this->getMaxPoints() > 0 )
-		{
-			$percentage = $this->getReachedPoints() / $this->getMaxPoints();
-		}
-		
-		return sprintf("%.2f", $percentage);
-	}
+        if ($this->getMaxPoints() > 0) {
+            $percentage = $this->getReachedPoints() / $this->getMaxPoints();
+        }
+        
+        return sprintf("%.2f", $percentage);
+    }
 
-	private function getReachedPoints()
-	{
-		return $this->resultData['reached_points'];
-	}
+    private function getReachedPoints()
+    {
+        return $this->resultData['reached_points'];
+    }
 
-	private function getMaxPoints()
-	{
-		return $this->resultData['max_points'];
-	}
+    private function getMaxPoints()
+    {
+        return $this->resultData['max_points'];
+    }
 
-	private function buildObligationsMsg()
-	{
-		if( $this->areObligationsAnswered() )
-		{
-			return $this->lng->txt('grading_obligations_answered_msg');
-		}
+    private function buildObligationsMsg()
+    {
+        if ($this->areObligationsAnswered()) {
+            return $this->lng->txt('grading_obligations_answered_msg');
+        }
 
-		return $this->lng->txt('grading_obligations_missing_msg');
-	}
-	
-	private function areObligationsAnswered()
-	{
-		return (bool)$this->resultData['obligations_answered'];
-	}
+        return $this->lng->txt('grading_obligations_missing_msg');
+    }
+    
+    private function areObligationsAnswered()
+    {
+        return (bool) $this->resultData['obligations_answered'];
+    }
 
-	private function buildEctsGradeMsg()
-	{
-		return str_replace('[markects]', $this->getEctsGrade(), $this->lng->txt('mark_tst_ects'));
-	}
-	
-	private function getEctsGrade()
-	{
-		return $this->resultData['ects_grade'];
-	}
+    private function buildEctsGradeMsg()
+    {
+        return str_replace('[markects]', $this->getEctsGrade(), $this->lng->txt('mark_tst_ects'));
+    }
+    
+    private function getEctsGrade()
+    {
+        return $this->resultData['ects_grade'];
+    }
 
-	public function buildList()
-	{
-		$this->loadResultData();
+    public function buildList()
+    {
+        $this->loadResultData();
 
-		$this->initListTemplate();
+        $this->initListTemplate();
 
-		if( $this->testOBJ->isShowGradingStatusEnabled() )
-		{
-			$passedStatusLangVar = $this->isPassed() ? 'passed_official' : 'failed_official';
+        if ($this->testOBJ->isShowGradingStatusEnabled()) {
+            $passedStatusLangVar = $this->isPassed() ? 'passed_official' : 'failed_official';
 
-			$this->populateListEntry(
-				$this->lng->txt('passed_status'), $this->lng->txt($passedStatusLangVar)
-			);
-		}
+            $this->populateListEntry(
+                $this->lng->txt('passed_status'),
+                $this->lng->txt($passedStatusLangVar)
+            );
+        }
 
-		if( $this->testOBJ->areObligationsEnabled() )
-		{
-			if( $this->areObligationsAnswered() )
-			{
-				$obligAnsweredStatusLangVar = 'grading_obligations_answered_listentry';
-			}
-			else
-			{
-				$obligAnsweredStatusLangVar = 'grading_obligations_missing_listentry';
-			}
+        if ($this->testOBJ->areObligationsEnabled()) {
+            if ($this->areObligationsAnswered()) {
+                $obligAnsweredStatusLangVar = 'grading_obligations_answered_listentry';
+            } else {
+                $obligAnsweredStatusLangVar = 'grading_obligations_missing_listentry';
+            }
 
-			$this->populateListEntry(
-				$this->lng->txt('grading_obligations_listlabel'), $this->lng->txt($obligAnsweredStatusLangVar)
-			);
-		}
+            $this->populateListEntry(
+                $this->lng->txt('grading_obligations_listlabel'),
+                $this->lng->txt($obligAnsweredStatusLangVar)
+            );
+        }
 
-		if( $this->testOBJ->isShowGradingMarkEnabled() )
-		{
-			$this->populateListEntry($this->lng->txt('tst_mark'), $this->getMarkOfficial());
-		}
+        if ($this->testOBJ->isShowGradingMarkEnabled()) {
+            $this->populateListEntry($this->lng->txt('tst_mark'), $this->getMarkOfficial());
+        }
 
-		if( $this->testOBJ->getECTSOutput() )
-		{
-			$this->populateListEntry($this->lng->txt('ects_grade'), $this->getEctsGrade());
-		}
+        if ($this->testOBJ->getECTSOutput()) {
+            $this->populateListEntry($this->lng->txt('ects_grade'), $this->getEctsGrade());
+        }
 
-		$this->parseListTemplate();
-	}
+        $this->parseListTemplate();
+    }
 
-	public function initListTemplate()
-	{
-		$this->tpl = new ilTemplate('tpl.tst_grading_msg_list.html', true, true, 'Modules/Test');
-	}
+    public function initListTemplate()
+    {
+        $this->tpl = new ilTemplate('tpl.tst_grading_msg_list.html', true, true, 'Modules/Test');
+    }
 
-	private function populateListEntry($label, $value)
-	{
-		$this->tpl->setCurrentBlock('grading_msg_entry');
-		$this->tpl->setVariable('LABEL', $label);
-		$this->tpl->setVariable('VALUE', $value);
-		$this->tpl->parseCurrentBlock();
-	}
+    private function populateListEntry($label, $value)
+    {
+        $this->tpl->setCurrentBlock('grading_msg_entry');
+        $this->tpl->setVariable('LABEL', $label);
+        $this->tpl->setVariable('VALUE', $value);
+        $this->tpl->parseCurrentBlock();
+    }
 
-	private function parseListTemplate()
-	{
-		$this->tpl->setCurrentBlock('grading_msg_list');
-		$this->tpl->parseCurrentBlock();
-	}
+    private function parseListTemplate()
+    {
+        $this->tpl->setCurrentBlock('grading_msg_list');
+        $this->tpl->parseCurrentBlock();
+    }
 
-	public function getList()
-	{
-		return $this->tpl->get();
-	}
+    public function getList()
+    {
+        return $this->tpl->get();
+    }
 }

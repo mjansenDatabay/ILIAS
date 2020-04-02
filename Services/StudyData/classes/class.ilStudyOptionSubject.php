@@ -66,7 +66,7 @@ class ilStudyOptionSubject extends ilStudyOption
 
         $query = "REPLACE INTO study_subjects(subject_id, subject_title) VALUES ("
             . $ilDB->quote($this->id, 'integer') . ', '
-            . $ilDB->quote($this->title, 'text'). ')';
+            . $ilDB->quote($this->title, 'text') . ')';
 
         $ilDB->manipulate($query);
     }

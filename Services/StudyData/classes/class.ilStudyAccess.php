@@ -25,22 +25,22 @@ class ilStudyAccess
     }
 
     /**
-	 * Check study data based access conditions
-	 * 
-	 * This check is called from ilRbacSystem->checkAccessOfUser() for "read" operations
-	 * A positive result will overrule the rbac restrictions
+     * Check study data based access conditions
+     *
+     * This check is called from ilRbacSystem->checkAccessOfUser() for "read" operations
+     * A positive result will overrule the rbac restrictions
      * Therefore this check requires a condition to exist and being fulfilled
-	 * 
-	 * @param 	int		$ref_id
-	 * @param 	int		$user_id
-	 * @return  boolean		access is granted (true/false)
-	 */
-	public static function _checkAccess($ref_id, $user_id)
-	{
-	    // Performance improvement
+     *
+     * @param 	int		$ref_id
+     * @param 	int		$user_id
+     * @return  boolean		access is granted (true/false)
+     */
+    public static function _checkAccess($ref_id, $user_id)
+    {
+        // Performance improvement
         // only check a few objects which are listed in the custom config
         $ref_ids = explode(',', ilCust::get('studydata_check_ref_ids'));
-        if (!in_array($ref_id, $ref_ids))  {
+        if (!in_array($ref_id, $ref_ids)) {
             return false;
         }
 
@@ -58,7 +58,7 @@ class ilStudyAccess
 
         // Otherwise do the condition checks
         return self::_checkConditions($obj_id, $user_id);
-	}
+    }
 
 
     /**
@@ -68,7 +68,7 @@ class ilStudyAccess
      * @param int   $user_id
      * @return bool
      */
-	public static function _checkSubscription($obj_id, $user_id)
+    public static function _checkSubscription($obj_id, $user_id)
     {
         // Don't allow subscription if a user does not have data
         if (!self::_hasData($user_id)) {
@@ -149,11 +149,11 @@ class ilStudyAccess
         self::_requireConditions();
 
         $texts = [];
-       foreach (ilStudyCourseCond::_get($obj_id) as $cond) {
-           if ($text = $cond->getText()) {
-               $texts[] = $text;
-           }
-       }
+        foreach (ilStudyCourseCond::_get($obj_id) as $cond) {
+            if ($text = $cond->getText()) {
+                $texts[] = $text;
+            }
+        }
         foreach (ilStudyDocCond::_get($obj_id) as $cond) {
             if ($text = $cond->getText()) {
                 $texts[] = $text;
@@ -161,9 +161,8 @@ class ilStudyAccess
         }
 
         if (count($texts)) {
-            return implode($lng->txt('studycond_condition_delimiter').' ', $texts);
-        }
-        else {
+            return implode($lng->txt('studycond_condition_delimiter') . ' ', $texts);
+        } else {
             return $lng->txt('studycond_no_condition_defined');
         }
     }
@@ -192,22 +191,22 @@ class ilStudyAccess
         ilStudyCourseCond::_delete($obj_id);
     }
 
-	/**
-	 * Check the mapping of conditions data and study data
+    /**
+     * Check the mapping of conditions data and study data
      * Returns true if one condition fits
      *
-	 * @param 	array		conditions data	
-	 * @param 	array		study data
-	 * @return boolean
-	 */
-	protected static function _checkConditions($obj_id, $usr_id)
-	{
-	    self::_requireData();
+     * @param 	array		conditions data
+     * @param 	array		study data
+     * @return boolean
+     */
+    protected static function _checkConditions($obj_id, $usr_id)
+    {
+        self::_requireData();
         self::_requireConditions();
 
-		// check the course conditions
+        // check the course conditions
         $data = ilStudyCourseData::_get($usr_id);
-		foreach (ilStudyCourseCond::_get($obj_id) as $cond) {
+        foreach (ilStudyCourseCond::_get($obj_id) as $cond) {
             if ($cond->check($data)) {
                 return true;
             }
@@ -225,59 +224,52 @@ class ilStudyAccess
     }
 
 
-	/**
-	* Get the offset of the running semester in relation to the given semester
-	*
-	* @param    string      year and semester, e.g. '20092' (ws) or '20101' (ss)
-	* @return   int         offset (-1, 0, 1)
-	*/
-	public static function _getRunningSemesterOffset($a_semester = '')
-	{
-		if (strlen($a_semester) != 5 or !is_numeric($a_semester))
-		{
-	        // not identifiably
-	        return 0;
-	    }
+    /**
+    * Get the offset of the running semester in relation to the given semester
+    *
+    * @param    string      year and semester, e.g. '20092' (ws) or '20101' (ss)
+    * @return   int         offset (-1, 0, 1)
+    */
+    public static function _getRunningSemesterOffset($a_semester = '')
+    {
+        if (strlen($a_semester) != 5 or !is_numeric($a_semester)) {
+            // not identifiably
+            return 0;
+        }
 
-		$current = self::_getRunningSemesterString();
-		$cur_year = (int) substr($current, 0, 4);
-		$cur_sem = (int) substr($current, 4);
-			    
-		$ref_year = (int) substr($a_semester, 0, 4);
-		$ref_sem = (int) substr($a_semester, 4);
+        $current = self::_getRunningSemesterString();
+        $cur_year = (int) substr($current, 0, 4);
+        $cur_sem = (int) substr($current, 4);
+                
+        $ref_year = (int) substr($a_semester, 0, 4);
+        $ref_sem = (int) substr($a_semester, 4);
 
-		return ($cur_year - $ref_year) * 2 + ($cur_sem - $ref_sem);
-	}
+        return ($cur_year - $ref_year) * 2 + ($cur_sem - $ref_sem);
+    }
 
-	
-	/**
-	 * Get a string representing the current semester
-	 * 
-	 * @return	string 	year and semester year and semester, e.g. '20092' (ws) or '20101' (ss)
-	 */
-	public static function _getRunningSemesterString()
-	{
-		$month = (int) date('m');
-		if ($month <= 3)
-		{
-			// winter semester of last year
-	        $cur_year = (int) date('Y') - 1;
-			$cur_sem = 2;
-		}
-		elseif ($month <= 9)
-		{
-	        // summer semester
-	        $cur_year = (int) date('Y');
-			$cur_sem = 1;
-		}
-		else
-		{
-			// winter semester of this year
-	        $cur_year = (int) date('Y');
-			$cur_sem = 2;
-	    }
-	    
-	    return sprintf("%04d%01d", $cur_year, $cur_sem);
-	}
+    
+    /**
+     * Get a string representing the current semester
+     *
+     * @return	string 	year and semester year and semester, e.g. '20092' (ws) or '20101' (ss)
+     */
+    public static function _getRunningSemesterString()
+    {
+        $month = (int) date('m');
+        if ($month <= 3) {
+            // winter semester of last year
+            $cur_year = (int) date('Y') - 1;
+            $cur_sem = 2;
+        } elseif ($month <= 9) {
+            // summer semester
+            $cur_year = (int) date('Y');
+            $cur_sem = 1;
+        } else {
+            // winter semester of this year
+            $cur_year = (int) date('Y');
+            $cur_sem = 2;
+        }
+        
+        return sprintf("%04d%01d", $cur_year, $cur_sem);
+    }
 }
-

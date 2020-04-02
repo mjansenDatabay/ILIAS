@@ -31,227 +31,216 @@
 
 class ilSessionOverviewGUI
 {
-	protected $course_ref_id = null;
-	protected $course_id = null;
+    protected $course_ref_id = null;
+    protected $course_id = null;
 
-	protected $lng;
-	protected $tpl;
-	protected $ctrl;
+    protected $lng;
+    protected $tpl;
+    protected $ctrl;
 
-	/**
-	 * constructor
-	 *
-	 * @access public
-	 * @param
-	 * @return
-	 */
-	public function __construct($a_crs_ref_id, ilParticipants $a_members)
-	{
-		global $DIC;
+    /**
+     * constructor
+     *
+     * @access public
+     * @param
+     * @return
+     */
+    public function __construct($a_crs_ref_id, ilParticipants $a_members)
+    {
+        global $DIC;
 
-		$tpl = $DIC['tpl'];
-		$ilCtrl = $DIC['ilCtrl'];
-		$lng = $DIC['lng'];
-		
-		$this->ctrl = $ilCtrl;
-		$this->tpl = $tpl;
-		$this->lng = $lng;
-		$this->lng->loadLanguageModule('event');
-		$this->lng->loadLanguageModule('crs');
-		
-		$this->course_ref_id = $a_crs_ref_id;
-		$this->course_id = ilObject::_lookupObjId($this->course_ref_id);
-		$this->members_obj = $a_members;
-	}
-	
-	/**
-	 * ecxecute command
-	 *
-	 * @access public
-	 * @param
-	 * @return
-	 */
-	public function executeCommand()
-	{
-		$next_class = $this->ctrl->getNextClass($this);
-		$cmd = $this->ctrl->getCmd();
-		
-  		switch($next_class)
-		{
-			default:
-				if(!$cmd)
-				{
-					$cmd = "listSessions";
-				}
-				$this->$cmd();
-				break;
-		}
-	}
-	/**
-	 * list sessions of all user
-	 *
-	 * @access public
-	 * @param
-	 * @return
-	 */
-	public function listSessions()
-	{
-		global $DIC;
+        $tpl = $DIC['tpl'];
+        $ilCtrl = $DIC['ilCtrl'];
+        $lng = $DIC['lng'];
+        
+        $this->ctrl = $ilCtrl;
+        $this->tpl = $tpl;
+        $this->lng = $lng;
+        $this->lng->loadLanguageModule('event');
+        $this->lng->loadLanguageModule('crs');
+        
+        $this->course_ref_id = $a_crs_ref_id;
+        $this->course_id = ilObject::_lookupObjId($this->course_ref_id);
+        $this->members_obj = $a_members;
+    }
+    
+    /**
+     * ecxecute command
+     *
+     * @access public
+     * @param
+     * @return
+     */
+    public function executeCommand()
+    {
+        $next_class = $this->ctrl->getNextClass($this);
+        $cmd = $this->ctrl->getCmd();
+        
+        switch ($next_class) {
+            default:
+                if (!$cmd) {
+                    $cmd = "listSessions";
+                }
+                $this->$cmd();
+                break;
+        }
+    }
+    /**
+     * list sessions of all user
+     *
+     * @access public
+     * @param
+     * @return
+     */
+    public function listSessions()
+    {
+        global $DIC;
 
-		$ilToolbar = $DIC['ilToolbar'];
-		$ilErr = $DIC['ilErr'];
+        $ilToolbar = $DIC['ilToolbar'];
+        $ilErr = $DIC['ilErr'];
 
-		if(!$GLOBALS['DIC']->access()->checkRbacOrPositionPermissionAccess('manage_members', 'manage_members',$this->course_ref_id))
-		{
-			$ilErr->raiseError($this->lng->txt('msg_no_perm_read'),$ilErr->MESSAGE);
-		}
-		
-		$ilToolbar->addButton($this->lng->txt('event_csv_export'),
-			$this->ctrl->getLinkTarget($this,'exportCSV'));
-		
-		include_once 'Modules/Session/classes/class.ilSessionOverviewTableGUI.php';
-		$part = $this->members_obj->getParticipants();
-		$part = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
-			'manage_members',
-			'manage_members',
-			$this->course_ref_id,
-			$part
-		);
+        if (!$GLOBALS['DIC']->access()->checkRbacOrPositionPermissionAccess('manage_members', 'manage_members', $this->course_ref_id)) {
+            $ilErr->raiseError($this->lng->txt('msg_no_perm_read'), $ilErr->MESSAGE);
+        }
+        
+        $ilToolbar->addButton(
+            $this->lng->txt('event_csv_export'),
+            $this->ctrl->getLinkTarget($this, 'exportCSV')
+        );
+        
+        include_once 'Modules/Session/classes/class.ilSessionOverviewTableGUI.php';
+        $part = $this->members_obj->getParticipants();
+        $part = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+            'manage_members',
+            'manage_members',
+            $this->course_ref_id,
+            $part
+        );
 
-		$tbl = new ilSessionOverviewTableGUI($this, 'listSessions', $this->course_ref_id, $part);
+        $tbl = new ilSessionOverviewTableGUI($this, 'listSessions', $this->course_ref_id, $part);
 
-// fau: sessionOverview - add legend and event list
-		$tpl = new ilTemplate('tpl.sess_list_legend.html',true, true, 'Modules/Session');
+        // fau: sessionOverview - add legend and event list
+        $tpl = new ilTemplate('tpl.sess_list_legend.html', true, true, 'Modules/Session');
 
-		$tpl->setVariable("HEAD_TXT_LEGEND", $this->lng->txt("legend"));
-		$tpl->setVariable("HEAD_TXT_DIGIT", $this->lng->txt("event_digit"));
-		$tpl->setVariable("HEAD_TXT_EVENT", $this->lng->txt("event"));
-		$tpl->setVariable("HEAD_TXT_LOCATION", $this->lng->txt("event_location"));
-		$tpl->setVariable("HEAD_TXT_DATE_TIME",$this->lng->txt("event_date_time"));
+        $tpl->setVariable("HEAD_TXT_LEGEND", $this->lng->txt("legend"));
+        $tpl->setVariable("HEAD_TXT_DIGIT", $this->lng->txt("event_digit"));
+        $tpl->setVariable("HEAD_TXT_EVENT", $this->lng->txt("event"));
+        $tpl->setVariable("HEAD_TXT_LOCATION", $this->lng->txt("event_location"));
+        $tpl->setVariable("HEAD_TXT_DATE_TIME", $this->lng->txt("event_date_time"));
 
-		$counter = 1;
-		$events = $tbl->getEvents();
-		foreach($events as $event_obj)
-		{
-			$tpl->setCurrentBlock("legend_loop");
-			$tpl->setVariable("LEGEND_DIGIT", $counter++);
-			$tpl->setVariable("LEGEND_EVENT_TITLE", $event_obj->getTitle());
-			$tpl->setVariable("LEGEND_EVENT_DESCRIPTION", $event_obj->getDescription());
-			$tpl->setVariable("LEGEND_EVENT_LOCATION", $event_obj->getLocation());
-			$tpl->setVariable("LEGEND_EVENT_APPOINTMENT", $event_obj->getFirstAppointment()->appointmentToString());
-			$tpl->parseCurrentBlock();
-		}
-		$tpl->setCurrentBlock("symbol_legend");
-		$tpl->setVariable("IMAGE_NOT_REGISTERED", ilUtil::getImagePath('scorm/not_attempted.svg'));
-		$tpl->setVariable("IMAGE_NOT_PARTICIPATED", ilUtil::getImagePath('scorm/failed.svg'));
-		$tpl->setVariable("IMAGE_PARTICIPATED", ilUtil::getImagePath('scorm/passed.svg'));
+        $counter = 1;
+        $events = $tbl->getEvents();
+        foreach ($events as $event_obj) {
+            $tpl->setCurrentBlock("legend_loop");
+            $tpl->setVariable("LEGEND_DIGIT", $counter++);
+            $tpl->setVariable("LEGEND_EVENT_TITLE", $event_obj->getTitle());
+            $tpl->setVariable("LEGEND_EVENT_DESCRIPTION", $event_obj->getDescription());
+            $tpl->setVariable("LEGEND_EVENT_LOCATION", $event_obj->getLocation());
+            $tpl->setVariable("LEGEND_EVENT_APPOINTMENT", $event_obj->getFirstAppointment()->appointmentToString());
+            $tpl->parseCurrentBlock();
+        }
+        $tpl->setCurrentBlock("symbol_legend");
+        $tpl->setVariable("IMAGE_NOT_REGISTERED", ilUtil::getImagePath('scorm/not_attempted.svg'));
+        $tpl->setVariable("IMAGE_NOT_PARTICIPATED", ilUtil::getImagePath('scorm/failed.svg'));
+        $tpl->setVariable("IMAGE_PARTICIPATED", ilUtil::getImagePath('scorm/passed.svg'));
 
-		$tpl->setVariable("NOT_REGISTERED", $this->lng->txt('event_not_registered'));
-		$tpl->setVariable("NOT_PARTICIPATED", $this->lng->txt('event_not_participated'));
-		$tpl->setVariable("PARTICIPATED", $this->lng->txt('event_participated'));
-		$tpl->parseCurrentBlock();
+        $tpl->setVariable("NOT_REGISTERED", $this->lng->txt('event_not_registered'));
+        $tpl->setVariable("NOT_PARTICIPATED", $this->lng->txt('event_not_participated'));
+        $tpl->setVariable("PARTICIPATED", $this->lng->txt('event_participated'));
+        $tpl->parseCurrentBlock();
 
-		$this->tpl->setContent($tbl->getHTML() .$tpl->get());
-// fau.
-	}
+        $this->tpl->setContent($tbl->getHTML() . $tpl->get());
+        // fau.
+    }
 
-	/**
-	 * Events List CSV Export
-	 *
-	 * @access public
-	 * @param
-	 * 
-	 */
-	public function exportCSV()
-	{
-		global $DIC;
+    /**
+     * Events List CSV Export
+     *
+     * @access public
+     * @param
+     *
+     */
+    public function exportCSV()
+    {
+        global $DIC;
 
-		$tree = $DIC['tree'];
-		$ilAccess = $DIC['ilAccess'];
-		
-		include_once('Services/Utilities/classes/class.ilCSVWriter.php');
-		include_once 'Modules/Session/classes/class.ilEventParticipants.php';
-		
-		$part = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
-			'manage_members',
-			'manage_members',
-			$this->course_ref_id,
-			$this->members_obj->getParticipants()
-		);
-		$members = ilUtil::_sortIds($part,'usr_data','lastname','usr_id');
+        $tree = $DIC['tree'];
+        $ilAccess = $DIC['ilAccess'];
+        
+        include_once('Services/Utilities/classes/class.ilCSVWriter.php');
+        include_once 'Modules/Session/classes/class.ilEventParticipants.php';
+        
+        $part = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+            'manage_members',
+            'manage_members',
+            $this->course_ref_id,
+            $this->members_obj->getParticipants()
+        );
+        $members = ilUtil::_sortIds($part, 'usr_data', 'lastname', 'usr_id');
 
-		$events = array();
-		foreach($tree->getSubtree($tree->getNodeData($this->course_ref_id),false,'sess') as $event_id)
-		{
-			$tmp_event = ilObjectFactory::getInstanceByRefId($event_id,false);
-			if(!is_object($tmp_event) or !$ilAccess->checkAccess('manage_members','',$event_id))
-			{
-				continue;
-			}
-// fau: sessionOverview - prepare sort key for events
-			$sort = $tmp_event->getFirstAppointment()->getStart()->get(IL_CAL_DATETIME);
-			$sort.= $tmp_event->getTitle();
-			$sort.= $tmp_event->getId();
-			$events[$sort] = $tmp_event;
-// fau.
-		}
-		
-// fau: sessionOverview - sort events by start date and title
-		ksort($events);
-		$events = array_values($events);
-// fau.
+        $events = array();
+        foreach ($tree->getSubtree($tree->getNodeData($this->course_ref_id), false, 'sess') as $event_id) {
+            $tmp_event = ilObjectFactory::getInstanceByRefId($event_id, false);
+            if (!is_object($tmp_event) or !$ilAccess->checkAccess('manage_members', '', $event_id)) {
+                continue;
+            }
+            // fau: sessionOverview - prepare sort key for events
+            $sort = $tmp_event->getFirstAppointment()->getStart()->get(IL_CAL_DATETIME);
+            $sort.= $tmp_event->getTitle();
+            $sort.= $tmp_event->getId();
+            $events[$sort] = $tmp_event;
+            // fau.
+        }
+        
+        // fau: sessionOverview - sort events by start date and title
+        ksort($events);
+        $events = array_values($events);
+        // fau.
 
-		$this->csv = new ilCSVWriter();
-		$this->csv->addColumn($this->lng->txt("lastname"));
-		$this->csv->addColumn($this->lng->txt("firstname"));
-		$this->csv->addColumn($this->lng->txt("login"));
-		
-// fau: sessionOverview temporary deactivate relative date presentation
-		$relative = ilDatePresentation::useRelativeDates();
-		ilDatePresentation::setUseRelativeDates(false);
-		foreach($events as $event_obj)
-		{			
-			// TODO: do not export relative dates
-			$this->csv->addColumn($event_obj->getTitle().' ('.$event_obj->getFirstAppointment()->appointmentToString().')');
-		}
-		ilDatePresentation::setUseRelativeDates($relative);
-// fau.
+        $this->csv = new ilCSVWriter();
+        $this->csv->addColumn($this->lng->txt("lastname"));
+        $this->csv->addColumn($this->lng->txt("firstname"));
+        $this->csv->addColumn($this->lng->txt("login"));
+        
+        // fau: sessionOverview temporary deactivate relative date presentation
+        $relative = ilDatePresentation::useRelativeDates();
+        ilDatePresentation::setUseRelativeDates(false);
+        foreach ($events as $event_obj) {
+            // TODO: do not export relative dates
+            $this->csv->addColumn($event_obj->getTitle() . ' (' . $event_obj->getFirstAppointment()->appointmentToString() . ')');
+        }
+        ilDatePresentation::setUseRelativeDates($relative);
+        // fau.
 
 
-		$this->csv->addRow();
-		
-		foreach($members as $user_id)
-		{
-			$name = ilObjUser::_lookupName($user_id);
-			
-			$this->csv->addColumn($name['lastname']);
-			$this->csv->addColumn($name['firstname']);
-			$this->csv->addColumn(ilObjUser::_lookupLogin($user_id));
-			
-			foreach($events as $event_obj)
-			{			
-				$event_part = new ilEventParticipants((int) $event_obj->getId());
-				
-// fau: sessionOverview - add registration info to CSV
-				if ($event_obj->enabledRegistration()
-				and (!$event_part->isRegistered($user_id))
-				and (!$event_part->hasParticipated($user_id)))
-				{
-					$this->csv->addColumn($this->lng->txt('event_not_registered'));
-				}
-				else
-				{
-					$this->csv->addColumn($event_part->hasParticipated($user_id) ?
-										$this->lng->txt('event_participated') :
-										$this->lng->txt('event_not_participated'));
-				}
-// fau.
-			}
+        $this->csv->addRow();
+        
+        foreach ($members as $user_id) {
+            $name = ilObjUser::_lookupName($user_id);
+            
+            $this->csv->addColumn($name['lastname']);
+            $this->csv->addColumn($name['firstname']);
+            $this->csv->addColumn(ilObjUser::_lookupLogin($user_id));
+            
+            foreach ($events as $event_obj) {
+                $event_part = new ilEventParticipants((int) $event_obj->getId());
+                
+                // fau: sessionOverview - add registration info to CSV
+                if ($event_obj->enabledRegistration()
+                and (!$event_part->isRegistered($user_id))
+                and (!$event_part->hasParticipated($user_id))) {
+                    $this->csv->addColumn($this->lng->txt('event_not_registered'));
+                } else {
+                    $this->csv->addColumn($event_part->hasParticipated($user_id) ?
+                                        $this->lng->txt('event_participated') :
+                                        $this->lng->txt('event_not_participated'));
+                }
+                // fau.
+            }
 
-			$this->csv->addRow();
-		}
-		$date = new ilDate(time(),IL_CAL_UNIX);
-		ilUtil::deliverData($this->csv->getCSVString(),$date->get(IL_CAL_FKT_DATE,'Y-m-d')."_course_events.csv", "text/csv");
-	}
+            $this->csv->addRow();
+        }
+        $date = new ilDate(time(), IL_CAL_UNIX);
+        ilUtil::deliverData($this->csv->getCSVString(), $date->get(IL_CAL_FKT_DATE, 'Y-m-d') . "_course_events.csv", "text/csv");
+    }
 }
-?>

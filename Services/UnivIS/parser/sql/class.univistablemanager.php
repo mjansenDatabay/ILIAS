@@ -41,15 +41,15 @@
  * @modifier Fred neumann <fred.neumann@fim.uni-erlangen.de>
  */
 class univistablemanager
-{ 
-    static function create_univis_tables()
+{
+    public static function create_univis_tables()
     {
-		$sql_query = array();
-		
-		// group_concat function not used
-		// $sql_query[]='SET GLOBAL group_concat_max_len = 16384';
+        $sql_query = array();
+        
+        // group_concat function not used
+        // $sql_query[]='SET GLOBAL group_concat_max_len = 16384';
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_person (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_person (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -82,12 +82,12 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			)';
-			//PRIMARY KEY(`key`)
+        //PRIMARY KEY(`key`)
 
-		// projects := ( HUMAINE, IMPRS, PF-STAR, SFB-539, SFB-603, SVcheck, SmartWeb )* -> univis_person_research,
-		// type := acad, admin, azubi, externalPhD, guest, info, secretary, trainee, webmaster
+        // projects := ( HUMAINE, IMPRS, PF-STAR, SFB-539, SFB-603, SVcheck, SmartWeb )* -> univis_person_research,
+        // type := acad, admin, azubi, externalPhD, guest, info, secretary, trainee, webmaster
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_location (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_location (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			person_key VARCHAR(255) REFERENCES univis_person,
@@ -104,10 +104,10 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (person_key)
 			)';
-			// 	PRIMARY KEY (person_key, ort, street, office)
+        // 	PRIMARY KEY (person_key, ort, street, office)
 
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_officehour (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_officehour (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			person_key VARCHAR(255) REFERENCES univis_person,
@@ -121,9 +121,9 @@ class univistablemanager
 			INDEX (department_id),
             INDEX (person_key)
 			)';
-			//PRIMARY KEY (person_key, starttime, repeat)
+        //PRIMARY KEY (person_key, starttime, repeat)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_research (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_research (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -143,16 +143,16 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			)';
-			//PRIMARY KEY (`key`)
+        //PRIMARY KEY (`key`)
 
-		// TODO
-		//    promoters , -> univis_research_promotions ?
-		//    coworkers , -> univis_research_coworkers
-		//    directors , -> univis_research_directors
-		//    externals , -> univis_research_externals
-		//    publics , -> univis_research_publics
+        // TODO
+        //    promoters , -> univis_research_promotions ?
+        //    coworkers , -> univis_research_coworkers
+        //    directors , -> univis_research_directors
+        //    externals , -> univis_research_externals
+        //    publics , -> univis_research_publics
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_promoters (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_promoters (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			project_key VARCHAR(255) references univis_research,
@@ -163,9 +163,9 @@ class univistablemanager
 			INDEX (project_key),
 			INDEX (name)
 			)';
-			//PRIMARY KEY (project_key, name)
+        //PRIMARY KEY (project_key, name)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_externals (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_externals (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			project_key VARCHAR(255) REFERENCES univis_research,
@@ -176,9 +176,9 @@ class univistablemanager
 			INDEX (project_key),
 			INDEX (name)
 			)';
-			//PRIMARY KEY (project_key, name)
+        //PRIMARY KEY (project_key, name)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_publics (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_publics (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			project_key VARCHAR(255) REFERENCES univis_research,
@@ -188,9 +188,9 @@ class univistablemanager
 			INDEX (project_key),
 			INDEX (`public`)
 			)';
-			//PRIMARY KEY (project_key, `public`)
+        //PRIMARY KEY (project_key, `public`)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_directors (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_directors (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			project_key VARCHAR(255) REFERENCES univis_research,
@@ -200,9 +200,9 @@ class univistablemanager
 			INDEX (project_key),
 			INDEX (director)
 			)';
-			//PRIMARY KEY (project_key, director)
+        //PRIMARY KEY (project_key, director)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_coworkers (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_research_coworkers (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			project_key VARCHAR(255) REFERENCES univis_research,
@@ -212,15 +212,15 @@ class univistablemanager
 			INDEX (project_key),
 			INDEX (coworker)
 			)';
-			//PRIMARY KEY (project_key, coworker)
+        //PRIMARY KEY (project_key, coworker)
 
-		// $sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_research (
-		//     person_key VARCHAR(255) REFERENCES univis_person,
-		//     project_key VARCHAR(255) REFERENCES univis_research,
-		//     PRIMARY KEY (person_key, project_key)
-		// )';
+        // $sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_research (
+        //     person_key VARCHAR(255) REFERENCES univis_person,
+        //     project_key VARCHAR(255) REFERENCES univis_research,
+        //     PRIMARY KEY (person_key, project_key)
+        // )';
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_title (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_title (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -235,9 +235,9 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			)';
-			//PRIMARY KEY (`key`)
+        //PRIMARY KEY (`key`)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_room (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_room (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -266,11 +266,11 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			    )';
-			//PRIMARY KEY (`key`)
+        //PRIMARY KEY (`key`)
 
-		//    contacts , -> univis_rooms_contacts
+        //    contacts , -> univis_rooms_contacts
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_room_contacts (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_room_contacts (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			room_key VARCHAR(255) REFERENCES univis_room,
@@ -280,9 +280,9 @@ class univistablemanager
 			INDEX (contact),
 			INDEX (room_key)
 			)';
-			//PRIMARY KEY (contact, room_key)
+        //PRIMARY KEY (contact, room_key)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -354,17 +354,17 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`, `semester`)
 			    )';
-			//PRIMARY KEY (`key`, `semester`)
+        //PRIMARY KEY (`key`, `semester`)
 
-		// TODO
-		//    courses , -> univis_lecture_courses
-		//    dozs , -> univis_lecture_dozs
-		//    literature , -> univis_lecture_literature
-		//    studs , -> univis_lecture_stud
-		//    terms , -> univis_lecture_term
-		//    parent-lv , -> parent_lecture ?
+        // TODO
+        //    courses , -> univis_lecture_courses
+        //    dozs , -> univis_lecture_dozs
+        //    literature , -> univis_lecture_literature
+        //    studs , -> univis_lecture_stud
+        //    terms , -> univis_lecture_term
+        //    parent-lv , -> parent_lecture ?
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_courses (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_courses (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			lecture_key VARCHAR(255) REFERENCES univis_lecture,
@@ -376,16 +376,16 @@ class univistablemanager
 			INDEX (lecture_key, semester),
 			INDEX (course)
 			)';
-			//PRIMARY KEY (lecture_key, semester, course)
+        //PRIMARY KEY (lecture_key, semester, course)
 
-		// $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_literature (
-		//     lecture_key VARCHAR(255) REFERENCES univis_lecture,
-		//     orderindex INTEGER,
-		//     name VARCHAR(255),
-		//     PRIMARY KEY (lecture_key, orderindex)
-		// )';
+        // $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_literature (
+        //     lecture_key VARCHAR(255) REFERENCES univis_lecture,
+        //     orderindex INTEGER,
+        //     name VARCHAR(255),
+        //     PRIMARY KEY (lecture_key, orderindex)
+        // )';
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_stud (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_stud (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			lecture_key VARCHAR(255) REFERENCES univis_lecture,
@@ -399,9 +399,9 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (lecture_key, semester)
 			)';
-			//PRIMARY KEY (lecture_key, semester, richt, pflicht, sem)
+        //PRIMARY KEY (lecture_key, semester, richt, pflicht, sem)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_term (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_term (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			lecture_key VARCHAR(255) REFERENCES univis_lecture,
@@ -418,9 +418,9 @@ class univistablemanager
 			INDEX (department_id),
             INDEX (lecture_key, semester)
 			)';
-			//PRIMARY KEY (lecture_key, semester, `repeat`, starttime)
+        //PRIMARY KEY (lecture_key, semester, `repeat`, starttime)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_dozs (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_lecture_dozs (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			lecture_key VARCHAR(255) REFERENCES univis_lecture,
@@ -432,9 +432,9 @@ class univistablemanager
             INDEX (lecture_key, semester),
 			INDEX (doz)
 			)';
-			//PRIMARY KEY (lecture_key, doz, semester)
+        //PRIMARY KEY (lecture_key, doz, semester)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_thesis (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_thesis (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -459,12 +459,12 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			)';
-			//PRIMARY KEY (`key`)
+        //PRIMARY KEY (`key`)
 
-		// TODO
-		//    advisors VARCHAR(255), -> univis_thesis_advisors
+        // TODO
+        //    advisors VARCHAR(255), -> univis_thesis_advisors
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_thesis_advisors (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_thesis_advisors (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			thesis_key VARCHAR(255) REFERENCES univis_theses,
@@ -474,10 +474,10 @@ class univistablemanager
 			INDEX (thesis_key),
 			INDEX (advisor)
 			)';
-			//PRIMARY KEY (thesis_key, advisor)
+        //PRIMARY KEY (thesis_key, advisor)
 
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_pub (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_pub (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -509,13 +509,13 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			    )';
-			//PRIMARY KEY (`key`)
+        //PRIMARY KEY (`key`)
 
-		// TODO
-		//    authors , -> univis_pub_authors
-		//    editors , -> univis_pub_editors
+        // TODO
+        //    authors , -> univis_pub_authors
+        //    editors , -> univis_pub_editors
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_pub_editors (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_pub_editors (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			pub_key VARCHAR(255) REFERENCES univis_pub,
@@ -526,9 +526,9 @@ class univistablemanager
 			UNIQUE INDEX (pub_key, orderindex),
 			INDEX (pkey)
 			)';
-			//PRIMARY KEY (pub_key, pkey)
+        //PRIMARY KEY (pub_key, pkey)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_pub_authors (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_pub_authors (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			pub_key VARCHAR(255) REFERENCES univis_pub,
@@ -539,9 +539,9 @@ class univistablemanager
 			UNIQUE INDEX (pub_key, orderindex),
 			INDEX  (pkey)
 			)';
-			//PRIMARY KEY (pub_key, pkey)
+        //PRIMARY KEY (pub_key, pkey)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_job (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_job (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`parent_key` VARCHAR(255),
@@ -552,9 +552,9 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`description`)
 			)';
-            //PRIMARY KEY(`description`)
+        //PRIMARY KEY(`description`)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_jobs (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_person_jobs (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			per VARCHAR(255) REFERENCES univis_person,
@@ -564,9 +564,9 @@ class univistablemanager
 			INDEX (per),
 			INDEX (job_key)
 			)';
-			//PRIMARY KEY (per, job_key)
+        //PRIMARY KEY (per, job_key)
 
-		$sql_query[]='CREATE TABLE IF NOT EXISTS univis_org (
+        $sql_query[]='CREATE TABLE IF NOT EXISTS univis_org (
 			session_id VARCHAR(80),
 			`department_id` INTEGER,
 			`key` VARCHAR(255),
@@ -602,50 +602,47 @@ class univistablemanager
 			INDEX (department_id),
 			INDEX (`key`)
 			    )';
-			//PRIMARY KEY (`key`)
+        //PRIMARY KEY (`key`)
 
 
-		global $ilDB;
-		foreach ($sql_query as $q)
-		{
-		    $ilDB->manipulate($q);
-		}
-    } 
+        global $ilDB;
+        foreach ($sql_query as $q) {
+            $ilDB->manipulate($q);
+        }
+    }
 
-    static function drop_univis_tables()
+    public static function drop_univis_tables()
     {
-		$sql_query = array();
-		$sql_query[]='DROP TABLE IF EXISTS univis_job';
-		$sql_query[]='DROP TABLE IF EXISTS univis_person';
-		$sql_query[]='DROP TABLE IF EXISTS univis_person_jobs';
-		$sql_query[]='DROP TABLE IF EXISTS univis_person_location';
-		$sql_query[]='DROP TABLE IF EXISTS univis_person_officehour';
-		$sql_query[]='DROP TABLE IF EXISTS univis_title';
-		$sql_query[]='DROP TABLE IF EXISTS univis_research';
-		$sql_query[]='DROP TABLE IF EXISTS univis_research_coworkers';
-		$sql_query[]='DROP TABLE IF EXISTS univis_research_directors';
-		$sql_query[]='DROP TABLE IF EXISTS univis_research_externals';
-		$sql_query[]='DROP TABLE IF EXISTS univis_research_promoters';
-		$sql_query[]='DROP TABLE IF EXISTS univis_research_publics';
-		$sql_query[]='DROP TABLE IF EXISTS univis_room';
-		$sql_query[]='DROP TABLE IF EXISTS univis_room_contacts';
-		$sql_query[]='DROP TABLE IF EXISTS univis_lecture';
-		$sql_query[]='DROP TABLE IF EXISTS univis_lecture_courses';
-		$sql_query[]='DROP TABLE IF EXISTS univis_lecture_stud';
-		$sql_query[]='DROP TABLE IF EXISTS univis_lecture_term';
-		$sql_query[]='DROP TABLE IF EXISTS univis_lecture_dozs';
-		$sql_query[]='DROP TABLE IF EXISTS univis_thesis';
-		$sql_query[]='DROP TABLE IF EXISTS univis_thesis_advisors';
-		$sql_query[]='DROP TABLE IF EXISTS univis_pub';
-		$sql_query[]='DROP TABLE IF EXISTS univis_pub_editors';
-		$sql_query[]='DROP TABLE IF EXISTS univis_pub_authors';
-		$sql_query[]='DROP TABLE IF EXISTS univis_org';
+        $sql_query = array();
+        $sql_query[]='DROP TABLE IF EXISTS univis_job';
+        $sql_query[]='DROP TABLE IF EXISTS univis_person';
+        $sql_query[]='DROP TABLE IF EXISTS univis_person_jobs';
+        $sql_query[]='DROP TABLE IF EXISTS univis_person_location';
+        $sql_query[]='DROP TABLE IF EXISTS univis_person_officehour';
+        $sql_query[]='DROP TABLE IF EXISTS univis_title';
+        $sql_query[]='DROP TABLE IF EXISTS univis_research';
+        $sql_query[]='DROP TABLE IF EXISTS univis_research_coworkers';
+        $sql_query[]='DROP TABLE IF EXISTS univis_research_directors';
+        $sql_query[]='DROP TABLE IF EXISTS univis_research_externals';
+        $sql_query[]='DROP TABLE IF EXISTS univis_research_promoters';
+        $sql_query[]='DROP TABLE IF EXISTS univis_research_publics';
+        $sql_query[]='DROP TABLE IF EXISTS univis_room';
+        $sql_query[]='DROP TABLE IF EXISTS univis_room_contacts';
+        $sql_query[]='DROP TABLE IF EXISTS univis_lecture';
+        $sql_query[]='DROP TABLE IF EXISTS univis_lecture_courses';
+        $sql_query[]='DROP TABLE IF EXISTS univis_lecture_stud';
+        $sql_query[]='DROP TABLE IF EXISTS univis_lecture_term';
+        $sql_query[]='DROP TABLE IF EXISTS univis_lecture_dozs';
+        $sql_query[]='DROP TABLE IF EXISTS univis_thesis';
+        $sql_query[]='DROP TABLE IF EXISTS univis_thesis_advisors';
+        $sql_query[]='DROP TABLE IF EXISTS univis_pub';
+        $sql_query[]='DROP TABLE IF EXISTS univis_pub_editors';
+        $sql_query[]='DROP TABLE IF EXISTS univis_pub_authors';
+        $sql_query[]='DROP TABLE IF EXISTS univis_org';
 
-		global $ilDB;
-		foreach ($sql_query as $q)
-		{
-		    $ilDB->manipulate($q);
-		}
-    } 
+        global $ilDB;
+        foreach ($sql_query as $q) {
+            $ilDB->manipulate($q);
+        }
+    }
 }
-?>

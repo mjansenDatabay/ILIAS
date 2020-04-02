@@ -40,8 +40,7 @@ class ilStudyOptionDocProgram extends ilStudyOption
             if (!empty($row['prog_end'])) {
                 try {
                     $option->end = new ilDateTime($row['prog_end'], IL_CAL_DATETIME);
-                }
-                catch (ilDateTimeException $e) {
+                } catch (ilDateTimeException $e) {
                     $option->end = null;
                 }
             }

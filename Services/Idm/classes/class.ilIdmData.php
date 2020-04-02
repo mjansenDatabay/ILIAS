@@ -96,7 +96,7 @@ class ilIdmData
      */
     public function __construct()
     {
-        require_once ('Services/Idm/classes/class.ilDBIdm.php');
+        require_once('Services/Idm/classes/class.ilDBIdm.php');
         $this->idmDB = ilDBIdm::getInstance();
 
         ilStudyAccess::_requireData();
@@ -110,25 +110,20 @@ class ilIdmData
      */
     public function read($identity = null)
     {
-        if (isset($identity))
-        {
+        if (isset($identity)) {
             $this->identity = $identity;
         }
 
-        if (!isset($this->idmDB))
-        {
+        if (!isset($this->idmDB)) {
             return false;
         }
 
-        $query = "SELECT * FROM identities WHERE pk_persistent_id = ". $this->idmDB->quote($this->identity,'text');
+        $query = "SELECT * FROM identities WHERE pk_persistent_id = " . $this->idmDB->quote($this->identity, 'text');
         $result = $this->idmDB->query($query);
-        if ($rawdata = $this->idmDB->fetchAssoc($result))
-        {
+        if ($rawdata = $this->idmDB->fetchAssoc($result)) {
             $this->setRawData($rawdata);
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -149,8 +144,7 @@ class ilIdmData
         $result = $this->idmDB->query($query);
 
         $options = [];
-        while ($row = $this->idmDB->fetchAssoc($result))
-        {
+        while ($row = $this->idmDB->fetchAssoc($result)) {
             $option = new ilStudyOptionDocProgram();
             $option->id = (int) $row['prog_code'];
             $option->title = (string) $row['prog_text'];
@@ -189,8 +183,7 @@ class ilIdmData
         $result = $this->idmDB->query($query);
 
         $options = [];
-        while ($row = $this->idmDB->fetchAssoc($result))
-        {
+        while ($row = $this->idmDB->fetchAssoc($result)) {
             $option = new ilStudyOptionDegree();
             $option->id = (int) $row['degree_id'];
             $option->title = (string) $row['degree_title'];
@@ -222,8 +215,7 @@ class ilIdmData
         $result = $this->idmDB->query($query);
 
         $options = [];
-        while ($row = $this->idmDB->fetchAssoc($result))
-        {
+        while ($row = $this->idmDB->fetchAssoc($result)) {
             $option = new ilStudyOptionSchool();
             $option->id = (int) $row['school_id'];
             $option->title = (string) $row['school_title'];
@@ -255,8 +247,7 @@ class ilIdmData
         $result = $this->idmDB->query($query);
 
         $options = [];
-        while ($row = $this->idmDB->fetchAssoc($result))
-        {
+        while ($row = $this->idmDB->fetchAssoc($result)) {
             $option = new ilStudyOptionSubject();
             $option->id = (int) $row['subject_id'];
             $option->title = (string) $row['subject_title'];
@@ -285,8 +276,7 @@ class ilIdmData
         $this->lastname = $raw['sn'];
         $this->firstname = $raw['given_name'];
         $this->email = $raw['mail'];
-        switch ($raw['schac_gender'])
-        {
+        switch ($raw['schac_gender']) {
             // genders are differently coded in provisions by sso and database
             case '1':
                 $this->gender = $fromShibboleth ? 'm' :'f';
@@ -299,17 +289,15 @@ class ilIdmData
                 break;
         }
         $this->coded_password = $raw['user_password'];
-        $this->affiliations = explode(';',$raw['unscoped_affiliation']);
+        $this->affiliations = explode(';', $raw['unscoped_affiliation']);
 
         // matriculation
         $code = $raw['schac_personal_unique_code'];
         $pattern = 'uni-erlangen.de:Matrikelnummer:';
         $pos = strpos($code, $pattern);
-        if ($pos !== false)
-        {
-            $this->matriculation = trim(substr($code,$pos+strlen($pattern)));
-        }
-        else{
+        if ($pos !== false) {
+            $this->matriculation = trim(substr($code, $pos+strlen($pattern)));
+        } else {
             $this->matriculation = '';
         }
 
@@ -320,54 +308,47 @@ class ilIdmData
 
         // fau study data
         $this->studies =[];
-        if ($raw['fau_features_of_study'])
-        {
+        if ($raw['fau_features_of_study']) {
             $fau = explode("#", $raw['fau_features_of_study']);
             $i = 0;
 
             $matriculation = $fau[$i++];
             $ref_semester = $fau[$i++];
 
-            for ($study = 1; $study <= 3; $study ++)
-            {
+            for ($study = 1; $study <= 3; $study++) {
                 $studata = new ilStudyCourseData();
                 $studata->study_no = $study;
                 $studata->degree_id = $fau[$i++];
-                if ($fromShibboleth)
-                {
+                if ($fromShibboleth) {
                     // old format provided with sso has semester per study
                     $semester = $fau[$i++];
                 }
                 $studata->school_id = $fau[$i++];
                 $studata->ref_semester =  $ref_semester;
                 $type = substr($raw['fau_studytype'], $study - 1, 1);
-                if(!empty($type) && $type != '_') {
+                if (!empty($type) && $type != '_') {
                     $studata->study_type = $type;
                 }
 
-                for ($subject = 1; $subject <= 3; $subject++)
-                {
+                for ($subject = 1; $subject <= 3; $subject++) {
                     $subdata = new ilStudyCourseSubject();
                     $subdata->study_no = $study;
                     $subdata->subject_id = $fau[$i++];
-                    if ($fromShibboleth)  {
+                    if ($fromShibboleth) {
                         $subdata->semester = $semester;
-                    }
-                    else {
+                    } else {
                         // new format in database has semester per subject
                         $subdata->semester = $fau[$i++];
                     }
 
                     // this subjects is set
-                    if ($subdata->subject_id)
-                    {
+                    if ($subdata->subject_id) {
                         $studata->subjects[] = $subdata;
                     }
                 }
 
                 // this study is set
-                if ($studata->degree_id)
-                {
+                if ($studata->degree_id) {
                     $this->studies[] = $studata;
                 }
             }
@@ -376,16 +357,15 @@ class ilIdmData
         // set data for structured doc programme
         $doc = new ilStudyDocData();
         if (!empty($raw['fau_doc_programmes_code']) && is_numeric($raw['fau_doc_programmes_code'])) {
-            $doc->prog_id = (int)  $raw['fau_doc_programmes_code'];
+            $doc->prog_id = (int) $raw['fau_doc_programmes_code'];
         }
         if ((!empty($raw['fau_doc_approval_date']))) {
             $year = substr($raw['fau_doc_approval_date'], 0, 4);
-            $month = substr($raw['fau_doc_approval_date'],4,2);
-            $day = substr($raw['fau_doc_approval_date'], 6,2);
+            $month = substr($raw['fau_doc_approval_date'], 4, 2);
+            $day = substr($raw['fau_doc_approval_date'], 6, 2);
             try {
-                $doc->prog_approval= new ilDate($year.'-'.$month.'-'.$day, IL_CAL_DATE);
-            }
-            catch (Exception $e) {
+                $doc->prog_approval= new ilDate($year . '-' . $month . '-' . $day, IL_CAL_DATE);
+            } catch (Exception $e) {
                 $doc->prog_approval = null;
             }
         }
@@ -407,8 +387,7 @@ class ilIdmData
         global $ilSetting;
 
         // update the profile fields if auth mode is shibboleth
-        if ($userObj->getAuthMode() == "shibboleth")
-        {
+        if ($userObj->getAuthMode() == "shibboleth") {
             if (!empty($this->firstname)) {
                 $userObj->setFirstname($this->firstname);
             }
@@ -419,8 +398,7 @@ class ilIdmData
                 $userObj->setGender($this->gender);
             }
             if (!empty($this->email)
-                and (is_null($userObj->getEmail()) || $userObj->getEmail() == '' || $userObj->getEmail() == $ilSetting->get('mail_external_sender_noreply')))
-            {
+                and (is_null($userObj->getEmail()) || $userObj->getEmail() == '' || $userObj->getEmail() == $ilSetting->get('mail_external_sender_noreply'))) {
                 $userObj->setEmail($this->email);
             }
             if (!empty($this->coded_password)) {
@@ -438,17 +416,13 @@ class ilIdmData
         $userObj->setExternalPasswd($this->coded_password);
 
         // time limit and activation
-        if ($mode == 'create')
-        {
-            if (ilCust::get('shib_create_limited'))
-            {
+        if ($mode == 'create') {
+            if (ilCust::get('shib_create_limited')) {
                 $limit = new ilDateTime(ilCust::get('shib_create_limited'), IL_CAL_DATE);
                 $userObj->setTimeLimitUnlimited(0);
                 $userObj->setTimeLimitFrom(time() - 10);
                 $userObj->setTimeLimitUntil($limit->get(IL_CAL_UNIX));
-            }
-            else
-            {
+            } else {
                 $userObj->setTimeLimitUnlimited(1);
                 $userObj->setTimeLimitFrom(time());
                 $userObj->setTimeLimitUntil(time());

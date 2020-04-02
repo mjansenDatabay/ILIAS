@@ -58,10 +58,10 @@ class ilMainMenuGUI
     /**
      * @var ilTemplate
      */
-    var $tpl;
-    var $target;
-    var $start_template;
-    var $mail; // [bool]
+    public $tpl;
+    public $target;
+    public $start_template;
+    public $mail; // [bool]
     /**
      * @var ilTemplate
      */
@@ -105,7 +105,9 @@ class ilMainMenuGUI
         $ilUser = $DIC->user();
 
         $this->tpl = new ilTemplate(
-            "tpl.main_menu.html", true, true,
+            "tpl.main_menu.html",
+            true,
+            true,
             "Services/MainMenu"
         );
         $this->target = $a_target;
@@ -226,18 +228,19 @@ class ilMainMenuGUI
         $gr_list->setAsDropDown(true);
 
         $languages = $lng->getInstalledLanguages();
-        if (sizeof($languages) > 1) // #11237
-        {
+        if (sizeof($languages) > 1) { // #11237
             foreach ($languages as $lang_key) {
                 $base = substr($_SERVER["REQUEST_URI"], strrpos($_SERVER["REQUEST_URI"], "/") + 1);
-// fau: rootAsLogin - better replacement of lang parameter
-				// needed because this language selection is also presented by ilStartupGUI
-				$link = preg_replace("/(&*)lang=[a-z]{2}(&*)/", "$1lang=".$lang_key."$2", $base);
-				if (strpos($link, 'lang=') === false) {
-					$link = ilUtil::appendUrlParameterString($link,
-						"lang=".$lang_key);
-				}
-// fau.
+                // fau: rootAsLogin - better replacement of lang parameter
+                // needed because this language selection is also presented by ilStartupGUI
+                $link = preg_replace("/(&*)lang=[a-z]{2}(&*)/", "$1lang=" . $lang_key . "$2", $base);
+                if (strpos($link, 'lang=') === false) {
+                    $link = ilUtil::appendUrlParameterString(
+                        $link,
+                        "lang=" . $lang_key
+                    );
+                }
+                // fau.
                 $link = str_replace("?&", "?", $link);
 
                 $gr_list->addEntry($lng->_lookupEntry($lang_key, "meta", "meta_l_" . $lang_key), $link);
@@ -289,7 +292,8 @@ class ilMainMenuGUI
 
                 // user interface plugin slot + default rendering
                 $uip = new ilUIHookProcessor(
-                    "Services/MainMenu", "main_menu_search",
+                    "Services/MainMenu",
+                    "main_menu_search",
                     array("main_menu_gui" => $this, "main_menu_search_gui" => $main_search)
                 );
                 if (!$uip->replaced()) {
@@ -328,16 +332,16 @@ class ilMainMenuGUI
 
             // login stuff
             if ($GLOBALS['DIC']['ilUser']->getId() == ANONYMOUS_USER_ID) {
-// fau: rootAsLogin - don't show standard registration link, if the root is the login page
-				if (!ilCust::get('ilias_root_as_login')) {
-					if (ilRegistrationSettings::_lookupRegistrationType() != IL_REG_DISABLED) {
-						$this->tpl->setCurrentBlock("registration_link");
-						$this->tpl->setVariable("TXT_REGISTER", $lng->txt("register"));
-						$this->tpl->setVariable("LINK_REGISTER", $link_dir . "register.php?client_id=" . rawurlencode(CLIENT_ID) . "&lang=" . $ilUser->getCurrentLanguage());
-						$this->tpl->parseCurrentBlock();
-					}
-				}
-// fau.
+                // fau: rootAsLogin - don't show standard registration link, if the root is the login page
+                if (!ilCust::get('ilias_root_as_login')) {
+                    if (ilRegistrationSettings::_lookupRegistrationType() != IL_REG_DISABLED) {
+                        $this->tpl->setCurrentBlock("registration_link");
+                        $this->tpl->setVariable("TXT_REGISTER", $lng->txt("register"));
+                        $this->tpl->setVariable("LINK_REGISTER", $link_dir . "register.php?client_id=" . rawurlencode(CLIENT_ID) . "&lang=" . $ilUser->getCurrentLanguage());
+                        $this->tpl->parseCurrentBlock();
+                    }
+                }
+                // fau.
 
                 // language selection
                 $selection = self::getLanguageSelection();
@@ -346,35 +350,35 @@ class ilMainMenuGUI
                     $this->tpl->setVariable("LANG_SELECT", $selection);
                 }
 
-// fau: rootAsLogin - don't show standard login link if the root is the login page
-				if (!ilCust::get('ilias_root_as_login')
-					or (!empty($_GET['ref_id']) and $_GET['ref_id'] != 1)
-					or !empty($_GET['wsp_id'])
-					or !empty($_GET['prt_id'])
-				) {
-					$this->tpl->setCurrentBlock("userisanonymous");
-					$this->tpl->setVariable("TXT_NOT_LOGGED_IN", $lng->txt("not_logged_in"));
-					$this->tpl->setVariable("TXT_LOGIN", $lng->txt("log_in"));
+                // fau: rootAsLogin - don't show standard login link if the root is the login page
+                if (!ilCust::get('ilias_root_as_login')
+                    or (!empty($_GET['ref_id']) and $_GET['ref_id'] != 1)
+                    or !empty($_GET['wsp_id'])
+                    or !empty($_GET['prt_id'])
+                ) {
+                    $this->tpl->setCurrentBlock("userisanonymous");
+                    $this->tpl->setVariable("TXT_NOT_LOGGED_IN", $lng->txt("not_logged_in"));
+                    $this->tpl->setVariable("TXT_LOGIN", $lng->txt("log_in"));
 
-					// #13058
-					$target_str = ($this->getLoginTargetPar() != "")
-						? $this->getLoginTargetPar()
-						: ilTemplate::buildLoginTarget();
-					$this->tpl->setVariable(
-						"LINK_LOGIN",
-						$link_dir . "login.php?target=" . $target_str . "&client_id=" . rawurlencode(CLIENT_ID) . "&cmd=force_login&lang=" . $ilUser->getCurrentLanguage()
-					);
-					$this->tpl->parseCurrentBlock();
-			}
-// fau.
+                    // #13058
+                    $target_str = ($this->getLoginTargetPar() != "")
+                        ? $this->getLoginTargetPar()
+                        : ilTemplate::buildLoginTarget();
+                    $this->tpl->setVariable(
+                        "LINK_LOGIN",
+                        $link_dir . "login.php?target=" . $target_str . "&client_id=" . rawurlencode(CLIENT_ID) . "&cmd=force_login&lang=" . $ilUser->getCurrentLanguage()
+                    );
+                    $this->tpl->parseCurrentBlock();
+                }
+                // fau.
             } else {
                 $this->renderOnScreenNotifications($ilUser, $main_tpl, $lng);
 
                 $this->tpl->setCurrentBlock("userisloggedin");
                 $this->tpl->setVariable("TXT_LOGIN_AS", $lng->txt("login_as"));
-// fau: wcag - add title
+                // fau: wcag - add title
                 $this->tpl->setVariable("USER_MENU_TITLE", $lng->txt("user_menu"));
-// fau.
+                // fau.
                 $user_img_src = $ilUser->getPersonalPicturePath("small", true);
                 $user_img_alt = $ilUser->getFullname();
                 $this->tpl->setVariable("USER_IMG", ilUtil::img($user_img_src, $user_img_alt));
@@ -383,9 +387,9 @@ class ilMainMenuGUI
                 $this->tpl->setVariable("USR_LINK_SETTINGS", "ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSettings");
                 $this->tpl->setVariable("USR_TXT_SETTINGS", $lng->txt("personal_settings"));
                 $this->tpl->setVariable("TXT_LOGOUT2", $lng->txt("logout"));
-// fau: samlAuth - use different logout link if authentified by SSO
+                // fau: samlAuth - use different logout link if authentified by SSO
                 $this->tpl->setVariable("LINK_LOGOUT2", ilUserUtil::_getLogoutLink());
-// fau.
+                // fau.
                 $this->tpl->setVariable("USERNAME", $ilUser->getFullname());
                 $this->tpl->setVariable("LOGIN", $ilUser->getLogin());
                 $this->tpl->setVariable("MATRICULATION", $ilUser->getMatriculation());
@@ -412,7 +416,8 @@ class ilMainMenuGUI
             $this->tpl->setCurrentBlock("header_back_bl");
             $this->tpl->setVariable("URL_HEADER_BACK", $this->topbar_back_url);
             $this->tpl->setVariable(
-                "TXT_HEADER_BACK", $this->topbar_back_caption
+                "TXT_HEADER_BACK",
+                $this->topbar_back_caption
                 ? $this->topbar_back_caption
                 : $lng->txt("back")
             );
@@ -424,31 +429,27 @@ class ilMainMenuGUI
         if ($this->getMode() == self::MODE_FULL) {
             // $this->tpl->setVariable("TXT_LOGOUT", $lng->txt("logout"));
             $this->tpl->setVariable("HEADER_URL", $this->getHeaderURL());
-// fau: wcag -  add title
-			$this->tpl->setVariable("HEADER_URL_TITLE", $lng->txt('to_home'));
-// fau.
-			$this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
+            // fau: wcag -  add title
+            $this->tpl->setVariable("HEADER_URL_TITLE", $lng->txt('to_home'));
+            // fau.
+            $this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
             $this->tpl->setVariable("HEADER_ICON_RESPONSIVE", ilUtil::getImagePath("HeaderIconResponsive.svg"));
         }
 
-// fau: pageLayout - don't show links in reduced mode
+        // fau: pageLayout - don't show links in reduced mode
 
-		if (ilCust::get('ilias_footer_type') != 'exam')
-		{
-			if($this->getMode() == self::MODE_FULL)
-			{
-				$this->tpl->touchBlock('header_top_links');
-			}
-			elseif (!$this->topbar_back_url)
-			{
-				$this->tpl->setCurrentBlock('header_top_logo');
-				$this->tpl->setVariable('TOPBAR_LOGO_URL', $this->getHeaderURL());
-				$this->tpl->parseCurrentBlock();
-			}
-		}
-// fau.
+        if (ilCust::get('ilias_footer_type') != 'exam') {
+            if ($this->getMode() == self::MODE_FULL) {
+                $this->tpl->touchBlock('header_top_links');
+            } elseif (!$this->topbar_back_url) {
+                $this->tpl->setCurrentBlock('header_top_logo');
+                $this->tpl->setVariable('TOPBAR_LOGO_URL', $this->getHeaderURL());
+                $this->tpl->parseCurrentBlock();
+            }
+        }
+        // fau.
 
-		$this->tpl->setVariable("TXT_MAIN_MENU", $lng->txt("main_menu"));
+        $this->tpl->setVariable("TXT_MAIN_MENU", $lng->txt("main_menu"));
 
         $this->tpl->parseCurrentBlock();
     }
@@ -556,9 +557,9 @@ class ilMainMenuGUI
         $main_tpl = $this->main_tpl;
 
         // screen id
-// fau - showHelpIds -  make showing of ids independent from author mode
-		if (ilCust::get("help_show_ids")) {
-// fau.
+        // fau - showHelpIds -  make showing of ids independent from author mode
+        if (ilCust::get("help_show_ids")) {
+            // fau.
             if ($ilHelp->getScreenId() != "") {
                 if ($this->getMode() == self::MODE_FULL) {
                     $this->tpl->setCurrentBlock("screen_id");
@@ -570,11 +571,11 @@ class ilMainMenuGUI
 
         $help_active = false;
 
-/* fau: MainMenuHelp - help menu is moved to main menu plugin
-
-        $helpl = new ilGroupedListGUI();
-        $helpl->setAsDropDown(true, true);
-fau. */
+        /* fau: MainMenuHelp - help menu is moved to main menu plugin
+        
+                $helpl = new ilGroupedListGUI();
+                $helpl->setAsDropDown(true, true);
+        fau. */
 
         if ($ilHelp->hasSections()) {
             $help_active = true;
@@ -589,12 +590,16 @@ fau. */
             $acc->addCss();
 
             ilTooltipGUI::addTooltip(
-                "help_tr", $lng->txt("help_open_online_help"), "",
-                "bottom center", "top center", false
+                "help_tr",
+                $lng->txt("help_open_online_help"),
+                "",
+                "bottom center",
+                "top center",
+                false
             );
-/* fau: MainMenuHelp - help menu is moved to main menu plugin
-			$helpl->addEntry("<span>&nbsp;</span> " . $lng->txt("help_topcis"), "#", "", "il.Help.listHelp(event, false);");
-fau. */
+            /* fau: MainMenuHelp - help menu is moved to main menu plugin
+                        $helpl->addEntry("<span>&nbsp;</span> " . $lng->txt("help_topcis"), "#", "", "il.Help.listHelp(event, false);");
+            fau. */
         }
 
         $module_id = (int) $ilSetting->get("help_module");
@@ -607,21 +612,25 @@ fau. */
             $main_tpl->addJavascript("./Services/Help/js/ilHelp.js");
 
             ilTooltipGUI::addTooltip(
-                "help_tt", $lng->txt("help_toggle_tooltips"), "",
-                "bottom center", "top center", false
+                "help_tt",
+                $lng->txt("help_toggle_tooltips"),
+                "",
+                "bottom center",
+                "top center",
+                false
             );
-/* fau: MainMenuHelp - help menu is moved to main menu plugin
-			$helpl->addEntry('<span id="help_tt_switch_on" class="glyphicon glyphicon-ok"></span> ' . $lng->txt("help_tooltips"), "#", "", "return il.Help.switchTooltips(event);");
-fau. */
+            /* fau: MainMenuHelp - help menu is moved to main menu plugin
+                        $helpl->addEntry('<span id="help_tt_switch_on" class="glyphicon glyphicon-ok"></span> ' . $lng->txt("help_tooltips"), "#", "", "return il.Help.switchTooltips(event);");
+            fau. */
         }
 
         if ($help_active && $ilHelp->hasSections()) {
-/* fau: MainMenuHelp - help menu is moved to main menu plugin
-			$this->tpl->setCurrentBlock("help");
-			$this->tpl->setVariable("TXT_HELP", $lng->txt("help"));
-			$this->tpl->setVariable("HELP_CLICK", "il.Help.listHelp(event, false);");
-			$this->tpl->parseCurrentBlock();
-fau. */
+            /* fau: MainMenuHelp - help menu is moved to main menu plugin
+                        $this->tpl->setCurrentBlock("help");
+                        $this->tpl->setVariable("TXT_HELP", $lng->txt("help"));
+                        $this->tpl->setVariable("HELP_CLICK", "il.Help.listHelp(event, false);");
+                        $this->tpl->parseCurrentBlock();
+            fau. */
             $this->addToolbarTooltip("mm_help", "mm_tb_help");
 
             // always set ajax url
@@ -663,7 +672,7 @@ fau. */
     /**
      * Render awareness tool
      */
-    function renderAwareness()
+    public function renderAwareness()
     {
         include_once("./Services/Awareness/classes/class.ilAwarenessGUI.php");
         $aw = ilAwarenessGUI::getInstance();
@@ -743,9 +752,10 @@ fau. */
 
         $numberOfUserInteractions = count(
             array_filter(
-                $metas, function (BucketMeta $meta) {
-                return $meta->getState() == State::USER_INTERACTION;
-            }
+                $metas,
+                function (BucketMeta $meta) {
+                    return $meta->getState() == State::USER_INTERACTION;
+                }
             )
         );
         $numberOfNotUserInteractions = count($metas) - $numberOfUserInteractions;
@@ -800,9 +810,14 @@ fau. */
     protected function addToolbarTooltip(string $element_id, string $help_id)
     {
         if (ilHelp::getMainMenuTooltip($help_id) != "") {
-            ilTooltipGUI::addTooltip($element_id, ilHelp::getMainMenuTooltip($help_id),
-                "", "top center", "bottom center", false);
+            ilTooltipGUI::addTooltip(
+                $element_id,
+                ilHelp::getMainMenuTooltip($help_id),
+                "",
+                "top center",
+                "bottom center",
+                false
+            );
         }
     }
 }
-

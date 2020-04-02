@@ -7,60 +7,60 @@
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
- * @ingroup 
+ * @ingroup
  */
 class ilUserActionAdmin
 {
-	static protected $loaded = false;
-	static protected $data = array();
+    protected static $loaded = false;
+    protected static $data = array();
 
-	/**
-	 * Activate action
-	 *
-	 * @param string $a_context_comp
-	 * @param string $a_context_id
-	 * @param string $a_action_comp
-	 * @param string $a_action_type
-	 * @param bool $a_active active true/false
-	 */
-	public static function activateAction($a_context_comp, $a_context_id, $a_action_comp, $a_action_type, $a_active)
-	{
-		global $DIC;
+    /**
+     * Activate action
+     *
+     * @param string $a_context_comp
+     * @param string $a_context_id
+     * @param string $a_action_comp
+     * @param string $a_action_type
+     * @param bool $a_active active true/false
+     */
+    public static function activateAction($a_context_comp, $a_context_id, $a_action_comp, $a_action_type, $a_active)
+    {
+        global $DIC;
 
-		$db = $DIC->database();
-		$db->replace("user_action_activation",
-			array(
-				"context_comp" => array("text", $a_context_comp),
-				"context_id" => array("text", $a_context_id),
-				"action_comp" => array("text", $a_action_comp),
-				"action_type" => array("text", $a_action_type),
-			),
-			array(
-				"active" => array("integer", $a_active))
-			);
+        $db = $DIC->database();
+        $db->replace(
+            "user_action_activation",
+            array(
+                "context_comp" => array("text", $a_context_comp),
+                "context_id" => array("text", $a_context_id),
+                "action_comp" => array("text", $a_action_comp),
+                "action_type" => array("text", $a_action_type),
+            ),
+            array(
+                "active" => array("integer", $a_active))
+        );
 
-		self::$loaded = false;
-	}
+        self::$loaded = false;
+    }
 
-	/**
-	 * Is activated?
-	 *
-	 * @param string $a_context_comp
-	 * @param string $a_context_id
-	 * @param string $a_action_comp
-	 * @param string $a_action_type
-	 * @return bool active true/false
-	 */
-	public static function lookupActive($a_context_comp, $a_context_id, $a_action_comp, $a_action_type)
-	{
-		if (!self::$loaded)
-		{
-			self::loadData();
-		}
-		return (bool) self::$data[$a_context_comp][$a_context_id][$a_action_comp][$a_action_type];
-	}
+    /**
+     * Is activated?
+     *
+     * @param string $a_context_comp
+     * @param string $a_context_id
+     * @param string $a_action_comp
+     * @param string $a_action_type
+     * @return bool active true/false
+     */
+    public static function lookupActive($a_context_comp, $a_context_id, $a_action_comp, $a_action_type)
+    {
+        if (!self::$loaded) {
+            self::loadData();
+        }
+        return (bool) self::$data[$a_context_comp][$a_context_id][$a_action_comp][$a_action_type];
+    }
 
-// fau: optimizeUserActions - check if user actions are available for context and component
+    // fau: optimizeUserActions - check if user actions are available for context and component
     /**
      * Has active actions?
      *
@@ -69,50 +69,41 @@ class ilUserActionAdmin
      * @param string $a_action_comp
      * @return bool active true/false
      */
-	public static function hasActiveActions($a_context_comp, $a_context_id, $a_action_comp)
+    public static function hasActiveActions($a_context_comp, $a_context_id, $a_action_comp)
     {
-        if (!self::$loaded)
-        {
+        if (!self::$loaded) {
             self::loadData();
         }
 
-        if (is_array(self::$data[$a_context_comp][$a_context_id][$a_action_comp]))
-        {
-            foreach(self::$data[$a_context_comp][$a_context_id][$a_action_comp] as $a_action_type => $a_active)
-            {
-                if ($a_active)
-                {
+        if (is_array(self::$data[$a_context_comp][$a_context_id][$a_action_comp])) {
+            foreach (self::$data[$a_context_comp][$a_context_id][$a_action_comp] as $a_action_type => $a_active) {
+                if ($a_active) {
                     return true;
                 }
             }
         }
         return false;
     }
-// fau.
+    // fau.
 
-	/**
-	 * Load data
-	 *
-	 * @param
-	 * @return
-	 */
-	protected static function loadData()
-	{
-		global $DIC;
+    /**
+     * Load data
+     *
+     * @param
+     * @return
+     */
+    protected static function loadData()
+    {
+        global $DIC;
 
-		$db = $DIC->database();
+        $db = $DIC->database();
 
-		$set = $db->query("SELECT * FROM user_action_activation");
-		self::$data = array();
-		while ($rec = $db->fetchAssoc($set))
-		{
-			self::$data[$rec["context_comp"]][$rec["context_id"]][$rec["action_comp"]][$rec["action_type"]] = (bool) $rec["active"];
-		}
+        $set = $db->query("SELECT * FROM user_action_activation");
+        self::$data = array();
+        while ($rec = $db->fetchAssoc($set)) {
+            self::$data[$rec["context_comp"]][$rec["context_id"]][$rec["action_comp"]][$rec["action_type"]] = (bool) $rec["active"];
+        }
 
-		self::$loaded = true;
-	}
-
-
+        self::$loaded = true;
+    }
 }
-
-?>

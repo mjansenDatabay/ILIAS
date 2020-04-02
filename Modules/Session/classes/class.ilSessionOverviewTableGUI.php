@@ -5,159 +5,144 @@ include_once './Services/Table/classes/class.ilTable2GUI.php';
 
 /**
  * Table presentation for session overview
- * 
+ *
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  * @Id: $Id$
  */
 class ilSessionOverviewTableGUI extends ilTable2GUI
 {
-	protected $events; // [array]
-	
-	public function __construct($a_parent_obj, $a_parent_cmd, $a_crs_ref_id, array $a_members)
-	{				
-		$this->setId('sessov');
-		
-		parent::__construct($a_parent_obj,$a_parent_cmd);
-		
-		$this->setTitle($this->lng->txt('event_overview'));
-		
-		$this->addColumn($this->lng->txt('name'),'name');
-		$this->addColumn($this->lng->txt('login'),'login');
-		
-		$this->events = $this->gatherEvents($a_crs_ref_id);
-		foreach($this->events as $idx => $event_obj)
-		{						
-			// tooltip properties
-			$tt = array();
-			if(trim($event_obj->getTitle()))
-			{
-				$tt[] = $event_obj->getTitle();						
-			}
-			if(trim($event_obj->getDescription()))
-			{
-				$tt[] = $event_obj->getDescription();
-			}
-			if(trim($event_obj->getLocation()))
-			{
-				$tt[] = $this->lng->txt("event_location").': '.$event_obj->getLocation();
-			}
-			$tt[] = $this->lng->txt("event_date_time").': '.$event_obj->getFirstAppointment()->appointmentToString();			
-			
-			// use title/datetime
-			if(sizeof($this->events) <= 4)
-			{				
-				$caption = $event_obj->getFirstAppointment()->appointmentToString();			
-				if(sizeof($tt) == 1)
-				{
-					$tt = array();
-				}
-			}
-			// use sequence 
-			else
-			{
-				$caption = $idx+1;
-			}
-			$tt = implode("<br />\n", $tt);
-			
-			$this->addColumn($caption,'event_'.$event_obj->getId(), '', false, '', $tt, true);
-		}
-		
-		$this->setDefaultOrderField('name');
-		$this->setDefaultOrderDirection('asc');
-				
-		$this->setRowTemplate('tpl.sess_list_row.html','Modules/Session');		
-				
-		$this->getItems($this->events, $a_members);
-	}
-	
-	protected function gatherEvents($a_crs_ref_id)
-	{
-		global $DIC;
+    protected $events; // [array]
+    
+    public function __construct($a_parent_obj, $a_parent_cmd, $a_crs_ref_id, array $a_members)
+    {
+        $this->setId('sessov');
+        
+        parent::__construct($a_parent_obj, $a_parent_cmd);
+        
+        $this->setTitle($this->lng->txt('event_overview'));
+        
+        $this->addColumn($this->lng->txt('name'), 'name');
+        $this->addColumn($this->lng->txt('login'), 'login');
+        
+        $this->events = $this->gatherEvents($a_crs_ref_id);
+        foreach ($this->events as $idx => $event_obj) {
+            // tooltip properties
+            $tt = array();
+            if (trim($event_obj->getTitle())) {
+                $tt[] = $event_obj->getTitle();
+            }
+            if (trim($event_obj->getDescription())) {
+                $tt[] = $event_obj->getDescription();
+            }
+            if (trim($event_obj->getLocation())) {
+                $tt[] = $this->lng->txt("event_location") . ': ' . $event_obj->getLocation();
+            }
+            $tt[] = $this->lng->txt("event_date_time") . ': ' . $event_obj->getFirstAppointment()->appointmentToString();
+            
+            // use title/datetime
+            if (sizeof($this->events) <= 4) {
+                $caption = $event_obj->getFirstAppointment()->appointmentToString();
+                if (sizeof($tt) == 1) {
+                    $tt = array();
+                }
+            }
+            // use sequence
+            else {
+                $caption = $idx+1;
+            }
+            $tt = implode("<br />\n", $tt);
+            
+            $this->addColumn($caption, 'event_' . $event_obj->getId(), '', false, '', $tt, true);
+        }
+        
+        $this->setDefaultOrderField('name');
+        $this->setDefaultOrderDirection('asc');
+                
+        $this->setRowTemplate('tpl.sess_list_row.html', 'Modules/Session');
+                
+        $this->getItems($this->events, $a_members);
+    }
+    
+    protected function gatherEvents($a_crs_ref_id)
+    {
+        global $DIC;
 
-		$tree = $DIC['tree'];
-		$ilAccess = $DIC['ilAccess'];
-				
-		$events = array();
-		foreach($tree->getSubtree($tree->getNodeData($a_crs_ref_id),false,'sess') as $event_id)
-		{
-			$tmp_event = ilObjectFactory::getInstanceByRefId($event_id,false);
-			if(!is_object($tmp_event) ||
-				!$ilAccess->checkAccess('manage_members','',$event_id))
-			{
-				continue;
-			}
-			// sort by date of 1st appointment
-			// fim: [memsess] add title to sorting criteria
-			$events[$tmp_event->getFirstAppointment()->getStartingTime().'_'.$tmp_event->getTitle().'_'.$tmp_event->getId()] = $tmp_event;
-			// fim.
-		}
-		
-		ksort($events);	
-		return array_values($events);
-	}
+        $tree = $DIC['tree'];
+        $ilAccess = $DIC['ilAccess'];
+                
+        $events = array();
+        foreach ($tree->getSubtree($tree->getNodeData($a_crs_ref_id), false, 'sess') as $event_id) {
+            $tmp_event = ilObjectFactory::getInstanceByRefId($event_id, false);
+            if (!is_object($tmp_event) ||
+                !$ilAccess->checkAccess('manage_members', '', $event_id)) {
+                continue;
+            }
+            // sort by date of 1st appointment
+            // fim: [memsess] add title to sorting criteria
+            $events[$tmp_event->getFirstAppointment()->getStartingTime() . '_' . $tmp_event->getTitle() . '_' . $tmp_event->getId()] = $tmp_event;
+            // fim.
+        }
+        
+        ksort($events);
+        return array_values($events);
+    }
 
-	// fim: [memsess] allow to get the gathered events to show a legend
-	public function getEvents()
-	{
-		return $this->events;
-	}
-	// fim.
+    // fim: [memsess] allow to get the gathered events to show a legend
+    public function getEvents()
+    {
+        return $this->events;
+    }
+    // fim.
 
-	protected function getItems(array $a_events, array $a_members)
-	{	 			
-		$data = array();
-		
-		include_once 'Modules/Session/classes/class.ilEventParticipants.php';
-		
-		foreach($a_members as $user_id)
-		{		
-			$name = ilObjUser::_lookupName($user_id);
-			$data[$user_id] = array(
-				'name' => $name['lastname'].', '.$name['firstname'],
-				'login' => $name['login']				
-			);
-			
-			foreach($a_events as $event_obj)
-			{															
-				$event_part = new ilEventParticipants($event_obj->getId());
-// fau: sessionOverview - get info about registration and participation
-				$data[$user_id]['event_'.$event_obj->getId().'_participated'] = $event_part->hasParticipated($user_id);
-				$data[$user_id]['event_'.$event_obj->getId().'_registered'] = $event_part->isRegistered($user_id);
-// fau.
-			}								
-		}		
-		
-		$this->setData($data);
-	}
-		
-	public function fillRow($a_set)
-	{	
-		$this->tpl->setVariable('NAME', $a_set['name']);
-		$this->tpl->setVariable('LOGIN', $a_set['login']);
-		
-		$this->tpl->setCurrentBlock('eventcols');
-		foreach($this->events as $event_obj)
-		{
-// fau: sessionOverview - show different icons with additional icon for not registered
-			if ($event_obj->enabledRegistration()
-				and (! (bool) $a_set['event_'.$event_obj->getId().'_registered'])
-				and (! (bool) $a_set['event_'.$event_obj->getId().'_participated']))
-			{
-				$this->tpl->setVariable("IMAGE_PARTICIPATED", ilUtil::getImagePath('scorm/not_attempted.svg'));
-				$this->tpl->setVariable("PARTICIPATED", $this->lng->txt('event_not_registered'));
-			}
-			else
-			{
-				$this->tpl->setVariable("IMAGE_PARTICIPATED", (bool) $a_set['event_'.$event_obj->getId().'_participated'] ?
-					ilUtil::getImagePath('scorm/passed.svg') :
-					ilUtil::getImagePath('scorm/failed.svg'));
+    protected function getItems(array $a_events, array $a_members)
+    {
+        $data = array();
+        
+        include_once 'Modules/Session/classes/class.ilEventParticipants.php';
+        
+        foreach ($a_members as $user_id) {
+            $name = ilObjUser::_lookupName($user_id);
+            $data[$user_id] = array(
+                'name' => $name['lastname'] . ', ' . $name['firstname'],
+                'login' => $name['login']
+            );
+            
+            foreach ($a_events as $event_obj) {
+                $event_part = new ilEventParticipants($event_obj->getId());
+                // fau: sessionOverview - get info about registration and participation
+                $data[$user_id]['event_' . $event_obj->getId() . '_participated'] = $event_part->hasParticipated($user_id);
+                $data[$user_id]['event_' . $event_obj->getId() . '_registered'] = $event_part->isRegistered($user_id);
+                // fau.
+            }
+        }
+        
+        $this->setData($data);
+    }
+        
+    public function fillRow($a_set)
+    {
+        $this->tpl->setVariable('NAME', $a_set['name']);
+        $this->tpl->setVariable('LOGIN', $a_set['login']);
+        
+        $this->tpl->setCurrentBlock('eventcols');
+        foreach ($this->events as $event_obj) {
+            // fau: sessionOverview - show different icons with additional icon for not registered
+            if ($event_obj->enabledRegistration()
+                and (!(bool) $a_set['event_' . $event_obj->getId() . '_registered'])
+                and (!(bool) $a_set['event_' . $event_obj->getId() . '_participated'])) {
+                $this->tpl->setVariable("IMAGE_PARTICIPATED", ilUtil::getImagePath('scorm/not_attempted.svg'));
+                $this->tpl->setVariable("PARTICIPATED", $this->lng->txt('event_not_registered'));
+            } else {
+                $this->tpl->setVariable("IMAGE_PARTICIPATED", (bool) $a_set['event_' . $event_obj->getId() . '_participated'] ?
+                    ilUtil::getImagePath('scorm/passed.svg') :
+                    ilUtil::getImagePath('scorm/failed.svg'));
 
-				$this->tpl->setVariable("PARTICIPATED", (bool) $a_set['event_'.$event_obj->getId().'_participated'] ?
-					$this->lng->txt('event_participated') :
-					$this->lng->txt('event_not_participated'));
-			}
-// fau.
-			$this->tpl->parseCurrentBlock();
-		}
-	}
+                $this->tpl->setVariable("PARTICIPATED", (bool) $a_set['event_' . $event_obj->getId() . '_participated'] ?
+                    $this->lng->txt('event_participated') :
+                    $this->lng->txt('event_not_participated'));
+            }
+            // fau.
+            $this->tpl->parseCurrentBlock();
+        }
+    }
 }
