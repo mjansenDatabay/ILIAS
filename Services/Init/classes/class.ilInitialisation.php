@@ -1375,7 +1375,10 @@ class ilInitialisation
             ilContext::getType() == ilContext::CONTEXT_WAC) {
             throw new Exception("Authentication failed.");
         }
-        if ($GLOBALS['DIC']['ilAuthSession']->isExpired()) {
+        if (
+            $GLOBALS['DIC']['ilAuthSession']->isExpired() &&
+            !\ilObjUser::_isAnonymous($GLOBALS['DIC']['ilAuthSession']->getUserId())
+        ) {
             ilLoggerFactory::getLogger('init')->debug('Expired session found -> redirect to login page');
             return self::goToLogin();
         }
