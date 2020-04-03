@@ -526,7 +526,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         //highlighting
         if ($_GET["srcstring"] != "") {
             include_once './Services/Search/classes/class.ilUserSearchCache.php';
-            $cache =  ilUserSearchCache::_getInstance($ilUser->getId());
+            $cache = ilUserSearchCache::_getInstance($ilUser->getId());
             $cache->switchSearchType(ilUserSearchCache::LAST_QUERY);
             $search_string = $cache->getQuery();
             
@@ -615,7 +615,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 
 
         // metadata in print view
-        if ($this->getOutputMode() == "print"  && $this->wiki instanceof ilObjWiki) {
+        if ($this->getOutputMode() == "print" && $this->wiki instanceof ilObjWiki) {
             include_once("./Services/Object/classes/class.ilObjectMetaDataGUI.php");
             $mdgui = new ilObjectMetaDataGUI($this->wiki, "wpg", $this->getId());
             $md = $mdgui->getKeyValueList();
@@ -861,7 +861,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $op2 = new ilRadioOption($lng->txt("wiki_whole_wiki")
                 . " (" . $lng->txt("wiki_pages") . ": " . count($pages) . ")", "wiki");
         $radg->addOption($op2);
-        $op3= new ilRadioOption($lng->txt("wiki_selected_pages"), "selection");
+        $op3 = new ilRadioOption($lng->txt("wiki_selected_pages"), "selection");
         $radg->addOption($op3);
 
         include_once("./Services/Form/classes/class.ilNestedListInputGUI.php");
@@ -870,14 +870,14 @@ class ilWikiPageGUI extends ilPageObjectGUI
 
         foreach ($pages as $p) {
             $nl->addListNode(
-                    $p["id"],
-                    $p["title"],
-                    0,
-                    false,
-                    false,
-                    ilUtil::getImagePath("icon_pg.svg"),
-                    $lng->txt("wiki_page")
-                );
+                $p["id"],
+                $p["title"],
+                0,
+                false,
+                false,
+                ilUtil::getImagePath("icon_pg.svg"),
+                $lng->txt("wiki_page")
+            );
         }
 
         $this->form->addItem($radg);

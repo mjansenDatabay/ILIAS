@@ -204,12 +204,12 @@ class ilContentPageKioskModeView extends ilKioskModeView
         // fau: inheritContentStyle - get the effective content style by ref_id
         $this->mainTemplate->addCss(
             \ilObjStyleSheet::getContentStylePath(
-            \ilObjStyleSheet::getEffectiveContentStyleId(
+                \ilObjStyleSheet::getEffectiveContentStyleId(
                 $this->contentPageObject->getStyleSheetId(),
                 $this->contentPageObject->getType(),
                 $this->contentPageObject->getRefId()
             )
-        )
+            )
         );
         // fau.
     }

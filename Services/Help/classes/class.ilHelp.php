@@ -62,7 +62,7 @@ class ilHelp
             // fau: showHelpIds - make showing of ids independent from OH_REF_ID
 
             if (ilCust::get("help_show_ids")) {
-                $t.="<br/><i class='small'>" . $a_tt_id . "</i>";
+                $t .= "<br/><i class='small'>" . $a_tt_id . "</i>";
             }
             // fau.
             // fau: cacheTooltips - store tt
@@ -83,7 +83,7 @@ class ilHelp
                 // fau: showHelpIds - make showing of ids independent from OH_REF_ID
 
                 if (ilCust::get("help_show_ids")) {
-                    $t.="<br/><i class='small'>" . $a_tt_id . "</i>";
+                    $t .= "<br/><i class='small'>" . $a_tt_id . "</i>";
                 }
                 // fau.
                 // fau: cacheTooltips - store tt
@@ -141,13 +141,13 @@ class ilHelp
         $ilDB = $DIC->database();
         
         $q = "SELECT * FROM help_tooltip";
-        $q.= " WHERE module_id = " . $ilDB->quote($a_module_id, "integer");
+        $q .= " WHERE module_id = " . $ilDB->quote($a_module_id, "integer");
         if ($a_comp != "") {
-            $q.= " AND comp = " . $ilDB->quote($a_comp, "text");
+            $q .= " AND comp = " . $ilDB->quote($a_comp, "text");
         }
         $set = $ilDB->query($q);
         $tts = array();
-        while ($rec  = $ilDB->fetchAssoc($set)) {
+        while ($rec = $ilDB->fetchAssoc($set)) {
             $tts[$rec["id"]] = array("id" => $rec["id"], "text" => $rec["tt_text"],
                 "tt_id" => $rec["tt_id"]);
         }

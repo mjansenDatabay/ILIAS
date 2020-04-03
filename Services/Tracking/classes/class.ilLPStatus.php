@@ -33,7 +33,7 @@ class ilLPStatus
      * 				This will be compared with a global limit of refreshes per request
      * @see checkStatusForObject
      */
-    public static $refreshes_done  = 0;
+    public static $refreshes_done = 0;
     // fau.
 
     const LP_STATUS_NOT_ATTEMPTED = 'trac_no_attempted';
@@ -410,7 +410,7 @@ class ilLPStatus
             }
         }
         if ($a_users) {
-            $missing_users = array_diff($a_users, $not_attempted+$in_progress+$completed+$failed);
+            $missing_users = array_diff($a_users, $not_attempted + $in_progress + $completed + $failed);
             if ($missing_users) {
                 foreach ($missing_users as $user_id) {
                     ilLPStatusWrapper::_updateStatus($a_obj_id, $user_id);

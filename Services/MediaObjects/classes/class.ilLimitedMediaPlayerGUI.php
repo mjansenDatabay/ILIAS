@@ -53,7 +53,7 @@ class ilLimitedMediaPlayerGUI
         $this->parent_id = $_GET["parent_id"];
         $this->page_id = $_GET["page_id"];
         $mob_id = explode("_", $_GET["mob_id"]);
-        $this->mob_id = $mob_id[count($mob_id)-1];
+        $this->mob_id = $mob_id[count($mob_id) - 1];
         $this->file = '../../' . substr($_GET["source"], 2);
         $this->height = $_GET["height"];
         $this->width = $_GET["width"];

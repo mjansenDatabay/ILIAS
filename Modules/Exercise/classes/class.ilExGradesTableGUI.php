@@ -172,7 +172,7 @@ class ilExGradesTableGUI extends ilTable2GUI
         $this->tpl->setVariable("IMG_STATUS", ilUtil::getImagePath($pic));
         $this->tpl->setVariable("ALT_STATUS", $lng->txt("exc_" . $status));
         
-        if ($this->exc->getPassMode()== "man") {
+        if ($this->exc->getPassMode() == "man") {
             $this->tpl->setVariable("SEL_" . strtoupper($status), ' selected="selected" ');
             $this->tpl->setVariable("TXT_NOTGRADED", $lng->txt("exc_notgraded"));
             $this->tpl->setVariable("TXT_PASSED", $lng->txt("exc_passed"));

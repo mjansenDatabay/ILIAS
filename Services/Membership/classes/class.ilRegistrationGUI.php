@@ -848,7 +848,7 @@ abstract class ilRegistrationGUI
         switch ($this->container->getType()) {
             case 'crs':
                 $message = str_replace('{LABEL_REG_TYPE}', $this->lng->txt('crs_registration_type'), $message);
-                if ($this->container->getSubscriptionLimitationType() ==  IL_CRS_SUBSCRIPTION_DEACTIVATED) {
+                if ($this->container->getSubscriptionLimitationType() == IL_CRS_SUBSCRIPTION_DEACTIVATED) {
                     $message = str_replace('{REG_TYPE}', $this->lng->txt('crs_reg_no_selfreg'), $message);
                 } else {
                     switch ($this->container->getSubscriptionType()) {

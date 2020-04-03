@@ -121,7 +121,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->tabs_gui->setTabActive('perm_settings');
                 include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
                 $perm_gui = new ilPermissionGUI($this);
-                $ret =&$this->ctrl->forwardCommand($perm_gui);
+                $ret = &$this->ctrl->forwardCommand($perm_gui);
                 break;
 
             case 'ilbookingobjectgui':
@@ -132,7 +132,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->tabs_gui->setTabActive('render');
                 include_once("Modules/BookingManager/classes/class.ilBookingObjectGUI.php");
                 $object_gui = new ilBookingObjectGUI($this);
-                $ret =&$this->ctrl->forwardCommand($object_gui);
+                $ret = &$this->ctrl->forwardCommand($object_gui);
                 break;
 
             case 'ilbookingschedulegui':
@@ -140,7 +140,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->tabs_gui->setTabActive('schedules');
                 include_once("Modules/BookingManager/classes/class.ilBookingScheduleGUI.php");
                 $schedule_gui = new ilBookingScheduleGUI($this);
-                $ret =&$this->ctrl->forwardCommand($schedule_gui);
+                $ret = &$this->ctrl->forwardCommand($schedule_gui);
                 break;
 
             case 'ilpublicuserprofilegui':
@@ -464,10 +464,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
         if ($this->checkPermissionBool('edit_permission')) {
             $this->tabs_gui->addTab(
-                    "perm_settings",
-                    $this->lng->txt("perm_settings"),
-                    $this->ctrl->getLinkTargetByClass("ilpermissiongui", "perm")
-                );
+                "perm_settings",
+                $this->lng->txt("perm_settings"),
+                $this->ctrl->getLinkTargetByClass("ilpermissiongui", "perm")
+            );
         }
     }
     
@@ -558,9 +558,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                         if ($morning_aggr > 0 && $i == $morning_aggr) {
                             $hours[$i] = sprintf('%02d:00', 0) . "-";
                         }
-                        $hours[$i].= sprintf('%02d:00', $i);
+                        $hours[$i] .= sprintf('%02d:00', $i);
                         if ($evening_aggr < 23 && $i == $evening_aggr) {
-                            $hours[$i].= "-" . sprintf('%02d:00', 23);
+                            $hours[$i] .= "-" . sprintf('%02d:00', 23);
                         }
                         break;
 
@@ -568,9 +568,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                         if ($morning_aggr > 0 && $i == $morning_aggr) {
                             $hours[$i] = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
                         }
-                        $hours[$i].= date('h a', mktime($i, 0, 0, 1, 1, 2000));
+                        $hours[$i] .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
                         if ($evening_aggr < 23 && $i == $evening_aggr) {
-                            $hours[$i].= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
+                            $hours[$i] .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
                         }
                         break;
                 }
@@ -635,7 +635,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             for ($loop = 0; $loop < 7; $loop++) {
                 $col = $all[$loop];
                 $fnt = ilCalendarUtil::calculateFontColor($col);
-                $color[$loop+1] = 'border-bottom: 1px solid ' . $col . '; background-color: ' . $col . '; color: ' . $fnt;
+                $color[$loop + 1] = 'border-bottom: 1px solid ' . $col . '; background-color: ' . $col . '; color: ' . $fnt;
             }
             
             $counter = 0;
@@ -682,7 +682,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
                 $mytpl->setCurrentBlock('slots');
                 $mytpl->setVariable('TXT_HOUR', $caption);
-                if ($counter%2) {
+                if ($counter % 2) {
                     $mytpl->setVariable('CSS_ROW', 'tblrow1');
                 } else {
                     $mytpl->setVariable('CSS_ROW', 'tblrow2');
@@ -735,12 +735,12 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             }
 
             $slots = array();
-            if (isset($definition[$map[$date_info['isoday']-1]])) {
+            if (isset($definition[$map[$date_info['isoday'] - 1]])) {
                 $slots = array();
-                foreach ($definition[$map[$date_info['isoday']-1]] as $slot) {
+                foreach ($definition[$map[$date_info['isoday'] - 1]] as $slot) {
                     $slot = explode('-', $slot);
-                    $slots[] = array('from'=>str_replace(':', '', $slot[0]),
-                        'to'=>str_replace(':', '', $slot[1]));
+                    $slots[] = array('from' => str_replace(':', '', $slot[0]),
+                        'to' => str_replace(':', '', $slot[1]));
                 }
             }
 
@@ -783,7 +783,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                         $slot_to = mktime(substr($slot['to'], 0, 2), substr($slot['to'], 2, 2), 0, $date_info["mon"], $date_info["mday"], $date_info["year"]);
 
                         // always single object, we can sum up
-                        $nr_available = (array) ilBookingReservation::getAvailableObject($object_ids, $slot_from, $slot_to-1, false, true);
+                        $nr_available = (array) ilBookingReservation::getAvailableObject($object_ids, $slot_from, $slot_to - 1, false, true);
                         
                         // any objects available?
                         if (!array_sum($nr_available)) {
@@ -793,7 +793,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                         // check deadline
                         if ($schedule->getDeadline() >= 0) {
                             // 0-n hours before slots begins
-                            if ($slot_from < (time()+$schedule->getDeadline()*60*60)) {
+                            if ($slot_from < (time() + $schedule->getDeadline() * 60 * 60)) {
                                 continue;
                             }
                         } else {
@@ -885,7 +885,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                         $counter = $counter[$object_id];
                         if ($counter) {
                             // needed for recurrence
-                            $confirm[$object_id . "_" . $fromto[0] . "_" . ($fromto[1]+1)] = $counter;
+                            $confirm[$object_id . "_" . $fromto[0] . "_" . ($fromto[1] + 1)] = $counter;
                         }
                     }
                 }
@@ -1037,7 +1037,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     protected function addDaysDate($a_date, $a_days)
     {
         $date = date_parse($a_date);
-        $stamp = mktime(0, 0, 1, $date["month"], $date["day"]+$a_days, $date["year"]);
+        $stamp = mktime(0, 0, 1, $date["month"], $date["day"] + $a_days, $date["year"]);
         return date("Y-m-d", $stamp);
     }
     
@@ -1049,7 +1049,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             $date["minutes"],
             $date["seconds"],
             $date["mon"],
-            $date["mday"]+$a_days,
+            $date["mday"] + $a_days,
             $date["year"]
         );
     }
@@ -1086,7 +1086,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         if ((int) $_POST["recm"] > 0 && $end && $current_first) {
             ksort($counter);
             $end = $end->get(IL_CAL_DATE);
-            $cycle = (int) $_POST["recm"]*7;
+            $cycle = (int) $_POST["recm"] * 7;
             $cut = 0;
             $org = $counter;
             while ($cut < 1000 && $this->addDaysDate($current_first, $cycle) <= $end) {
@@ -1096,15 +1096,15 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                     $parts = explode("_", $item_id);
                     $obj_id = $parts[0];
                     
-                    $from = $this->addDaysStamp($parts[1], $cycle*$cut);
-                    $to = $this->addDaysStamp($parts[2], $cycle*$cut);
+                    $from = $this->addDaysStamp($parts[1], $cycle * $cut);
+                    $to = $this->addDaysStamp($parts[2], $cycle * $cut);
                     
                     $new_item_id = $obj_id . "_" . $from . "_" . $to;
                     
                     // form reload because of validation errors
                     if (!isset($counter[$new_item_id]) && date("Y-m-d", $to) <= $end) {
                         // get max available for added dates
-                        $new_max = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to-1, false, true);
+                        $new_max = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to - 1, false, true);
                         $new_max = (int) $new_max[$obj_id];
 
                         $counter[$new_item_id] = $new_max;
@@ -1131,7 +1131,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $parts = explode("_", $id);
                 $obj_id = $parts[0];
                 $from = $parts[1];
-                $to = $parts[2]-1;
+                $to = $parts[2] - 1;
                 
                 // get currently available slots
                 $counter = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to, false, true);
@@ -1272,7 +1272,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             $this->ctrl->getLinkTarget($this, "log")
         );
                 
-        $show_all = ($this->checkPermissionBool('write') ||	$this->object->hasPublicLog());
+        $show_all = ($this->checkPermissionBool('write') || $this->object->hasPublicLog());
         
         $filter = null;
         if ($this->book_obj_id > 0) {
@@ -1319,7 +1319,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
      */
     public function applyLogFilterObject()
     {
-        $show_all = ($this->checkPermissionBool('write') ||	$this->object->hasPublicLog());
+        $show_all = ($this->checkPermissionBool('write') || $this->object->hasPublicLog());
         
         include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
         $table = new ilBookingReservationsTableGUI(
@@ -1340,7 +1340,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
      */
     public function resetLogFilterObject()
     {
-        $show_all = ($this->checkPermissionBool('write') ||	$this->object->hasPublicLog());
+        $show_all = ($this->checkPermissionBool('write') || $this->object->hasPublicLog());
         
         include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
         $table = new ilBookingReservationsTableGUI(
@@ -1509,7 +1509,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             if ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE) {
                 $details .= ", " . ilDatePresentation::formatPeriod(
                     new ilDateTime($rsv->getFrom(), IL_CAL_UNIX),
-                    new ilDateTime($rsv->getTo()+1, IL_CAL_UNIX)
+                    new ilDateTime($rsv->getTo() + 1, IL_CAL_UNIX)
                 );
             }
             
@@ -1544,7 +1544,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         
             $caption = $obj->getTitle() . ", " . ilDatePresentation::formatPeriod(
                 new ilDateTime($rsv->getFrom(), IL_CAL_UNIX),
-                new ilDateTime($rsv->getTo()+1, IL_CAL_UNIX)
+                new ilDateTime($rsv->getTo() + 1, IL_CAL_UNIX)
             );
             
             // #17869

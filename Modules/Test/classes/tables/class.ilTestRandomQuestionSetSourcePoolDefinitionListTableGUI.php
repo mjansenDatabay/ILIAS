@@ -311,7 +311,7 @@ class ilTestRandomQuestionSetSourcePoolDefinitionListTableGUI extends ilTable2GU
         global $ilAccess;
 
         $obj_type = ilObject::_lookupType($a_obj_id);
-        $ref_ids  = ilObject::_getAllReferences($a_obj_id);
+        $ref_ids = ilObject::_getAllReferences($a_obj_id);
 
         foreach ($ref_ids as $ref_id) {
             if ($ilAccess->checkAccess("read", "", $ref_id, $obj_type, $a_obj_id)) {

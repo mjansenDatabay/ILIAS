@@ -167,7 +167,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
     {
         $this->writePostData(true);
         $position = key($_POST['cmd']['addchoice']);
-        $this->object->addAnswer("", 0, $position+1);
+        $this->object->addAnswer("", 0, $position + 1);
         $this->editQuestion();
     }
 
@@ -212,7 +212,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         // get the solution of the user for the active pass or from the last pass if allowed
         $user_solution = "";
         if (($active_id > 0) && (!$show_correct_solution)) {
-            $solutions =&$this->object->getSolutionValues($active_id, $pass);
+            $solutions = &$this->object->getSolutionValues($active_id, $pass);
             foreach ($solutions as $idx => $solution_value) {
                 $user_solution = $solution_value["value1"];
             }
@@ -315,7 +315,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $template->parseCurrentBlock();
         }
         $questiontext = $this->object->getQuestion();
-        if ($show_question_text==true) {
+        if ($show_question_text == true) {
             $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
         }
         $questionoutput = $template->get();
@@ -717,8 +717,8 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
                 $answertext = preg_replace('/<span class="latex">(.*)<\/span>/', '[tex]$1[/tex]', $answertext);
                 $answertext = ilUtil::secureString($answertext, true, '<span>');
 
-                $picturefile    = $_POST['choice']['imagename'][$index];
-                $file_org_name  = $_FILES['choice']['name']['image'][$index];
+                $picturefile = $_POST['choice']['imagename'][$index];
+                $file_org_name = $_FILES['choice']['name']['image'][$index];
                 $file_temp_name = $_FILES['choice']['tmp_name']['image'][$index];
 
                 if (strlen($file_temp_name)) {
@@ -800,9 +800,9 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
     {
         $aggregate = array();
         foreach ($answers_defined_on_question as $answer) {
-            $aggregated_info_for_answer 					= array();
-            $aggregated_info_for_answer['answertext']		= $answer->getAnswerText();
-            $aggregated_info_for_answer['count_checked']	= 0;
+            $aggregated_info_for_answer = array();
+            $aggregated_info_for_answer['answertext'] = $answer->getAnswerText();
+            $aggregated_info_for_answer['count_checked'] = 0;
 
             foreach ($relevant_answers_chosen as $relevant_answer) {
                 if ($relevant_answer['value1'] == $answer->getOrder()) {

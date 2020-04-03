@@ -389,9 +389,9 @@ class ilObjectCopyGUI
         $cgs->init();
         $cgs->setObjects(
             array_merge(
-                    ilParticipants::_getMembershipByType($user->getId(), 'crs', false),
-                    ilParticipants::_getMembershipByType($user->getId(), 'grp', false)
-                )
+                ilParticipants::_getMembershipByType($user->getId(), 'crs', false),
+                ilParticipants::_getMembershipByType($user->getId(), 'grp', false)
+            )
         );
         $cgs->parse();
 
@@ -447,7 +447,7 @@ class ilObjectCopyGUI
         $t->setLeadingImage(ilUtil::getImagePath("arrow_downright.svg"), " ");
         $t->setCloseFormTag(true);
         $t->setOpenFormTag(false);
-        $output.= "<br />" . $t->getHTML();
+        $output .= "<br />" . $t->getHTML();
 
         $this->tpl->setContent($output);
 
@@ -559,10 +559,10 @@ class ilObjectCopyGUI
                 if (!array_key_exists($source_type, (array) $possible_subtypes)) {
                     ilUtil::sendFailure(
                         sprintf(
-                                $this->lng->txt('msg_obj_may_not_contain_objects_of_type'),
-                                $this->lng->txt('obj_' . $target_type),
-                                $this->lng->txt('obj_' . $source_type)
-                            )
+                            $this->lng->txt('msg_obj_may_not_contain_objects_of_type'),
+                            $this->lng->txt('obj_' . $target_type),
+                            $this->lng->txt('obj_' . $source_type)
+                        )
                     );
                     $this->showTargetSelectionTree();
                     return false;
@@ -854,10 +854,10 @@ class ilObjectCopyGUI
                     ) {
                         ilUtil::sendFailure(
                             sprintf(
-                                    $this->lng->txt('msg_obj_may_not_contain_objects_of_type'),
-                                    $this->lng->txt('obj_' . $target_type),
-                                    $this->lng->txt('obj_' . $source_type)
-                                )
+                                $this->lng->txt('msg_obj_may_not_contain_objects_of_type'),
+                                $this->lng->txt('obj_' . $target_type),
+                                $this->lng->txt('obj_' . $source_type)
+                            )
                         );
                         $this->searchSource();
                         return false;
@@ -920,7 +920,7 @@ class ilObjectCopyGUI
         $info = $this->lng->txt($this->getType() . '_copy_threads_info');
 
         if (ilCust::get('ilias_copy_by_soap')) {
-            $info.= '<br /><span class="small">' . $this->lng->txt('object_copy_with_mail_info') . '</span>';
+            $info .= '<br /><span class="small">' . $this->lng->txt('object_copy_with_mail_info') . '</span>';
         }
         ilUtil::sendInfo($info);
         // fau.

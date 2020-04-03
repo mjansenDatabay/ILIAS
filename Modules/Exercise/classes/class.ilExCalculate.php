@@ -200,7 +200,7 @@ class ilExCalculate
 
         // selection of candidates
         if ($this->options['mark_select'] == 'number') {
-            $needed =  $this->options['mark_select_count'];
+            $needed = $this->options['mark_select_count'];
             if (count($selected) + count($candidates) < $needed) {
                 // not enough marks available
                 return null;

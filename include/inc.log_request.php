@@ -160,7 +160,7 @@ class RequestLog
 
         $ini = ini_get_all();
         foreach ($ini as $key => $values) {
-            $ret.= '<tr><td>' . $key . '</td>' . "\n";
+            $ret .= '<tr><td>' . $key . '</td>' . "\n";
             $ret .= '<td>' . wordwrap($values['global_value'], floor($this->wrap / 2), "\n", 1) . '&nbsp;</td>' . "\n";
             $ret .= '<td>' . wordwrap($values['local_value'], floor($this->wrap / 2), "\n", 1) . '&nbsp;</td>' . "\n";
             $ret .= '<td>' . $this->access_name[$values['access']] . '&nbsp;</td></tr>' . "\n";
@@ -187,7 +187,7 @@ class RequestLog
             $ret = '<table border="1" cellspacing="0" cellpadding="2">' . "\n";
             $ret .= '<th>Key</th><th>Value</th>' . "\n";
             foreach ($a_var as $key => $value) {
-                $ret.= '<tr><td>' . $key . '</td>' . "\n";
+                $ret .= '<tr><td>' . $key . '</td>' . "\n";
                 
                 if (is_array($value)) {
                     $ret .= '<td>' . $this->getAssocDump($value) . '</td></tr>' . "\n";

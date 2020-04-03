@@ -238,7 +238,7 @@ class ilObjSurveyGUI extends ilObjectGUI
                 break;
             
             case 'ilsurveyparticipantsgui':
-                if ($this->object->getMode() == ilObjSurvey::MODE_STANDARD  || $this->object->getMode() == ilObjSurvey::MODE_SELF_EVAL) {
+                if ($this->object->getMode() == ilObjSurvey::MODE_STANDARD || $this->object->getMode() == ilObjSurvey::MODE_SELF_EVAL) {
                     $ilTabs->activateTab("maintenance");
                 } else {
                     $ilTabs->activateTab("survey_360_appraisees");
@@ -269,7 +269,7 @@ class ilObjSurveyGUI extends ilObjectGUI
 
             default:
                 $this->addHeaderAction();
-                $cmd.= "Object";
+                $cmd .= "Object";
 
                 $this->log->debug("Default cmd= $cmd");
 
@@ -559,7 +559,7 @@ class ilObjSurveyGUI extends ilObjectGUI
             if (!$this->object->get360Mode()) {
                 if ($form->getInput("tut")) {
                     // check if given "tutors" have write permission
-                    $tut_ids =array();
+                    $tut_ids = array();
                     $tut_logins = $form->getInput("tut_ids");
                     foreach ($tut_logins as $tut_login) {
                         $tut_id = ilObjUser::_lookupId($tut_login);
@@ -1545,7 +1545,7 @@ class ilObjSurveyGUI extends ilObjectGUI
         $questionspools = $svy->getAvailableQuestionpools(true, true, true);
 
         $pools = new ilSelectInputGUI($this->lng->txt("select_questionpool_short"), "spl");
-        $pools->setOptions(array(""=>$this->lng->txt("dont_use_questionpool")) + $questionspools);
+        $pools->setOptions(array("" => $this->lng->txt("dont_use_questionpool")) + $questionspools);
         $pools->setRequired(false);
         $form->addItem($pools);
 
@@ -1952,7 +1952,7 @@ class ilObjSurveyGUI extends ilObjectGUI
         if ($big_button) {
             // fau: surveyAsForm - rename the start button
             if ($big_button[0] == 'start' and $this->object->getMetaIdentifier('StartButton')) {
-                $big_button[1] =  $this->object->getMetaIdentifier('StartButton');
+                $big_button[1] = $this->object->getMetaIdentifier('StartButton');
             }
             // fau.
 

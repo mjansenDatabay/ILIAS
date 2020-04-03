@@ -239,7 +239,7 @@
             'subject_id' => array('type' => 'integer', 'length' => 4, 'notnull' => false),
             'degree_id' => array('type' => 'integer', 'length' => 4, 'notnull' => false),
             'min_semester' => array('type' => 'integer', 'length' => 4, 'notnull' => false),
-            'max_semester' => array('type' => 'integer', 'length'=> 4, 'notnull' => false),
+            'max_semester' => array('type' => 'integer', 'length' => 4, 'notnull' => false),
             'ref_semester' => array('type' => 'text', 'length' => 10, 'notnull' => false, 'default' => null),
         ));
         $ilDB->addPrimaryKey("il_studycond", array("cond_id"));
@@ -353,8 +353,8 @@
      */
     if (!$ilDB->tableExists('tst_mycampus_options')) {
         $ilDB->createTable('tst_mycampus_options', array(
-            'obj_id' => array('type'  => 'integer', 'length' => 4, 'notnull' => true),
-            'option_key' => array('type' => 'text', 'length' =>  100, 'notnull' => false),
+            'obj_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true),
+            'option_key' => array('type' => 'text', 'length' => 100, 'notnull' => false),
             'option_value' => array('type' => 'text', 'length' => 2000, 'notnull' => false)
         ));
         $ilDB->addPrimaryKey("tst_mycampus_options", array('obj_id', 'option_key'));
@@ -368,7 +368,7 @@
     if (!$ilDB->tableExists('exc_calc_options')) {
         $ilDB->createTable('exc_calc_options', array(
             'obj_id' => array('type' => 'integer', 'length' => 4, 'notnull' => true),
-            'option_key' => array('type' => 'text', 'length' =>  100, 'notnull' => false),
+            'option_key' => array('type' => 'text', 'length' => 100, 'notnull' => false),
             'option_value' => array('type' => 'text', 'length' => 2000, 'notnull' => false)
         ));
         $ilDB->addPrimaryKey('exc_calc_options', array('obj_id', 'option_key'));
@@ -504,7 +504,7 @@
         $ilDB->addTableColumn(
             'usr_subject',
             'semester',
-            array('type' => 'integer', 'length' => 4, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
         );
     }
 ?>
@@ -517,7 +517,7 @@
         $ilDB->addTableColumn(
             'usr_subject',
             'subject_no',
-            array('type' => 'integer', 'length' => 4, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
         );
     }
 ?>
@@ -610,14 +610,14 @@
         $ilDB->addTableColumn(
             'tst_rnd_quest_set_qpls',
             'origin_tax_filter',
-            array('type' => 'text', 'length' => 4000, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 4000, 'notnull' => false, 'default' => null)
         );
     }
     if (!$ilDB->tableColumnExists('tst_rnd_quest_set_qpls', 'mapped_tax_filter')) {
         $ilDB->addTableColumn(
             'tst_rnd_quest_set_qpls',
             'mapped_tax_filter',
-            array('type' => 'text', 'length' => 4000, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 4000, 'notnull' => false, 'default' => null)
         );
     }
 
@@ -654,7 +654,7 @@
         $ilDB->addTableColumn(
             'tax_node',
             'description',
-            array('type' => 'text', 'length' => 4000, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 4000, 'notnull' => false, 'default' => null)
         );
     }
 ?>
@@ -717,7 +717,7 @@
         $ilDB->addTableColumn(
             'exc_assignment',
             'res_time',
-            array('type' => 'integer', 'length' => 4, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
         );
     }
 ?>
@@ -738,7 +738,7 @@
         $ilDB->addTableColumn(
             'tst_rnd_quest_set_qpls',
             'type_filter',
-            array('type' => 'text', 'length' => 250, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 250, 'notnull' => false, 'default' => null)
         );
     }
 ?>
@@ -751,12 +751,12 @@
         $ilDB->addTableColumn(
             'reg_registration_codes',
             'title',
-            array('type' => 'text', 'length' => 250, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 250, 'notnull' => false, 'default' => null)
         );
         $ilDB->addTableColumn(
             'reg_registration_codes',
             'description',
-            array('type' => 'text', 'length' => 4000, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 4000, 'notnull' => false, 'default' => null)
         );
         $ilDB->addTableColumn(
             'reg_registration_codes',
@@ -858,7 +858,7 @@
         $ilDB->addTableColumn(
             'tst_rnd_quest_set_qpls',
             'origin_group_tax_fi',
-            array('type' => 'integer', 'length' => 4, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
         );
     }
     if (!$ilDB->tableColumnExists('tst_rnd_quest_set_qpls', 'mapped_group_tax_fi')) {
@@ -877,7 +877,7 @@
         $ilDB->addTableColumn(
             'tst_rnd_quest_set_qpls',
             'order_by',
-            array('type' => 'text', 'length' => 20, 'notnull'	=> false, 'default'	=> null)
+            array('type' => 'text', 'length' => 20, 'notnull' => false, 'default' => null)
         );
     }
     // fau.

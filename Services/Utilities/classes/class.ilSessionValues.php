@@ -18,7 +18,7 @@ class ilSessionValues
         if (!is_array($_SESSION[$a_identifier])) {
             $_SESSION[$a_identifier] = array();
         }
-        $this->values =&$_SESSION[$a_identifier];
+        $this->values = &$_SESSION[$a_identifier];
         
         //echo $a_identifier;
         //var_dump($this->values);
@@ -144,7 +144,7 @@ class ilSessionValues
 
         $value = $this->getSessionValue($a_section, $a_name);
 
-        if (true||!is_array($value)) {
+        if (true || !is_array($value)) {
             return new ilDateTime($a_default_timestamp, IL_CAL_UNIX);
         } else {
             return new ilDateTime($value['end'], IL_CAL_DATETIME, $ilUser->getTimeZone());

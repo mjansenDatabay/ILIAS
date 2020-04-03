@@ -351,7 +351,7 @@ abstract class ilParticipants
         $tree = $DIC['tree'];
 
         // check objects from current object upwards
-        $path_ids  = array_reverse($tree->getPathId($a_ref_id));
+        $path_ids = array_reverse($tree->getPathId($a_ref_id));
         foreach ($path_ids as $path_id) {
             // this gets all roles with local policies
             // it doen't get parent roles with protected permissions
@@ -1368,7 +1368,7 @@ abstract class ilParticipants
         $this->participants_status = array();
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $this->participants_status[$row->usr_id]['blocked'] = $row->blocked;
-            $this->participants_status[$row->usr_id]['notification']  = $row->notification;
+            $this->participants_status[$row->usr_id]['notification'] = $row->notification;
             $this->participants_status[$row->usr_id]['passed'] = $row->passed;
             // cognos-blu-patch: begin
             $this->participants_status[$row->usr_id]['contact'] = $row->contact;
@@ -1395,7 +1395,7 @@ abstract class ilParticipants
         if ($a_field) {
             include_once './Services/User/classes/class.ilObjUser.php';
 
-            $tmp_user =&ilObjectFactory::getInstanceByObjId($a_usr_id);
+            $tmp_user = &ilObjectFactory::getInstanceByObjId($a_usr_id);
             switch ($a_field) {
                 case 'login':
                     $and = "AND login = " . $ilDB->quote($tmp_user->getLogin(), 'text') . " ";
@@ -1520,7 +1520,7 @@ abstract class ilParticipants
             return false;
         }
 
-        if (!$tmp_obj =&ilObjectFactory::getInstanceByObjId($a_usr_id)) {
+        if (!$tmp_obj = &ilObjectFactory::getInstanceByObjId($a_usr_id)) {
             $ilErr->appendMessage($this->lng->txt("crs_user_not_exists"));
 
             return false;
@@ -1807,7 +1807,7 @@ abstract class ilParticipants
         $list = array();
         $list[] = $this->lng->txt('user') . $sep . $a_user->getFullname();
         $list[] = $this->lng->txt('email') . $sep . $a_user->getEmail();
-        $list[] =  $this->lng->txt('title') . $sep . $a_object->getTitle();
+        $list[] = $this->lng->txt('title') . $sep . $a_object->getTitle();
         if ($a_object->getType() == 'crs' && !empty($a_object->getSyllabus())) {
             $list[] = $this->lng->txt('crs_syllabus') . $sep . $a_object->getSyllabus();
         }

@@ -90,7 +90,7 @@ class ilNusoapUserAdministrationAdapter
             '',
             'SOAP-ENC:Array',
             array(),
-            array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:int[]')),
+            array(array('ref' => 'SOAP-ENC:arrayType','wsdl:arrayType' => 'xsd:int[]')),
             'xsd:int'
         );
 
@@ -101,7 +101,7 @@ class ilNusoapUserAdministrationAdapter
             '',
             'SOAP-ENC:Array',
             array(),
-            array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:string[]')),
+            array(array('ref' => 'SOAP-ENC:arrayType','wsdl:arrayType' => 'xsd:string[]')),
             'xsd:string'
         );
 
@@ -112,7 +112,7 @@ class ilNusoapUserAdministrationAdapter
             '',
             'SOAP-ENC:Array',
             array(),
-            array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:double[]')),
+            array(array('ref' => 'SOAP-ENC:arrayType','wsdl:arrayType' => 'xsd:double[]')),
             'xsd:double'
         );
 
@@ -962,19 +962,19 @@ class ilNusoapUserAdministrationAdapter
         );
 
         $this->server->register(
-        'saveQuestionSolution',
-        array('sid' => 'xsd:string',
+            'saveQuestionSolution',
+            array('sid' => 'xsd:string',
                                   'active_id' => 'xsd:long',
                                   'question_id' => 'xsd:long',
                                   'pass' => 'xsd:int',
                                   'solution' => 'xsd:string'),
-        array('status' => 'xsd:string'),
-        SERVICE_NAMESPACE,
-        SERVICE_NAMESPACE . '#saveQuestionSolution',
-        SERVICE_STYLE,
-        SERVICE_USE,
-        'ILIAS saveQuestionSolution: Saves the result of a question in a given test pass for the active test user. The active user is identified by the active ID, which assigns a user to a test. The solution has to be an XML string which contains &lt;values&gt;&lt;value&gt;VALUE&lt;/value&gt;&lt;value&gt;VALUE&lt;/value&gt;&lt;points&gt;POINTS&lt;/points&gt;...&lt;/values&gt; where the triplet (value,value,points) can repeat n times. The result string is either TRUE or it contains an error message.'
-    );
+            array('status' => 'xsd:string'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#saveQuestionSolution',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'ILIAS saveQuestionSolution: Saves the result of a question in a given test pass for the active test user. The active user is identified by the active ID, which assigns a user to a test. The solution has to be an XML string which contains &lt;values&gt;&lt;value&gt;VALUE&lt;/value&gt;&lt;value&gt;VALUE&lt;/value&gt;&lt;points&gt;POINTS&lt;/points&gt;...&lt;/values&gt; where the triplet (value,value,points) can repeat n times. The result string is either TRUE or it contains an error message.'
+        );
 
         $this->server->register(
             'getQuestionSolution',
@@ -991,57 +991,57 @@ class ilNusoapUserAdministrationAdapter
         );
 
         $this->server->register(
-                                'getTestUserData',
-                                array('sid' => 'xsd:string',
+            'getTestUserData',
+            array('sid' => 'xsd:string',
                                                           'active_id' => 'xsd:long'),
-                                array('userdata' => 'tns:stringArray'),
-                                SERVICE_NAMESPACE,
-                                SERVICE_NAMESPACE . '#getTestUserData',
-                                SERVICE_STYLE,
-                                SERVICE_USE,
-                                'ILIAS getTestUserData: Typically called from external assessment questions to retrieve data of the active user. The returned string array values are fullname, title, firstname, lastname, login.'
-                            );
+            array('userdata' => 'tns:stringArray'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#getTestUserData',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'ILIAS getTestUserData: Typically called from external assessment questions to retrieve data of the active user. The returned string array values are fullname, title, firstname, lastname, login.'
+        );
 
         $this->server->register(
-                                'getPositionOfQuestion',
-                                array('sid' => 'xsd:string',
+            'getPositionOfQuestion',
+            array('sid' => 'xsd:string',
                                                           'active_id' => 'xsd:long',
                                                           'question_id' => 'xsd:int',
                                                           'pass' => 'xsd:int'),
-                                array('position' => 'xsd:int'),
-                                SERVICE_NAMESPACE,
-                                SERVICE_NAMESPACE . '#getPositionOfQuestion',
-                                SERVICE_STYLE,
-                                SERVICE_USE,
-                                'ILIAS getPositionOfQuestion: Returns the position of a given question for a given user in a given test pass.'
-                            );
+            array('position' => 'xsd:int'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#getPositionOfQuestion',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'ILIAS getPositionOfQuestion: Returns the position of a given question for a given user in a given test pass.'
+        );
 
         $this->server->register(
-                                'getPreviousReachedPoints',
-                                array('sid' => 'xsd:string',
+            'getPreviousReachedPoints',
+            array('sid' => 'xsd:string',
                                                           'active_id' => 'xsd:long',
                                                           'question_id' => 'xsd:int',
                                                           'pass' => 'xsd:int'),
-                                array('position' => 'tns:doubleArray'),
-                                SERVICE_NAMESPACE,
-                                SERVICE_NAMESPACE . '#getPreviousReachedPoints',
-                                SERVICE_STYLE,
-                                SERVICE_USE,
-                                'ILIAS getPreviousReachedPoints: Returns an array of reached points for the previous questions in a given test pass.'
-                            );
+            array('position' => 'tns:doubleArray'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#getPreviousReachedPoints',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'ILIAS getPreviousReachedPoints: Returns an array of reached points for the previous questions in a given test pass.'
+        );
 
         $this->server->register(
-                                'getNrOfQuestionsInPass',
-                                array('sid' => 'xsd:string',
+            'getNrOfQuestionsInPass',
+            array('sid' => 'xsd:string',
                                                           'active_id' => 'xsd:long',
                                                           'pass' => 'xsd:int'),
-                                array('count' => 'xsd:int'),
-                                SERVICE_NAMESPACE,
-                                SERVICE_NAMESPACE . '#getNrOfQuestionsInPass',
-                                SERVICE_STYLE,
-                                SERVICE_USE,
-                                'ILIAS getNrOfQuestionsInPass: Returns the question count for a given test user in a given pass.'
-                            );
+            array('count' => 'xsd:int'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#getNrOfQuestionsInPass',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'ILIAS getNrOfQuestionsInPass: Returns the question count for a given test user in a given pass.'
+        );
 
         $this->server->register(
             'getStructureObjects',
@@ -1220,15 +1220,15 @@ class ilNusoapUserAdministrationAdapter
 
 
         $this->server->register(
-              'getUserXML',
-              array('sid' => 'xsd:string', 'user_ids' => 'tns:intArray', 'attach_roles' => 'xsd:int'),
-              array('xml' => 'xsd:string'),
-              SERVICE_NAMESPACE,
-              SERVICE_NAMESPACE . '#resolveUsers',
-              SERVICE_STYLE,
-              SERVICE_USE,
-              'ILIAS getUserXML(): get xml records for user ids, e.g. retrieved vom members of course xml. Returns user xml dtds. ids are numeric ids of user'
-          );
+            'getUserXML',
+            array('sid' => 'xsd:string', 'user_ids' => 'tns:intArray', 'attach_roles' => 'xsd:int'),
+            array('xml' => 'xsd:string'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#resolveUsers',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'ILIAS getUserXML(): get xml records for user ids, e.g. retrieved vom members of course xml. Returns user xml dtds. ids are numeric ids of user'
+        );
 
 
         // get objs ids by ref id

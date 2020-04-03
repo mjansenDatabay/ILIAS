@@ -184,7 +184,7 @@ class ilStudyDocCond extends ilStudyCond
             // all defined criteria must be satisfied
             // continue with next doc program on failure
 
-            if (isset($this->prog_id) and (!isset($doc->prog_id)  or $this->prog_id != $doc->prog_id)) {
+            if (isset($this->prog_id) and (!isset($doc->prog_id) or $this->prog_id != $doc->prog_id)) {
                 continue; // failed
             }
 

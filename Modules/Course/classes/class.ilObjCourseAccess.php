@@ -230,18 +230,18 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
 
         // fau: fairSub - general command for editing requests
         // on waiting list
-        $commands[]	= array('permission' => "join", "cmd" => "leave", "lang_var" => "mem_edit_request");
+        $commands[] = array('permission' => "join", "cmd" => "leave", "lang_var" => "mem_edit_request");
         // fau.
 
         // fim: [memad] add command for guest accounts to request a join
         include_once('Services/User/classes/class.ilUserUtil.php');
         if (ilUserUtil::_isGuestHearer()) {
-            $commands[]	= array('permission' => "visible", "cmd" => "joinAsGuest", "lang_var" => "join_as_guest");
+            $commands[] = array('permission' => "visible", "cmd" => "joinAsGuest", "lang_var" => "join_as_guest");
         }
         // fim.
         
         // regualar users
-        $commands[]	= array('permission' => "leave", "cmd" => "leave", "lang_var" => "crs_unsubscribe");
+        $commands[] = array('permission' => "leave", "cmd" => "leave", "lang_var" => "crs_unsubscribe");
 
         include_once('Services/WebDAV/classes/class.ilDAVActivationChecker.php');
         if (ilDAVActivationChecker::_isActive()) {
@@ -515,10 +515,10 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
             if ($show_hidden_notice) {
                 $limits[] = $lng->txt("mem_max_users_hidden");
             }
-            $limits[] =  $lng->txt("mem_max_users") . $max_members;
-            $limits[] =  $lng->txt("mem_free_places") . ': ' . $free_places;
+            $limits[] = $lng->txt("mem_max_users") . $max_members;
+            $limits[] = $lng->txt("mem_free_places") . ': ' . $free_places;
             if ($waiting > 0) {
-                $limits[] =  $lng->txt("subscribers_or_waiting_list") . ': ' . (string) ($waiting);
+                $limits[] = $lng->txt("subscribers_or_waiting_list") . ': ' . (string) ($waiting);
             }
 
             $info['reg_info_list_prop_limit']['property'] = '';

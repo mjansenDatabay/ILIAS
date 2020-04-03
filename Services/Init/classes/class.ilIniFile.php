@@ -132,7 +132,7 @@ class ilIniFile
         }
         //set current group
         $temp = array_keys($this->GROUPS);
-        $this->CURRENT_GROUP = $temp[count($temp)-1];
+        $this->CURRENT_GROUP = $temp[count($temp) - 1];
         return true;
     }
 
@@ -195,10 +195,10 @@ class ilIniFile
         $groups = $this->readGroups();
         $group_cnt = count($groups);
         
-        for ($i=0; $i<$group_cnt; $i++) {
+        for ($i = 0; $i < $group_cnt; $i++) {
             $group_name = $groups[$i];
             //prevent empty line at beginning of ini-file
-            if ($i==0) {
+            if ($i == 0) {
                 $res = sprintf("[%s]\r\n", $group_name);
             } else {
                 $res = sprintf("\r\n[%s]\r\n", $group_name);
@@ -207,7 +207,7 @@ class ilIniFile
             $result = fwrite($fp, $res);
             $group = $this->readGroup($group_name);
             
-            for (reset($group); $key=key($group);next($group)) {
+            for (reset($group); $key = key($group);next($group)) {
                 $res = sprintf("%s = %s\r\n", $key, "\"" . $group[$key] . "\"");
                 $result = fwrite($fp, $res);
             }
@@ -233,10 +233,10 @@ class ilIniFile
         $content = "";
         
         // go through all groups
-        for ($i=0; $i<$group_cnt; $i++) {
+        for ($i = 0; $i < $group_cnt; $i++) {
             $group_name = $groups[$i];
             //prevent empty line at beginning of ini-file
-            if ($i==0) {
+            if ($i == 0) {
                 $content = sprintf("[%s]\n", $group_name);
             } else {
                 $content .= sprintf("\n[%s]\n", $group_name);
@@ -245,7 +245,7 @@ class ilIniFile
             $group = $this->readGroup($group_name);
             
             //go through group an display all variables
-            for (reset($group); $key=key($group);next($group)) {
+            for (reset($group); $key = key($group);next($group)) {
                 $content .= sprintf("%s = %s\n", $key, $group[$key]);
             }
         }
@@ -272,8 +272,8 @@ class ilIniFile
     {
         $groups = array();
 
-        for (reset($this->GROUPS);$key=key($this->GROUPS);next($this->GROUPS)) {
-            $groups[]=$key;
+        for (reset($this->GROUPS);$key = key($this->GROUPS);next($this->GROUPS)) {
+            $groups[] = $key;
         }
 
         return $groups;

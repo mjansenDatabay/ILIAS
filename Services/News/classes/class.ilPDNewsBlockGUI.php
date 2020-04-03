@@ -406,7 +406,7 @@ class ilPDNewsBlockGUI extends ilNewsForContextBlockGUI
                 60 => "2 " . $lng->txt("months"),
                 120 => "4 " . $lng->txt("months"),
                 180 => "6 " . $lng->txt("months"),
-                366 =>  "1 " . $lng->txt("year"));
+                366 => "1 " . $lng->txt("year"));
 
             $unset = array();
             foreach ($per_opts as $k => $opt) {
@@ -447,7 +447,7 @@ class ilPDNewsBlockGUI extends ilNewsForContextBlockGUI
             if (!$a_private_form) {
                 $a_private_form = $this->initPrivateSettingsForm();
             }
-            $returnForm .= ($returnForm=="")
+            $returnForm .= ($returnForm == "")
                 ? $a_private_form->getHTML()
                 : "<br>" . $a_private_form->getHTML();
         }

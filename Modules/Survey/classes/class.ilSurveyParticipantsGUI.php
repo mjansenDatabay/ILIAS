@@ -325,12 +325,12 @@ class ilSurveyParticipantsGUI
         if (!in_array("invitation", $hidden_tabs)) {
             if ($this->access->checkAccess('write', '', $this->object->getRefId())) {
                 $ilTabs->addSubTabTarget(
-                "invitation",
-                $this->ctrl->getLinkTarget($this, 'invite'),
-                array("invite", "saveInvitationStatus",
+                    "invitation",
+                    $this->ctrl->getLinkTarget($this, 'invite'),
+                    array("invite", "saveInvitationStatus",
                  "inviteUserGroup", "disinviteUserGroup"),
-                ""
-            );
+                    ""
+                );
             }
         }
         
@@ -457,8 +457,8 @@ class ilSurveyParticipantsGUI
                 $this,
                 $tb,
                 array(
-                    'auto_complete_name'	=> $lng->txt('user'),
-                    'submit_name'			=> $lng->txt('svy_invite_action')
+                    'auto_complete_name' => $lng->txt('user'),
+                    'submit_name' => $lng->txt('svy_invite_action')
                 )
             );
 
@@ -560,7 +560,7 @@ class ilSurveyParticipantsGUI
         ilUtil::sendQuestion($this->lng->txt("confirm_delete_single_user_data"));
         include_once "./Modules/Survey/classes/tables/class.ilSurveyMaintenanceTableGUI.php";
         $table_gui = new ilSurveyMaintenanceTableGUI($this, 'maintenance', true);
-        $total =&$this->object->getSurveyParticipants();
+        $total = &$this->object->getSurveyParticipants();
         $data = array();
         foreach ($total as $user_data) {
             if (in_array($user_data['active_id'], $_POST['chbUser'])) {
@@ -1038,7 +1038,7 @@ class ilSurveyParticipantsGUI
     }
     
     // see ilBookmarkImportExport
-    protected function _convertCharset($a_string, $a_from_charset="", $a_to_charset="UTF-8")
+    protected function _convertCharset($a_string, $a_from_charset = "", $a_to_charset = "UTF-8")
     {
         if (extension_loaded("mbstring")) {
             if (!$a_from_charset) {
@@ -1220,10 +1220,10 @@ class ilSurveyParticipantsGUI
             $this,
             $ilToolbar,
             array(
-                'auto_complete_name'	=> $this->lng->txt('user'),
-                'submit_name'			=> $this->lng->txt('add'),
-                'add_search'			=> true,
-                'add_from_container'    => $this->ref_id
+                'auto_complete_name' => $this->lng->txt('user'),
+                'submit_name' => $this->lng->txt('add'),
+                'add_search' => true,
+                'add_from_container' => $this->ref_id
             )
         );
         
@@ -1371,10 +1371,10 @@ class ilSurveyParticipantsGUI
             $this,
             $ilToolbar,
             array(
-                'auto_complete_name'	=> $this->lng->txt('user'),
-                'submit_name'			=> $this->lng->txt('add'),
-                'add_search'			=> true,
-                'add_from_container'	=> $this->ref_id
+                'auto_complete_name' => $this->lng->txt('user'),
+                'submit_name' => $this->lng->txt('add'),
+                'add_search' => true,
+                'add_from_container' => $this->ref_id
             )
         );
         

@@ -186,8 +186,8 @@ class ilSessionOverviewGUI
             }
             // fau: sessionOverview - prepare sort key for events
             $sort = $tmp_event->getFirstAppointment()->getStart()->get(IL_CAL_DATETIME);
-            $sort.= $tmp_event->getTitle();
-            $sort.= $tmp_event->getId();
+            $sort .= $tmp_event->getTitle();
+            $sort .= $tmp_event->getId();
             $events[$sort] = $tmp_event;
             // fau.
         }

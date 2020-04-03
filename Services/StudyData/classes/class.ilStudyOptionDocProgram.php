@@ -118,7 +118,7 @@ class ilStudyOptionDocProgram extends ilStudyOption
         $text = $this->getText();
 
         if ($this->end instanceof ilDateTime) {
-            $text .=  ' ' . $lng->txt('studydata_doc_prog_until') . ' ' . ilDatePresentation::formatDate($this->end);
+            $text .= ' ' . $lng->txt('studydata_doc_prog_until') . ' ' . ilDatePresentation::formatDate($this->end);
         }
 
         return $text;

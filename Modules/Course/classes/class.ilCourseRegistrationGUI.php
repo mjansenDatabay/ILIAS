@@ -138,7 +138,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
         if ($this->container->getImportantInformation()) {
             // fim: [univis] user custom input for info
             $imp = new ilCustomInputGUI($this->lng->txt('crs_important_info'), "", true);
-            $html =  nl2br(ilUtil::makeClickable($this->container->getImportantInformation(), true));
+            $html = nl2br(ilUtil::makeClickable($this->container->getImportantInformation(), true));
             $imp->setHtml($html);
             $this->form->addItem($imp);
             // fim.
@@ -220,7 +220,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
         }
 
         // fau: fairSub	- add info about fair time for limited subscription
-        if ($this->container->isSubscriptionMembershipLimited() &&$this->container->getSubscriptionMaxMembers()) {
+        if ($this->container->isSubscriptionMembershipLimited() && $this->container->getSubscriptionMaxMembers()) {
             if ($this->container->getSubscriptionFair() >= 0) {
                 $tpl->setVariable('TXT_FAIR', $this->lng->txt('sub_fair_date') . ': ');
                 $tpl->setVariable('FAIR', $this->container->getSubscriptionFairDisplay(false));
@@ -526,7 +526,7 @@ class ilCourseRegistrationGUI extends ilRegistrationGUI
         require_once("./Modules/Session/classes/class.ilObjSession.php");
         require_once("./Modules/Session/classes/class.ilObjSessionAccess.php");
 
-        $events =&ilObjSession::_getSessions($this->container->getRefId(), true);
+        $events = &ilObjSession::_getSessions($this->container->getRefId(), true);
         if (!count($events)) {
             return;
         }

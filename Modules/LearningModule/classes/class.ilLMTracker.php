@@ -266,8 +266,8 @@ class ilLMTracker
             $time_diff = $read_diff = 0;
 
             // spent_seconds or read_count ?
-            if (($now-$pg_ts) <= $valid_timespan) {
-                $time_diff = $now-$pg_ts;
+            if (($now - $pg_ts) <= $valid_timespan) {
+                $time_diff = $now - $pg_ts;
             } else {
                 $read_diff = 1;
             }
@@ -517,21 +517,21 @@ class ilLMTracker
         self::preloadLMTrackingData($this->lm_obj_id, array($this->user_id));
 
         // user independent lm data
-        $this->tree_arr =&self::$tree_arr_by_lm[$this->lm_obj_id];
-        $this->lm_obj_ids =&self::$lm_obj_ids_by_lm[$this->lm_obj_id];
-        $this->page_questions =&self::$page_questions_by_lm[$this->lm_obj_id];
-        $this->all_questions =&self::$all_questions_by_lm[$this->lm_obj_id];
+        $this->tree_arr = &self::$tree_arr_by_lm[$this->lm_obj_id];
+        $this->lm_obj_ids = &self::$lm_obj_ids_by_lm[$this->lm_obj_id];
+        $this->page_questions = &self::$page_questions_by_lm[$this->lm_obj_id];
+        $this->all_questions = &self::$all_questions_by_lm[$this->lm_obj_id];
 
         // read events of the user
         $this->re_arr = array();
         if (isset(self::$read_events_by_lm[$this->lm_obj_id][$this->user_id])) {
-            $this->re_arr =&self::$read_events_by_lm[$this->lm_obj_id][$this->user_id];
+            $this->re_arr = &self::$read_events_by_lm[$this->lm_obj_id][$this->user_id];
         }
 
         // answer statuses of the user
         $this->answer_status = array();
         if (isset(self::$answer_status_by_lm[$this->lm_obj_id][$this->user_id])) {
-            $this->answer_status =&self::$answer_status_by_lm[$this->lm_obj_id][$this->user_id];
+            $this->answer_status = &self::$answer_status_by_lm[$this->lm_obj_id][$this->user_id];
         }
 
         $this->has_incorrect_answers = false;
@@ -747,9 +747,7 @@ class ilLMTracker
                 $this->tree_arr["nodes"][$a_obj_id]["has_pred_incorrect_answers"] = $a_has_pred_incorrect_answers;
                 $this->tree_arr["nodes"][$a_obj_id]["has_pred_incorrect_not_unlocked_answers"] = $a_has_pred_incorrect_not_unlocked_answers;
             }
-
         } else {	// free pages (currently not called, since only walking through tree structure)
-        
         }
         $this->tree_arr["nodes"][$a_obj_id]["status"] = $status;
 

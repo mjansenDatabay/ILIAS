@@ -51,7 +51,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         $rbacsystem = $DIC['rbacsystem'];
         $lng->loadLanguageModule("assessment");
         $this->type = "qpl";
-        $this->ctrl =&$ilCtrl;
+        $this->ctrl = &$ilCtrl;
         
         $this->ctrl->saveParameter($this, array(
             "ref_id", "test_ref_id", "calling_test", "test_express_mode", "q_id", 'tax_node', 'calling_consumer', 'consumer_context'
@@ -401,7 +401,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
                     $this->ctrl->setParameter($this, 'q_id', '');
                 }
                 
-                $cmd.= "Object";
+                $cmd .= "Object";
                 $ret = $this->$cmd();
                 break;
                 
@@ -538,7 +538,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         include_once "./Services/QTI/classes/class.ilQTIParser.php";
         $qtiParser = new ilQTIParser($qti_file, IL_MO_VERIFY_QTI, 0, "");
         $result = $qtiParser->startParsing();
-        $founditems =&$qtiParser->getFoundItems();
+        $founditems = &$qtiParser->getFoundItems();
         if (count($founditems) == 0) {
             // nothing found
 
@@ -581,7 +581,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 
         require_once 'Modules/TestQuestionPool/classes/tables/class.ilQuestionPoolImportVerificationTableGUI.php';
         $table = new ilQuestionPoolImportVerificationTableGUI($this, 'uploadQplObject');
-        $rows  = array();
+        $rows = array();
 
         foreach ($founditems as $item) {
             $row = array(
@@ -694,7 +694,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
     public function importVerifiedFileObject()
     {
         if ($_POST["questions_only"] == 1) {
-            $newObj =&$this->object;
+            $newObj = &$this->object;
         } else {
             include_once("./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php");
             // create new questionpool object
@@ -843,7 +843,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         }
 
         include_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
-        $q_gui =&assQuestionGUI::_getQuestionGUI($_POST["sel_question_types"]);
+        $q_gui = &assQuestionGUI::_getQuestionGUI($_POST["sel_question_types"]);
         $this->object->addQuestionChangeListeners($q_gui->object);
         $q_gui->object->setObjId($this->object->getId());
         $q_gui->object->setAdditionalContentEditingMode($addContEditMode);
@@ -867,7 +867,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
             }
             
             include_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
-            $q_gui =&assQuestionGUI::_getQuestionGUI($_GET["sel_question_types"]);
+            $q_gui = &assQuestionGUI::_getQuestionGUI($_GET["sel_question_types"]);
             $q_gui->object->setObjId($this->object->getId());
             $q_gui->object->setAdditionalContentEditingMode($addContEditMode);
             $q_gui->object->createNewQuestion();
@@ -926,7 +926,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         }
         
         ilUtil::sendQuestion($this->lng->txt("qpl_confirm_delete_questions"));
-        $deleteable_questions =&$this->object->getDeleteableQuestionDetails($questionIdsToDelete);
+        $deleteable_questions = &$this->object->getDeleteableQuestionDetails($questionIdsToDelete);
         include_once "./Modules/TestQuestionPool/classes/tables/class.ilQuestionBrowserTableGUI.php";
         $table_gui = new ilQuestionBrowserTableGUI($this, 'questions', (($rbacsystem->checkAccess('write', (int) $_GET['ref_id']) ? true : false)), true);
         $table_gui->setShowRowsSelector(false);
@@ -1248,10 +1248,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         require_once 'Services/Form/classes/class.ilSelectInputGUI.php';
         $mode = new ilSelectInputGUI($this->lng->txt('output_mode'), 'output');
         $mode->setOptions(array(
-            'overview'           => $this->lng->txt('overview'),
-            'detailed'           => $this->lng->txt('detailed_output_solutions'),
+            'overview' => $this->lng->txt('overview'),
+            'detailed' => $this->lng->txt('detailed_output_solutions'),
             // fim: [exam] add option for detailed view with scoring
-            'detailed_scoring'   => $this->lng->txt('detailed_output_scoring'),
+            'detailed_scoring' => $this->lng->txt('detailed_output_scoring'),
             // fim.
             'detailed_printview' => $this->lng->txt('detailed_output_printview')
         ));
@@ -1350,7 +1350,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         $rbacsystem = $DIC['rbacsystem'];
         if ($rbacsystem->checkAccess("write", $_GET['ref_id'])) {
             include_once("./Modules/TestQuestionPool/classes/class.ilQuestionpoolExport.php");
-            $question_ids =&$this->object->getAllQuestionIds();
+            $question_ids = &$this->object->getAllQuestionIds();
             $qpl_exp = new ilQuestionpoolExport($this->object, 'xls', $question_ids);
             $qpl_exp->buildExportFile();
             $this->ctrl->redirectByClass("ilquestionpoolexportgui", "");
@@ -1363,7 +1363,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
     public function &editQuestionForTestObject()
     {
         include_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
-        $q_gui =&assQuestionGUI::_getQuestionGUI("", $_GET["q_id"]);
+        $q_gui = &assQuestionGUI::_getQuestionGUI("", $_GET["q_id"]);
         $this->ctrl->redirectByClass(get_class($q_gui), "editQuestion");
     }
 
@@ -1705,10 +1705,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
         $lng = $DIC['lng'];
 
         if ($ilAccess->checkAccess("write", "", $a_target) || $ilAccess->checkAccess('read', '', $a_target)) {
-            $_GET['cmdClass']  = 'ilObjQuestionPoolGUI';
-            $_GET['cmd']       = 'questions';
+            $_GET['cmdClass'] = 'ilObjQuestionPoolGUI';
+            $_GET['cmd'] = 'questions';
             $_GET['baseClass'] = 'ilRepositoryGUI';
-            $_GET["ref_id"]    = $a_target;
+            $_GET["ref_id"] = $a_target;
             include_once("ilias.php");
             exit;
         } elseif ($ilAccess->checkAccess("read", "", ROOT_FOLDER_ID)) {

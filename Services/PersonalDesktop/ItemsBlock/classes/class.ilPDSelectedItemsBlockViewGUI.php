@@ -47,13 +47,13 @@ abstract class ilPDSelectedItemsBlockViewGUI
     {
         global $DIC;
 
-        $this->lng            = $DIC->language();
-        $this->tree           = $DIC->repositoryTree();
-        $this->object_cache   = $DIC['ilObjDataCache'];
-        $this->accessHandler  = $DIC->rbac()->system();
+        $this->lng = $DIC->language();
+        $this->tree = $DIC->repositoryTree();
+        $this->object_cache = $DIC['ilObjDataCache'];
+        $this->accessHandler = $DIC->rbac()->system();
 
         $this->viewSettings = $viewSettings;
-        $this->provider     = $provider;
+        $this->provider = $provider;
     }
 
     /**
@@ -209,7 +209,7 @@ abstract class ilPDSelectedItemsBlockViewGUI
             } else {
                 include_once("./Services/Component/classes/class.ilPlugin.php");
                 $pl = ilObjectPlugin::getPluginObjectByType($container_object_type);
-                $title= $pl->txt("objs_" . $container_object_type);
+                $title = $pl->txt("objs_" . $container_object_type);
             }
 
             $group->setLabel($title);
@@ -233,9 +233,9 @@ abstract class ilPDSelectedItemsBlockViewGUI
         }
 
         $groups = array(
-            'upcoming'  => array(),
-            'ongoing'   => array(),
-            'ended'     => array(),
+            'upcoming' => array(),
+            'ongoing' => array(),
+            'ended' => array(),
             'not_dated' => array()
         );
 

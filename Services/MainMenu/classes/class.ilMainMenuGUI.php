@@ -572,7 +572,7 @@ class ilMainMenuGUI
         $help_active = false;
 
         /* fau: MainMenuHelp - help menu is moved to main menu plugin
-        
+
                 $helpl = new ilGroupedListGUI();
                 $helpl->setAsDropDown(true, true);
         fau. */

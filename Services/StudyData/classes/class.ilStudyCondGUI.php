@@ -376,7 +376,7 @@ class ilStudyCondGUI
         $values = [];
         $values['prog_id'] = $a_condition->prog_id;
         $values['min_approval_date'] = $a_condition->min_approval_date;
-        $values['max_approval_date'] =  $a_condition->max_approval_date;
+        $values['max_approval_date'] = $a_condition->max_approval_date;
 
         return $values;
     }
@@ -391,7 +391,7 @@ class ilStudyCondGUI
     {
         $form_gui = $this->form_gui;
 
-        $subject_id =  $form_gui->getInput("subject_id");
+        $subject_id = $form_gui->getInput("subject_id");
         $a_condition->subject_id = ($subject_id < 0 ? null : $subject_id);
 
         $degree_id = $form_gui->getInput("degree_id");

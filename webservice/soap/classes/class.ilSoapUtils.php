@@ -86,7 +86,7 @@ class ilSoapUtils extends ilSoapAdministration
             // for backward compatibility we have to check if the substring "#:#" exists as leading separator
             // otherwise we should use ";"
             if (strpos($attach, '#:#') === 0) {
-                $attach      = substr($attach, strlen('#:#'));
+                $attach = substr($attach, strlen('#:#'));
                 $attachments = explode('#:#', $attach);
             } else {
                 $attachments = explode(',', $attach);
@@ -94,7 +94,7 @@ class ilSoapUtils extends ilSoapAdministration
 
             foreach ($attachments as $attachment) {
                 $final_filename = null;
-                $filename       = basename($attachment);
+                $filename = basename($attachment);
                 if (strlen($filename) > 0) {
                     // #17740
                     $final_filename = preg_replace('/^(\d+?_)(.*)/', '$2', $filename);
@@ -319,7 +319,7 @@ class ilSoapUtils extends ilSoapAdministration
         // Fetch first node
         if (($node = $cp_options->fetchFirstDependenciesNode()) === false) {
             // fau: copyBySoap - send a system message when the copy process is finished
-            $mail_options =  $cp_options->getOptions(ilCopyWizardOptions::SEND_MAIL);
+            $mail_options = $cp_options->getOptions(ilCopyWizardOptions::SEND_MAIL);
             if (ilCust::get('ilias_copy_always_mail') || ($cp_options->isSOAPEnabled() and !empty($mail_options))) {
                 $root_options = $cp_options->getOptions(ilCopyWizardOptions::ROOT_NODE);
                 if (count($root_options)) {
@@ -472,7 +472,6 @@ class ilSoapUtils extends ilSoapAdministration
         }
 
         if ($this->findMappedReferenceForNode($cpo, $node)) {
-
             if ($default_mode == \ilCopyWizardOptions::COPY_WIZARD_COPY) {
                 return \ilCopyWizardOptions::COPY_WIZARD_LINK_TO_TARGET;
             }
@@ -496,11 +495,10 @@ class ilSoapUtils extends ilSoapAdministration
 
         $mappings = $cpo->getMappings();
         foreach (\ilObject::_getAllReferences($obj_id) as $ref_id => $also_ref_id) {
+            $logger->debug('Validating node: ' . $ref_id . ' and root ' . $root);
+            $logger->dump($DIC->repositoryTree()->getRelation($ref_id, $root));
 
-            $logger->debug('Validating node: ' . $ref_id . ' and root ' . $root );
-            $logger->dump($DIC->repositoryTree()->getRelation($ref_id , $root));
-
-            if($DIC->repositoryTree()->getRelation($ref_id , $root) != \ilTree::RELATION_CHILD) {
+            if ($DIC->repositoryTree()->getRelation($ref_id, $root) != \ilTree::RELATION_CHILD) {
                 $logger->debug('Ignoring non child relation');
                 continue;
             }
@@ -678,12 +676,11 @@ class ilSoapUtils extends ilSoapAdministration
         $source_id = $this->findMappedReferenceForNode($cp_options, $node);
         try {
             $orig = ilObjectFactory::getInstanceByRefId((int) $source_id);
-            if(!$orig instanceof \ilObject) {
+            if (!$orig instanceof \ilObject) {
                 $logger->error('Cannot create object instance.');
                 return false;
             }
-        }
-        catch (\ilObjectNotFoundException $e) {
+        } catch (\ilObjectNotFoundException $e) {
             $logger->error('Cannot create object instance for ref_id: ' . $source_id);
             $logger->error($e->getMessage());
             return false;
@@ -785,7 +782,7 @@ class ilSoapUtils extends ilSoapAdministration
             $msg = array();
             if (is_array($error)) {
                 foreach ($error as $err) {
-                    $msg []= "(" . $err["line"] . "," . $err["col"] . "): " . $err["errormessage"];
+                    $msg [] = "(" . $err["line"] . "," . $err["col"] . "): " . $err["errormessage"];
                 }
             } else {
                 $msg[] = $error;

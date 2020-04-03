@@ -814,10 +814,10 @@ class ilRegistrationSettingsGUI
         $lng = $DIC['lng'];
 
         $options = array(
-                        'null'		=> $lng->txt('please_choose'),
+                        'null' => $lng->txt('please_choose'),
                         'unlimited' => $lng->txt('reg_access_limitation_mode_unlimited'),
-                        'absolute'	=> $lng->txt('reg_access_limitation_mode_absolute'),
-                        'relative'	=> $lng->txt('reg_access_limitation_mode_relative')
+                        'absolute' => $lng->txt('reg_access_limitation_mode_absolute'),
+                        'relative' => $lng->txt('reg_access_limitation_mode_relative')
                         );
         
         $attribs = array('onchange' => 'displayAccessLimitationSelectionForm(document.cmd.access_limitation_mode_' . $a_role_id . ',' . $a_role_id . ')');
@@ -923,17 +923,17 @@ class ilRegistrationSettingsGUI
         
         $code_type->addOption(
             new ilCheckboxOption(
-                    $this->lng->txt('registration_codes_type_reg'),
-                    self::CODE_TYPE_REGISTRATION,
-                    $this->lng->txt('registration_codes_type_reg_info')
-                )
+                $this->lng->txt('registration_codes_type_reg'),
+                self::CODE_TYPE_REGISTRATION,
+                $this->lng->txt('registration_codes_type_reg_info')
+            )
         );
         $code_type->addOption(
             new ilCheckboxOption(
-                    $this->lng->txt('registration_codes_type_ext'),
-                    self::CODE_TYPE_EXTENSION,
-                    $this->lng->txt('registration_codes_type_ext_info')
-                )
+                $this->lng->txt('registration_codes_type_ext'),
+                self::CODE_TYPE_EXTENSION,
+                $this->lng->txt('registration_codes_type_ext_info')
+            )
         );
         $values = array();
         if ($codeObj->reg_enabled) {
@@ -1073,7 +1073,7 @@ class ilRegistrationSettingsGUI
         if ($codeObj->limit_type == 'relative') {
             $duration = $codeObj->limit_duration;
             $dur->setDays($duration['d']);
-            $dur->setMonths((int) $duration['m'] + (int) $duration['y']*12);
+            $dur->setMonths((int) $duration['m'] + (int) $duration['y'] * 12);
         }
         $opt->addSubItem($dur);
 
@@ -1110,8 +1110,8 @@ class ilRegistrationSettingsGUI
                 } else {
                     $date = array(
                         "d" => $date["dd"],
-                        "m" => $date["MM"]%12,
-                        "y" => floor($date["MM"]/12)
+                        "m" => $date["MM"] % 12,
+                        "y" => floor($date["MM"] / 12)
                     );
                 }
                 break;
@@ -1178,21 +1178,21 @@ class ilRegistrationSettingsGUI
 
             case "relative":
                 $date = $this->form_gui->getInput("rel_date");
-                if (is_array($date) && array_sum($date) >0) {
+                if (is_array($date) && array_sum($date) > 0) {
                     $date = array(
                         "d" => $date["dd"],
-                        "m" => $date["MM"]%12,
-                        "y" => floor($date["MM"]/12)
+                        "m" => $date["MM"] % 12,
+                        "y" => floor($date["MM"] / 12)
                     );
 
-                    $codeObj->limit_type =  "relative";
+                    $codeObj->limit_type = "relative";
                     $codeObj->limit_date = new ilDateTime();
                     $codeObj->limit_duration = $date;
                 }
                 break;
 
             case "unlimited":
-                $codeObj->limit_type =  "unlimited";
+                $codeObj->limit_type = "unlimited";
                 $codeObj->limit_date = new ilDateTime();
                 $codeObj->limit_duration = array();
                 break;

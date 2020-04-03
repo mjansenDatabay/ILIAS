@@ -271,7 +271,7 @@ class ilObjCourseGUI extends ilContainerGUI
         include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
         include_once 'Modules/Course/classes/class.ilCourseFile.php';
 
-        $files =&ilCourseFile::_readFilesByCourse($this->object->getId());
+        $files = &ilCourseFile::_readFilesByCourse($this->object->getId());
 
         $info = new ilInfoScreenGUI($this);
         $info->enablePrivateNotes();
@@ -319,8 +319,8 @@ class ilObjCourseGUI extends ilContainerGUI
                 $info->addProperty(
                     $this->lng->txt('crs_important_info'),
                     "<strong>" . nl2br(
-                                   ilUtil::makeClickable($this->object->getImportantInformation(), true) . "</strong>"
-                               )
+                        ilUtil::makeClickable($this->object->getImportantInformation(), true) . "</strong>"
+                    )
                 );
             }
             // fim.
@@ -406,14 +406,14 @@ class ilObjCourseGUI extends ilContainerGUI
                         'showSummary',
                         array(),
                         array(
-                            'type'   => 'new',
+                            'type' => 'new',
                             'rcp_to' => $email,
                             'sig' => $this->createMailSignature()
                         ),
                         array(
                             ilMailFormCall::CONTEXT_KEY => ilCourseMailTemplateMemberContext::ID,
                             'ref_id' => $this->object->getRefId(),
-                            'ts'     => time()
+                            'ts' => time()
                         )
                     )
                 );
@@ -1237,7 +1237,7 @@ class ilObjCourseGUI extends ilContainerGUI
             $warning_cat = ilRegistrationPeriodLimiter::_isValidByNumberOfPlaces((int) $this->object->getSubscriptionStart());
             if ($warning_cat != '') {
                 $message = sprintf($this->lng->txt('rpl_warning'), ilCust::get($warning_cat));
-                $message.= '<br />' . ilRegistrationPeriodLimiter::_getOverviewLink((int) $this->object->getSubscriptionStart());
+                $message .= '<br />' . ilRegistrationPeriodLimiter::_getOverviewLink((int) $this->object->getSubscriptionStart());
                 ilUtil::sendFailure($message, true);
             }
         }
@@ -1672,7 +1672,7 @@ class ilObjCourseGUI extends ilContainerGUI
             $wait_options = array(
                 'auto' => 'sub_fair_inactive_autofill',
                 'manu' => 'sub_fair_inactive_waiting',
-                'no_list'=> 'sub_fair_inactive_no_list'
+                'no_list' => 'sub_fair_inactive_no_list'
             );
         } else {
             $fair_date = new ilDateTimeInputGUI($this->lng->txt('sub_fair_date'), 'subscription_fair');
@@ -1684,7 +1684,7 @@ class ilObjCourseGUI extends ilContainerGUI
                 'auto' => 'sub_fair_autofill',
                 'auto_manu' => 'sub_fair_auto_manu',
                 'manu' => 'sub_fair_waiting',
-                'no_list'=> 'sub_fair_no_list'
+                'no_list' => 'sub_fair_no_list'
             );
         }
 
@@ -1785,10 +1785,10 @@ class ilObjCourseGUI extends ilContainerGUI
         #$prev->setSubmitFormOnEnter(true);
         $prev->setMinValue(0);
         $prev->setValue(
-                        $this->object->getNumberOfPreviousSessions() == -1 ?
+            $this->object->getNumberOfPreviousSessions() == -1 ?
                         '' :
                         $this->object->getNumberOfPreviousSessions()
-                    );
+        );
         $prev->setSize(2);
         $prev->setMaxLength(3);
         $sess->addSubItem($prev);
@@ -1797,10 +1797,10 @@ class ilObjCourseGUI extends ilContainerGUI
         #$next->setSubmitFormOnEnter(true);
         $next->setMinValue(0);
         $next->setValue(
-                        $this->object->getNumberOfNextSessions() == -1 ?
+            $this->object->getNumberOfNextSessions() == -1 ?
                         '' :
                         $this->object->getNumberOfnextSessions()
-                    );
+        );
         $next->setSize(2);
         $next->setMaxLength(3);
         $sess->addSubItem($next);
@@ -1912,7 +1912,7 @@ class ilObjCourseGUI extends ilContainerGUI
         $form->addItem($mem);
 
         // check privacy
-        if(\ilPrivacySettings::_getInstance()->participantsListInCoursesEnabled()) {
+        if (\ilPrivacySettings::_getInstance()->participantsListInCoursesEnabled()) {
             $part_list = new ilCheckboxInputGUI($this->lng->txt('crs_show_member_export'), 'show_members_export');
             $part_list->setChecked($this->object->getShowMembersExport());
             $part_list->setInfo($this->lng->txt('crs_show_member_export_info'));
@@ -2412,9 +2412,9 @@ class ilObjCourseGUI extends ilContainerGUI
             $GLOBALS['DIC']['ilTabs']->addTarget(
                 "info_short",
                 $this->ctrl->getLinkTargetByClass(
-                                     array("ilobjcoursegui", "ilinfoscreengui"),
-                                     "showSummary"
-                                 ),
+                    array("ilobjcoursegui", "ilinfoscreengui"),
+                    "showSummary"
+                ),
                 "infoScreen"
             );
         }
@@ -2530,9 +2530,9 @@ class ilObjCourseGUI extends ilContainerGUI
             $this->tabs_gui->addTarget(
                 "info_short",
                 $this->ctrl->getLinkTargetByClass(
-                                     array("ilobjcoursegui", "ilinfoscreengui"),
-                                     "showSummary"
-                                 ),
+                    array("ilobjcoursegui", "ilinfoscreengui"),
+                    "showSummary"
+                ),
                 "infoScreen",
                 "",
                 "",
@@ -2809,7 +2809,7 @@ class ilObjCourseGUI extends ilContainerGUI
 
                 $this->ctrl->setReturn($this, "");
                 $reg_gui = new ilCourseObjectivesGUI($this->object->getRefId());
-                $ret =&$this->ctrl->forwardCommand($reg_gui);
+                $ret = &$this->ctrl->forwardCommand($reg_gui);
                 break;
 
             case 'ilobjcoursegroupinggui':
@@ -2867,7 +2867,7 @@ class ilObjCourseGUI extends ilContainerGUI
                 include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
                 $this->tabs_gui->setTabActive('perm_settings');
                 $perm_gui = new ilPermissionGUI($this);
-                $ret =&$this->ctrl->forwardCommand($perm_gui);
+                $ret = &$this->ctrl->forwardCommand($perm_gui);
                 break;
 
             case 'ilcalendarpresentationgui':
@@ -3192,7 +3192,7 @@ class ilObjCourseGUI extends ilContainerGUI
 
                     $this->ctrl->setReturn($this, "");
                     $obj_gui = new ilCourseObjectivesGUI($this->object->getRefId());
-                    $ret =&$this->ctrl->forwardCommand($obj_gui);
+                    $ret = &$this->ctrl->forwardCommand($obj_gui);
                     break;
                 }
 
@@ -3412,7 +3412,7 @@ class ilObjCourseGUI extends ilContainerGUI
             $def = ilMapUtil::getDefaultSettings();
             $latitude = $def["latitude"];
             $longitude = $def["longitude"];
-            $zoom =  $def["zoom"];
+            $zoom = $def["zoom"];
         }
 
         include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
@@ -3802,7 +3802,7 @@ class ilObjCourseGUI extends ilContainerGUI
     {
         global $DIC;
 
-        $ilUser   = $DIC['ilUser'];
+        $ilUser = $DIC['ilUser'];
         $ilAccess = $DIC['ilAccess'];
         $request = $DIC->http()->request();
 

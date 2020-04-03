@@ -73,7 +73,7 @@ if (is_numeric($_GET['target'])) {
 // fau.
 
 $r_pos = strpos($_GET["target"], "_");
-$rest = substr($_GET["target"], $r_pos+1);
+$rest = substr($_GET["target"], $r_pos + 1);
 $target_arr = explode("_", $_GET["target"]);
 $target_type = $target_arr[0];
 $target_id = $target_arr[1];

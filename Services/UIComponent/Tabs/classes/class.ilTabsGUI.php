@@ -503,7 +503,7 @@ class ilTabsGUI
 
         $targets = $a_get_sub_tabs ? $this->sub_target : $this->target;
 
-        $i=0;
+        $i = 0;
         
         // fim: [bugfix] add scrren id for hidden single tab
         if (count($targets) == 1 and !$this->getSetupMode()) {

@@ -296,7 +296,7 @@ class ilIdmData
         $pattern = 'uni-erlangen.de:Matrikelnummer:';
         $pos = strpos($code, $pattern);
         if ($pos !== false) {
-            $this->matriculation = trim(substr($code, $pos+strlen($pattern)));
+            $this->matriculation = trim(substr($code, $pos + strlen($pattern)));
         } else {
             $this->matriculation = '';
         }
@@ -307,7 +307,7 @@ class ilIdmData
         $this->fau_guest = $raw['fau_guest'];
 
         // fau study data
-        $this->studies =[];
+        $this->studies = [];
         if ($raw['fau_features_of_study']) {
             $fau = explode("#", $raw['fau_features_of_study']);
             $i = 0;
@@ -324,7 +324,7 @@ class ilIdmData
                     $semester = $fau[$i++];
                 }
                 $studata->school_id = $fau[$i++];
-                $studata->ref_semester =  $ref_semester;
+                $studata->ref_semester = $ref_semester;
                 $type = substr($raw['fau_studytype'], $study - 1, 1);
                 if (!empty($type) && $type != '_') {
                     $studata->study_type = $type;
@@ -364,7 +364,7 @@ class ilIdmData
             $month = substr($raw['fau_doc_approval_date'], 4, 2);
             $day = substr($raw['fau_doc_approval_date'], 6, 2);
             try {
-                $doc->prog_approval= new ilDate($year . '-' . $month . '-' . $day, IL_CAL_DATE);
+                $doc->prog_approval = new ilDate($year . '-' . $month . '-' . $day, IL_CAL_DATE);
             } catch (Exception $e) {
                 $doc->prog_approval = null;
             }

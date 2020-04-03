@@ -309,7 +309,7 @@ class ilUserQuery
             $udf_table = ($udf_def[$id]["field_type"] != UDF_TYPE_WYSIWYG)
                 ? "udf_text"
                 : "udf_clob";
-            $join.= " LEFT JOIN " . $udf_table . " ud_" . $id . " ON (ud_" . $id . ".field_id=" . $ilDB->quote($id) . " AND ud_" . $id . ".usr_id = usr_data.usr_id) ";
+            $join .= " LEFT JOIN " . $udf_table . " ud_" . $id . " ON (ud_" . $id . ".field_id=" . $ilDB->quote($id) . " AND ud_" . $id . ".usr_id = usr_data.usr_id) ";
         }
 
         // count query
@@ -363,8 +363,8 @@ class ilUserQuery
             $role_cond = " AND rbac_ua.rol_id = " . $ilDB->quote($this->role, "integer");
         }
 
-        $query.= $role_join;
-        $count_query.= $role_join;
+        $query .= $role_join;
+        $count_query .= $role_join;
 
         // apply user filter also to count query
         // excluding anonymous user is not needed if user filter is active
@@ -375,14 +375,14 @@ class ilUserQuery
         }
 
         $query .= $where . $role_cond;
-        $count_query.=  $where . $role_cond;
+        $count_query .= $where . $role_cond;
         $where = " AND";
         // fau.
 
         if ($this->first_letter != "") {
             $add = $where . " (" . $ilDB->upper($ilDB->substr("usr_data.lastname", 1, 1)) . " = " . $ilDB->upper($ilDB->quote($this->first_letter, "text")) . ") ";
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
         
@@ -392,8 +392,8 @@ class ilUserQuery
                 "OR " . $ilDB->like("usr_data.lastname", "text", "%" . $this->text_filter . "%") . " " .
                 "OR " . $ilDB->like("usr_data.second_email", "text", "%" . $this->text_filter . "%") . " " .
                 "OR " . $ilDB->like("usr_data.email", "text", "%" . $this->text_filter . "%") . ") ";
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
         
@@ -403,8 +403,8 @@ class ilUserQuery
             } else {
                 $add = $where . " usr_data.active = " . $ilDB->quote(1, "integer") . " ";
             }
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
@@ -412,15 +412,15 @@ class ilUserQuery
             if (ilDateTime::_before($this->last_login, new ilDateTime(time(), IL_CAL_UNIX), IL_CAL_DAY)) {
                 $add = $where . " usr_data.last_login < " .
                     $ilDB->quote($this->last_login->get(IL_CAL_DATETIME), "timestamp");
-                $query.= $add;
-                $count_query.= $add;
+                $query .= $add;
+                $count_query .= $add;
                 $where = " AND";
             }
         }
         if ($this->limited_access) {		// limited access
             $add = $where . " usr_data.time_limit_unlimited= " . $ilDB->quote(0, "integer");
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
@@ -433,8 +433,8 @@ class ilUserQuery
                 } else {
                     $add = $where . " ud_" . $udf_id . ".value = " . $ilDB->quote($f, "text");
                 }
-                $query.= $add;
-                $count_query.= $add;
+                $query .= $add;
+                $count_query .= $add;
                 $where = " AND";
             }
         }
@@ -445,28 +445,28 @@ class ilUserQuery
             $until = "time_limit_until > " . $ilDB->quote(time(), 'integer');
 
             $add = $where . ' (' . $unlimited . ' OR (' . $from . ' AND ' . $until . '))';
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
         if ($this->no_courses) {		// no courses assigned
-// fau: userQuery - optimize condition for 'no courses assigned'
+            // fau: userQuery - optimize condition for 'no courses assigned'
             $add = $where . " NOT EXISTS (" .
                 "SELECT * FROM rbac_ua INNER JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) " .
                 "WHERE rbac_ua.usr_id = usr_data.usr_id AND od.title LIKE 'il_crs_%')";
             // fau.
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
         if ($this->no_groups) {		// no groups assigned
-// fau: userQuery - optimize condition for 'no groups assigned'
+            // fau: userQuery - optimize condition for 'no groups assigned'
             $add = $where . " NOT EXISTS (" .
                 "SELECT * FROM rbac_ua INNER JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) " .
                 "WHERE rbac_ua.usr_id = usr_data.usr_id AND od.title LIKE 'il_grp_%')";
             // fau.
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
         if ($this->crs_grp > 0) {		// members of course/group
@@ -477,8 +477,8 @@ class ilUserQuery
                 "SELECT * FROM rbac_ua INNER JOIN object_data od ON (rbac_ua.rol_id = od.obj_id) " .
                 "WHERE rbac_ua.usr_id = usr_data.usr_id AND od.title = " . $ilDB->quote("il_" . $cgtype . "_member_" . $this->crs_grp, "text") . ")";
             // fau.
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
@@ -497,15 +497,15 @@ class ilUserQuery
         
         if ($this->user_folder) {
             $add = $where . " " . $ilDB->in('usr_data.time_limit_owner', $this->user_folder, false, 'integer');
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
         if ($this->authentication_method != "") {		// authentication
             $add = $where . " usr_data.auth_mode = " . $ilDB->quote($this->authentication_method, "text") . " ";
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
@@ -513,17 +513,17 @@ class ilUserQuery
         switch ($this->order_field) {
             case  "access_until":
                 if ($this->order_dir == "desc") {
-                    $query.= " ORDER BY usr_data.active DESC, usr_data.time_limit_unlimited DESC, usr_data.time_limit_until DESC";
+                    $query .= " ORDER BY usr_data.active DESC, usr_data.time_limit_unlimited DESC, usr_data.time_limit_until DESC";
                 } else {
-                    $query.= " ORDER BY usr_data.active ASC, usr_data.time_limit_unlimited ASC, usr_data.time_limit_until ASC";
+                    $query .= " ORDER BY usr_data.active ASC, usr_data.time_limit_unlimited ASC, usr_data.time_limit_until ASC";
                 }
                 break;
                 
             case "online_time":
                 if ($this->order_dir == "desc") {
-                    $query.= " ORDER BY ut_online.online_time DESC";
+                    $query .= " ORDER BY ut_online.online_time DESC";
                 } else {
-                    $query.= " ORDER BY ut_online.online_time ASC";
+                    $query .= " ORDER BY ut_online.online_time ASC";
                 }
                 break;
 

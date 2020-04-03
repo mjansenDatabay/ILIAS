@@ -463,15 +463,15 @@ class ilContObjParser extends ilMDSaxParser
     * @param	string		element/tag name
     * @param	array		array of attributes
     */
-    public function buildTag($type, $name, $attr="")
+    public function buildTag($type, $name, $attr = "")
     {
         $tag = "<";
 
         if ($type == "end") {
-            $tag.= "/";
+            $tag .= "/";
         }
 
-        $tag.= $name;
+        $tag .= $name;
 
         if (is_array($attr)) {
             foreach ($attr as $k => $v) {
@@ -479,7 +479,7 @@ class ilContObjParser extends ilMDSaxParser
             }
         }
 
-        $tag.= ">";
+        $tag .= ">";
 
         return $tag;
     }
@@ -788,7 +788,7 @@ case "InteractiveImage":
                                 $this->lm_page_object->create(true);
                             }
                             $this->md = new ilMD(
-                                $this->content_object->getId() ,
+                                $this->content_object->getId(),
                                 $this->current_object->getId(),
                                 $this->current_object->getType()
                             );
@@ -796,7 +796,7 @@ case "InteractiveImage":
                         // type gdf
                         elseif ($this->current_object->getType() == "gdf") {
                             $this->md = new ilMD(
-                                $this->glossary_object->getId() ,
+                                $this->glossary_object->getId(),
                                 $this->current_object->getId(),
                                 $this->current_object->getType()
                             );
@@ -805,7 +805,7 @@ case "InteractiveImage":
                         else {
                             if ($this->processMeta()) {
                                 $this->md = new ilMD(
-                                    $this->current_object->getId() ,
+                                    $this->current_object->getId(),
                                     0,
                                     $this->current_object->getType()
                                 );
@@ -878,7 +878,7 @@ case "InteractiveImage":
                         }
                         $this->media_object->setImportId($a_attribs["Entry"]);
                         $this->md = new ilMD(
-                            0 ,
+                            0,
                             $this->media_object->getId(),
                             "mob"
                         );

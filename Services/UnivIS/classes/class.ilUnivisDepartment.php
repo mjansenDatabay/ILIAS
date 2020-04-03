@@ -21,7 +21,7 @@ class ilUnivisDepartment extends ilUnivisData
 
         $options = array();
         if ($a_add_default) {
-            $options[0] =  $lng->txt('please_select');
+            $options[0] = $lng->txt('please_select');
         }
         $query = "SELECT * FROM univis_org "
                 . " WHERE " . parent::_getLookupCondition()

@@ -433,7 +433,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 
         // text rating
         if (!$this->object->getSelfAssessmentEditingMode()) {
-            $textrating   = new ilSelectInputGUI($this->lng->txt("text_rating"), "textgap_rating");
+            $textrating = new ilSelectInputGUI($this->lng->txt("text_rating"), "textgap_rating");
             $text_options = array(
                 "ci" => $this->lng->txt("cloze_textgap_case_insensitive"),
                 "cs" => $this->lng->txt("cloze_textgap_case_sensitive"),
@@ -494,7 +494,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
             return $form;
         } else {
             require_once 'Modules/TestQuestionPool/classes/Form/class.ilClozeGapInputBuilderGUI.php';
-            $json=$this->populateJSON();
+            $json = $this->populateJSON();
             $assClozeGapCombinationObject = new assClozeGapCombination();
             $combination_exists = $assClozeGapCombinationObject->combinationExistsForQid($this->object->id);
             if ($combination_exists) {
@@ -512,25 +512,25 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 
     protected function populateJSON()
     {
-        $gap    = $this->object->getGaps();
+        $gap = $this->object->getGaps();
         $array = array();
         if ($gap == null) {
             return $array;
         }
-        $translate_type=array('text','select','numeric');
+        $translate_type = array('text','select','numeric');
         $i = 0;
         foreach ($gap as $content) {
-            $shuffle=false;
-            $value=$content->getItemsRaw();
-            $items=array();
-            for ($j=0;$j<count($value);$j++) {
-                if ($content->getType()==2) {
+            $shuffle = false;
+            $value = $content->getItemsRaw();
+            $items = array();
+            for ($j = 0;$j < count($value);$j++) {
+                if ($content->getType() == 2) {
                     $items[$j] = array(
                         'answer' => $value[$j]->getAnswerText(),
-                        'lower'  => $value[$j]->getLowerBound(),
-                        'upper'  => $value[$j]->getUpperBound(),
+                        'lower' => $value[$j]->getLowerBound(),
+                        'upper' => $value[$j]->getUpperBound(),
                         'points' => $value[$j]->getPoints(),
-                        'error'  => false
+                        'error' => false
                     );
                 } else {
                     $items[$j] = array(
@@ -539,12 +539,12 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                         'error' => false
                     );
 
-                    if ($content->getType()==1) {
-                        $shuffle=$content->getShuffle();
+                    if ($content->getType() == 1) {
+                        $shuffle = $content->getShuffle();
                     }
                 }
             }
-            $answers[$i]=array(
+            $answers[$i] = array(
             'type' => $translate_type[$content->getType()] ,
             'values' => $items ,
             'shuffle' => $shuffle,
@@ -567,7 +567,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
      */
     protected function populateGapFormPart($form, $gapCounter)
     {
-        $gap    = $this->object->getGap($gapCounter);
+        $gap = $this->object->getGap($gapCounter);
 
         if ($gap == null) {
             return $form;
@@ -795,7 +795,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
     public function addgap()
     {
         $this->writePostData(true);
-        $this->object->addGapAnswer($this->gapIndex, key($_POST['cmd']['addgap_' . $this->gapIndex])+1, "");
+        $this->object->addGapAnswer($this->gapIndex, key($_POST['cmd']['addgap_' . $this->gapIndex]) + 1, "");
         $this->editQuestion();
     }
 
@@ -833,7 +833,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                         }
                     }
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
                 case CLOZE_SELECT:
@@ -854,7 +854,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     $gaptemplate->setVariable("PLEASE_SELECT", $this->lng->txt("please_select"));
                     $gaptemplate->setVariable("GAP_COUNTER", $gap_index);
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
                 case CLOZE_NUMERIC:
@@ -872,7 +872,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                         }
                     }
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
             }
@@ -917,7 +917,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
         $user_solution = array();
         if (($active_id > 0) && (!$show_correct_solution)) {
             // get the solutions of a user
-            $user_solution =&$this->object->getSolutionValues($active_id, $pass);
+            $user_solution = &$this->object->getSolutionValues($active_id, $pass);
             if (!is_array($user_solution)) {
                 $user_solution = array();
             }
@@ -926,8 +926,8 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
         include_once "./Services/UICore/classes/class.ilTemplate.php";
         $template = new ilTemplate("tpl.il_as_qpl_cloze_question_output_solution.html", true, true, "Modules/TestQuestionPool");
         $output = $this->object->getClozeText();
-        $assClozeGapCombinationObject 	= new assClozeGapCombination();
-        $check_for_gap_combinations 	= $assClozeGapCombinationObject->loadFromDb($this->object->getId());
+        $assClozeGapCombinationObject = new assClozeGapCombination();
+        $check_for_gap_combinations = $assClozeGapCombinationObject->loadFromDb($this->object->getId());
 
         foreach ($this->object->getGaps() as $gap_index => $gap) {
             $gaptemplate = new ilTemplate("tpl.il_as_qpl_cloze_question_output_solution_gap.html", true, true, "Modules/TestQuestionPool");
@@ -963,7 +963,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                                 }
                             }
                             $points_array = $this->object->calculateCombinationResult($custom_user_solution);
-                            $max_combination_points	= $assClozeGapCombinationObject->getMaxPointsForCombination($this->object->getId(), $combination_id);
+                            $max_combination_points = $assClozeGapCombinationObject->getMaxPointsForCombination($this->object->getId(), $combination_id);
                             if ($points_array[0] == $max_combination_points) {
                                 $gaptemplate->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
                                 $gaptemplate->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
@@ -1036,7 +1036,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     }
                     $this->populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext);
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
                 case CLOZE_SELECT:
@@ -1061,7 +1061,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     }
                     $this->populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext);
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
                 case CLOZE_NUMERIC:
@@ -1079,7 +1079,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     }
                     $this->populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext);
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
             }
@@ -1107,7 +1107,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
             $fb = $this->getSpecificFeedbackOutput(
                 $this->object->fetchIndexedValuesFromValuePairs($user_solution)
             );
-            $feedback .=  strlen($fb) ? $fb : '';
+            $feedback .= strlen($fb) ? $fb : '';
         }
         if (strlen($feedback)) {
             $cssClass = (
@@ -1226,7 +1226,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                         }
                     }
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
                 case CLOZE_SELECT:
@@ -1247,7 +1247,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     $gaptemplate->setVariable("PLEASE_SELECT", $this->lng->txt("please_select"));
                     $gaptemplate->setVariable("GAP_COUNTER", $gap_index);
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
                 case CLOZE_NUMERIC:
@@ -1266,7 +1266,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                         }
                     }
 // fau: fixGapReplace - use replace function
-                    $output  = $this->object->replaceFirstGap($output, $gaptemplate->get());
+                    $output = $this->object->replaceFirstGap($output, $gaptemplate->get());
 // fau.
                     break;
             }
@@ -1387,7 +1387,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
             $answerIndex = $this->object->feedbackOBJ->determineAnswerIndexForAnswerValue($gap, $answerValue);
             $fb = $this->object->feedbackOBJ->determineTestOutputGapFeedback($gapIndex, $answerIndex);
 
-            $caption = $lng->txt('gap') . ' ' . ($gapIndex+1) . ': ';
+            $caption = $lng->txt('gap') . ' ' . ($gapIndex + 1) . ': ';
             $feedback .= '<tr><td>';
             $feedback .= $caption . '</td><td>';
             $feedback .= $fb . '</td> </tr>';
@@ -1453,7 +1453,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
         $i = 0;
         foreach ($this->object->getGaps() as $gap) {
             if ($gap->type == CLOZE_SELECT) {
-                $html .= '<p>Gap ' . ($i+1) . ' - SELECT</p>';
+                $html .= '<p>Gap ' . ($i + 1) . ' - SELECT</p>';
                 $html .= '<ul>';
                 $j = 0;
                 foreach ($gap->getItems($this->object->getShuffler()) as $gap_item) {
@@ -1471,7 +1471,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     $present_elements[] = $item->getAnswertext();
                 }
 
-                $html .= '<p>Gap ' . ($i+1) . ' - TEXT</p>';
+                $html .= '<p>Gap ' . ($i + 1) . ' - TEXT</p>';
                 $html .= '<ul>';
                 $aggregate = (array) $aggregation[$i];
                 foreach ($aggregate as $answer => $count) {
@@ -1489,7 +1489,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
             }
 
             if ($gap->type == CLOZE_NUMERIC) {
-                $html .= '<p>Gap ' . ($i+1) . ' - NUMERIC</p>';
+                $html .= '<p>Gap ' . ($i + 1) . ' - NUMERIC</p>';
                 $html .= '<ul>';
                 $j = 0;
                 foreach ($gap->getItems($this->object->getShuffler()) as $gap_item) {
@@ -1511,7 +1511,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 
     public function applyIndizesToGapText($question_text)
     {
-        $parts	= explode('[gap', $question_text);
+        $parts = explode('[gap', $question_text);
         $i = 0;
         $question_text = '';
         foreach ($parts as $part) {
@@ -1527,7 +1527,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 
     public function removeIndizesFromGapText($question_text)
     {
-        $parts         = preg_split('/\[gap \d*\]/', $question_text);
+        $parts = preg_split('/\[gap \d*\]/', $question_text);
         $question_text = implode('[gap]', $parts);
         return $question_text;
     }

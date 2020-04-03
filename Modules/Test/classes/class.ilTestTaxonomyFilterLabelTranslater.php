@@ -168,7 +168,7 @@ class ilTestTaxonomyFilterLabelTranslater
         $nodeId = $taxonomyTreeId;
         $path = [];
         while ($parentId = $this->taxononyTreeParentIds[$nodeId]) {
-            $path[] =  $this->taxonomyNodeLabels[$nodeId];
+            $path[] = $this->taxonomyNodeLabels[$nodeId];
             $nodeId = $parentId;
         }
         return implode(' / ', array_reverse($path));

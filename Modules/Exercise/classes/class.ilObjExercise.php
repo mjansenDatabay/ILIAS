@@ -314,7 +314,7 @@ class ilObjExercise extends ilObject
         $ilAppEventHandler->raise(
             'Modules/Exercise',
             'delete',
-            array('obj_id'=>$this->getId())
+            array('obj_id' => $this->getId())
         );
 
         return true;
@@ -509,7 +509,7 @@ class ilObjExercise extends ilObject
             $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
         } elseif ($this->getPassMode() != "nr") {
             // fau.
-//echo "5";
+            //echo "5";
             $overall_stat = "notgraded";
             if ($failed_a_mandatory) {
                 //echo "6";
@@ -532,7 +532,7 @@ class ilObjExercise extends ilObject
             }
         }
         
-        $ret =  array(
+        $ret = array(
             "overall_status" => $overall_stat,
             "failed_a_mandatory" => $failed_a_mandatory);
         //echo "<br>p:".$cnt_passed.":ng:".$cnt_notgraded;

@@ -55,7 +55,7 @@ class ilWizardGUI
 
         'general' => array(
             'title_var' => 'general_title',                     // lang var of main title
-            'steps' 	=> array(                              // list if all visible steps
+            'steps' => array(                              // list if all visible steps
                 array(
                         'cmd' => 'showSearchForm',             	// step command
                         'title_var' => 'general_search_title',  // lang var for title
@@ -83,8 +83,8 @@ class ilWizardGUI
     {
         global $lng, $tpl, $ilCtrl;
 
-        $this->tpl =&$tpl;
-        $this->lng =&$lng;
+        $this->tpl = &$tpl;
+        $this->lng = &$lng;
         $this->cmd = '';
 
         $this->parent_gui = $a_parent_gui;

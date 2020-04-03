@@ -124,11 +124,11 @@ class ilObjSession extends ilObject
             "WHERE obj_id = " . $ilDB->quote($a_obj_id);
         $res = $ilDB->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $data['location'] 	= $row->location ? $row->location : '';
-            $data['details']	= $row->details ? $row->details : '';
-            $data['name']		= $row->tutor_name ? $row->tutor_name : '';
-            $data['email']		= $row->tutor_email ? $row->tutor_email : '';
-            $data['phone']		= $row->tutor_phone ? $row->tutor_phone : '';
+            $data['location'] = $row->location ? $row->location : '';
+            $data['details'] = $row->details ? $row->details : '';
+            $data['name'] = $row->tutor_name ? $row->tutor_name : '';
+            $data['email'] = $row->tutor_email ? $row->tutor_email : '';
+            $data['phone'] = $row->tutor_phone ? $row->tutor_phone : '';
         }
         return (array) $data;
     }
@@ -1038,8 +1038,8 @@ class ilObjSession extends ilObject
                 continue;
             }
             $sort = $session->getFirstAppointment()->getStart()->get(IL_CAL_DATETIME);
-            $sort.= ' ' . $session->getTitle();
-            $sort.= ' ' . $session->getId();
+            $sort .= ' ' . $session->getTitle();
+            $sort .= ' ' . $session->getId();
 
             $sessions[$sort] = $session;
         }

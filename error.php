@@ -7,7 +7,7 @@ try {
     $tpl->addBlockFile("CONTENT", "content", "tpl.error.html");
     $lng->loadLanguageModule("error");
     // #13515 - link back to "system" [see ilWebAccessChecker::sendError()]
-    $nd  = $tree->getNodeData(ROOT_FOLDER_ID);
+    $nd = $tree->getNodeData(ROOT_FOLDER_ID);
     // fau: rootAsLogin - changed button text to home, removed blocks
     $txt = $lng->txt('to_home');
     $tpl->SetVariable("TXT_LINK", $txt);

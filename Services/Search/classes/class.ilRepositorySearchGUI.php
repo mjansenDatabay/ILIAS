@@ -594,7 +594,7 @@ class ilRepositorySearchGUI
 
         include_once './Services/Form/classes/class.ilPropertyFormGUI.php';
 
-        $this->form =  new ilPropertyFormGUI();
+        $this->form = new ilPropertyFormGUI();
         // fim: [bugfix] set correct fallback command
         $this->form->setFormAction($this->ctrl->getFormAction($this, 'performSearch'));
         // fim.
@@ -874,7 +874,7 @@ class ilRepositorySearchGUI
 
                     // no break
                 case FIELD_TYPE_TEXT:
-                    $user_search =&ilObjectSearchFactory::_getUserSearchInstance($query_parser);
+                    $user_search = &ilObjectSearchFactory::_getUserSearchInstance($query_parser);
                     $user_search->setFields(array($name));
                     $result_obj = $user_search->performSearch();
 

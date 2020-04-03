@@ -199,7 +199,7 @@ class ilTestMyCampusTools
         
         // build the date rows
         $rows = array();
-        $data =&$this->test_obj->getCompleteEvaluationData(true, '', '');
+        $data = &$this->test_obj->getCompleteEvaluationData(true, '', '');
         foreach ($data->getParticipants() as $active_id => $participant) {
             $row = array();
             $userfields = ilObjUser::_lookupFields($participant->getUserID());

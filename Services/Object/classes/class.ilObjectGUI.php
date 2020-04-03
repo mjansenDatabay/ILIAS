@@ -541,10 +541,10 @@ class ilObjectGUI
             
             include_once "Services/Object/classes/class.ilObjectListGUI.php";
             ilObjectListGUI::prepareJSLinks(
-                    $this->ctrl->getLinkTarget($this, "redrawHeaderAction", "", true),
-                    $this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "ilnotegui"), "", "", true, false),
-                    $this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "iltagginggui"), "", "", true, false)
-                );
+                $this->ctrl->getLinkTarget($this, "redrawHeaderAction", "", true),
+                $this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "ilnotegui"), "", "", true, false),
+                $this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "iltagginggui"), "", "", true, false)
+            );
             
             $lg = $dispatcher->initHeaderAction();
             
@@ -1193,8 +1193,8 @@ class ilObjectGUI
     public function getDidacticTemplateVar($a_type)
     {
         $tpl = $_POST["didactic_type"];
-        if ($tpl && substr($tpl, 0, strlen($a_type)+1) == $a_type . "_") {
-            return (int) substr($tpl, strlen($a_type)+1);
+        if ($tpl && substr($tpl, 0, strlen($a_type) + 1) == $a_type . "_") {
+            return (int) substr($tpl, strlen($a_type) + 1);
         }
         return 0;
     }
@@ -1590,7 +1590,7 @@ class ilObjectGUI
     *									return location was set)
     * @access	public
     */
-    protected function getReturnLocation($a_cmd, $a_location ="")
+    protected function getReturnLocation($a_cmd, $a_location = "")
     {
         if ($this->return_location[$a_cmd] != "") {
             return $this->return_location[$a_cmd];
@@ -1652,7 +1652,7 @@ class ilObjectGUI
             if ($crs_id = $tree->checkForParentType($a_ref_id, 'crs')) {
                 if (!$this->checkPermissionBool("write", "", "", $crs_id)) {
                     // Show only activated courses
-                    $tmp_obj =&ilObjectFactory::getInstanceByRefId($crs_id, false);
+                    $tmp_obj = &ilObjectFactory::getInstanceByRefId($crs_id, false);
     
                     if (!$tmp_obj->isActivated()) {
                         unset($tmp_obj);
@@ -1757,7 +1757,7 @@ class ilObjectGUI
 
                 if ($row["max"] > 0) {
                     //how many elements are present?
-                    for ($i=0; $i<count($this->data["ctrl"]); $i++) {
+                    for ($i = 0; $i < count($this->data["ctrl"]); $i++) {
                         if ($this->data["ctrl"][$i]["type"] == $row["name"]) {
                             $count++;
                         }
@@ -2198,7 +2198,7 @@ class ilObjectGUI
             if ($a_form) {
                 global $DIC;
                 /** @var \ilObjectCustomIconFactory  $customIconFactory */
-                $customIconFactory        = $DIC['object.customicons.factory'];
+                $customIconFactory = $DIC['object.customicons.factory'];
 
                 $customIcon = $customIconFactory->getByObjId($this->object->getId(), $this->object->getType());
 
@@ -2211,7 +2211,7 @@ class ilObjectGUI
                 $a_form->addItem($title);
 
                 $caption = $this->lng->txt("cont_custom_icon");
-                $icon    = new ilImageFileInputGUI($caption, "cont_icon");
+                $icon = new ilImageFileInputGUI($caption, "cont_icon");
 
                 $icon->setSuffixes($customIcon->getSupportedFileExtensions());
                 $icon->setUseCache(false);

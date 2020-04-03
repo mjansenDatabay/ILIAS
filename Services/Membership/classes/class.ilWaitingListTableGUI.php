@@ -136,7 +136,7 @@ class ilWaitingListTableGUI extends ilTable2GUI
         switch ($this->getRepositoryObject()->getType()) {
             case "crs":
                 /** @var ilObjCourse $object */
-                $object =  $this->getRepositoryObject();
+                $object = $this->getRepositoryObject();
                 $max = $object->getSubscriptionMaxMembers();
                 $members = ilCourseParticipants::lookupNumberOfMembers($object->getRefId());
                 $limited = $object->isSubscriptionMembershipLimited();
@@ -144,7 +144,7 @@ class ilWaitingListTableGUI extends ilTable2GUI
 
             case 'grp':
                 /** @var ilObjGroup $object */
-                $object =  $this->getRepositoryObject();
+                $object = $this->getRepositoryObject();
                 $max = $object->getMaxMembers();
                 $members = ilGroupParticipants::lookupNumberOfMembers($object->getRefId());
                 $limited = $object->isMembershipLimited();

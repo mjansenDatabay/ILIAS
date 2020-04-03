@@ -169,7 +169,7 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
 
                 and (strpos($login, 'user.') === 0 or    // loca users
                     strpos($login, 'vhb.') === 0 or     // vhb users
-                    strpos($login, '.') 	=== false   // all other users except firstname.lastname
+                    strpos($login, '.') === false   // all other users except firstname.lastname
                 )) {
                 $userObj->updateLogin($this->data->identity);
             }
@@ -226,21 +226,21 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
         if ($this->data->read() == false) {
             // not existent in database, the get the data from the shibboleth attributes
             $rawdata = array();
-            $rawdata['last_change']                 = date('Y-m-d H:i:s', time());
-            $rawdata['pk_persistent_id']            = $this->uid;
-            $rawdata['sn']                          = $this->attributes['urn:mace:dir:attribute-def:sn'][0];
-            $rawdata['given_name']                  = $this->attributes['urn:mace:dir:attribute-def:givenName'][0];
-            $rawdata['mail']                        = $this->attributes['urn:mace:dir:attribute-def:mail'][0];
-            $rawdata['schac_gender']                = $this->attributes['urn:mace:terena.org:attribute-def:schacGender'][0];
-            $rawdata['unscoped_affiliation']        = implode(';', $this->attributes['urn:mace:dir:attribute-def:eduPersonAffiliation']);
+            $rawdata['last_change'] = date('Y-m-d H:i:s', time());
+            $rawdata['pk_persistent_id'] = $this->uid;
+            $rawdata['sn'] = $this->attributes['urn:mace:dir:attribute-def:sn'][0];
+            $rawdata['given_name'] = $this->attributes['urn:mace:dir:attribute-def:givenName'][0];
+            $rawdata['mail'] = $this->attributes['urn:mace:dir:attribute-def:mail'][0];
+            $rawdata['schac_gender'] = $this->attributes['urn:mace:terena.org:attribute-def:schacGender'][0];
+            $rawdata['unscoped_affiliation'] = implode(';', $this->attributes['urn:mace:dir:attribute-def:eduPersonAffiliation']);
             // Passwords by SSO have {CRYPT} prefix - not yet supported by StudOn
             //$rawdata['user_password']               = $this->attributes['urn:mace:dir:attribute-def:userPassword'][0];
-            $rawdata['schac_personal_unique_code']  = $this->attributes['urn:mace:terena.org:attribute-def:schacPersonalUniqueCode'][0];
-            $rawdata['fau_features_of_study']       = '';
-            $rawdata['fau_employee']                = null;
-            $rawdata['fau_student']                 = null;
-            $rawdata['fau_guest']                   = null;
-            $rawdata['fau_studytype']               = null;
+            $rawdata['schac_personal_unique_code'] = $this->attributes['urn:mace:terena.org:attribute-def:schacPersonalUniqueCode'][0];
+            $rawdata['fau_features_of_study'] = '';
+            $rawdata['fau_employee'] = null;
+            $rawdata['fau_student'] = null;
+            $rawdata['fau_guest'] = null;
+            $rawdata['fau_studytype'] = null;
 
             $this->data->setRawData($rawdata, true);
         }

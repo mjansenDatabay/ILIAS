@@ -338,7 +338,7 @@ class ilBenchmark
         $this->db_enabled = $ilSetting->get("enable_db_bench");
         $this->db_enabled_user = $ilSetting->get("db_bench_user");
         // fau: extendBenchmark - get setting for instant saving
-        $this->db_enabled_instant =  $ilSetting->get("enable_db_bench_instant");
+        $this->db_enabled_instant = $ilSetting->get("enable_db_bench_instant");
         // fau.
         return $this->db_enabled;
     }
@@ -438,7 +438,7 @@ class ilBenchmark
                     "backtrace" => array("text", $backtrace)
                 ));
 
-                $this->db_bench_stop_rec  = false;
+                $this->db_bench_stop_rec = false;
             }
 
             $this->db_bench[] = array(

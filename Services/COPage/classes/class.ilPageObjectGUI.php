@@ -978,7 +978,7 @@ class ilPageObjectGUI
                     $pl_name
                 );
                 if ($plugin->isValidParentType($this->getPageObject()->getParentType())) {
-                    $xml.= '<ComponentPlugin Name="' . $plugin->getPluginName() .
+                    $xml .= '<ComponentPlugin Name="' . $plugin->getPluginName() .
                         '" InsertText="' . $plugin->txt(ilPageComponentPlugin::TXT_CMD_INSERT) . '" />';
                 }
             }
@@ -1259,9 +1259,9 @@ class ilPageObjectGUI
             }
 
             $tpl->setVariable(
-                    "WYSIWYG_ACTION",
-                    $this->ctrl->getFormActionByClass("ilpageeditorgui", "", "", true)
-                );
+                "WYSIWYG_ACTION",
+                $this->ctrl->getFormActionByClass("ilpageeditorgui", "", "", true)
+            );
 
             // determine media, html and javascript mode
             $sel_media_mode = ($this->user->getPref("ilPageEditor_MediaMode") == "disable")
@@ -1285,11 +1285,11 @@ class ilPageObjectGUI
             // presentation view
             if ($this->getViewPageLink() != "") {
                 $this->tabs_gui->addNonTabbedLink(
-                        "pres_view",
-                        $this->getViewPageText(),
-                        $this->getViewPageLink(),
-                        $this->getViewPageTarget()
-                    );
+                    "pres_view",
+                    $this->getViewPageText(),
+                    $this->getViewPageLink(),
+                    $this->getViewPageTarget()
+                );
             }
 
             // show actions drop down
@@ -1330,8 +1330,8 @@ class ilPageObjectGUI
 
                 $cfg = $this->getPageConfig();
                 $tpl->setVariable(
-                        "IL_TINY_MENU",
-                        self::getTinyMenu(
+                    "IL_TINY_MENU",
+                    self::getTinyMenu(
                             $this->getPageObject()->getParentType(),
                             $cfg->getEnableInternalLinks(),
                             $cfg->getEnableWikiLinks(),
@@ -1343,20 +1343,20 @@ class ilPageObjectGUI
                             true,
                             $cfg->getEnableUserLinks()
                         )
-                    );
+                );
                     
                 // add int link parts
                 include_once("./Services/Link/classes/class.ilInternalLinkGUI.php");
                 $tpl->setCurrentBlock("int_link_prep");
                 $tpl->setVariable("INT_LINK_PREP", ilInternalLinkGUI::getInitHTML(
-                        $this->ctrl->getLinkTargetByClass(
+                    $this->ctrl->getLinkTargetByClass(
                             array("ilpageeditorgui", "ilinternallinkgui"),
                             "",
                             false,
                             true,
                             false
                         )
-                    ));
+                ));
                 $tpl->parseCurrentBlock();
 
                 include_once("./Services/YUI/classes/class.ilYuiUtil.php");
@@ -1418,9 +1418,9 @@ class ilPageObjectGUI
                         $tpl->setVariable("TXT_PREV_REV", $this->lng->txt("cont_previous_rev"));
                         $this->ctrl->setParameter($this, "old_nr", $hist_info["previous"]["nr"]);
                         $tpl->setVariable(
-                                "HREF_PREV",
-                                $this->ctrl->getLinkTarget($this, "preview")
-                            );
+                            "HREF_PREV",
+                            $this->ctrl->getLinkTarget($this, "preview")
+                        );
                         $tpl->parseCurrentBlock();
                     } else {
                         $tpl->setCurrentBlock("previous_rev_disabled");
@@ -1434,9 +1434,9 @@ class ilPageObjectGUI
                         $tpl->setVariable("TXT_NEXT_REV", $this->lng->txt("cont_next_rev"));
                         $this->ctrl->setParameter($this, "old_nr", $hist_info["next"]["nr"]);
                         $tpl->setVariable(
-                                "HREF_NEXT",
-                                $this->ctrl->getLinkTarget($this, "preview")
-                            );
+                            "HREF_NEXT",
+                            $this->ctrl->getLinkTarget($this, "preview")
+                        );
                         $tpl->parseCurrentBlock();
 
                         // latest revision
@@ -1444,9 +1444,9 @@ class ilPageObjectGUI
                         $tpl->setVariable("TXT_LATEST_REV", $this->lng->txt("cont_latest_rev"));
                         $this->ctrl->setParameter($this, "old_nr", "");
                         $tpl->setVariable(
-                                "HREF_LATEST",
-                                $this->ctrl->getLinkTarget($this, "preview")
-                            );
+                            "HREF_LATEST",
+                            $this->ctrl->getLinkTarget($this, "preview")
+                        );
                         $tpl->parseCurrentBlock();
                     }
 
@@ -1457,14 +1457,14 @@ class ilPageObjectGUI
                         $tpl->setCurrentBlock("rollback");
                         $this->ctrl->setParameter($this, "old_nr", $c_old_nr);
                         $tpl->setVariable(
-                                "HREF_ROLLBACK",
-                                $this->ctrl->getLinkTarget($this, "rollbackConfirmation")
-                            );
+                            "HREF_ROLLBACK",
+                            $this->ctrl->getLinkTarget($this, "rollbackConfirmation")
+                        );
                         $this->ctrl->setParameter($this, "old_nr", "");
                         $tpl->setVariable(
-                                "TXT_ROLLBACK",
-                                $this->lng->txt("cont_rollback")
-                            );
+                            "TXT_ROLLBACK",
+                            $this->lng->txt("cont_rollback")
+                        );
                         $tpl->parseCurrentBlock();
                     }
                 }
@@ -1472,13 +1472,13 @@ class ilPageObjectGUI
                 $tpl->setCurrentBlock("hist_nav");
                 $tpl->setVariable("TXT_REVISION", $this->lng->txt("cont_revision"));
                 $tpl->setVariable(
-                        "VAL_REVISION_DATE",
-                        ilDatePresentation::formatDate(new ilDateTime($hist_info["current"]["hdate"], IL_CAL_DATETIME))
-                    );
+                    "VAL_REVISION_DATE",
+                    ilDatePresentation::formatDate(new ilDateTime($hist_info["current"]["hdate"], IL_CAL_DATETIME))
+                );
                 $tpl->setVariable(
-                        "VAL_REV_USER",
-                        ilUserUtil::getNamePresentation($hist_info["current"]["user_id"])
-                    );
+                    "VAL_REV_USER",
+                    ilUserUtil::getNamePresentation($hist_info["current"]["user_id"])
+                );
                 $tpl->parseCurrentBlock();
             }
         }
@@ -1492,10 +1492,10 @@ class ilPageObjectGUI
         // output media object edit list (of media links)
         if ($this->getOutputMode() == "edit") {
             $links = ilInternalLink::_getTargetsOfSource(
-                    $this->obj->getParentType() . ":pg",
-                    $this->obj->getId(),
-                    $this->obj->getLanguage()
-                );
+                $this->obj->getParentType() . ":pg",
+                $this->obj->getId(),
+                $this->obj->getLanguage()
+            );
             $mob_links = array();
             foreach ($links as $link) {
                 if ($link["type"] == "mob") {
@@ -1510,9 +1510,9 @@ class ilPageObjectGUI
                 $tpl->setCurrentBlock("med_link");
                 $tpl->setVariable("TXT_LINKED_MOBS", $this->lng->txt("cont_linked_mobs"));
                 $tpl->setVariable(
-                        "SEL_MED_LINKS",
-                        ilUtil::formSelect(0, "mob_id", $mob_links, false, true)
-                    );
+                    "SEL_MED_LINKS",
+                    ilUtil::formSelect(0, "mob_id", $mob_links, false, true)
+                );
                 $tpl->setVariable("TXT_EDIT_MEDIA", $this->lng->txt("cont_edit_mob"));
                 $tpl->setVariable("TXT_COPY_TO_CLIPBOARD", $this->lng->txt("cont_copy_to_clipboard"));
                 //$this->tpl->setVariable("TXT_COPY_TO_POOL", $this->lng->txt("cont_copy_to_mediapool"));
@@ -1522,9 +1522,9 @@ class ilPageObjectGUI
             // content snippets used
             include_once("./Services/COPage/classes/class.ilPCContentInclude.php");
             $snippets = ilPCContentInclude::collectContentIncludes(
-                    $this->getPageObject(),
-                    $this->getPageObject()->getDomDoc()
-                );
+                $this->getPageObject(),
+                $this->getPageObject()->getDomDoc()
+            );
             if (count($snippets) > 0) {
                 foreach ($snippets as $s) {
                     include_once("./Modules/MediaPool/classes/class.ilMediaPoolPage.php");
@@ -1533,9 +1533,9 @@ class ilPageObjectGUI
                 $tpl->setCurrentBlock("med_link");
                 $tpl->setVariable("TXT_CONTENT_SNIPPETS_USED", $this->lng->txt("cont_snippets_used"));
                 $tpl->setVariable(
-                        "SEL_SNIPPETS",
-                        ilUtil::formSelect(0, "ci_id", $sn_arr, false, true)
-                    );
+                    "SEL_SNIPPETS",
+                    ilUtil::formSelect(0, "ci_id", $sn_arr, false, true)
+                );
                 $tpl->setVariable("TXT_SHOW_INFO", $this->lng->txt("cont_show_info"));
                 $tpl->parseCurrentBlock();
             }
@@ -1547,23 +1547,23 @@ class ilPageObjectGUI
                 $tpl->setCurrentBlock("activation_txt");
                 $tpl->setVariable("TXT_SCHEDULED_ACTIVATION", $this->lng->txt("cont_scheduled_activation"));
                 $tpl->setVariable(
-                        "SA_FROM",
-                        ilDatePresentation::formatDate(
+                    "SA_FROM",
+                    ilDatePresentation::formatDate(
                             new ilDateTime(
-                            $this->getPageObject()->getActivationStart(),
-                            IL_CAL_DATETIME
+                                $this->getPageObject()->getActivationStart(),
+                                IL_CAL_DATETIME
+                            )
                         )
-                        )
-                    );
+                );
                 $tpl->setVariable(
-                        "SA_TO",
-                        ilDatePresentation::formatDate(
+                    "SA_TO",
+                    ilDatePresentation::formatDate(
                             new ilDateTime(
-                            $this->getPageObject()->getActivationEnd(),
-                            IL_CAL_DATETIME
+                                $this->getPageObject()->getActivationEnd(),
+                                IL_CAL_DATETIME
+                            )
                         )
-                        )
-                    );
+                );
                 $tpl->parseCurrentBlock();
             }
         }
@@ -1571,9 +1571,9 @@ class ilPageObjectGUI
         if ($_GET["reloadTree"] == "y") {
             $tpl->setCurrentBlock("reload_tree");
             $tpl->setVariable(
-                    "LINK_TREE",
-                    $this->ctrl->getLinkTargetByClass("ilobjlearningmodulegui", "explorer", "", false, false)
-                );
+                "LINK_TREE",
+                $this->ctrl->getLinkTargetByClass("ilobjlearningmodulegui", "explorer", "", false, false)
+            );
             $tpl->parseCurrentBlock();
         }
         //		}
@@ -1792,17 +1792,17 @@ class ilPageObjectGUI
                          'paragraph_plugins' => $paragraph_plugin_string,
                          'disable_auto_margins' => $disable_auto_margins,
                          'page_toc' => $cfg->getEnablePageToc() ? "y" : "n",
-                         'enable_profile' =>  $cfg->getEnablePCType("Profile") ? "y" : "n",
-                         'enable_verification' =>  $cfg->getEnablePCType("Verification") ? "y" : "n",
-                         'enable_blog' =>  $cfg->getEnablePCType("Blog") ? "y" : "n",
-                         'enable_skills' =>  $cfg->getEnablePCType("Skills") ? "y" : "n",
-                         'enable_learning_history' =>  $cfg->getEnablePCType("LearningHistory") ? "y" : "n",
-                         'enable_qover' =>  $cfg->getEnablePCType("QuestionOverview") ? "y" : "n",
-                         'enable_consultation_hours' =>  $cfg->getEnablePCType("ConsultationHours") ? "y" : "n",
-                         'enable_my_courses' =>  $cfg->getEnablePCType("MyCourses") ? "y" : "n",
-                         'enable_amd_page_list' =>  $cfg->getEnablePCType("AMDPageList") ? "y" : "n",
+                         'enable_profile' => $cfg->getEnablePCType("Profile") ? "y" : "n",
+                         'enable_verification' => $cfg->getEnablePCType("Verification") ? "y" : "n",
+                         'enable_blog' => $cfg->getEnablePCType("Blog") ? "y" : "n",
+                         'enable_skills' => $cfg->getEnablePCType("Skills") ? "y" : "n",
+                         'enable_learning_history' => $cfg->getEnablePCType("LearningHistory") ? "y" : "n",
+                         'enable_qover' => $cfg->getEnablePCType("QuestionOverview") ? "y" : "n",
+                         'enable_consultation_hours' => $cfg->getEnablePCType("ConsultationHours") ? "y" : "n",
+                         'enable_my_courses' => $cfg->getEnablePCType("MyCourses") ? "y" : "n",
+                         'enable_amd_page_list' => $cfg->getEnablePCType("AMDPageList") ? "y" : "n",
                          'current_ts' => $current_ts,
-                         'enable_html_mob' =>  ilObjMediaObject::isTypeAllowed("html") ? "y" : "n",
+                         'enable_html_mob' => ilObjMediaObject::isTypeAllowed("html") ? "y" : "n",
                          'flv_video_player' => $flv_video_player,
                          'page_perma_link' => $this->getPagePermaLink()
                         );
@@ -2166,7 +2166,7 @@ class ilPageObjectGUI
                                 {
                                     $a_list->addItem($this->lng->txt("cont_activate_multi_lang"), "",
                                         $this->ctrl->getLinkTargetByClass("ilpagemultilanggui", "activateMultilinguality"));
-                
+
                                     $any_items = true;
                                 }*/
             } else {
@@ -2529,9 +2529,9 @@ class ilPageObjectGUI
                     ? $int_link["TargetFrame"]
                     : "None";
 
-                $ltarget="_top";
+                $ltarget = "_top";
                 if ($targetframe != "None") {
-                    $ltarget="_blank";
+                    $ltarget = "_blank";
                 }
 
                 // anchor
@@ -2608,7 +2608,7 @@ class ilPageObjectGUI
                             }
                             $this->ctrl->setParameterByClass("ilpublicuserprofilegui", "user_id", "");
                             $lcontent = ilUserUtil::getNamePresentation($target_id, false, false);
-                            $lcontent = str_replace("&", "&amp;" ,htmlentities($lcontent));
+                            $lcontent = str_replace("&", "&amp;", htmlentities($lcontent));
                         }
                         break;
 
@@ -2620,7 +2620,7 @@ class ilPageObjectGUI
                 }
             }
         }
-        $link_info.= "</IntLinkInfos>";
+        $link_info .= "</IntLinkInfos>";
         $this->setLinkXML($link_info);
     }
 
@@ -2657,7 +2657,7 @@ class ilPageObjectGUI
             $download_ok = true;
         }
 
-        $pcs = ilPageContentUsage::getUsagesOfPage($pg_obj->getId(), $pg_obj->getParentType().":pg", 0, false);
+        $pcs = ilPageContentUsage::getUsagesOfPage($pg_obj->getId(), $pg_obj->getParentType() . ":pg", 0, false);
         foreach ($pcs as $pc) {
             $files = ilObjFile::_getFilesOfObject("mep:pg", $pc["id"], 0);
             $file = explode("_", $_GET["file_id"]);
@@ -2706,16 +2706,16 @@ class ilPageObjectGUI
 
         if (!empty($_GET["pg_id"])) {
             $xml = "<dummy>";
-            $xml.= $pg_obj->getMediaAliasElement($_GET["mob_id"]);
-            $xml.= $media_obj->getXML(IL_MODE_OUTPUT);
-            $xml.= $link_xml;
-            $xml.="</dummy>";
+            $xml .= $pg_obj->getMediaAliasElement($_GET["mob_id"]);
+            $xml .= $media_obj->getXML(IL_MODE_OUTPUT);
+            $xml .= $link_xml;
+            $xml .= "</dummy>";
         } else {
             $xml = "<dummy>";
-            $xml.= $media_obj->getXML(IL_MODE_ALIAS);
-            $xml.= $media_obj->getXML(IL_MODE_OUTPUT);
-            $xml.= $link_xml;
-            $xml.="</dummy>";
+            $xml .= $media_obj->getXML(IL_MODE_ALIAS);
+            $xml .= $media_obj->getXML(IL_MODE_OUTPUT);
+            $xml .= $link_xml;
+            $xml .= "</dummy>";
         }
 
         $xsl = file_get_contents("./Services/COPage/xsl/page.xsl");
@@ -3065,7 +3065,7 @@ class ilPageObjectGUI
         $html = $this->showPage();
         
         if ($this->isEnabledNotes()) {
-            $html.= "<br /><br />" . $this->getNotesHTML();
+            $html .= "<br /><br />" . $this->getNotesHTML();
         }
     
         return $mess . $html;
@@ -3111,7 +3111,7 @@ class ilPageObjectGUI
         
         //		  'pl_hier_id' => string '2_1_1_1' (length=7)
         //  'pl_pc_id' => string '1f77eb1d8a478497d69b99d938fda8f' (length=31)
-        $html =  $this->edit();
+        $html = $this->edit();
 
         $tpl->addOnLoadCode("ilCOPage.insertJSAtPlaceholder('" .
             $_GET["pl_hier_id"] . ":" . $_GET["pl_pc_id"] .
@@ -3181,14 +3181,14 @@ class ilPageObjectGUI
             $xml = "<dummy>";
             // todo: we get always the first alias now (problem if mob is used multiple
             // times in page)
-            $xml.= $pg_obj->getMediaAliasElement($_GET["mob_id"]);
-            $xml.= $media_obj->getXML(IL_MODE_OUTPUT);
-            $xml.="</dummy>";
+            $xml .= $pg_obj->getMediaAliasElement($_GET["mob_id"]);
+            $xml .= $media_obj->getXML(IL_MODE_OUTPUT);
+            $xml .= "</dummy>";
         } else {
             $xml = "<dummy>";
-            $xml.= $media_obj->getXML(IL_MODE_ALIAS);
-            $xml.= $media_obj->getXML(IL_MODE_OUTPUT);
-            $xml.="</dummy>";
+            $xml .= $media_obj->getXML(IL_MODE_ALIAS);
+            $xml .= $media_obj->getXML(IL_MODE_OUTPUT);
+            $xml .= "</dummy>";
         }
 
         //echo htmlentities($xml); exit;

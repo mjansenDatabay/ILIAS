@@ -791,7 +791,7 @@ class ilUnivisImportLecturesGUI extends ilWizardGUI
         $dur->setShowTime(true);
         $dur->setStart(new ilDateTime($this->values->getSessionValue('conditions_form', 'access_start', time()), IL_CAL_UNIX));
         $dur->setStartText($this->lng->txt('rep_activation_limited_start'));
-        $dur->setEnd(new ilDateTime($this->values->getSessionValue('conditions_form', 'access_end', mktime(0, 0, 0, 12, 31, date("Y", time())+1)), IL_CAL_UNIX));
+        $dur->setEnd(new ilDateTime($this->values->getSessionValue('conditions_form', 'access_end', mktime(0, 0, 0, 12, 31, date("Y", time()) + 1)), IL_CAL_UNIX));
         $dur->setEndText($this->lng->txt('rep_activation_limited_end'));
         $act_type->addSubItem($dur);
 
@@ -834,7 +834,7 @@ class ilUnivisImportLecturesGUI extends ilWizardGUI
 
         $dur->setStart(new ilDateTime($this->values->getSessionValue('conditions_form', 'subscription_start', time()), IL_CAL_UNIX));
         $dur->setStartText($this->lng->txt('crs_start'));
-        $dur->setEnd(new ilDateTime($this->values->getSessionValue('conditions_form', 'subscription_end', mktime(0, 0, 0, 12, 31, date("Y", time())+1)), IL_CAL_UNIX));
+        $dur->setEnd(new ilDateTime($this->values->getSessionValue('conditions_form', 'subscription_end', mktime(0, 0, 0, 12, 31, date("Y", time()) + 1)), IL_CAL_UNIX));
         $dur->setEndText($this->lng->txt('crs_end'));
         // fau: regPeriod - show deny time for registration
 
@@ -844,10 +844,10 @@ class ilUnivisImportLecturesGUI extends ilWizardGUI
             $deny_regstart_from = new ilDateTime($deny_regstart_from, IL_CAL_DATETIME);
             $deny_regstart_to = new ilDateTime($deny_regstart_to, IL_CAL_DATETIME);
             $dur->setInfo(sprintf(
-                            $this->lng->txt('deny_regstart_message'),
-                            ilDatePresentation::formatDate($deny_regstart_from),
-                            ilDatePresentation::formatDate($deny_regstart_to)
-                        ));
+                $this->lng->txt('deny_regstart_message'),
+                ilDatePresentation::formatDate($deny_regstart_from),
+                ilDatePresentation::formatDate($deny_regstart_to)
+            ));
         }
         // fau.
         $opt->addSubItem($dur);
@@ -1244,7 +1244,7 @@ class ilUnivisImportLecturesGUI extends ilWizardGUI
                 $crs->setOfflineStatus(!(bool) $cond['activation_online']);
 
                 $crs->setActivationStart($this->values->getSessionValue('conditions_form', 'access_start', time()));
-                $crs->setActivationEnd($this->values->getSessionValue('conditions_form', 'access_end', mktime(0, 0, 0, 12, 31, date("Y", time())+1)));
+                $crs->setActivationEnd($this->values->getSessionValue('conditions_form', 'access_end', mktime(0, 0, 0, 12, 31, date("Y", time()) + 1)));
                 $crs->setActivationVisibility((bool) $cond['activation_visibility']);
             }
 
@@ -1262,7 +1262,7 @@ class ilUnivisImportLecturesGUI extends ilWizardGUI
                     // get registration period from the form
                     $crs->setSubscriptionLimitationType($cond['subscription_limitation_type']);
                     $start = $this->values->getSessionValue('conditions_form', 'subscription_start', time());
-                    $end = $this->values->getSessionValue('conditions_form', 'subscription_end', mktime(0, 0, 0, 12, 31, date("Y", time())+1));
+                    $end = $this->values->getSessionValue('conditions_form', 'subscription_end', mktime(0, 0, 0, 12, 31, date("Y", time()) + 1));
                 }
 
                 $crs->setSubscriptionStart($start);

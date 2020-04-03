@@ -171,7 +171,7 @@ class ilRegistrationCode
         $map = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
         
         $code = "";
-        $max = strlen($map)-1;
+        $max = strlen($map) - 1;
         // fau: regCodes - customize the length of generated registration codes
         for ($loop = 1; $loop <= ilCust::get('reg_code_length'); $loop++) {
             $code .= $map[mt_rand(0, $max)];
@@ -266,13 +266,13 @@ class ilRegistrationCode
             $where[] = $ilDB->like("code", "text", "%" . $filter_code . "%");
         }
         if ($filter_role) {
-            $where[] ="role = " . $ilDB->quote($filter_role, "integer");
+            $where[] = "role = " . $ilDB->quote($filter_role, "integer");
         }
         if ($filter_generated) {
-            $where[] ="generated_on = " . $ilDB->quote($filter_generated, "text");
+            $where[] = "generated_on = " . $ilDB->quote($filter_generated, "text");
         }
         if ($filter_access_limitation) {
-            $where[] ="alimit = " . $ilDB->quote($filter_access_limitation, "text");
+            $where[] = "alimit = " . $ilDB->quote($filter_access_limitation, "text");
         }
         if (sizeof($where)) {
             return " WHERE " . implode(" AND ", $where);
@@ -405,7 +405,7 @@ class ilRegistrationCode
         $this->local_roles = array();
         $this->limit_type = null;
         $this->limit_date = new ilDateTime();
-        $this->limit_duration =  array();
+        $this->limit_duration = array();
         $this->reg_enabled = true;
         $this->ext_enabled = false;
         $this->login_generation_type = 'guestlistener';
@@ -505,7 +505,7 @@ class ilRegistrationCode
                 'description' => array('text', $this->description),
                 'use_limit' => array('integer', $this->use_limit),
                 'use_count' => array('integer', $this->use_count),
-                'used' =>array('integer', (int) $this->last_use->get(IL_CAL_UNIX)),
+                'used' => array('integer', (int) $this->last_use->get(IL_CAL_UNIX)),
                 'role' => array('integer', $this->global_role),
                 'role_local' => array('text', implode(';', $this->local_roles)),
                 'alimit' => array('text', $this->limit_type),

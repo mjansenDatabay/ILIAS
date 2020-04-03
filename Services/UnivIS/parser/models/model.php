@@ -147,10 +147,10 @@ class Model
             $ilDB->manipulate($query);
         }
 
-        $names =  implode(', ', array_keys($quoted));
+        $names = implode(', ', array_keys($quoted));
         $values = implode(', ', array_values($quoted));
 
-        $query= 'INSERT INTO ' . $ilDB->quoteIdentifier($table) . ' (' . $names . ') VALUES (' . $values . ')';
+        $query = 'INSERT INTO ' . $ilDB->quoteIdentifier($table) . ' (' . $names . ') VALUES (' . $values . ')';
         //print $query."\n";
 
         $ilDB->manipulate($query);

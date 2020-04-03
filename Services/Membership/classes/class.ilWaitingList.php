@@ -275,10 +275,10 @@ abstract class ilWaitingList
         if ($res == 0) {
             return false;
         } else {
-            $this->users[$a_usr_id]['time']			= $a_sub_time;
-            $this->users[$a_usr_id]['usr_id']		= $a_usr_id;
-            $this->users[$a_usr_id]['subject']		= $a_subject;
-            $this->users[$a_usr_id]['to_confirm']	= $a_to_confirm;
+            $this->users[$a_usr_id]['time'] = $a_sub_time;
+            $this->users[$a_usr_id]['usr_id'] = $a_usr_id;
+            $this->users[$a_usr_id]['subject'] = $a_subject;
+            $this->users[$a_usr_id]['to_confirm'] = $a_to_confirm;
             $this->recalculate();
             return true;
         }
@@ -572,7 +572,7 @@ abstract class ilWaitingList
         }
 
         $effective = $this->getEffectivePosition($a_usr_id);
-        $others = count($this->getPositionUsers((int) $this->getPosition($a_usr_id))) -1;
+        $others = count($this->getPositionUsers((int) $this->getPosition($a_usr_id))) - 1;
 
         if ($others == 0) {
             return (string) $effective;
@@ -704,10 +704,10 @@ abstract class ilWaitingList
         $res = $this->db->query($query);
 
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $this->users[$row->usr_id]['time']			= $row->sub_time;
-            $this->users[$row->usr_id]['usr_id']		= $row->usr_id;
-            $this->users[$row->usr_id]['subject']		= $row->subject;
-            $this->users[$row->usr_id]['to_confirm']	= $row->to_confirm;
+            $this->users[$row->usr_id]['time'] = $row->sub_time;
+            $this->users[$row->usr_id]['usr_id'] = $row->usr_id;
+            $this->users[$row->usr_id]['subject'] = $row->subject;
+            $this->users[$row->usr_id]['to_confirm'] = $row->to_confirm;
         }
         // fau: fairSub - recalculate data when list is read
         $this->recalculate();

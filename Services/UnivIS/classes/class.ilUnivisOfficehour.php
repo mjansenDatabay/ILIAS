@@ -100,7 +100,7 @@ class ilUnivisOfficehour extends ilUnivisData
 
         // room
         if ($this->data['office']) {
-            $info.= ', ' . $this->data['office'];
+            $info .= ', ' . $this->data['office'];
         }
 
         return $info;

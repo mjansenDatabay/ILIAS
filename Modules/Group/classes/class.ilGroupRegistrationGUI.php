@@ -127,7 +127,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
     {
         if ($this->container->getInformation()) {
             $imp = new ilNonEditableValueGUI($this->lng->txt('crs_important_info'), '', true);
-            $value =  nl2br(ilUtil::makeClickable($this->container->getInformation(), true));
+            $value = nl2br(ilUtil::makeClickable($this->container->getInformation(), true));
             $imp->setValue($value);
             $this->form->addItem($imp);
         }
@@ -191,7 +191,7 @@ class ilGroupRegistrationGUI extends ilRegistrationGUI
         }
 
         // fau: fairSub	- add info about fair time for limited subscription
-        if ($this->container->isMembershipLimited() &&$this->container->getMaxMembers()) {
+        if ($this->container->isMembershipLimited() && $this->container->getMaxMembers()) {
             if ($this->container->getSubscriptionFair() >= 0) {
                 $tpl->setVariable('TXT_FAIR', $this->lng->txt('sub_fair_date') . ': ');
                 $tpl->setVariable('FAIR', $this->container->getSubscriptionFairDisplay(false));

@@ -80,7 +80,7 @@ class univis2mysql
     */
     public function validateXML($xmlToValidate)
     {
-        $xmlParser= xml_parser_create();
+        $xmlParser = xml_parser_create();
         if (!xml_parse($xmlParser, $xmlToValidate, true)) {
             U2T3_DEBUG("ERROR occurred\n");
             if (xml_get_error_code($xmlParser)) {

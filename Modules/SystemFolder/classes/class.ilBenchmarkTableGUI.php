@@ -142,10 +142,10 @@ class ilBenchmarkTableGUI extends ilTable2GUI
 
         $table = "";
         if ($pos1 > 0) {
-            $tablef = substr(strtolower($a_sql), $pos1+5);
+            $tablef = substr(strtolower($a_sql), $pos1 + 5);
             $pos2 = $this->getFirst($tablef, array(" ", "\n", "\t", "\r"));
             if ($pos2 > 0) {
-                $table =substr($tablef, 0, $pos2);
+                $table = substr($tablef, 0, $pos2);
             } else {
                 $table = $tablef;
             }
@@ -228,7 +228,7 @@ class ilBenchmarkTableGUI extends ilTable2GUI
         if ($this->total > 0) {
             $share = round(100 * $a_set["time"] / $this->total, 2) . '%';
         }
-        $expand_id ='expand' . rand();
+        $expand_id = 'expand' . rand();
 
         switch ($this->mode) {
             case "by_first_table":

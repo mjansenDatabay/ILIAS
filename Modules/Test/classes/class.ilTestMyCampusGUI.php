@@ -66,7 +66,7 @@ class ilTestMyCampusGUI extends ilTestServiceGUI
         $cmd = $this->getCommand($cmd);
         switch ($next_class) {
             default:
-                $ret =&$this->$cmd();
+                $ret = &$this->$cmd();
                 break;
         }
         return $ret;

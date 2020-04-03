@@ -281,7 +281,7 @@ class ilMemberExport
                 break;
                 
             case self::EXPORT_EXCEL:
-                $this->worksheet->setCell($a_row+1, $a_col, $a_value);
+                $this->worksheet->setCell($a_row + 1, $a_col, $a_value);
                 break;
         }
     }
@@ -764,8 +764,8 @@ class ilMemberExport
                 continue;
             }
             $sort = $tmp_event->getFirstAppointment()->getStart()->get(IL_CAL_DATETIME);
-            $sort.= $tmp_event->getTitle();
-            $sort.= " " . $tmp_event->getId();
+            $sort .= $tmp_event->getTitle();
+            $sort .= " " . $tmp_event->getId();
             $events[$sort] = $tmp_event;
         }
         ksort($events);
@@ -841,7 +841,7 @@ class ilMemberExport
             }
 
             if ($this->settings->enabled($data['type'] . '_marks') || $this->settings->enabled($data['type'] . '_comments')) {
-                $markData =  ilLPMarks::_getMarkDataOfObject($data['obj_id']);
+                $markData = ilLPMarks::_getMarkDataOfObject($data['obj_id']);
             }
 
             if ($this->settings->enabled($data['type'] . '_marks')) {
@@ -959,7 +959,7 @@ class ilMemberExport
 
         // fim: [export] use prechecked requirement for agreement
         if (!$this->agreement_needed or $this->agreement[$udf_data->getUserId()]['accepted']) {
-        // fim.
+            // fim.
             $field_info = explode('_', $a_field);
             $field_id = $field_info[1];
             $value = $udf_data->get('f_' . $field_id);
@@ -1000,7 +1000,7 @@ class ilMemberExport
             $this->groups_rights = array();
             foreach ($groups as $idx => $group_data) {
                 // check for group in group
-                if ($group_data["parent"] != $this->ref_id  && $tree->checkForParentType($group_data["ref_id"], "grp", true)) {
+                if ($group_data["parent"] != $this->ref_id && $tree->checkForParentType($group_data["ref_id"], "grp", true)) {
                     unset($groups[$idx]);
                 } else {
                     $this->groups[$group_data["ref_id"]] = $group_data["title"];

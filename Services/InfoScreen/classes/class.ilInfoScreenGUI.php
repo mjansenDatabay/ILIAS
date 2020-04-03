@@ -554,7 +554,7 @@ class ilInfoScreenGUI
                         foreach ($refs as $r) {
                             $cont_loc = new ilLocatorGUI();
                             $cont_loc->addContextItems($r, true);
-                            $links.= $sep . $cont_loc->getHTML();
+                            $links .= $sep . $cont_loc->getHTML();
                             $sep = "<br />";
                         }
 
@@ -1157,9 +1157,9 @@ class ilInfoScreenGUI
         $i_tpl->setVariable("INFO_EDITED", $this->lng->txt("trac_info_edited"));
         $i_tpl->setVariable("SELECT_STATUS", ilUtil::formSelect(
             (int) ilLPMarks::_hasCompleted(
-            $ilUser->getId(),
-            $this->getContextObjId()
-        ),
+                $ilUser->getId(),
+                $this->getContextObjId()
+            ),
             'lp_edit',
             array(0 => $this->lng->txt('trac_not_completed'),
                       1 => $this->lng->txt('trac_completed')),

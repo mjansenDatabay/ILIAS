@@ -133,7 +133,7 @@ class ilUnivisPerson extends ilUnivisData
 
         $options = array();
         if ($a_add_default) {
-            $options[''] =  $lng->txt('please_select');
+            $options[''] = $lng->txt('please_select');
         }
 
         $query = "SELECT * FROM univis_person "

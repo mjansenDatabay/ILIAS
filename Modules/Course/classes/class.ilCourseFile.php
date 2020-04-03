@@ -60,7 +60,7 @@ class ilCourseFile
         $lng = $DIC['lng'];
 
         $this->ilErr = $ilErr;
-        $this->db  = $ilDB;
+        $this->db = $ilDB;
         $this->lng = $lng;
 
         $this->file_id = $a_file_id;
@@ -167,7 +167,7 @@ class ilCourseFile
 
         // fau: fixCourseFileDownload - try to use use the uploaded file extension
         $pi = pathinfo($this->getFileName());
-        $ext =  $pi['extension'];
+        $ext = $pi['extension'];
         $variants = [
             $file,					// standard
             $file . '.sec',			// standard, secured

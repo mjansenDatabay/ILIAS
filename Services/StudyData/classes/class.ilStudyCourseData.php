@@ -11,7 +11,7 @@ class ilStudyCourseData extends ilStudyData
 {
     const TYPE_FULL = "V";
     const TYPE_PART = "T";
-    const TYPE_NONE  = "";
+    const TYPE_NONE = "";
 
     /** @inheritdoc */
     protected static $cache;
@@ -112,10 +112,10 @@ class ilStudyCourseData extends ilStudyData
 
         $subject_texts = [];
         foreach ($this->subjects as $subject) {
-            $subject_texts[] =  $subject->getText();
+            $subject_texts[] = $subject->getText();
         }
         if (!empty($subject_texts)) {
-            $text.= " \n" . implode(', ', $subject_texts);
+            $text .= " \n" . implode(', ', $subject_texts);
         }
         if ($degree_text = ilStudyOptionDegree::_lookupText($this->degree_id)) {
             $text .= " \n" . $degree_text;

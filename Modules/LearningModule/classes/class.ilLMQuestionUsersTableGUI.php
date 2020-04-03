@@ -136,10 +136,10 @@ class ilLMQuestionUsersTableGUI extends ilTable2GUI
             $this->tpl->setVariable('VAL_CORRECT_THIRD_OR_MORE', ' ');
             $this->tpl->setVariable('VAL_NEVER', ' ');
         } else {
-            $this->tpl->setVariable('VAL_CORRECT_FIRST', round(100/$a_set['answered'] * $a_set['first']) . ' %');
-            $this->tpl->setVariable('VAL_CORRECT_SECOND', round(100/$a_set['answered'] * $a_set['second']) . ' %');
-            $this->tpl->setVariable('VAL_CORRECT_THIRD_AND_MORE', round(100/$a_set['answered'] * $a_set['third_or_more']) . ' %');
-            $this->tpl->setVariable('VAL_NEVER', round(100/$a_set['answered'] * $a_set['never']) . ' %');
+            $this->tpl->setVariable('VAL_CORRECT_FIRST', round(100 / $a_set['answered'] * $a_set['first']) . ' %');
+            $this->tpl->setVariable('VAL_CORRECT_SECOND', round(100 / $a_set['answered'] * $a_set['second']) . ' %');
+            $this->tpl->setVariable('VAL_CORRECT_THIRD_AND_MORE', round(100 / $a_set['answered'] * $a_set['third_or_more']) . ' %');
+            $this->tpl->setVariable('VAL_NEVER', round(100 / $a_set['answered'] * $a_set['never']) . ' %');
         }
     }
 }

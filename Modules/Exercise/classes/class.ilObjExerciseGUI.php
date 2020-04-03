@@ -102,7 +102,7 @@ class ilObjExerciseGUI extends ilObjectGUI
                 $ilTabs->activateTab("permissions");
                 include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
                 $perm_gui = new ilPermissionGUI($this);
-                $ret =&$this->ctrl->forwardCommand($perm_gui);
+                $ret = &$this->ctrl->forwardCommand($perm_gui);
             break;
     
             case "illearningprogressgui":
@@ -267,25 +267,25 @@ class ilObjExerciseGUI extends ilObjectGUI
         $radg = new ilRadioGroupInputGUI($this->lng->txt("exc_pass_mode"), "pass_mode");
     
         $op1 = new ilRadioOption(
-                $this->lng->txt("exc_pass_all"),
-                "all",
-                $this->lng->txt("exc_pass_all_info")
-            );
+            $this->lng->txt("exc_pass_all"),
+            "all",
+            $this->lng->txt("exc_pass_all_info")
+        );
         $radg->addOption($op1);
         $op2 = new ilRadioOption(
-                $this->lng->txt("exc_pass_minimum_nr"),
-                "nr",
-                $this->lng->txt("exc_pass_minimum_nr_info")
-            );
+            $this->lng->txt("exc_pass_minimum_nr"),
+            "nr",
+            $this->lng->txt("exc_pass_minimum_nr_info")
+        );
         $radg->addOption($op2);
 
         // fau: exManCalc - new pass mode "man"
         $op3 = new ilRadioOption(
-                $this->lng->txt("exc_pass_manual"),
-                "man",
-                $this->lng->txt("exc_pass_manual_info")
-            );
-        $instruction= new ilTextAreaInputGUI($this->lng->txt("description"), "instruction");
+            $this->lng->txt("exc_pass_manual"),
+            "man",
+            $this->lng->txt("exc_pass_manual_info")
+        );
+        $instruction = new ilTextAreaInputGUI($this->lng->txt("description"), "instruction");
         $instruction->setInfo($this->lng->txt("exc_pass_manual_description"));
         $op3->addSubItem($instruction);
         $radg->addOption($op3);
@@ -779,7 +779,7 @@ class ilObjExerciseGUI extends ilObjectGUI
                     break;
 
                 case "grades":
-                    $action= $parts[2];
+                    $action = $parts[2];
                     $ass_id = $parts[1];
                     break;
             }

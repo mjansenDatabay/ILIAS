@@ -94,10 +94,10 @@ class ilObjCourseListGUI extends ilObjectListGUI
             !ilObject::lookupOfflineStatus($this->obj_id)
         ) {
             $showRegistrationInfo = false;
-            $props[]              = array(
-                "alert"    => true,
+            $props[] = array(
+                "alert" => true,
                 "property" => $lng->txt("status"),
-                "value"    => $lng->txt("offline")
+                "value" => $lng->txt("offline")
             );
         }
 

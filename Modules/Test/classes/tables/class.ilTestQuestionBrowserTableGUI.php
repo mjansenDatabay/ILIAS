@@ -102,15 +102,15 @@ class ilTestQuestionBrowserTableGUI extends ilTable2GUI
         ilObjTest $testOBJ,
         ilAccessHandler $access
     ) {
-        $this->ctrl        = $ctrl;
-        $this->mainTpl     = $mainTpl;
-        $this->tabs        = $tabs;
-        $this->lng         = $lng;
-        $this->tree        = $tree;
-        $this->db          = $db;
+        $this->ctrl = $ctrl;
+        $this->mainTpl = $mainTpl;
+        $this->tabs = $tabs;
+        $this->lng = $lng;
+        $this->tree = $tree;
+        $this->db = $db;
         $this->pluginAdmin = $pluginAdmin;
-        $this->testOBJ     = $testOBJ;
-        $this->access      = $access;
+        $this->testOBJ = $testOBJ;
+        $this->access = $access;
 
         $this->setId('qpl_brows_tabl_' . $this->testOBJ->getId());
 
@@ -581,7 +581,7 @@ class ilTestQuestionBrowserTableGUI extends ilTable2GUI
 
             return array_filter($parentIds, function ($obj_id) use ($access) {
                 $refIds = ilObject::_getAllReferences($obj_id);
-                $refId  = current($refIds);
+                $refId = current($refIds);
                 return $this->access->checkAccess('write', '', $refId);
             });
         }

@@ -109,10 +109,10 @@ class ilUnivisTerm extends ilUnivisData
         if ($this->data['startdate'] and $this->data['enddate']
         and $this->data['startdate'] != $this->data['enddate']
         and $show_enddate) {
-            $info.= date('d.m.Y', strtotime($this->data['startdate'])) . '-'
+            $info .= date('d.m.Y', strtotime($this->data['startdate'])) . '-'
                   . date('d.m.Y', strtotime($this->data['enddate'])) . ' ';
         } elseif ($this->data['startdate']) {
-            $info.= date('d.m.Y', strtotime($this->data['startdate'])) . ' ';
+            $info .= date('d.m.Y', strtotime($this->data['startdate'])) . ' ';
         }
 
         // weekdays
@@ -130,7 +130,7 @@ class ilUnivisTerm extends ilUnivisData
         // room
         if ($this->data['room']) {
             $room = new ilUnivisRoom($this->data['room']);
-            $info.= ', ' . $room->getDisplayShort($a_linked);
+            $info .= ', ' . $room->getDisplayShort($a_linked);
         }
 
         return $info;

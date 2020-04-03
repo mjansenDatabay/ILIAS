@@ -113,7 +113,7 @@ class ilRelativeLink
         $query = '';
         switch ($target_type) {
             case self::TYPE_REP_OBJECT:
-                $query =  "SELECT "
+                $query = "SELECT "
                     . $ilDB->quote($a_code, 'text') . " AS code, "
                     . $ilDB->quote($target_type, 'text') . " AS target_type, "
                     . " r.obj_id AS target_id, "
@@ -126,7 +126,7 @@ class ilRelativeLink
                 break;
 
             case self::TYPE_LM_PAGE:
-                $query =  "SELECT "
+                $query = "SELECT "
                     . $ilDB->quote($a_code, 'text') . " AS code, "
                     . $ilDB->quote($target_type, 'text') . " AS target_type, "
                     . " l.obj_id AS target_id, "
@@ -264,7 +264,7 @@ class ilRelativeLink
                 break;
 
             case self::TYPE_LM_PAGE:
-                $query =  "SELECT lm_id FROM lm_data WHERE obj_id = " . $ilDB->quote($a_target_id, 'integer');
+                $query = "SELECT lm_id FROM lm_data WHERE obj_id = " . $ilDB->quote($a_target_id, 'integer');
                 $res = $ilDB->query($query);
                 while ($row = $ilDB->fetchAssoc($res)) {
                     $ref_ids = array_merge($ref_ids, ilObject::_getAllReferences($row['lm_id']));
@@ -285,7 +285,7 @@ class ilRelativeLink
 
         $code = '';
         for ($i = 0; $i < $length; $i++) {
-            $pos = rand(0, strlen($chars) -1);
+            $pos = rand(0, strlen($chars) - 1);
             $code .= substr($chars, $pos, 1);
         }
 

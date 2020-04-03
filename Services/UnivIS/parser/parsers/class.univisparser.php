@@ -70,8 +70,8 @@ class univisparser
     public function setParent($parent)
     {
         U2T3_DEBUG_PARSER($this->depth, "Set parent and parent xmlParser.\n");
-        $this->parent =&$parent;
-        $this->xmlParser =&$parent->xmlParser;
+        $this->parent = &$parent;
+        $this->xmlParser = &$parent->xmlParser;
     }
     
     public function setParentKey($parentKey)
@@ -121,7 +121,7 @@ class univisparser
                     U2T3_DEBUG_PARSER($this->depth, "No modelObj, set this->tagName = $name and modelClass = $modelClassForTag and set modelObj!\n");
                     $this->tagName = $name;
                     $this->modelClass = $modelClassForTag;
-                    $this->modelObj =&$modelObjForTag;
+                    $this->modelObj = &$modelObjForTag;
                     // populate the model with the tag's attributes
                     foreach ($attrs as $key => $value) {
                         U2T3_DEBUG_PARSER($this->depth, "Set tag attribute (a): $key = $value \n");
@@ -136,11 +136,11 @@ class univisparser
                     // create a child parser
                     U2T3_DEBUG_PARSER($this->depth, "Generating child parser for {$modelClassForTag}\n");
                     $this->childParser = new UnivisParser();
-                    $this->childParser->department_id=$this->department_id;
+                    $this->childParser->department_id = $this->department_id;
                     $this->childParser->setParent($this);
                     U2T3_DEBUG_PARSER($this->depth, "Set childParser->modelClass = $modelClassForTag and childParser->tagName = $name\n ");
                     $this->childParser->modelClass = $modelClassForTag;
-                    $this->childParser->modelObj =&$modelObjForTag;
+                    $this->childParser->modelObj = &$modelObjForTag;
                     $this->childParser->tagName = $name;
                     //$this->depth[$parser]++;
                     U2T3_DEBUG_PARSER($this->depth, "Set xml element and character_data handler\n");

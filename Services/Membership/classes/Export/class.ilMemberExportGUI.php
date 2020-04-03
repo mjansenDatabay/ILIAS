@@ -66,7 +66,7 @@ class ilMemberExportGUI
         'fold' => array('status'),
         'lm' => array('status'),
         'htlm' => array('status'),
-        'sahs'=> array('status'),
+        'sahs' => array('status'),
         // 'wiki' => array('marks', 'status') funktioniert nicht
     );
     // fim.

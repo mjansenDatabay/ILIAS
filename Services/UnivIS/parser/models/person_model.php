@@ -65,7 +65,7 @@ class LocationsModel extends Model
     public $attributes = array();
     public function LocationsModel()
     {
-        $this->attributes[$this->childModelKey]='';
+        $this->attributes[$this->childModelKey] = '';
     }
 
     public function store()
@@ -94,7 +94,7 @@ class LocationModel extends Model
 
     public function LocationModel()
     {
-        $this->attributes[$this->childModelKey]='';
+        $this->attributes[$this->childModelKey] = '';
     }
 }
 
@@ -107,7 +107,7 @@ class OfficehoursModel extends Model
     public $attributes = array();
     public function OfficehoursModel()
     {
-        $this->attributes[$this->childModelKey]='';
+        $this->attributes[$this->childModelKey] = '';
     }
 
     public function store()
@@ -133,6 +133,6 @@ class OfficehourModel extends Model
 
     public function OfficehourModel()
     {
-        $this->attributes[$this->childModelKey]='';
+        $this->attributes[$this->childModelKey] = '';
     }
 }

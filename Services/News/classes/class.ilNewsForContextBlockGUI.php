@@ -138,18 +138,18 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
     
             
         $news_data = $news_item->getNewsForRefId(
-                $_GET["ref_id"],
-                false,
-                false,
-                0,
-                $prevent_aggregation,
-                $forum_grouping
-            );
+            $_GET["ref_id"],
+            false,
+            false,
+            0,
+            $prevent_aggregation,
+            $forum_grouping
+        );
 
         $this->acache->storeEntry(
-                $ilUser->getId() . ":" . $_GET["ref_id"],
-                serialize($news_data)
-            );
+            $ilUser->getId() . ":" . $_GET["ref_id"],
+            serialize($news_data)
+        );
 
         //		}
         //var_dump($news_data);
@@ -351,7 +351,7 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
             $obj_def = $DIC["objDefinition"];
             $obj_id = ilObject::_lookupObjectId($ref_id);
             $obj_type = ilObject::_lookupType($ref_id, true);
-            $obj_class= strtolower($obj_def->getClassName($obj_type));
+            $obj_class = strtolower($obj_def->getClassName($obj_type));
             $parent_gui = "ilobj" . $obj_class . "gui";
 
             $ilCtrl->setParameterByClass("ilcontainernewssettingsgui", "ref_id", $ref_id);
@@ -466,9 +466,9 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
             $this->tpl->setCurrentBlock("long");
             //$this->tpl->setVariable("VAL_CONTENT", $news["content"]);
             $this->tpl->setVariable(
-                    "VAL_CREATION_DATE",
-                    ilDatePresentation::formatDate(new ilDateTime($news["creation_date"], IL_CAL_DATETIME))
-                );
+                "VAL_CREATION_DATE",
+                ilDatePresentation::formatDate(new ilDateTime($news["creation_date"], IL_CAL_DATETIME))
+            );
             $this->tpl->parseCurrentBlock();
         }
 
@@ -680,10 +680,9 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
                         
             // media player
             $ui_renderer = $this->ui->renderer();
-            $ui_factory =  $this->ui->factory();
+            $ui_factory = $this->ui->factory();
             $this->ui->factory();
             if ($item["mob_id"] > 0 && ilObject::_exists($item["mob_id"])) {
-
                 $media_path = $this->getMediaPath($item["mob_id"]);
                 $mime = ilObjMediaObject::getMimeType($media_path);
                 if (in_array($mime, array("image/jpeg", "image/svg+xml", "image/gif", "image/png"))) {
@@ -706,8 +705,6 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
                     $html
                 );
                 $tpl->parseCurrentBlock();
-
-
             }
             
             // access
@@ -754,9 +751,9 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
             if ($item["creation_date"] != "") {
                 $tpl->setCurrentBlock("ni_update");
                 $tpl->setVariable(
-                        "VAL_CREATION_DATE",
-                        ilDatePresentation::formatDate(new ilDateTime($item["creation_date"], IL_CAL_DATETIME))
-                    );
+                    "VAL_CREATION_DATE",
+                    ilDatePresentation::formatDate(new ilDateTime($item["creation_date"], IL_CAL_DATETIME))
+                );
                 $tpl->setVariable("TXT_CREATED", $lng->txt("created"));
                 $tpl->parseCurrentBlock();
             }
@@ -1182,9 +1179,9 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
             $hnpd->setChecked($hide_news_per_date);
             
             $dt_prop = new ilDateTimeInputGUI(
-                    $lng->txt("news_hide_news_date"),
-                    "hide_news_date"
-                );
+                $lng->txt("news_hide_news_date"),
+                "hide_news_date"
+            );
             $dt_prop->setRequired(true);
             if ($hide_news_date != "") {
                 $dt_prop->setDate(new ilDateTime($hide_news_date[0] . ' ' . $hide_news_date[1], IL_CAL_DATETIME));
@@ -1316,7 +1313,7 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
 
         $block_id = $DIC->ctrl()->getContextObjId();
 
-        foreach ($a_values as $key=>$value) {
+        foreach ($a_values as $key => $value) {
             ilBlockSetting::_write(self::$block_type, $key, $value, 0, $block_id);
         }
     }
