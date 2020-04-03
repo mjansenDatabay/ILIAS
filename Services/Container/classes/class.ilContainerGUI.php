@@ -790,9 +790,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
                 $toolbar->addButton(
                     $this->lng->txt('cntr_adopt_content'),
                     $this->ctrl->getLinkTargetByClass(
-                            'ilObjectCopyGUI',
-                            'adoptContent'
-                        )
+                        'ilObjectCopyGUI',
+                        'adoptContent'
+                    )
                 );
             }
             //			}
