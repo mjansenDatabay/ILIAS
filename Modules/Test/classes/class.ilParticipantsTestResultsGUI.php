@@ -14,6 +14,8 @@ use ILIAS\DI\Container;
  *
  * @ilCtrl_Calls ilParticipantsTestResultsGUI: ilTestEvaluationGUI
  * @ilCtrl_Calls ilParticipantsTestResultsGUI: ilAssQuestionPageGUI
+ * @ilCtrl_Calls ilParticipantsTestResultsGUI: ilAssSpecFeedbackPageGUI
+ * @ilCtrl_Calls ilParticipantsTestResultsGUI: ilAssGenFeedbackPageGUI
  */
 class ilParticipantsTestResultsGUI
 {
@@ -628,7 +630,7 @@ class ilParticipantsTestResultsGUI
         
         $show_user_results = $_SESSION["show_user_results"];
         
-        if (count($show_user_results) == 0) {
+        if (!is_array($show_user_results) || count($show_user_results) == 0) {
             ilUtil::sendInfo($DIC->language()->txt("select_one_user"), true);
             $DIC->ctrl()->redirect($this, self::CMD_SHOW_PARTICIPANTS);
         }
@@ -760,7 +762,7 @@ class ilParticipantsTestResultsGUI
         }
         
         if ($this->isPdfDeliveryRequest()) {
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             
             ilTestPDFGenerator::generatePDF(
                 $template->get(),

@@ -325,11 +325,8 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
             );
             
             if (!$this->object->getAnonymity()) {
-                $factory = new ilCertificateFactory();
-
-                $certificate = $factory->create($this->object);
-
-                if ($certificate->isComplete(new ilTestCertificateAdapter($this->object))) {
+                $globalCertificatePrerequisites = new ilCertificateActiveValidator();
+                if ($globalCertificatePrerequisites->validate()) {
                     $options['certificate'] = $this->lng->txt('exp_type_certificate');
                 }
             }
@@ -811,6 +808,11 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
     {
         global $DIC;
 
+        $globalCertificatePrerequisites = new ilCertificateActiveValidator();
+        if (!$globalCertificatePrerequisites->validate()) {
+            $DIC['ilErr']->raiseError($this->lng->txt('permission_denied'), $DIC['ilErr']->MESSAGE);
+        }
+
         $database = $DIC->database();
         $logger = $DIC->logger()->root();
 
@@ -960,12 +962,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
         }
         // fau.
 
-        $result_array = $this->object->getTestResult(
-            $active_id,
-            $pass,
-            false,
-            !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()
-        );
+        $result_array = $this->getFilteredTestResult($active_id, $pass, false, !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired());
 
         $overviewTableGUI = $this->getPassDetailsOverviewTableGUI($result_array, $active_id, $pass, $this, "outParticipantsPassDetails", '', true, $objectivesList);
         $overviewTableGUI->setTitle($testResultHeaderLabelBuilder->getPassDetailsHeaderLabel($pass + 1));
@@ -1034,7 +1031,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 
         if ($this->isPdfDeliveryRequest()) {
             //$this->object->deliverPDFfromHTML($template->get());
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant(), PDF_USER_RESULT);
         } else {
             $this->tpl->setVariable("ADM_CONTENT", $template->get());
@@ -1110,7 +1107,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
         }
         // fau.
 
-        
+
         global $DIC; /* @var ILIAS\DI\Container $DIC */
         require_once 'Modules/Test/classes/class.ilTestPassesSelector.php';
         $testPassesSelector = new ilTestPassesSelector($DIC['ilDB'], $this->object);
@@ -1170,7 +1167,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
                 $filename = $name['lastname'] . '_' . $name['firstname'] . '_' . $name['login'] . '__' . $this->object->getTitleFilenameCompliant();
             }
             // fau.
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $filename, PDF_USER_RESULT);
         //ilUtil::deliverData($file, ilUtil::getASCIIFilename($this->object->getTitle()) . ".pdf", "application/pdf", false, true);
             //$template->setVariable("PDF_FILE_LOCATION", $filename);
@@ -1195,6 +1192,24 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
         $tableGUI->resetOffset();
         $tableGUI->resetFilter();
         $this->outUserPassDetails();
+    }
+
+    public function outParticipantsPassDetailsSetTableFilter()
+    {
+        $tableGUI = $this->buildPassDetailsOverviewTableGUI($this, 'outParticipantsPassDetails');
+        $tableGUI->initFilter();
+        $tableGUI->resetOffset();
+        $tableGUI->writeFilterToSession();
+        $this->outParticipantsPassDetails();
+    }
+
+    public function outParticipantsPassDetailsResetTableFilter()
+    {
+        $tableGUI = $this->buildPassDetailsOverviewTableGUI($this, 'outParticipantsPassDetails');
+        $tableGUI->initFilter();
+        $tableGUI->resetOffset();
+        $tableGUI->resetFilter();
+        $this->outParticipantsPassDetails();
     }
 
     /**
@@ -1369,7 +1384,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
         }
 
         if ($this->isPdfDeliveryRequest()) {
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             ilTestPDFGenerator::generatePDF($tpl->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant(), PDF_USER_RESULT);
         } else {
             $this->tpl->setContent($tpl->get());
@@ -1496,7 +1511,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 
         if ($this->isPdfDeliveryRequest()) {
             //$this->object->deliverPDFfromHTML($template->get(), $this->object->getTitle());
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant(), PDF_USER_RESULT);
         } else {
             $this->tpl->setContent($templatehead->get());

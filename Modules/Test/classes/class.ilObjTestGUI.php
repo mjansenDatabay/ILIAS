@@ -2453,7 +2453,7 @@ class ilObjTestGUI extends ilObjectGUI
         $template->setVariable("VALUE_MAXIMUM_POINTS", ilUtil::prepareFormOutput($max_points));
         
         if ($isPdfDeliveryRequest) {
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant(), PDF_PRINT_VIEW_QUESTIONS);
         } else {
             $this->tpl->setVariable("PRINT_CONTENT", $template->get());
@@ -2471,7 +2471,7 @@ class ilObjTestGUI extends ilObjectGUI
     {
         global $DIC;
         $ilAccess = $DIC['ilAccess'];
-        $ilias = $DIC['ilias'];
+
         if (!$ilAccess->checkAccess("write", "", $this->ref_id)) {
             // allow only write access
             ilUtil::sendInfo($this->lng->txt("cannot_edit_test"), true);
@@ -2484,9 +2484,6 @@ class ilObjTestGUI extends ilObjectGUI
 
         $isPdfDeliveryRequest = isset($_GET['pdf']) && $_GET['pdf'];
 
-        global $DIC;
-        $ilUser = $DIC['ilUser'];
-        $print_date = mktime(date("H"), date("i"), date("s"), date("m"), date("d"), date("Y"));
         $max_points= 0;
         $counter = 1;
 
@@ -2518,17 +2515,21 @@ class ilObjTestGUI extends ilObjectGUI
             $max_points += $question_gui->object->getMaximumPoints();
         }
 
-
-
         $template->setVariable("TITLE", ilUtil::prepareFormOutput($this->object->getTitle()));
         $template->setVariable("PRINT_TEST", ilUtil::prepareFormOutput($this->lng->txt("review_view")));
         $template->setVariable("TXT_PRINT_DATE", ilUtil::prepareFormOutput($this->lng->txt("date")));
-        $template->setVariable("VALUE_PRINT_DATE", ilUtil::prepareFormOutput(strftime("%c", $print_date)));
+        $usedRelativeDates = ilDatePresentation::useRelativeDates();
+        ilDatePresentation::setUseRelativeDates(false);
+        $template->setVariable(
+            "VALUE_PRINT_DATE",
+            ilDatePresentation::formatDate(new ilDateTime(time(), IL_CAL_UNIX))
+        );
+        ilDatePresentation::setUseRelativeDates($usedRelativeDates);
         $template->setVariable("TXT_MAXIMUM_POINTS", ilUtil::prepareFormOutput($this->lng->txt("tst_maximum_points")));
         $template->setVariable("VALUE_MAXIMUM_POINTS", ilUtil::prepareFormOutput($max_points));
 
         if ($isPdfDeliveryRequest) {
-            require_once 'class.ilTestPDFGenerator.php';
+            require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
             ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant(), PDF_PRINT_VIEW_QUESTIONS);
         } else {
             $this->ctrl->setParameter($this, "pdf", "1");

@@ -115,6 +115,9 @@ class ilObjCloudGUI extends ilObject2GUI
             case "render":
                 $this->addHeaderAction();
                 break;
+            case 'infoScreen':
+                $this->ctrl->redirectByClass(ilInfoScreenGUI::class);
+                break;
         }
 
         switch ($next_class) {
@@ -205,30 +208,24 @@ class ilObjCloudGUI extends ilObject2GUI
      */
     public static function _goto($a_target)
     {
-        // Using slashes in the URL for the destination path led to errors
-        // As a result it was converted into underscores
 
         $content = explode("_", $a_target);
-
-        // The empty spot is where the double underscores are
-        // It is used to identify the location of the path easier
-        $path_begin_pos = array_search("", $content) + 1;
-        $path_end_pos = count($content) - 1;
 
         $_GET["ref_id"] = $content[0];
         $_GET["baseClass"] = "ilrepositorygUI";
         $_GET["cmdClass"] = "ilobjcloudgui";
         $_GET["cmd"] = "render";
 
-        // Convert path components back to a default path
-        $path = "";
-        for ($i = $path_begin_pos; $i < $path_end_pos; $i++) {
-            $path .= "/" . $content[$i];
+        if (in_array("path", $content)) {
+            // remove ref_id, "path" und "endPath"
+            unset($content[0]);
+            unset($content[1]);
+            array_pop($content);
+            // reconstruct and set path
+            $_POST["path"] = implode('_', $content);
         }
 
-        if ($path !== "") {
-            $_POST["path"] = $path;
-        }
+
         include("ilias.php");
     }
 
@@ -338,6 +335,7 @@ class ilObjCloudGUI extends ilObject2GUI
         include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         $form->setTarget("_top");
+        $this->ctrl->setParameter($this, 'new_type', 'cld');
         $form->setFormAction($this->ctrl->getFormAction($this, "save"));
         $form->setTitle($this->lng->txt($a_new_type . "_new"));
 
@@ -393,7 +391,9 @@ class ilObjCloudGUI extends ilObject2GUI
          * @var $a_new_object ilObjCloud
          */
         try {
+            $this->ctrl->setParameter($this, 'ref_id', $this->tree->getParentId($a_new_object->getRefId()));
             $form = $this->initCreateForm("cld");
+            $this->ctrl->setParameter($this, 'ref_id', $a_new_object->getRefId());
 
             if ($form->checkInput()) {
                 $a_new_object->setServiceName($form->getInput("service"));
@@ -406,11 +406,13 @@ class ilObjCloudGUI extends ilObject2GUI
                     $init_gui->afterSavePluginCreation($a_new_object, $form);
                 }
                 $a_new_object->update();
+                $this->ctrl->setParameter($this, 'new_type', '');
                 $this->serviceAuth($a_new_object);
             }
         } catch (Exception $e) {
             ilUtil::sendFailure($e->getMessage(), true);
-            ilObjectGUI::redirectToRefId($this->parent_id);
+            $form->setValuesByPost();
+            $this->tpl->setContent($form->getHTML());
         }
     }
 

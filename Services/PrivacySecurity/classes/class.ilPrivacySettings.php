@@ -43,6 +43,12 @@ class ilPrivacySettings
     private $export_confirm_course;
     private $export_confirm_group;
     private $export_confirm_learning_sequence;
+
+    /**
+     * @var bool
+     */
+    private $participants_list_course_enabled = true;
+
     private $fora_statistics;
     private $anonymous_fora;
     private $rbac_log;
@@ -121,6 +127,22 @@ class ilPrivacySettings
     }
     // fim.
 
+
+    /**
+     * @return bool
+     */
+    public function participantsListInCoursesEnabled()
+    {
+        return $this->participants_list_course_enabled;
+    }
+
+    /**
+     * @param bool
+     */
+    public function enableParticipantsListInCourses($a_status)
+    {
+        $this->participants_list_course_enabled = $a_status;
+    }
 
     /**
      * Check if a user has the permission to access approved user profile fields, course related user data and custom user data
@@ -385,6 +407,8 @@ class ilPrivacySettings
         $this->settings->set('rbac_log_age', (int) $this->getRbacLogAge());
         $this->settings->set('enable_sahs_pd', (int) $this->enabledSahsProtocolData());
         $this->settings->set('ps_export_scorm', (bool) $this->enabledExportSCORM());
+
+        $this->settings->set('participants_list_courses' , (bool) $this->participantsListInCoursesEnabled());
     }
     /**
      * read settings
@@ -420,6 +444,7 @@ class ilPrivacySettings
         $this->rbac_log_age = (int) $this->settings->get('rbac_log_age', 6);
         $this->sahs_protocol_data = (int) $this->settings->get('enable_sahs_pd', 0);
         $this->export_scorm = (bool) $this->settings->get('ps_export_scorm', false);
+        $this->enableParticipantsListInCourses((bool) $this->settings->get('participants_list_courses', $this->participantsListInCoursesEnabled()));
     }
 
     /**

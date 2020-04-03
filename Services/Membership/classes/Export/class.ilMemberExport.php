@@ -956,9 +956,10 @@ class ilMemberExport
         if (substr($a_field, 0, 4) != 'udf_') {
             return false;
         }
+
         // fim: [export] use prechecked requirement for agreement
         if (!$this->agreement_needed or $this->agreement[$udf_data->getUserId()]['accepted']) {
-            // fim.
+        // fim.
             $field_info = explode('_', $a_field);
             $field_id = $field_info[1];
             $value = $udf_data->get('f_' . $field_id);
@@ -966,8 +967,9 @@ class ilMemberExport
             $this->addCol($value, $row, $col);
             return true;
         }
-        #$this->csv->addColumn('');
+
         $this->addCol('', $row, $col);
+        return true;
     }
     
     /**

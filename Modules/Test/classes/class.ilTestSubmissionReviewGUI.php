@@ -202,8 +202,8 @@ class ilTestSubmissionReviewGUI extends ilTestServiceGUI
         $pass = $this->testSession->getPass();
         $time = time();
         $filename = 'review-' . $inst_id . '-' . $obj_id . '-' . $active_id . '-' . $pass . '-' . $time . '.pdf';
-        
-        require_once 'class.ilTestPDFGenerator.php';
+
+        require_once 'Modules/Test/classes/class.ilTestPDFGenerator.php';
         ilTestPDFGenerator::generatePDF($reviewOutput, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $filename, PDF_USER_RESULT);
         // fau.
         
