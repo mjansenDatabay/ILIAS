@@ -21,7 +21,7 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
     {
         if (!is_array($this->attributes) || 0 === count($this->attributes)) {
             $this->getLogger()->warning('Could not parse any attributes from SAML response.');
-            $this->handleAuthenticationFail($status, 'shib_not_configured');
+            $this->handleAuthenticationFail($status, 'auth_shib_not_configured');
             return false;
         }
 
@@ -29,13 +29,19 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
             // get the uid attribute
             $this->uid = $this->attributes['urn:mace:dir:attribute-def:uid'][0];
 
+            // nedded since ILIAS 5.4.10
+            if (empty($this->uid)) {
+                $this->uid = $this->attributes['urn:oid:0.9.2342.19200300.100.1.1'][0];
+            }
+
+
             // optionally log the request data for specific accounts
             $this->debugLogin();
 
             // check shibboleth session
             if (empty($this->uid)) {
                 $this->getLogger()->warning('Uid attribute is not set in SAML data.');
-                $this->handleAuthenticationFail($status, 'shib_not_configured');
+                $this->handleAuthenticationFail($status, 'auth_shib_not_configured');
                 return false;
             }
 
