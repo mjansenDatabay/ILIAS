@@ -840,7 +840,7 @@ class ilAccountRegistrationGUI
         ilStartUpGUI::initStartUpTemplate(array('tpl.usr_registered.html', 'Services/Registration'), false);
         $this->tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('registration'));
 
-        $this->tpl->setVariable("TXT_WELCOME", $lng->txt("welcome") . ", " . $this->userObj->getTitle() . "!");
+        $this->tpl->setVariable("TXT_WELCOME", $this->lng->txt("welcome") . ", " . $this->userObj->getTitle() . "!");
         if (
             (
                 $this->registration_settings->getRegistrationType() == IL_REG_DIRECT ||
@@ -868,20 +868,20 @@ class ilAccountRegistrationGUI
             $this->tpl->setVariable('FORMACTION', $action);
 
             // fau: samlAuth - changed language var for local login
-            $this->tpl->setVariable('TXT_LOGIN', $lng->txt('local_login_to_ilias'));
+            $this->tpl->setVariable('TXT_LOGIN', $this->lng->txt('local_login_to_ilias'));
             // fau.
             $this->tpl->parseCurrentBlock();
         } elseif ($this->registration_settings->getRegistrationType() == IL_REG_APPROVE) {
-            $this->tpl->setVariable('TXT_REGISTERED', $lng->txt('txt_submitted'));
+            $this->tpl->setVariable('TXT_REGISTERED', $this->lng->txt('txt_submitted'));
         }
         // fau: regCodes show info about confirmation mail also for code - don't redirect automatically
         elseif ($this->registration_settings->activationEnabled()) {
             $login_url = './login.php?cmd=force_login&lang=' . $this->userObj->getLanguage();
-            $this->tpl->setVariable('TXT_REGISTERED', sprintf($lng->txt('reg_confirmation_link_successful'), $login_url));
+            $this->tpl->setVariable('TXT_REGISTERED', sprintf($this->lng->txt('reg_confirmation_link_successful'), $login_url));
         }
         // fau.
         else {
-            $this->tpl->setVariable('TXT_REGISTERED', $lng->txt('txt_registered_passw_gen'));
+            $this->tpl->setVariable('TXT_REGISTERED', $this->lng->txt('txt_registered_passw_gen'));
         }
     }
     
