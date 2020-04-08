@@ -337,7 +337,9 @@ class ilObjMediaObjectGUI extends ilObjectGUI
         $up = new ilFileInputGUI("", "standard_file");
         $up->setSuffixes(ilObjMediaObject::getRestrictedFileTypes());
         $up->setForbiddenSuffixes(ilObjMediaObject::getForbiddenFileTypes());
-        $up->setInfo("");
+        // fau: uploadZippedHtmlMedia - add info for file upload
+        $up->setInfo($lng->txt("cont_zipped_html_info"));
+        // fau.
         if ($a_mode == "create" || $std_item->getLocationType() != "LocalFile") {
             $up->setRequired(true);
         }
@@ -752,21 +754,28 @@ class ilObjMediaObjectGUI extends ilObjectGUI
             $format = ilObjMediaObject::getMimeType($file);
             $location = $file_name;
 
-            // resize standard images
-            if ($_POST["standard_size"] != "original" &&
-                is_int(strpos($format, "image"))) {
-                $location = ilObjMediaObject::_resizeImage(
-                    $file,
-                    (int) $_POST["standard_width_height"]["width"],
-                    (int) $_POST["standard_width_height"]["height"],
-                    (boolean) $_POST["standard_width_height"]["contr_prop"]
-                );
+            // fau: uploadZippedHtmlMedia - process zip
+            if ($format == 'application/zip') {
+                self::unzipHtmlMedia($mob_dir, $file, $media_item);
             }
+            else {
+                // resize standard images
+                if ($_POST["standard_size"] != "original" &&
+                    is_int(strpos($format, "image"))) {
+                    $location = ilObjMediaObject::_resizeImage(
+                        $file,
+                        (int) $_POST["standard_width_height"]["width"],
+                        (int) $_POST["standard_width_height"]["height"],
+                        (boolean) $_POST["standard_width_height"]["contr_prop"]
+                    );
+                }
 
-            // set real meta and object data
-            $media_item->setFormat($format);
-            $media_item->setLocation($location);
-            $media_item->setLocationType("LocalFile");
+                // set real meta and object data
+                $media_item->setFormat($format);
+                $media_item->setLocation($location);
+                $media_item->setLocationType("LocalFile");
+            }
+            // fau.
         } else {	// standard type: reference
             $format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["standard_reference"]), true);
             $media_item->setFormat($format);
@@ -884,8 +893,49 @@ class ilObjMediaObjectGUI extends ilObjectGUI
         ilMediaSvgSanitizer::sanitizeDir($mob_dir);	// see #20339
         $a_mob->update();
     }
-    
-    
+
+    // fau: uploadZippedHtmlMedia - new function uploadZippedHtmlMedia()
+
+    /**
+     * Upload a zipped hml media package
+     * @param string      $mob_dir
+     * @param array       $upload
+     * @param ilMediaItem $mediaItem
+     * @throws ilException
+     */
+    protected static function unzipHtmlMedia($mob_dir, $file, $mediaItem) {
+        global $DIC;
+        $lng = $DIC->language();
+
+        if (@is_file($file)) {
+            $cur_files_r = iterator_to_array(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($mob_dir)));
+
+            ilUtil::unzip($file, true);
+            unlink($file);
+
+            $new_files_r = iterator_to_array(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($mob_dir)));
+            $diff_r = array_diff($new_files_r, $cur_files_r);
+
+            // unlink forbidden file types
+            foreach ($diff_r as $f => $d) {
+                $pi = pathinfo($f);
+                if (!is_dir($f) && in_array($pi["extension"], (array)  ilObjMediaObject::getForbiddenFileTypes())) {
+                    ilUtil::sendFailure($lng->txt("file_some_invalid_file_types_removed") . " (" . $pi["extension"] . ")", true);
+                    unlink($f);
+                }
+            }
+
+        }
+        ilUtil::renameExecutables($mob_dir);
+
+        $mediaItem->setFormat('text/html');
+        if (is_file($mob_dir . '/index.html')) {
+            $mediaItem->setLocation('index.html');
+            $mediaItem->setLocationType("LocalFile");
+        }
+    }
+    // fau.
+
     /**
     * Cancel saving
     */

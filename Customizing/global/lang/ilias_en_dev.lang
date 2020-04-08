@@ -129,6 +129,7 @@ common#:#cont_limit_starts_current_plays_text#:#Started Playbacks: &nbsp;
 common#:#cont_limit_starts_max_plays_text#:#Maximum Playbacks: &nbsp;
 common#:#cont_limit_starts_limit_reached_text#:#The maximum number of playbacks is reached.
 common#:#cont_limit_starts_first_time_text#:#Start the player for the first time.
+common#:#cont_zipped_html_info#:#You may upload a zipped media package, e.g. created by Camtasia. It should have an index.html on the main level, otherwise you need to set a Standard file on the "Files" tab. Please don't use special characters for project or file names when you author the package, because then it won't work.
 common#:#crs_create_exco#:#Create new external content
 common#:#crs_create_perc#:#Create new Perception-Assessment
 common#:#crs_helptext#:#Courses are Container-objects, which can contain any other learnobject and offer different abilities of memberadministration. It is suggested to use courses for organisation of classes in StudOn. <a target="_blank" href="http://www.studon.uni-erlangen.de/lm113424.html">More...</a>
