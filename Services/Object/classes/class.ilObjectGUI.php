@@ -230,6 +230,10 @@ class ilObjectGUI
     // fau: showTypeHelptext - function to show a helptext box for the new type
     public function showTypeHelptext()
     {
+        global $DIC;
+        /** @var ilObjectDefinition $objDefinition */
+        $objDefinition = $DIC['objDefinition'];
+
         if ($this->getCreationMode()) {
             $type = $_POST["new_type"] ? $_POST["new_type"] : $_GET["new_type"];
         } else {
@@ -247,9 +251,18 @@ class ilObjectGUI
         $tpl = new ilTemplate("tpl.helptext_create.html", true, true);
 
         $tpl->setVariable("HELPTEXT", $helptext);
-        $tpl->setVariable("TYPE_TXT", $this->lng->txt("obj_" . $type));
-        $tpl->setVariable("TYPE_IMG", ilUtil::getImagePath("icon_" . $type . ".svg"));
-        $tpl->setVariable("ALT_IMG", $this->lng->txt("obj_" . $type));
+
+        if ($objDefinition->isPluginTypeName($type)) {
+            $tpl->setVariable("TYPE_TXT",  $this->lng->txt("rep_robj_".$type."_obj_" . $type));
+            $tpl->setVariable("TYPE_IMG", ilRepositoryObjectPlugin::_getIcon($type,''));
+            $tpl->setVariable("ALT_IMG",  $this->lng->txt("rep_robj_".$type."_obj_" . $type));
+        }
+        else {
+            $tpl->setVariable("TYPE_TXT", $this->lng->txt("obj_" . $type));
+            $tpl->setVariable("TYPE_IMG", ilUtil::getImagePath("icon_" . $type . ".svg"));
+            $tpl->setVariable("ALT_IMG", $this->lng->txt("obj_" . $type));
+
+        }
 
         $this->tpl->setRightContent($tpl->get());
     }
