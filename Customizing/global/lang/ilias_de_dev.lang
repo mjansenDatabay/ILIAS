@@ -162,7 +162,7 @@ common#:#file_helptext#:#Stellen Sie in Ihren Kursen beliebige Dateien zum Downl
 common#:#fold_create_exco#:#Neuen externen Inhalt anlegen
 common#:#fold_create_perc#:#Neues Perception-Assessment anlegen
 common#:#fold_helptext#:#Mit Hilfe von Ordnern können Sie Ihre Lernangebote beliebig strukturieren, Sie können z.B. einen Ordner für Skripten oder Seminarprotokolle anlegen. Ordner sind die einfachsten Container-Elemente in StudOn – bei ihrer Erstellung müssen Sie lediglich einen Namen vergeben.
-common#:#footer_active_users#:#Nutzer online
+common#:#footer_active_users#:#Nutzer online:
 common#:#footer_financed_by#:#Finanziert aus Studienzuschüssen
 common#:#footer_realised_with#:#Realisiert mit ILIAS
 common#:#footer_server#:#Server:

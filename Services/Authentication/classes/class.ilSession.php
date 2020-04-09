@@ -420,27 +420,32 @@ class ilSession
         return $users;
     }
 
+    // fau: ownFooter - new function to periodically count the users online
     /*
-    * fim: [cust] new function to periodically count the users online
-    */
-    public static function _getUsersOnline()
+     * Get Users online since a certain time span
+     * @param int $seconds   time window for counting
+     */
+    public static function _getUsersOnline($seconds)
     {
         global $ilDB, $ilSetting;
 
-        if (time() < $ilSetting->get('session_count_users_online_expire')) {
-            return $ilSetting->get('session_count_users_online');
+        // ensure integer
+        $seconds = (int) $seconds;
+
+        if (time() < $ilSetting->get('session_count_users_online_expire_' . $seconds)) {
+            return $ilSetting->get('session_count_users_online_' . $seconds);
         } else {
-            $query = "SELECT COUNT(DISTINCT user_id) users FROM usr_session u WHERE expires > UNIX_TIMESTAMP() AND ctime + 600 > UNIX_TIMESTAMP();";
+            $query = "SELECT COUNT(DISTINCT user_id) users FROM usr_session u WHERE expires > UNIX_TIMESTAMP() AND ctime + $seconds > UNIX_TIMESTAMP();";
             $result = $ilDB->query($query);
             $row = $ilDB->fetchAssoc($result);
 
-            $ilSetting->set('session_count_users_online', $row['users']);
-            $ilSetting->set('session_count_users_online_expire', time() + 60);
+            $ilSetting->set('session_count_users_online_' . $seconds, $row['users']);
+            $ilSetting->set('session_count_users_online_expire_' . $seconds, time() + 60);
 
             return $row['users'];
         }
     }
-    // fim.
+    // fau.
     
     /**
      * Set a value

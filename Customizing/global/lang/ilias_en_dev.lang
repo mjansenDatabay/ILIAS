@@ -164,7 +164,7 @@ common#:#file_helptext#:#Provide any Files to download for your courses. You can
 common#:#fold_create_exco#:#Create new external content
 common#:#fold_create_perc#:#Create new perception-assessment
 common#:#fold_helptext#:#With help of folders you can struct your courses as you wish, you can for example add a folder for scripts or seminar protocols. Folders are the easiest COntainer-elements in StudOn â€“ by creating, you only have to give a name.
-common#:#footer_active_users#:#users online
+common#:#footer_active_users#:#users online:
 common#:#footer_financed_by#:#Financed with state tuition funds
 common#:#footer_realised_with#:#Realised with ILIAS
 common#:#footer_server#:#Server

@@ -941,6 +941,8 @@ class ilTemplate extends HTML_Template_ITX
             return;
         }
 
+        $users_online = ilSession::_getUsersOnline(600) . ' (10min) ⸱ ' . ilSession::_getUsersOnline(3600). ' (1h)';
+
         $lng->loadLanguageModule("common");
         $ftpl->setVariable("FAU_LOGO", ilUtil::getImagePath("studon/fau-white.svg"));
         $ftpl->setVariable("ILI_LOGO", ilUtil::getImagePath("studon/ili-white.svg"));
@@ -963,7 +965,7 @@ class ilTemplate extends HTML_Template_ITX
 
         $ftpl->setVariable("SERVER_ADDR", $_SERVER['SERVER_ADDR']);
         $ftpl->setVariable("SERVER_NAME", current(explode('.', gethostbyaddr($_SERVER['SERVER_ADDR']))));
-        $ftpl->setVariable("USERS_ONLINE", ilSession::_getUsersOnline());
+        $ftpl->setVariable("USERS_ONLINE", $users_online);
         $ftpl->setVariable("TXT_SERVER", $lng->txt('footer_server'));
         $ftpl->setVariable("TXT_ACTIVE_USERS", $lng->txt('footer_active_users'));
         $ftpl->setVariable("TXT_HOTLINE", $lng->txt('footer_hotline'));
