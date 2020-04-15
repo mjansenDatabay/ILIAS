@@ -756,7 +756,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 
             // fau: uploadZippedHtmlMedia - process zip
             if ($format == 'application/zip') {
-                self::unzipHtmlMedia($mob_dir, $file, $media_item);
+                self::unzipHtmlMedia($mob_dir, $file, $file_name, $media_item);
             }
             else {
                 // resize standard images
@@ -899,11 +899,12 @@ class ilObjMediaObjectGUI extends ilObjectGUI
     /**
      * Upload a zipped hml media package
      * @param string      $mob_dir
-     * @param array       $upload
+     * @param string       $file
+     * @param string       $file_name
      * @param ilMediaItem $mediaItem
      * @throws ilException
      */
-    protected static function unzipHtmlMedia($mob_dir, $file, $mediaItem) {
+    protected static function unzipHtmlMedia($mob_dir, $file, $file_name, $mediaItem) {
         global $DIC;
         $lng = $DIC->language();
 
@@ -928,11 +929,28 @@ class ilObjMediaObjectGUI extends ilObjectGUI
         }
         ilUtil::renameExecutables($mob_dir);
 
+        $pi = pathinfo($file_name);
+        $filename = $pi['filename'];
+
         $mediaItem->setFormat('text/html');
         if (is_file($mob_dir . '/index.html')) {
             $mediaItem->setLocation('index.html');
-            $mediaItem->setLocationType("LocalFile");
         }
+        else if (is_file($mob_dir . '/' . $filename . '.html')) {
+                $mediaItem->setLocation($filename . '.html');
+        }
+        else {
+            $files = glob($mob_dir. '/*.html');
+            foreach ($files as $file) {
+                if (count($files) == 1 || !strpos($file, '_player.html')) {
+                    $pi = pathinfo($file);
+                    $mediaItem->setLocation($pi['basename']);
+                    break;
+                }
+            }
+        }
+
+        $mediaItem->setLocationType("LocalFile");
     }
     // fau.
 
