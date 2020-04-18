@@ -410,5 +410,84 @@ class ilCleanupPatches
 
         echo "Deleted: $deleted_sum \n";
     }
+
+    /**
+     * Delete test accounts of deleted users
+     *
+     * @param array $params
+     */
+    public function deleteObsoleteTestAccounts($params = array('limit'=> null))
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+        $ilLog = $DIC->logger()->root();
+        $ilUser = $DIC->user();
+
+        // find test accounts with existing user accounts (faster then opposite)
+        $existing = [];
+        $query = "
+            SELECT ut.usr_id
+            FROM usr_data ut 
+            INNER JOIN usr_data u ON (ut.login = CONCAT(u.login, '.test1') OR ut.login = CONCAT(u.login, '.test2'))
+        ";
+        $res = $ilDB->query($query);
+        while ($row = $ilDB->fetchAssoc($res)) {
+            $existing[] = (int) $row['usr_id'];
+        }
+        echo "Exclude with existing main accounts: ".count($existing) . "\n";
+
+        // find all test accounts
+        $query = "
+            SELECT ut.usr_id, ut.login, ut.firstname, ut.lastname
+            FROM usr_data ut 
+            WHERE ut.login LIKE '%.test1' OR ut.login LIKE '%.test2'        
+        ";
+        $res = $ilDB->query($query);
+
+
+        $count = 0;
+        $deleted_sum = 0;
+        while ($row = $ilDB->fetchAssoc($res))
+        {
+            // don't delete test accounts with existing account
+            if (in_array((int) $row['usr_id'], $existing)) {
+                continue;
+            }
+
+            $count++;
+            if (isset($params['limit']) and $deleted_sum >= $params['limit']) {
+                break;
+            }
+
+            if ($row['usr_id'] == $ilUser->getId()) {
+                $logstr = "can't delete running user!";
+                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$logstr);
+                echo $logstr."\n";
+                break;
+            }
+            else {
+                $logstr = $count. ": ". $row['usr_id']." ".$row['login']." ".$row['firstname']
+                    ." ".$row['lastname'];
+                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$logstr);
+                echo $logstr."\n";
+            }
+
+//            try {
+//                $userObj = new ilObjUser($row['usr_id']);
+//                $userObj->delete();
+//            }
+//            catch (Exception $e) {
+//                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$e->getMessage()."\n".$e->getTraceAsString());
+//
+//                echo $e->getMessage();
+//                echo $e->getTraceAsString();
+//                continue;
+//            }
+
+            $deleted_sum++;
+        }
+
+        echo "Deleted: $deleted_sum \n";
+    }
 }
 
