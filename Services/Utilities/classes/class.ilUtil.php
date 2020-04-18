@@ -4683,8 +4683,12 @@ class ilUtil
         global $DIC;
 
         /** @var ilTemplate $tpl */
-        $tpl = $DIC["tpl"];
-        $tpl->setMessage("success", $a_info, $a_keep);
+        // fau: fixRemoveTrashed - template in ilUtil::sendSuccess
+        if ($DIC->offsetExists('tpl')) {
+            $tpl = $DIC["tpl"];
+            $tpl->setMessage("success", $a_info, $a_keep);
+        }
+        // fau.
     }
 
     public static function infoPanel($a_keep = true)

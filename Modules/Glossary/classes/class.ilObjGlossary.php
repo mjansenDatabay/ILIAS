@@ -48,7 +48,12 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     {
         global $DIC;
         $this->error = $DIC["ilErr"];
-        $this->tpl = $DIC["tpl"];
+
+        // fau: fixRemoveTrashed - template in ilObjGlossary
+        if ($DIC->offsetExists('tpl')) {
+            $this->tpl = $DIC["tpl"];
+        }
+        // fau.
 
         $this->db = $DIC->database();
         $this->user = $DIC->user();

@@ -301,7 +301,11 @@ abstract class assQuestion
         global $DIC;
         $ilias = $DIC['ilias'];
         $lng = $DIC['lng'];
-        $tpl = $DIC['tpl'];
+        // fau: fixRemoveTrashed - template in assQuestion::__construct
+        if ($DIC->offsetExists('tpl')) {
+            $tpl = $DIC['tpl'];
+        }
+        // fau.
         $ilDB = $DIC['ilDB'];
 
         $this->ilias = $ilias;
