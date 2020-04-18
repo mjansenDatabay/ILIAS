@@ -37,6 +37,7 @@ $p->login();
 //$p->applyPatch('ilCleanupPatches.deleteOldPageHistory', array('delete_until' => '2020-01-01 00:00:00'));
 //$p->applyPatch('ilCleanupPatches.moveDeletedMediaObjects', array('keep_deleted_after' => '2020-01-01 00:00:00'));
 
+//$p->applyPatch('ilCleanupPatches.deleteInactiveUsers', array('inactive_since' => '2018-04-01 00:00:00', 'limit' => null));
 
 /*******************
 * Patches for UnivIS

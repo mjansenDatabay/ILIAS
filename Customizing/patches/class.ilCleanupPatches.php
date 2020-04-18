@@ -350,5 +350,65 @@ class ilCleanupPatches
 		echo "Deleted: ";
 		var_dump($deleted);
 	}
+
+    /**
+     * Delete old user accounts (not logged in since time)
+     *
+     * @param array $params
+     */
+    public function deleteInactiveUsers($params = array('inactive_since' => '2014-10-01 00:00:00', 'limit'=> null))
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+        $ilLog = $DIC->logger()->root();
+        $ilUser = $DIC->user();
+
+        $query = "
+            SELECT usr_id, login, firstname, lastname
+            FROM usr_data
+            WHERE login NOT LIKE '%.test1' AND login NOT LIKE '%.test2' AND login <> 'anonymous' AND login <> 'root'
+            AND (create_date < ". $ilDB->quote($params['inactive_since'], 'text').")
+            AND (last_login IS NULL OR last_login < ". $ilDB->quote($params['inactive_since'], 'text').")
+        ";
+        $res = $ilDB->query($query);
+
+        $count = 0;
+        $deleted_sum = 0;
+        while ($row = $ilDB->fetchAssoc($res))
+        {
+            $count++;
+            if (isset($params['limit']) and $deleted_sum >= $params['limit']) {
+                break;
+            }
+            if ($row['usr_id'] == $ilUser->getId()) {
+                $logstr = "can't delete running user!";
+                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$logstr);
+                echo $logstr."\n";
+                break;
+            }
+            else {
+                $logstr = $count. ": ". $row['usr_id']." ".$row['login']." ".$row['firstname']
+                    ." ".$row['lastname'];
+                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$logstr);
+                echo $logstr."\n";
+            }
+
+            try {
+                $userObj = new ilObjUser($row['usr_id']);
+                $userObj->delete();
+            }
+            catch (Exception $e) {
+                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$e->getMessage()."\n".$e->getTraceAsString());
+
+                echo $e->getMessage();
+                echo $e->getTraceAsString();
+                continue;
+            }
+
+            $deleted_sum++;
+        }
+
+        echo "Deleted: $deleted_sum \n";
+    }
 }
 
