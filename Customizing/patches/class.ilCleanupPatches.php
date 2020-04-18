@@ -423,19 +423,6 @@ class ilCleanupPatches
         $ilLog = $DIC->logger()->root();
         $ilUser = $DIC->user();
 
-        // find test accounts with existing user accounts (faster then opposite)
-        $existing = [];
-        $query = "
-            SELECT ut.usr_id
-            FROM usr_data ut 
-            INNER JOIN usr_data u ON (ut.login = CONCAT(u.login, '.test1') OR ut.login = CONCAT(u.login, '.test2'))
-        ";
-        $res = $ilDB->query($query);
-        while ($row = $ilDB->fetchAssoc($res)) {
-            $existing[] = (int) $row['usr_id'];
-        }
-        echo "Exclude with existing main accounts: ".count($existing) . "\n";
-
         // find all test accounts
         $query = "
             SELECT ut.usr_id, ut.login, ut.firstname, ut.lastname
@@ -449,8 +436,19 @@ class ilCleanupPatches
         $deleted_sum = 0;
         while ($row = $ilDB->fetchAssoc($res))
         {
+            $pos1 = strpos($row['login'], '.test1');
+            $pos2 = strpos($row['login'], '.test2');
+
+            if ($pos1 > 0) {
+                $prefix = substr($row['login'], 0, $pos1);
+            }
+            elseif ($pos2 > 0) {
+                $prefix = substr($row['login'], 0, $pos2);
+            }
+
             // don't delete test accounts with existing account
-            if (in_array((int) $row['usr_id'], $existing)) {
+            if (ilObjUser::_loginExists($prefix)) {
+                echo "$prefix exists. \n";
                 continue;
             }
 
@@ -472,17 +470,17 @@ class ilCleanupPatches
                 echo $logstr."\n";
             }
 
-//            try {
-//                $userObj = new ilObjUser($row['usr_id']);
-//                $userObj->delete();
-//            }
-//            catch (Exception $e) {
-//                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$e->getMessage()."\n".$e->getTraceAsString());
-//
-//                echo $e->getMessage();
-//                echo $e->getTraceAsString();
-//                continue;
-//            }
+            try {
+                $userObj = new ilObjUser($row['usr_id']);
+                $userObj->delete();
+            }
+            catch (Exception $e) {
+                $ilLog->write("ilSpecificPatches::deleteInactiveUsers: ".$e->getMessage()."\n".$e->getTraceAsString());
+
+                echo $e->getMessage();
+                echo $e->getTraceAsString();
+                continue;
+            }
 
             $deleted_sum++;
         }
