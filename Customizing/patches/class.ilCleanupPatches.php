@@ -299,7 +299,10 @@ class ilCleanupPatches
 	 */
 	public function removeTrashedObjects($params = array('types' => 'cat,crs', 'deleted_before' => '2014-10-01 00:00:00', 'limit'=> null))
 	{
-		global $ilDB, $ilLog;
+	    global $DIC;
+	    $ilDB = $DIC->database();
+	    $ilLog = $DIC->logger()->root();
+	    $ilSetting = $DIC->settings();
 
 		include_once("./Services/Repository/classes/class.ilRepUtil.php");
 
@@ -318,6 +321,9 @@ class ilCleanupPatches
 
 		$deleted = array();
 		$deleted_sum = 0;
+		$error = "";
+		$trace = "";
+		$logstr = "";
 		while ($row = $ilDB->fetchAssoc($res))
 		{
 			if (isset($params['limit']) and $deleted_sum >= $params['limit'])
@@ -337,10 +343,11 @@ class ilCleanupPatches
 			catch (Exception $e)
 			{
 				$ilLog->write("ilSpecificPatches::removeTrashedObjects: ".$e->getMessage()."\n".$e->getTraceAsString());
-
+				$error = $e->getMessage();
+				$trace = $e->getTraceAsString();
 				echo $e->getMessage();
 				echo $e->getTraceAsString();
-				continue;
+				break;
 			}
 
 			$deleted[$row['type']]++;
@@ -349,6 +356,20 @@ class ilCleanupPatches
 
 		echo "Deleted: ";
 		var_dump($deleted);
+
+		$sender = new ilMailMimeSenderSystem($ilSetting);
+		$mail = new ilMimeMail();
+		$mail->From($sender);
+		$mail->to('fred.neumann@ili.fau.de');
+		if ($error) {
+		    $mail->Subject('Cleanup Error');
+		    $mail->Body($logstr . "\n" . $error . "\n" . $trace);
+        }
+		else {
+            $mail->Subject('Cleanup Success');
+            $mail->Body("Deleted:\n" . print_r($deleted, true));
+        }
+		$mail->send();
 	}
 
     /**
