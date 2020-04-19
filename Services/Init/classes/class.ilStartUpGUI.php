@@ -226,9 +226,12 @@ class ilStartUpGUI
      */
     protected function showLoginPage(ilPropertyFormGUI $form = null)
     {
-        global $tpl, $ilSetting;
-
         // fau: rootAsLogin - show the root page instead of the login page
+
+        global $DIC;
+        $tpl = $DIC['tpl'];
+        $ilSetting = $DIC->settings();
+        $lng = $DIC->language();
 
         if (ilCust::get('ilias_root_as_login')) {
             global $DIC;
@@ -246,6 +249,11 @@ class ilStartUpGUI
                 $ilAuthSession->init();
                 $ilAuthSession->setAuthenticated(true, ANONYMOUS_USER_ID);
                 ilInitialisation::initUserAccount();
+            }
+
+            // Message for reached session limit
+            if (isset($_GET['reached_session_limit']) && $_GET['reached_session_limit']) {
+                ilUtil::sendFailure($lng->txt("reached_session_limit"));
             }
 
             if ($ilAccess->checkAccess("read", "", ROOT_FOLDER_ID)) {
