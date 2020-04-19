@@ -350,21 +350,27 @@ class ilRepUtil
             
                 if ($a_delete_objects) {
                     foreach ($del_subtree_nodes as $node) {
-                        $node_obj = ilObjectFactory::getInstanceByRefId($node["ref_id"]);
-                        
-                        // write log entry
-                        // fim: [trash] fixed class in log entry
-                        $log->write("ilRepUtil::removeDeletedNodes(), delete obj_id: " . $node_obj->getId() .
-                            ", ref_id: " . $node_obj->getRefId() . ", type: " . $node_obj->getType() . ", " .
-                            "title: " . $node_obj->getTitle());
-                        // fim.
-                        $a_affected_ids[$node["ref_id"]] = array(
-                                                            "ref_id" => $node["ref_id"],
-                                                            "obj_id" => $node_obj->getId(),
-                                                            "type" => $node_obj->getType(),
-                                                            "old_parent_ref_id" => $node["parent"]);
-                                                        
-                        $node_obj->delete();
+
+                        // fau: fixRemoveTrashed - tolarance if object does not exist
+                        try {
+                            $node_obj = ilObjectFactory::getInstanceByRefId($node["ref_id"]);
+
+                            // write log entry
+                            // fim: [trash] fixed class in log entry
+                            $log->write("ilRepUtil::removeDeletedNodes(), delete obj_id: " . $node_obj->getId() .
+                                ", ref_id: " . $node_obj->getRefId() . ", type: " . $node_obj->getType() . ", " .
+                                "title: " . $node_obj->getTitle());
+                            // fim.
+                            $a_affected_ids[$node["ref_id"]] = array(
+                                                                "ref_id" => $node["ref_id"],
+                                                                "obj_id" => $node_obj->getId(),
+                                                                "type" => $node_obj->getType(),
+                                                                "old_parent_ref_id" => $node["parent"]);
+                            $node_obj->delete();
+                        }
+                        catch (exception $e) {
+                        }
+                        // fau.
                     }
                 }
             
