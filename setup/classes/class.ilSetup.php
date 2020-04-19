@@ -1760,39 +1760,19 @@ class ilSetup
         $i = 0;
         foreach ($setting_fields as $field) {
             if (isset($session_settings[$field])) {
-                $query = "SELECT keyword FROM settings WHERE module = %s AND keyword = %s";
-                $res = $db->queryF(
-                    $query,
-                    array('text', 'text'),
-                    array('common', $field)
+
+                // fau: fixSessionControlSetup - use relplace function
+                /** @var ilDBInterface $db */
+                $db->replace(
+                    'settings',
+                    array(
+                        'module' => array('text', 'common'),
+                        'keyword' => array('text', $field)
+                    ),                   array(
+                        'value' => array('text', $session_settings[$field])
+                    )
                 );
-
-                $row = array();
-                while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
-                    break;
-                }
-
-                if (count($row) > 0) {
-                    $db->update(
-                        'settings',
-                        array(
-                            'value' => array('text', $session_settings[$field])
-                        ),
-                        array(
-                            'module' => array('text', 'common'),
-                            'keyword' => array('text', $field)
-                        )
-                    );
-                } else {
-                    $db->insert(
-                        'settings',
-                        array(
-                            'module' => array('text', 'common'),
-                            'keyword' => array('text', $field),
-                            'value' => array('text', $session_settings[$field])
-                        )
-                    );
-                }
+                // fau.
 
                 $i++;
             }
