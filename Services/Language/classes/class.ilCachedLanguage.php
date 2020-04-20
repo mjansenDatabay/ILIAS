@@ -61,7 +61,6 @@ class ilCachedLanguage
     {
         // fau: cacheByCode - try to read from saved code
         if (ilCust::get('cache_by_code')) {
-            log_line('read_from_code');
             $translations = $this->readFromCode();
             if (is_array($translations)) {
                 $this->setTranslations($translations);
