@@ -54,6 +54,13 @@ class ilObjLanguageFolderGUI extends ilObjectGUI
             $check->setCaption("check_languages");
             $this->toolbar->addButtonInstance($check);
 
+            // fau: cacheByCode - button to flush the caches
+            // flush language cache
+            $flush = ilLinkButton::getInstance();
+            $flush->setUrl($this->ctrl->getLinkTarget($this, "flushCache"));
+            $flush->setCaption("flush_caches");
+            $this->toolbar->addButtonInstance($flush);
+            // fau.
 
             if (!$this->settings->get('lang_detection')) {
                 $detect = ilLinkButton::getInstance();
@@ -271,6 +278,20 @@ class ilObjLanguageFolderGUI extends ilObjectGUI
         $this->data = $this->lng->txt("languages_updated");
         $this->out();
     }
+
+    // fau: cacheByCode - new function flushCacheObject()
+    /**
+     * update all installed languages
+     */
+    public function flushCacheObject()
+    {
+        $this->checkPermission('write');
+
+        ilObjLanguage::flushCaches();
+        $this->data = $this->lng->txt("caches_flushed");
+        $this->out();
+    }
+    // fau.
 
 
     /**

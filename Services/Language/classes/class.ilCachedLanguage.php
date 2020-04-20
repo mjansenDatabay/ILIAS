@@ -59,6 +59,18 @@ class ilCachedLanguage
 
     protected function readFromCache()
     {
+        // fau: cacheByCode - try to read from saved code
+        if (ilCust::get('cache_by_code')) {
+            log_line('read_from_code');
+            $translations = $this->readFromCode();
+            if (is_array($translations)) {
+                $this->setTranslations($translations);
+                $this->setLoaded(true);
+                return;
+            }
+        }
+        // fau.
+
         if ($this->global_cache->isActive()) {
             $translations = $this->global_cache->get('translations_' . $this->getLanguageKey());
             if (is_array($translations)) {
@@ -76,6 +88,30 @@ class ilCachedLanguage
         }
     }
 
+    // fau: cacheByCode - new function readFromCode()
+    protected function readFromCode() {
+        $variable = null;
+        try {
+            include(CLIENT_DATA_DIR . '/ilGlobalCache/translations_'. $this->getLanguageKey().'.php');
+        }
+        catch (Exception $e) {
+        }
+
+        return $variable;
+    }
+    // fau.
+
+    // fau: cacheByCode - new function writeToCode()
+    public function writeToCode()
+    {
+        if (!is_dir(CLIENT_DATA_DIR . '/ilGlobalCache')) {
+            ilUtil::makeDir(CLIENT_DATA_DIR . '/ilGlobalCache');
+        }
+
+        $code = '<?php $variable = '. var_export($this->getTranslations(), true) .';';
+        file_put_contents(CLIENT_DATA_DIR . '/ilGlobalCache/translations_'. $this->getLanguageKey().'.php', $code);
+    }
+    // fau.
 
     protected function readFromDB()
     {
@@ -117,6 +153,9 @@ class ilCachedLanguage
         }
         $this->readFromDB();
         $this->writeToCache();
+        // fau: cacheByCode - call writeToCode when cache is flushed
+        $this->writeToCode();
+        // fau.
     }
 
 

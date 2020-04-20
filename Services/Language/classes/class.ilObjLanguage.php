@@ -260,6 +260,22 @@ class ilObjLanguage extends ilObject
         self::refreshPlugins($refreshed);
     }
 
+    // fau: cacheByCode - new function flushCaches()
+    /**
+     * Flush all language caches
+     */
+    public static function flushCaches()
+    {
+        $languages = ilObject::_getObjectsByType("lng");
+        foreach ($languages as $lang) {
+            $langObj = new ilObjLanguage($lang["obj_id"], false);
+            if($langObj->isInstalled()) {
+                $cachedLang = ilCachedLanguage::getInstance($langObj->getKey());
+                $cachedLang->flush();
+            }
+        }
+    }
+    // fau.
 
     /**
      * Refresh languages of activated plugins
