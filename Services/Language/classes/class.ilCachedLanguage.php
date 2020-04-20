@@ -91,7 +91,8 @@ class ilCachedLanguage
     protected function readFromCode() {
         $variable = null;
         try {
-            include(CLIENT_DATA_DIR . '/ilGlobalCache/translations_'. $this->getLanguageKey().'.php');
+            $cacheDir = ilCust::get('cache_by_code_dir');
+            include($cacheDir . '/translations_'. $this->getLanguageKey().'.php');
         }
         catch (Exception $e) {
         }
