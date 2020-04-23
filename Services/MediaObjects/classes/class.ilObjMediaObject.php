@@ -1463,6 +1463,12 @@ class ilObjMediaObject extends ilObject
                 $obj_id = $id;
                 break;
 
+            // fau: webAccessChecker - Patch for Interactive Video
+            case "xvid":
+                $obj_id = $id;
+                break;
+            // fau.
+
             // News Context Object (e.g. MediaCast)
             case "news":
                 include_once("./Services/News/classes/class.ilNewsItem.php");
