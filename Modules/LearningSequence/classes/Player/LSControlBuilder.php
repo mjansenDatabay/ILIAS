@@ -322,8 +322,7 @@ class LSControlBuilder implements ControlBuilder
     // fau: lsoManualRefresh - build controls for a manual refresh
     public function refresh($label) : ControlBuilder
     {
-        $this->refresh = $this->ui_factory->button()->standard($label,'javascript:lso_checkLPOfObject();');
-
+        $this->refresh = $this->ui_factory->button()->standard($label,'javascript:lso_refreshPage();');
         return $this;
     }
 
@@ -375,14 +374,21 @@ function lso_checkLPOfObject() {
 	});
 }
 
+// fau: lsoManualRefresh - new function to refresh the page
+function lso_refreshPage() {
+    location.replace('$on_lp_change_url');
+}
+// fau.
+
+
 $(document).on('{$signal_id}', function() {
 	var il_ls_win = window.open('$new_win_url');
 });
 
 
 window._lso_current_item_lp = -1;
-// fau: lsoManualRefresh - trigger only one refresh at the beginning , not by interval
-window.setTimeout(lso_checkLPOfObject, $interval);
+// fau: lsoManualRefresh - don't trigger lso_checkLPOfObject
+// window.setInterval(lso_checkLPOfObject, $interval);
 // fau. 
 JS;
     }
