@@ -79,12 +79,12 @@ class LSControlBuilder implements ControlBuilder
      */
     protected $start;
 
-
+    // fau: lsoManualRefresh - variable for refresh control
     /**
      * @var Component|null
      */
     protected $refresh;
-
+    // fau.
 
     /**
      * @var string | null
