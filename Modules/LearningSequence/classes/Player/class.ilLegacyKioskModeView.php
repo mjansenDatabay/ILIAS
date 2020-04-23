@@ -94,7 +94,8 @@ class ilLegacyKioskModeView implements ILIAS\KioskMode\View
         }
 
         // fau: lsoManualRefresh - prepare control for a manual refresh
-        $builder->refresh($this->lng->txt('refresh'));
+        $this->lng->loadLanguageModule('trac');
+        $builder->refresh($this->lng->txt('trac_refresh'));
         // fau.
         $builder->start($label, $url, 0);
         //return $this->debugBuildAllControls($builder);
