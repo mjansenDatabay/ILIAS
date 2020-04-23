@@ -79,6 +79,13 @@ class LSControlBuilder implements ControlBuilder
      */
     protected $start;
 
+
+    /**
+     * @var Component|null
+     */
+    protected $refresh;
+
+
     /**
      * @var string | null
      */
@@ -312,6 +319,21 @@ class LSControlBuilder implements ControlBuilder
         return $this->start;
     }
 
+    // fau: lsoManualRefresh - build controls for a manual refresh
+    public function refresh($label) : ControlBuilder
+    {
+        $this->refresh = $this->ui_factory->button()->standard($label,'javascript:lso_checkLPOfObject();');
+
+        return $this;
+    }
+
+    public function getRefreshControl()
+    {
+        return $this->refresh;
+    }
+    // fau.
+
+
     /**
      * This is a hack and not supposed to be considered as a common way to inject
      * JS-Code and bind it to a button.
@@ -356,8 +378,12 @@ function lso_checkLPOfObject() {
 $(document).on('{$signal_id}', function() {
 	var il_ls_win = window.open('$new_win_url');
 });
+
+
 window._lso_current_item_lp = -1;
-window.setInterval(lso_checkLPOfObject, $interval);
+// fau: lsoManualRefresh - trigger only one refresh at the beginning , not by interval
+window.setTimeout(lso_checkLPOfObject, $interval);
+// fau. 
 JS;
     }
 }
