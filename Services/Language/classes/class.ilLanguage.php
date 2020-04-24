@@ -323,9 +323,11 @@ class ilLanguage
             return;
         }
         // fau: cacheByCode - ignore certain lang modules from individual database read
-        $ignore = explode(',', (string) ilCust::get('cache_lang_modules_no_db'));
-        if (in_array($a_module, $ignore)) {
-            return;
+        if (class_exists('ilCust')) {
+            $ignore = explode(',', (string) ilCust::get('cache_lang_modules_no_db'));
+            if (in_array($a_module, $ignore)) {
+                return;
+            }
         }
         // fau.
 

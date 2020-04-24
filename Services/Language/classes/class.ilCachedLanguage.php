@@ -60,6 +60,12 @@ class ilCachedLanguage
     protected function readFromCache()
     {
         // fau: cacheByCode - try to read from saved code
+
+       // fix for LiveVoting
+        if (!class_exists('ilCust')) {
+            return;
+        }
+
         if (ilCust::get('cache_by_code')) {
             $translations = $this->readFromCode();
             if (is_array($translations)) {
