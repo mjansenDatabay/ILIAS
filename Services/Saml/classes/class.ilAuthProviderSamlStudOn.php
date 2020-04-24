@@ -184,6 +184,12 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
             // this will cause the profile fields to be updated below
             $userObj->setAuthMode("shibboleth");
 
+            // set tue user active
+            $userObj->setActive(true);
+
+            // delete a time limit
+            $userObj->setTimeLimitUnlimited(true);
+
             // reset agreement to force a new acceptance
             // set user active and unlimited
             $userObj->setAgreeDate(null);
