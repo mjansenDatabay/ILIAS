@@ -506,6 +506,12 @@ class ilVhbAuth
 
 		$ilAuthSession->setAuthenticated(true, $a_user_id);
         //$_SESSION['AccountId'] = $a_user_id;
+
+		// update the last login status of a user
+		if ($a_user_id == $this->user_obj->getId()) {
+			ilObjUser::_updateLastLogin($a_user_id);
+		}
+
 		ilInitialisation::initUserAccount();
 	}
 
