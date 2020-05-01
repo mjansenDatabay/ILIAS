@@ -49,6 +49,10 @@ class ilLSPlayer
 
     public function render(array $get, array $post = null)
     {
+        // fau: fixLsoResume - fault tolerance for missing permission on currnt item
+        // go to previous item if learning sequence conditions have changed and current item is not accessible any more
+        global $DIC;
+
         //init state and current item
         $stored = $this->state_db->getCurrentItemsFor(
             $this->lso_ref_id,
@@ -58,12 +62,20 @@ class ilLSPlayer
         if (count($stored) === 0 ||
             $stored[$this->usr_id] < 0 //returns -1 if there is no current item
         ) {
+            $position = 0;
             $current_item = $this->items[0];
             $current_item_ref_id = $current_item->getRefId();
         } else {
             $current_item_ref_id = $stored[$this->usr_id];
             list($position, $current_item) = $this->findItemByRefId($current_item_ref_id);
         }
+
+        while ($position > 0 && !$DIC->access()->checkAccess('read', '', $current_item->getRefId())) {
+            $position--;
+            $current_item = $this->items[$position];
+            $current_item_ref_id =  $current_item->getRefId();
+        }
+        // fau.
 
         $view = $this->view_factory->getViewFor($current_item);
         $state = $current_item->getState();
