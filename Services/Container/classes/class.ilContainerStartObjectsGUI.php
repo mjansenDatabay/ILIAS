@@ -202,7 +202,7 @@ class ilContainerStartObjectsGUI
     
     protected function askDeleteStarterObject()
     {
-        if (!count($_POST['starter'])) {
+        if (empty($_POST['starter'])) {
             ilUtil::sendFailure($this->lng->txt('select_one'), true);
             $this->ctrl->redirect($this, "listStructure");
         }
@@ -262,7 +262,7 @@ class ilContainerStartObjectsGUI
     {
         $this->checkPermission('write');
 
-        if (!count($_POST['starter'])) {
+        if (empty($_POST['starter'])) {
             ilUtil::sendFailure($this->lng->txt('select_one'), true);
             $this->ctrl->redirect($this, "selectStarter");
         }

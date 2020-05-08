@@ -1597,6 +1597,7 @@ class ilObjWikiGUI extends ilObjectGUI
     
     public function printViewObject($a_pdf_export = false)
     {
+        global $tpl;
         $tpl = $this->tpl;
         
         $page_ids = $this->getPrintPageIds();
