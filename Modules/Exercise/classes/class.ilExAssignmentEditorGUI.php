@@ -740,7 +740,10 @@ class ilExAssignmentEditorGUI
 
             // fau: exResTime - checks for result time
             if ($a_form->getInput("result_time_cb")) {
-                $result_date = $a_form->getItemByPostVar("result_time")->getDate()->get(IL_CAL_UNIX);
+                $result_date_obj = $a_form->getItemByPostVar("result_time")->getDate();
+                if ($result_date_obj instanceof ilDateTime) {
+                    $result_date = $a_form->getItemByPostVar("result_time")->getDate()->get(IL_CAL_UNIX);
+                }
 
                 if ($a_form->getInput("deadline_cb")) {
                     $result_min_date = $a_form->getItemByPostVar("deadline")->getDate()->get(IL_CAL_UNIX);
