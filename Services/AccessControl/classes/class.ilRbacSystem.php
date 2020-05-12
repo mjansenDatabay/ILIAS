@@ -222,6 +222,22 @@ class ilRbacSystem
                 $ops_id = ilRbacReview::_getOperationIdByName($operation);
             }
             if (!in_array($ops_id, (array) $ops)) {
+
+                // fau: fixMissingCopyOperation - check write permission if copy operation is not defined for type
+                // this may be the case for some repository plugins, even if they implement a copy procedure
+                // the analogy to 'write' is also used by db update when copy operations are introduced
+                // e.g. in update steps #4894 or #4915
+                if ($operation == 'copy') {
+                    $ref_type = ilObject::_lookupType($a_ref_id, true);
+                    if (!in_array($ops_id, $DIC->rbac()->review()->getOperationsOnTypeString($ref_type))) {
+                        $write_id = ilRbacReview::_getOperationIdByName('write');
+                        if (in_array($write_id, (array) $ops)) {
+                            continue;
+                        }
+                    }
+                }
+                // fau.
+
                 //$ilLog->write('PERMISSION: '.$a_ref_id.' -> '.$a_ops_id.' failed');
                 // Store negative outcome in cache.
                 // Note: we only cache up to 1000 results to avoid memory overflows
