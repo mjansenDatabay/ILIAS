@@ -520,7 +520,14 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
             $row = 2;
             // Fill the excel
             foreach ($participants as $participant_id) {
-                $submission = new ilExSubmission($this->assignment, $participant_id);
+                // fau: fixDeletedExerciseMember - fault tolerance if user is deleted
+                try {
+                    $submission = new ilExSubmission($this->assignment, $participant_id);
+                }
+                catch (Exception $e) {
+                    continue;
+                }
+                // fau.
                 $submission_files = $submission->getFiles();
 
                 if ($submission_files) {
