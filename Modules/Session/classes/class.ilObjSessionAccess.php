@@ -88,9 +88,7 @@ class ilObjSessionAccess extends ilObjectAccess
         if (!$a_user_id) {
             $a_user_id = $ilUser->getId();
         }
-        include_once './Modules/Session/classes/class.ilSessionParticipants.php';
-        $part = ilSessionParticipants::getInstance($a_ref_id);
-        
+
         switch ($a_cmd) {
             case 'register':
                 // fim: [memsess] add ref_id as parameter
@@ -101,10 +99,10 @@ class ilObjSessionAccess extends ilObjectAccess
                 if ($ilUser->isAnonymous()) {
                     return false;
                 }
-                if ($part->isAssigned($a_user_id)) {
+                if (self::_lookupRegistered($a_user_id, $a_obj_id)) {
                     return false;
                 }
-                if ($part->isSubscriber($a_user_id)) {
+                if (\ilSessionParticipants::_isSubscriber($a_obj_id, $a_user_id)) {
                     return false;
                 }
                 include_once './Modules/Session/classes/class.ilSessionWaitingList.php';

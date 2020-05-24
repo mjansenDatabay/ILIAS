@@ -520,7 +520,7 @@ class ilMembershipGUI
         $ilUser = $DIC['ilUser'];
         $ilAccess = $DIC['ilAccess'];
                 
-        if (!count($_POST['participants'])) {
+        if (!array_key_exists('participants', $_POST) || !count($_POST['participants'])) {
             ilUtil::sendFailure($this->lng->txt('no_checkbox'), true);
             $this->ctrl->redirect($this, 'participants');
         }
@@ -769,6 +769,7 @@ class ilMembershipGUI
      */
     protected function sendMailToSelectedUsers()
     {
+        $participants = [];
         if ($_POST['participants']) {
             $participants = (array) $_POST['participants'];
         } elseif ($_GET['member_id']) {
@@ -1610,7 +1611,7 @@ class ilMembershipGUI
      */
     public function assignFromWaitingList()
     {
-        if (!count($_POST["waiting"])) {
+        if (!array_key_exists('waiting', $_POST) || !count($_POST["waiting"])) {
             ilUtil::sendFailure($this->lng->txt("crs_no_users_selected"), true);
             $this->ctrl->redirect($this, 'participants');
         }
@@ -1728,7 +1729,7 @@ class ilMembershipGUI
      */
     protected function refuseFromList()
     {
-        if (!count($_POST['waiting'])) {
+        if (!array_key_exists('waiting', $_POST) || !count($_POST['waiting'])) {
             ilUtil::sendFailure($this->lng->txt('no_checkbox'), true);
             $this->ctrl->redirect($this, 'participants');
         }

@@ -110,6 +110,7 @@ class ilFileDataForum extends ilFileData
      */
     public function getFilesOfPost()
     {
+        return [];
         $files = array();
 
         foreach (new DirectoryIterator($this->forum_path) as $file) {
