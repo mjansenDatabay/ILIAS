@@ -49,7 +49,7 @@ class ilLSPlayer
 
     public function render(array $get, array $post = null)
     {
-        // fau: fixLsoResume - fault tolerance for missing permission on currnt item
+        // fau: fixLsoResume - fault tolerance for missing permission on current item
         // go to previous item if learning sequence conditions have changed and current item is not accessible any more
         global $DIC;
 
@@ -66,8 +66,15 @@ class ilLSPlayer
             $current_item = $this->items[0];
             $current_item_ref_id = $current_item->getRefId();
         } else {
-            $current_item_ref_id = $stored[$this->usr_id];
-            list($position, $current_item) = $this->findItemByRefId($current_item_ref_id);
+            try {
+                $current_item_ref_id = $stored[$this->usr_id];
+                list($position, $current_item) = $this->findItemByRefId($current_item_ref_id);
+            }
+            catch (Exception $e) {
+                $position = 0;
+                $current_item = $this->items[0];
+                $current_item_ref_id = $current_item->getRefId();
+            }
         }
 
         while ($position > 0 && !$DIC->access()->checkAccess('read', '', $current_item->getRefId())) {
