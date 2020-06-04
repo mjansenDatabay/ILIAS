@@ -635,12 +635,17 @@ class ilMainMenuGUI
 
             // always set ajax url
             $ilHelp->setCtrlPar();
-            $this->main_tpl->addOnLoadCode(
-                "il.Help.setAjaxUrl('" .
-                $ilCtrl->getLinkTargetByClass("ilhelpgui", "", "", true)
-                . "');"
-            );
+            // fau: MainMenuHelp - move outside 'if' block
+            // fau.
         }
+
+        // fau: MainMenuHelp - always add the ajax url to prevent 404 errors
+        $this->main_tpl->addOnLoadCode(
+            "il.Help.setAjaxUrl('" .
+            $ilCtrl->getLinkTargetByClass("ilhelpgui", "", "", true)
+            . "');"
+        );
+        // fau.
     }
 
 
