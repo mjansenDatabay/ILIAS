@@ -987,7 +987,7 @@ class ilStartUpGUI
                     return $GLOBALS['ilCtrl']->redirect($this, 'showAccountMigration');
 
                 case ilAuthStatus::STATUS_AUTHENTICATION_FAILED:
-// fau: loginFailed - add contact and sso message
+                    // fau: loginFailed - add contact and sso message
                     $message = $status->getTranslatedReason();
                     if ($GLOBALS['DIC']['ilSetting']->get("shib_active") && ilObjUser::_checkExternalAuthAccount('shibboleth', $credentials->getUsername())) {
                         // account with shibboleth authentication
@@ -1002,11 +1002,19 @@ class ilStartUpGUI
                     } else {
                         $message .= '<p class="small">' . $this->lng->txt('err_inactive_contact') . '</p>';
                     }
+                    // fau.
 
 
-                    ilUtil::sendFailure($message);
-// fau.
-                    return $this->showLoginPage($form);
+                    // fau: rootAsLogin - redirect to set the current language
+                    if (ilCust::get('ilias_root_as_login') && $GLOBALS['DIC']['ilAccess']->checkAccess("read", "", ROOT_FOLDER_ID)) {
+                        ilUtil::sendFailure($message, true);
+                        ilUtil::redirect(ilUtil::_getRootLoginLink());
+                    }
+                    else {
+                        ilUtil::sendFailure($message);
+                        return $this->showLoginPage($form);
+                    }
+                    // fau.
             }
         }
         ilUtil::sendFailure($this->lng->txt('err_wrong_login'));
