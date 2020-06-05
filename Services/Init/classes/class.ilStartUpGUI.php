@@ -1606,8 +1606,8 @@ class ilStartUpGUI
             $GLOBALS['DIC']['ilAuthSession']->init();
             $GLOBALS['DIC']['ilAuthSession']->setAuthenticated(true, ANONYMOUS_USER_ID);
             ilInitialisation::initUserAccount();
-            ilUtil::sendSuccess($lng->txt("logout_text"));
-            $this->showRootPage();
+            ilUtil::sendSuccess($lng->txt("logout_text"), true);
+            ilUtil::redirect(ilUtil::_getRootLoginLink());
             return;
         }
         // fau.
