@@ -39,6 +39,7 @@ assessment#:#ass_mycampus_registrations_file_wrong_named#:#Die export file is wr
 assessment#:#fq_err_no_numeric_value#:#Please enter a numeric value or a fraction.
 assessment#:#fq_formula_desc_additional#:#StudOn also supports 'atan2(y;x)''. Please separate parameters by semicolon.
 assessment#:#log_wrong_test_password_entered#:#Participant entered a wrong test password.###fau: reducedTestPasswordLog
+assessment#:#dashboard_tab#:#Participants
 assessment#:#detailed_output_scoring#:#detail statement with solutions and points
 assessment#:#dont_use_questionpool#:#Do not add question in a existing questionpool.
 assessment#:#send_simple_results_body#:#%s\n\nName: %s\nmatriculation number: %s\ndate of the testrun: %s
