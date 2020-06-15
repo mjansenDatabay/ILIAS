@@ -177,7 +177,7 @@ class ilExCalculate
         foreach ($a_results as $result) {
             $mandatory = $this->assignments[$result['ass_id']]['mandatory'];
             
-            if (empty($result['mark'])) {
+            if (!isset($result['mark'])) {
                 if ($mandatory) {
                     // mandatory mark not available
                     return null;
