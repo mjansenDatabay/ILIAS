@@ -134,7 +134,9 @@ class ilScheduleInputGUI extends ilFormPropertyGUI
     public static function getPostData($a_post_var, $a_remove_invalid = true)
     {
         $res = array();
-        for ($loop = 0; $loop < 24; $loop++) {
+        // fau: fixScheduleInputLimit - allow more than 24 entries
+        for ($loop = 0; $loop < 240; $loop++) {
+            // fau.
             $days = $_POST[$a_post_var . "_days~" . $loop];
             $from = self::parseTime(
                 $_POST[$a_post_var . "_from_hh~" . $loop],
