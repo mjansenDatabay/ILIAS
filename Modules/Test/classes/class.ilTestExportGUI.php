@@ -209,12 +209,11 @@ class ilTestExportGUI extends ilExportGUI
         if (count($export_files) > 0) {
             foreach ($export_files as $exp_file) {
                 $file_arr = explode("__", $exp_file);
-                if($file_arr[0] == $exp_file) continue;
-
+// fau: campusGrades - support export files with other naming scheme
+                //if($file_arr[0] == $exp_file) continue;
                 array_push($data, array(
                     'file' => $exp_file,
                     'size' => filesize($export_dir . "/" . $exp_file),
-// fau: campusGrades - support export files with other naming scheme
                     'timestamp' => filemtime($export_dir . "/" . $exp_file)
 // fau.
                 ));
