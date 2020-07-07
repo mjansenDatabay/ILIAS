@@ -3,7 +3,9 @@
 use ILIAS\GlobalScreen\Scope\MainMenu\Provider\AbstractStaticMainMenuProvider;
 use ILIAS\MainMenu\Provider\StandardTopItemsProvider;
 use ILIAS\UI\Component\Symbol\Icon\Standard;
+use ilMailExplorer;
 use ilMailGlobalServices;
+use ilMailGUI;
 
 /**
  * Class MailMainBarProvider
@@ -34,9 +36,14 @@ class MailMainBarProvider extends AbstractStaticMainMenuProvider
                                                              ->withIsOutlined(true);
 
         return [
-            $this->mainmenu->link($this->if->identifier('mm_pd_mail'))
+            $this->mainmenu->complex($this->if->identifier('mm_pd_mail'))
                 ->withTitle($title)
-                ->withAction("ilias.php?baseClass=ilMailGUI")
+                ->withContentWrapper(function () {
+                    $exp = new ilMailExplorer(new ilMailGUI(), $this->dic->user()->getId());
+
+                    return $this->dic->ui()->factory()->legacy($exp->getHTML(true));
+                })
+                ->withSupportsAsynchronousLoading(false)
                 ->withParent(StandardTopItemsProvider::getInstance()->getCommunicationIdentification())
                 ->withPosition(10)
                 ->withSymbol($icon)
