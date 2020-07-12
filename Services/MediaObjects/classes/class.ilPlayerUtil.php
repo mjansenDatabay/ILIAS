@@ -1,4 +1,6 @@
 <?php
+// fau: jumpMedia - added custom parameters to take a newer version of the media element (can be switched back to standard in ilias 6)
+// fau: jumpMedia - included plugin for jump forward and back links
 
 /* Copyright (c) 1998-2011 ILIAS open source, Extended GPL, see docs/LICENSE */
 
@@ -11,33 +13,42 @@
  */
 class ilPlayerUtil
 {
+    static $initialized = false;
+
     /**
      * Get local path of jQuery file
      */
-    public static function getLocalMediaElementJsPath()
+    public static function getLocalMediaElementJsPath($custom = true)
     {
-        return "./libs/bower/bower_components/mediaelement/build/mediaelement-and-player.min.js";
+        if ($custom) {
+            return "./Customizing/libs/mediaelement/build/mediaelement-and-player.min.js";
+        }
+        else {
+            return "./libs/bower/bower_components/mediaelement/build/mediaelement-and-player.min.js";
+        }
     }
 
     /**
      * Get local path of jQuery file
      */
-    public static function getLocalMediaElementCssPath()
+    public static function getLocalMediaElementCssPath($custom = true)
     {
-        return "./libs/bower/bower_components/mediaelement/build/mediaelementplayer.min.css";
+        if ($custom) {
+            return "./Customizing/libs/mediaelement/build/mediaelementplayer.min.css";
+        }
+        else {
+            return "./libs/bower/bower_components/mediaelement/build/mediaelementplayer.min.css";
+        }
     }
 
     /**
      * Init mediaelement.js scripts
      */
-    public static function initMediaElementJs($a_tpl = null)
+    public static function initMediaElementJs($a_tpl = null, $custom = true)
     {
-        // fim: [exam] prevent the embedding of media_element
-
-        if (ilCust::get('tst_prevent_media_player')) {
+        if (self::$initialized) {
             return;
         }
-        // fim.
 
         global $DIC;
 
@@ -47,12 +58,14 @@ class ilPlayerUtil
             $a_tpl = $tpl;
         }
         
-        foreach (self::getJsFilePaths() as $js_path) {
+        foreach (self::getJsFilePaths($custom) as $js_path) {
             $a_tpl->addJavaScript($js_path);
         }
-        foreach (self::getCssFilePaths() as $css_path) {
+        foreach (self::getCssFilePaths($custom) as $css_path) {
             $a_tpl->addCss($css_path);
         }
+
+        self::$initialized = true;
     }
     
     /**
@@ -61,9 +74,16 @@ class ilPlayerUtil
      * @param
      * @return
      */
-    public static function getCssFilePaths()
+    public static function getCssFilePaths($custom = true)
     {
-        return array(self::getLocalMediaElementCssPath());
+        if ($custom) {
+            return array(self::getLocalMediaElementCssPath(true),
+                "./Customizing/libs/mediaelement_plugins/dist/skip-back/skip-back.min.css",
+                "./Customizing/libs/mediaelement_plugins/dist/jump-forward/jump-forward.min.css");
+        }
+        else {
+            return array(self::getLocalMediaElementCssPath(false));
+        }
     }
     
     /**
@@ -72,9 +92,16 @@ class ilPlayerUtil
      * @param
      * @return
      */
-    public static function getJsFilePaths()
+    public static function getJsFilePaths($custom)
     {
-        return array(self::getLocalMediaElementJsPath());
+        if ($custom) {
+            return array(self::getLocalMediaElementJsPath(true),
+                "./Customizing/libs/mediaelement_plugins/dist/skip-back/skip-back.min.js",
+                "./Customizing/libs/mediaelement_plugins/dist/jump-forward/jump-forward.js");
+        }
+        else {
+            return array(self::getLocalMediaElementJsPath(false));
+        }
     }
     
 
@@ -83,9 +110,14 @@ class ilPlayerUtil
      *
      * @return
      */
-    public static function getFlashVideoPlayerDirectory()
+    public static function getFlashVideoPlayerDirectory($custom = true)
     {
-        return "libs/bower/bower_components/mediaelement/build";
+        if ($custom) {
+            return "Customizing/libs/mediaelement/build";
+        }
+        else {
+            return "./libs/bower/bower_components/mediaelement/build";
+        }
     }
     
     
@@ -109,10 +141,10 @@ class ilPlayerUtil
      * @param
      * @return
      */
-    public static function copyPlayerFilesToTargetDirectory($a_target_dir)
+    public static function copyPlayerFilesToTargetDirectory($a_target_dir, $custom)
     {
         ilUtil::rCopy(
-            "./libs/bower/bower_components/mediaelement/build",
+        self::getFlashVideoPlayerDirectory($custom),
             $a_target_dir
         );
     }

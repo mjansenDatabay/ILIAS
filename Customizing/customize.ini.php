@@ -117,7 +117,6 @@ tst_notify_remote = "0"                 ;send mails to users at remote installat
 tst_export_mycampus = "0"               ;enable the export of test results for my campus
 tst_prevent_image_drag = "0"			;prevent the dragging of images an links to texts fields in tests
 tst_prevent_image_validate = "0"        ;fau: preventQtiImageValidate - prevent validation of images at test/pool import
-tst_prevent_media_player = "0"			;prevent the embedding of the media element player
 
 univis_server = ""                      ;only the server name, e.g. univis.uni-erlangen.de
 univis_port = ""                        ;port sor testing socket connection in univis2mysql

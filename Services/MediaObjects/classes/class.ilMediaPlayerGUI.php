@@ -23,8 +23,10 @@ class ilMediaPlayerGUI
     protected $lng;
 
     protected $file;
-    protected $displayHeight = "480";
-    protected $displayWidth = "640";
+    // fau: jumpMedia - taken from ilias 6
+    protected $displayHeight = "";
+    protected $displayWidth = "";
+    // fau.
     protected $mimeType;
     protected static $nr = 1;
     protected static $lightbox_initialized = false;
@@ -338,6 +340,9 @@ class ilMediaPlayerGUI
             }
             $mp_tpl->setVariable("PV", $p["v"]);
             $mp_tpl->setVariable("PLAYER_NR", $this->id . "_" . $this->current_nr);
+            // fau: jumpMedia - taken from ilias 6
+            $mp_tpl->setVariable("TXT_PLAY", $lng->txt("mob_play"));
+            // fau.
             $mp_tpl->setVariable("TITLE", $this->getTitle());
             $mp_tpl->setVariable("DESCRIPTION", $this->getDescription());
             include_once("./Services/UIComponent/Glyph/classes/class.ilGlyphGUI.php");
@@ -351,8 +356,7 @@ class ilMediaPlayerGUI
         // vimeo
         if (ilExternalMediaAnalyzer::isVimeo($this->getFile())) {
             $p = ilExternalMediaAnalyzer::extractVimeoParameters($this->getFile());
-
-            $html = '<iframe src="http://player.vimeo.com/video/' . $p["id"] . '" width="320" height="240" ' .
+            $html = '<iframe src="//player.vimeo.com/video/' . $p["id"] . '" width="320" height="240" ' .
                 'frameborder="0"></iframe>';
 
             return $html;
@@ -404,21 +408,39 @@ class ilMediaPlayerGUI
             }
             
             $mp_tpl->setCurrentBlock("mejs_video");
-            
+            // fau: jumpMedia - taken from ilias 6
             if ($a_preview) {
-                $mp_tpl->setVariable("CLASS", "ilNoDisplay");
+                $mp_tpl->setVariable("WRAP_CLASS", "ilNoDisplay");
+                $mp_tpl->setVariable("CLASS", "mejs__player ilNoDisplay");
+            } else {
+                //$mp_tpl->setVariable("CLASS", "mejs__player");
             }
+            // fau.
             
             $mp_tpl->setVariable("PLAYER_NR", $this->id . "_" . $this->current_nr);
+            // fau: jumpMedia - taken from ilias 6
+            $mp_tpl->setVariable("TXT_PLAY", $lng->txt("mob_play"));
+            // fau.
             $mp_tpl->setVariable("EVENT_URL", $this->event_callback_url);
             $height = $this->getDisplayHeight();
             $width = $this->getDisplayWidth();
             if (is_int(strpos($mimeType, "audio/mpeg"))) {
-                $height = "30";
+                $height = "30px";
             }
 
-            $mp_tpl->setVariable("DISPLAY_HEIGHT", $height);
-            $mp_tpl->setVariable("DISPLAY_WIDTH", $width);
+            // fau: jumpMedia - taken from ilias 6
+            if ($height != "") {
+                $style = "height: ".$height."; ";
+            }
+            if ($width != "") {
+                $style.= "width: ".$width."; ";
+            }
+            if ($style != "") {
+                $mp_tpl->setVariable("STYLE", "style='$style'");
+            }
+            //$mp_tpl->setVariable("DISPLAY_HEIGHT", $height);
+            //$mp_tpl->setVariable("DISPLAY_WIDTH", $width);
+            // fau.
             $mp_tpl->setVariable("PREVIEW_PIC", $this->getVideoPreviewPic());
             $mp_tpl->setVariable("SWF_FILE", ilPlayerUtil::getFlashVideoPlayerFilename(true));
             $mp_tpl->setVariable("FFILE", $this->getFile());
@@ -432,7 +454,10 @@ class ilMediaPlayerGUI
             $r = $mp_tpl->get();
 
             if (!$a_preview) {
-                $tpl->addOnLoadCode("new MediaElementPlayer('#player_" . $this->id . "_" . $this->current_nr . "');");
+                // fau: jumpMedia - activate skipback and jumpforward links
+                $cfg = "{features: ['playpause', 'current', 'progress', 'skipback', 'jumpforward', 'volume', 'fullscreen'], skipBackInterval: 10, jumpForwardInterval: 10}";
+                $tpl->addOnLoadCode("new MediaElementPlayer('#player_" . $this->id . "_" . $this->current_nr . "', $cfg);");
+                // fau.
             }
 
             //echo htmlentities($r); exit;
@@ -531,15 +556,7 @@ class ilMediaPlayerGUI
         }
 
         return;
-        $tpl->addJavaScript("./Services/MediaObjects/flash_flv_player/swfobject.js");
-        $mp_tpl = new ilTemplate("tpl.flv_player.html", true, true, "Services/MediaObjects");
-        $mp_tpl->setCurrentBlock("default");
-        $mp_tpl->setVariable("FILE", urlencode($this->getFile()));
-        $mp_tpl->setVariable("PLAYER_NR", $this->current_nr);
-        $mp_tpl->setVariable("DISPLAY_HEIGHT", strpos($mimeType, "audio/mpeg") === false ? "240" : "20");
-        $mp_tpl->setVariable("DISPLAY_WIDTH", "320");
-        $mp_tpl->parseCurrentBlock();
-        return $mp_tpl->get();
+        // fau: jumpMedia - deleted like in ilias 6.
     }
     
     /**

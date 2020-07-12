@@ -761,7 +761,9 @@ il.COPagePres =
 				var def, cfg;
 
 				def = $(el).find("track[default='default']").first().attr("srclang");
-				cfg = {};
+				// fau: jumpMedia - activate skipback and jumpforward links
+				cfg = {features: ['playpause', 'current', 'progress', 'skipback', 'jumpforward', 'volume', 'fullscreen'], skipBackInterval: 10, jumpForwardInterval: 10};
+				// fau.
 				if (def != ""){
 					cfg.startLanguage = def;
 				}

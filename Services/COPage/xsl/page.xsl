@@ -3020,9 +3020,9 @@
 				</xsl:if>
 				<!-- see #bug22632 -->
 				<xsl:if test="$width = '' and $height = ''">
-					<xsl:attribute name="width">100%</xsl:attribute>
-					<xsl:attribute name="height">100%</xsl:attribute>
-					<xsl:attribute name="style">width:100%;height:100%;</xsl:attribute>
+					<!-- fau: jumpMedia - see ilias 6, changed to max-width only -->
+					<xsl:attribute name="style">max-width: 100%;</xsl:attribute>
+					<!-- fau. -->
 				</xsl:if>
 				<xsl:if test="$mode != 'edit' and
 					(../MediaAliasItem[@Purpose = $curPurpose]/Parameter[@Name = 'autostart']/@Value = 'true' or
@@ -3065,9 +3065,9 @@
 						<xsl:attribute name="height"><xsl:value-of select="$height"/></xsl:attribute>
 					</xsl:if>
 					<xsl:if test="$width = '' and $height = ''">
-						<xsl:attribute name="width">100%</xsl:attribute>
-						<xsl:attribute name="height">100%</xsl:attribute>
-						<xsl:attribute name="style">width:100%;height:100%;</xsl:attribute>
+						<!-- fau: jumpMedia - see ilias 6, changed to max-width -->
+						<xsl:attribute name="style">max-width: 100%;</xsl:attribute>
+						<!-- fau. -->
 					</xsl:if>
 					<xsl:attribute name="data"><xsl:value-of select="$flv_video_player"/></xsl:attribute>
 					<param name="movie">
