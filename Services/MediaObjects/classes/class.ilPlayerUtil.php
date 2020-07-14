@@ -92,7 +92,7 @@ class ilPlayerUtil
      * @param
      * @return
      */
-    public static function getJsFilePaths($custom)
+    public static function getJsFilePaths($custom = true)
     {
         if ($custom) {
             return array(self::getLocalMediaElementJsPath(true),
@@ -141,7 +141,7 @@ class ilPlayerUtil
      * @param
      * @return
      */
-    public static function copyPlayerFilesToTargetDirectory($a_target_dir, $custom)
+    public static function copyPlayerFilesToTargetDirectory($a_target_dir, $custom = true)
     {
         ilUtil::rCopy(
         self::getFlashVideoPlayerDirectory($custom),
