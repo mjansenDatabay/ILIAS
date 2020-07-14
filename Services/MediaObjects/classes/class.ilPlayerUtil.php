@@ -141,7 +141,7 @@ class ilPlayerUtil
      * @param
      * @return
      */
-    public static function copyPlayerFilesToTargetDirectory($a_target_dir, $custom = true)
+    public static function copyPlayerFilesToTargetDirectory($a_target_dir, $custom = false)
     {
         ilUtil::rCopy(
         self::getFlashVideoPlayerDirectory($custom),
