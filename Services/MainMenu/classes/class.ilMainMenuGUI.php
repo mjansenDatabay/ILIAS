@@ -641,9 +641,9 @@ class ilMainMenuGUI
 
         // fau: MainMenuHelp - always add the ajax url to prevent 404 errors
         $this->main_tpl->addOnLoadCode(
-            "il.Help.setAjaxUrl('" .
+            "if (il.Help) {il.Help.setAjaxUrl('" .
             $ilCtrl->getLinkTargetByClass("ilhelpgui", "", "", true)
-            . "');"
+            . "');};"
         );
         // fau.
     }
