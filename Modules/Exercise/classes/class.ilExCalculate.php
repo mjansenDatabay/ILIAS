@@ -11,6 +11,7 @@
 */
 class ilExCalculate
 {
+    /** @var ilObjExercise */
     private $object = null;
     private $options = array();
     private $assignments = array();
@@ -49,7 +50,8 @@ class ilExCalculate
      */
     public function readOptions()
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
         
         $this->initOptions();
         
@@ -68,7 +70,8 @@ class ilExCalculate
      */
     public function writeOptions()
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
         
         $query = 'DELETE FROM exc_calc_options WHERE obj_id='
             . $ilDB->quote($this->object->getId(), 'integer');
@@ -121,11 +124,8 @@ class ilExCalculate
      */
     public function calculateResults($a_usr_ids = array())
     {
-        global $ilDB;
-        
-        include_once "./Modules/Exercise/classes/class.ilExerciseMembers.php";
-        include_once 'Services/Tracking/classes/class.ilLPMarks.php';
-        
+        global $DIC;
+        $ilDB = $DIC->database();
         // get the list of assignments
         $ass_ids = array_keys($this->assignments);
         
@@ -141,6 +141,8 @@ class ilExCalculate
             . $ilDB->in('ass_id', $ass_ids, false, 'integer') . " AND "
             . $ilDB->in('usr_id', $usr_ids, false, 'integer');
         $set = $ilDB->query($q);
+
+        $results = [];
         while ($rec = $ilDB->fetchAssoc($set)) {
             $results[$rec['usr_id']][$rec['ass_id']] = $rec;
         }
@@ -155,8 +157,13 @@ class ilExCalculate
             
             if ($this->options['status_calculate']) {
                 $status = $this->calculateStatusByMark($mark);
-                ilExerciseMembers::_writeStatus($this->object->getId(), $usr_id, $status);
             }
+            else {
+                $status = ilExerciseMembers::_lookupStatus($this->object->getId(), $usr_id);
+            }
+
+            // always save the status to set the current status time
+            ilExerciseMembers::_writeStatus($this->object->getId(), $usr_id, $status);
         }
     }
 
@@ -182,18 +189,29 @@ class ilExCalculate
                     // mandatory mark not available
                     return null;
                 }
-            } else {
+            }
+            else {
                 $mark = str_replace(',', '.', $result['mark']);
                 
                 if (!is_numeric($mark)) {
-                    // mark can't be used for calculation
-                    return null;
+                    if ($mandatory) {
+                        // mandatory mark not available
+                        return null;
+                    }
+                    else {
+                        // mark can't be used for calculation
+                        continue;
+                    }
+
                 } elseif ($mandatory) {
                     $selected[] = $mark;
+
                 } elseif ($this->options['mark_select'] == 'marked') {
                     $selected[] = $mark;
+
                 } elseif ($this->options['mark_select'] == 'number') {
                     $candidates[] = $mark;
+
                 }
             }
         }
@@ -268,6 +286,8 @@ class ilExCalculate
                 return $mark <= $value ? 'passed' : 'failed';
                 break;
         }
+
+        return 'notgraded';
     }
     
     
@@ -276,7 +296,6 @@ class ilExCalculate
      */
     private function readAssignments()
     {
-        include_once "./Modules/Exercise/classes/class.ilExAssignment.php";
         $ass_data = ilExAssignment::getAssignmentDataOfExercise($this->object->getId());
         
         $this->count_mandatory = 0;
