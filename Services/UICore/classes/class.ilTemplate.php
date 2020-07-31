@@ -2457,7 +2457,7 @@ class ilTemplate extends HTML_Template_ITX
             include_once("./Services/PermanentLink/classes/class.ilPermanentLinkGUI.php");
             $plinkgui = new ilPermanentLinkGUI(
                 $this->permanent_link["type"],
-                $this->permanent_link["id"],
+                0,
                 $this->permanent_link["append"],
                 $this->permanent_link["target"]
             );

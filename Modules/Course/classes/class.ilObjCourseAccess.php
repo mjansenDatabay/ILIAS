@@ -281,16 +281,17 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
             return false;
         }
 
-        // fim: [univis] don't allow 'join' command for anonymous users
+        // fau: joinLink - don't allow 'join' command for anonymous users
         if ($t_arr[2] == 'join' && $ilUser->getId() == ANONYMOUS_USER_ID) {
             global $lng;
 
             // ugly fix: $tpl used by ilUtil may not be initialized
-            //ilUtil::sendInfo($lng->txt('join_crs_needs_login'), true);
+            // ilUtil::sendInfo($lng->txt('join_crs_needs_login'), true);
+            //ilTemplate::MESSAGE_TYPE_INFO
             $_SESSION['info'] = $lng->txt('join_crs_needs_login');
             ilUtil::redirect(ilUtil::_getRootLoginLink($a_target), true);
         }
-        // fim.
+        // fau.
 
         // checking for read results in endless loop, if read is given
         // but visible is not given (-> see bug 5323)

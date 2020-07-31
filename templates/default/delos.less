@@ -1228,7 +1228,7 @@ div.il_Footer {
 	font-size: 90%;
 	text-align: center;
 }
-// fim: changed footer completely
+// fau: ownFooter - changed footer completely
 footer.ilFooter {
 	position: absolute;
 	left: 0;
@@ -1262,56 +1262,27 @@ footer.ilFooter {
 		padding: 20px 50px 0px 0px;
         height: 100px;
 
-        &.info {
-          padding: 5px 0px 0px 0px;
-        }
-        &.right {
-          float: right;
-          text-align: right;
-          padding: 63px 0px 0px 0px;
-        }
+		&.ilFooterContainerInfo {
+			padding: 5px 50px 0px 0px;
+		}
+
+		&.ilFooterContainerPerma {
+			padding: 10px 50px 0px 0px;
+
+			.input-group-btn {
+				display: none;
+			}
+		}
 	}
-    a {
+
+	a {
         color: #f0f0f0;
 		white-space: nowrap;
 	}
-    .dropdown-menu a {
-      color: @text-color;
-    }
 
     .ilFooterLogo {
       height: 35px;
     }
-
-	div.ilPermalinkContainer {
-		margin: 0px;
-		display:inline;
-	}
-
-	div.ilPermalinkContainer .small {
-		font-size: 70%;
-	}
-
-	div.ilPermalinkContainer .il_adv_sel {
-		font-size: 100%;
-	}
-
-	div.ilPermalinkContainer #current_perma_link {
-		color: @text-color;
-		width: 100px;
-		height: 20px;
-		font-size: 90%;
-		float: right;
-		margin-left: 3px;
-		background-color: white;
-		+ .btn-group {
-			vertical-align: top;
-		}
-	}
-
-	div.ilPermalinkContainer a {
-		font-size: 1em;
-	}
 
 	.ilFooterDevmode {
       clear: both;
@@ -1320,7 +1291,7 @@ footer.ilFooter {
       }
     }
 }
-// fim.
+// fau.
 
 [dir="rtl"] footer.ilFooter {
 	text-align: right;

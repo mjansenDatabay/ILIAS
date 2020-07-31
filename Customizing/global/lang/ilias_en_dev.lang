@@ -208,7 +208,7 @@ common#:#join_crs_not_permitted#:#You cannot join the course!
 common#:#join_grp_needs_login#:#Please log in to StudOn to join the group!
 common#:#join_grp_not_permitted#:#You cannot join the group!
 common#:#join_link#:#Link to the joining
-common#:#join_link_description#:#<span class="small">By calling up this link a user has to be logged in to StudOn and will then be forwarded to the joining-page.</span>
+common#:#join_link_description#:#By calling up this link a user has to be logged in to StudOn and will then be forwarded to the joining-page.
 common#:#label_remark#:#References
 common#:#leave_lot_list#:#unsubscribe for the lottery
 common#:#links_password_coded#:#password-code

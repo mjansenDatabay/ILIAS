@@ -594,26 +594,6 @@ class ilAdvancedSelectionListGUI
         return $this->dd_pullright;
     }
 
-    // fau: dropUp - get/set dropup mode
-    /**
-     * Set dropup mode
-     * @param boolean
-     */
-    public function setDropUp($a_dropup)
-    {
-        $this->dropup = $a_dropup;
-    }
-
-    /**
-     * Get dropup mode
-     * @return boolean
-     */
-    public function getDropUp()
-    {
-        return $this->dropup;
-    }
-    // fau.
-
     /**
     * Get selection list HTML
     */
@@ -647,11 +627,6 @@ class ilAdvancedSelectionListGUI
 
         $cnt = 0;
 
-        // fau: dropUp - allow dropup menu
-        if ($this->getDropUp()) {
-            $tpl->setVariable('DROPUP', 'dropup');
-        }
-        // fau.
         if ($this->getAsynch()) {
             $tpl->setCurrentBlock("asynch_request");
             $tpl->setVariable("IMG_LOADER", ilUtil::getImagePath("loader.svg"));

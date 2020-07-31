@@ -436,7 +436,7 @@ class ilInfoScreenGUI
             $this->addProperty("", nl2br($description));
         }
 
-        // fim: [info] show "general" section only if relevant data exist
+        // fau: infoScreen - show "general" section only if relevant data exist
         if ($keywords != '' or $author != '' or $copyright != '' or $learning_time != '') {
             // general section
             $this->addSection($lng->txt("meta_general"));
@@ -471,7 +471,7 @@ class ilInfoScreenGUI
                 );
             }
         }
-        // fim.
+        // fau.
     }
 
     /**
@@ -495,13 +495,15 @@ class ilInfoScreenGUI
             $ref_id = $a_obj->getRefId();
             
             if ($ref_id) {
-                include_once 'Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
-                if (ilECSServerSettings::getInstance()->activeServerExists()) {
-                    $this->addProperty(
-                        $lng->txt("object_id"),
-                        $a_obj->getId()
-                    );
-                }
+                // fau: infoScreen - don't show the object twice
+//                include_once 'Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
+//                if (ilECSServerSettings::getInstance()->activeServerExists()) {
+//                    $this->addProperty(
+//                        $lng->txt("object_id"),
+//                        $a_obj->getId()
+//                    );
+//                }
+                // fau.
 
                 include_once 'Services/PermanentLink/classes/class.ilPermanentLinkGUI.php';
                 $pm = new ilPermanentLinkGUI($type, $ref_id);
@@ -513,17 +515,19 @@ class ilInfoScreenGUI
                     ""
                 );
             
-                // fim: [univis] show a separate link to join
+                // fau: joinLink - show a separate link to join
                 if ($type == "crs" or $type == "grp") {
+                    $pm = new ilPermanentLinkGUI($type, $ref_id);
+                    $pm->setIncludePermanentLinkText(false);
                     $pm->setAppend('_join');
                     $this->addProperty(
                         $lng->txt("join_link"),
                         $pm->getHTML()
-                        . "<br /><small>" . $lng->txt("join_link_description") . "</small>",
+                        . '<div class="help-block">' . $lng->txt("join_link_description") . '</div>',
                         ""
                     );
                 }
-                // fim.
+                // fau.
 
 
                 // fau: relativeLink - show link on infoscreen of repository object
@@ -567,21 +571,21 @@ class ilInfoScreenGUI
             }
         }
 
-        // fim: [info] show the ref_id (and the obj_id to admins)
+        // fau: infoScreen - show the ref_id (and the obj_id to admins)
         $this->addProperty($this->lng->txt('studon_ref_id'), $a_obj->getRefId());
         if (ilCust::administrationIsVisible()) {
             $this->addProperty($this->lng->txt('object_id'), $a_obj->getId());
         }
-        // fim.
+        // fau.
 
-        // fim: [univis] show the univis id
+        // fau: infoScreen - show the univis id
         if ($import_id = $a_obj->getImportId()) {
             require_once('./Services/UnivIS/classes/class.ilUnivisLecture.php');
             if (ilUnivisLecture::_isIliasImportId($import_id)) {
                 $this->addProperty($this->lng->txt('univis_id'), $import_id);
             }
         }
-        // fim.
+        // fau.
 
         // creation date
         $this->addProperty(
@@ -620,10 +624,10 @@ class ilInfoScreenGUI
             }
         }
         // change event
-        // fim: [info] show statistical info to users with write access
+        // fau: infoScreen - show statistical info to users with write access
         if ($ilAccess->checkAccess("write", "", $ref_id)) {
             require_once 'Services/Tracking/classes/class.ilChangeEvent.php';
-            // fim.
+            // fau.
             if ($ilUser->getId() != ANONYMOUS_USER_ID) {
                 $readEvents = ilChangeEvent::_lookupReadEvents($a_obj->getId());
                 $count_users = 0;

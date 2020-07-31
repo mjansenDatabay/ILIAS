@@ -36,8 +36,7 @@ class ilPermanentLinkGUI
     /**
     * Example: type = "wiki", id (ref_id) = "234", append = "_Start_Page"
     */
-    // fau: dropUp - added dropup mode
-    public function __construct($a_type, $a_id, $a_append = "", $a_target = "", $a_dropup = false)
+    public function __construct($a_type, $a_id, $a_append = "", $a_target = "")
     {
         global $DIC;
 
@@ -49,10 +48,7 @@ class ilPermanentLinkGUI
         $this->setAppend($a_append);
         $this->setIncludePermanentLinkText(true);
         $this->setTarget($a_target);
-
-        $this->dropup = $a_dropup;
     }
-    // fau.
 
     /**
     * Set Include permanent link text.
@@ -237,6 +233,10 @@ class ilPermanentLinkGUI
         $tpl->setVariable("TXT_BOOKMARK_DEFAULT", $title);
 
         $tpl->setVariable("LINK", $href);
+
+        // fau: joinLink - set random ID
+        $tpl->setVariable('RAND_ID', rand(100000,999999));
+        // fau.
         
         if ($this->getAlignCenter()) {
             $tpl->setVariable("ALIGN", "center");
@@ -247,9 +247,8 @@ class ilPermanentLinkGUI
         if ($this->getTarget() != "") {
             $tpl->setVariable("TARGET", 'target="' . $this->getTarget() . '"');
         }
-        // fau: dropUp - set parameter
-        $bm_html = self::_getBookmarksSelectionList($title, $href, $this->dropup);
-        // fau.
+
+        $bm_html = self::getBookmarksSelectionList($title, $href);
         if ($bm_html) {
             $tpl->setVariable('SELECTION_LIST', $bm_html);
         }
@@ -260,17 +259,12 @@ class ilPermanentLinkGUI
     /**
      * @return string
      */
-    // fau: dropUp - added parameter for dropup mode
-    protected static function _getBookmarksSelectionList($title, $href, $dropup = false)
-// fau.
+    protected static function getBookmarksSelectionList($title, $href)
     {
         require_once 'Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
 
         $current_selection_list = new ilAdvancedSelectionListGUI();
         $current_selection_list->setId('socialbm_actions_' . md5(uniqid(rand(), true)));
-        // fau: dropUp - use parameter for dropup mode
-        $current_selection_list->setDropUp($dropup);
-        // fau.
 
         $html = '';
 

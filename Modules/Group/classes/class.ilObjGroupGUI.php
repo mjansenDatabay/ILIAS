@@ -1647,7 +1647,7 @@ class ilObjGroupGUI extends ilContainerGUI
         $lng = $DIC['lng'];
         $ilUser = $DIC['ilUser'];
 
-        // fim: [univis] handle the join command
+        // fau: joinLink - handle the join command
         if ($a_add == 'join') {
             include_once('Services/User/classes/class.ilUserUtil.php');
             include_once('Modules/Group/classes/class.ilGroupParticipants.php');
@@ -1674,7 +1674,7 @@ class ilObjGroupGUI extends ilContainerGUI
                 }
             }
         }
-        // fim.
+        // fau.
 
         include_once './Services/Membership/classes/class.ilMembershipRegistrationCodeUtils.php';
         if (substr($a_add, 0, 5) == 'rcode') {

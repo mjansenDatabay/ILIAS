@@ -10823,48 +10823,21 @@ footer.ilFooter .ilFooterContainer {
   padding: 20px 50px 0px 0px;
   height: 100px;
 }
-footer.ilFooter .ilFooterContainer.info {
-  padding: 5px 0px 0px 0px;
+footer.ilFooter .ilFooterContainer.ilFooterContainerInfo {
+  padding: 5px 50px 0px 0px;
 }
-footer.ilFooter .ilFooterContainer.right {
-  float: right;
-  text-align: right;
-  padding: 63px 0px 0px 0px;
+footer.ilFooter .ilFooterContainer.ilFooterContainerPerma {
+  padding: 10px 50px 0px 0px;
+}
+footer.ilFooter .ilFooterContainer.ilFooterContainerPerma .input-group-btn {
+  display: none;
 }
 footer.ilFooter a {
   color: #f0f0f0;
   white-space: nowrap;
 }
-footer.ilFooter .dropdown-menu a {
-  color: #434343;
-}
 footer.ilFooter .ilFooterLogo {
   height: 35px;
-}
-footer.ilFooter div.ilPermalinkContainer {
-  margin: 0px;
-  display: inline;
-}
-footer.ilFooter div.ilPermalinkContainer .small {
-  font-size: 70%;
-}
-footer.ilFooter div.ilPermalinkContainer .il_adv_sel {
-  font-size: 100%;
-}
-footer.ilFooter div.ilPermalinkContainer #current_perma_link {
-  color: #434343;
-  width: 100px;
-  height: 20px;
-  font-size: 90%;
-  float: right;
-  margin-left: 3px;
-  background-color: white;
-}
-footer.ilFooter div.ilPermalinkContainer #current_perma_link + .btn-group {
-  vertical-align: top;
-}
-footer.ilFooter div.ilPermalinkContainer a {
-  font-size: 1em;
 }
 footer.ilFooter .ilFooterDevmode {
   clear: both;
@@ -17206,4 +17179,3 @@ table.mceToolbar td {
   border: 1px solid #ddd;
   border-radius: 0.25em;
 }
-/*# sourceMappingURL=delos.css.map */

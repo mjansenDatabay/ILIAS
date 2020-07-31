@@ -1,12 +1,4 @@
 <!-- fau: ownFooter - new footer layout. -->
-<div class="ilFooterContainer right">
-    <!-- BEGIN items -->
-    <a href="{URL_ITEM}"<!-- BEGIN blank --> target="_blank"<!-- END blank -->>{TXT_ITEM}</a>
-    <!-- BEGIN item_separator --> | <!-- END item_separator -->
-    <!-- END items -->
-    <!-- BEGIN perma_link --> | {PRMLINK}<!-- END perma_link -->
-</div>
-
 <div class="ilFooterContainer">
     <img class="ilFooterLogo" src="{FAU_LOGO}" alt="FAU Logo" />
     <!-- BEGIN financed -->
@@ -23,13 +15,21 @@
 </div>
 
 
-<div class="ilFooterContainer info">
+<div class="ilFooterContainer ilFooterContainerInfo">
     <!-- BEGIN ilias_version -->
     <a href="http://www.ilias.de">{TXT_REALISED_WITH} {ILIAS_VERSION_NUMERIC}</a><br />
     <!-- END ilias_version -->
     {TXT_SERVER} {SERVER_NAME}<br />
     {TXT_ACTIVE_USERS} {USERS_ONLINE}<br />
     {TXT_HOTLINE}
+</div>
+
+<div class="ilFooterContainer ilFooterContainerPerma">
+    <!-- BEGIN items -->
+    <a href="{URL_ITEM}"<!-- BEGIN blank --> target="_blank"<!-- END blank -->>{TXT_ITEM}</a>
+    <!-- BEGIN item_separator --> | <!-- END item_separator -->
+    <!-- END items -->
+    <!-- BEGIN perma_link --><br />{PRMLINK}<!-- END perma_link -->
 </div>
 
 <!-- BEGIN dev_bl -->
