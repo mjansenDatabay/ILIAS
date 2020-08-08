@@ -146,6 +146,8 @@ common#:#docorder_err_wrong_request#:#This request has not been found!
 common#:#dummy_user_email_mycampus#:#noreply@fim.uni-erlangen.de
 common#:#dummy_user_firstname_mycampus#:#mein campus
 common#:#dummy_user_lastname_mycampus#:#Course registration
+common#:#dummy_admin_firstname_tca#:#TCA
+common#:#dummy_admin_lastname_tca#:#Course adminstrator
 common#:#duration#:#Duration
 common#:#err_inactive_contact#:#Please contact <a href="mailto:studon@fau.de">studon@fau.de</a> to get your account activated.
 common#:#err_inactive_sso#:#Please use the <a href="saml_login.php">Single Sign-On</a> with your FAU account, to log into StudOn.

@@ -144,6 +144,8 @@ common#:#docorder_err_no_write_access#:#Sie haben kein Schreibrecht im StudOn-Ku
 common#:#docorder_err_wrong_request#:#Diese Anfrage wurde nicht erkannt!
 common#:#dummy_user_firstname_mycampus#:#mein campus
 common#:#dummy_user_lastname_mycampus#:#Kursanmeldung
+common#:#dummy_admin_firstname_tca#:#TCA
+common#:#dummy_admin_lastname_tca#:#Kursadminstrator
 common#:#duration#:#Dauer
 common#:#err_inactive_contact#:#Bitte wenden Sie sich an <a href="mailto:studon@fau.de">studon@fau.de</a>, um das Benutzerkonto aktivieren zu lassen.
 common#:#err_inactive_sso#:#Bitte verwenden Sie das <a href="saml_login.php">Single Sign-On</a> mit Ihrer FAU-Benutzerkennung, um sich bei StudOn anzumelden.

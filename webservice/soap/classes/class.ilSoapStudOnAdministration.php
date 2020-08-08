@@ -423,6 +423,292 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
     }
 
 
+    public function studonCopyCourse($sid, $sourceRefId, $targetRefId, $typesToLink=[]) {
+
+        $this->initAuth($sid);
+        $this->initIlias();
+
+        global $DIC;
+
+        /** @var ilObjectDefinition $objDefinition */
+        $objDefinition = $DIC['objDefinition'];
+        $rbacsystem = $DIC->rbac()->system();
+        $access = $DIC->access();
+        $tree = $DIC->repositoryTree();
+
+
+        // basic check of arguments
+        if (!$this->__checkSession($sid)) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+
+        // does source object exist
+        if (!$source_object_type = ilObject::_lookupType($sourceRefId, true)) {
+            return $this->__raiseError('No valid source given.', 'Client');
+        }
+
+        // does target object exist
+        if (!$target_object_type = ilObject::_lookupType($targetRefId, true)) {
+            return $this->__raiseError('No valid target given.', 'Client');
+        }
+
+        // check the source type
+        $allowed_source_types = array('crs');
+        if (!in_array($source_object_type, $allowed_source_types)) {
+            return $this->__raiseError('No valid source type. Source must be reference id of a course', 'Client');
+        }
+
+        // check the target type
+        $allowed_target_types = array('cat');
+        if (!in_array($target_object_type, $allowed_target_types)) {
+            return $this->__raiseError('No valid target type. Target must be reference id of a category', 'Client');
+        }
+
+        // checking copy permissions
+        if (!$rbacsystem->checkAccess('copy', $sourceRefId)) {
+            return $this->__raiseError("Missing copy permissions for object with reference id " . $sourceRefId, 'Client');
+        }
+
+        // check if user can create objects of this type in the target
+        if (!$rbacsystem->checkAccess('create', $targetRefId, $target_object_type)) {
+            return $this->__raiseError('No permission to create objects of type ' . $target_object_type . '!', 'Client');
+        }
+
+        // prepare the copy options for all sub objects
+        $options = array();
+        $nodedata = $tree->getNodeData($sourceRefId);
+        $nodearray = $tree->getSubTree($nodedata);
+        foreach ($nodearray as $node) {
+            if (in_array($node['type'], $typesToLink)) {
+
+                // check linking of sub object
+                if (!$objDefinition->allowLink($node['type'])) {
+                    return $this->__raiseError("Link for object " . $node['ref_id'] . " of type " . $node['type'] . " is not supported", 'Client');
+                }
+                if (!$access->checkAccess('write', '', $node['ref_id'])) {
+                    return $this->__raiseError("Missing write permissions for object with reference id " .  $node['ref_id'], 'Client');
+                }
+                $options[$node['ref_id']] = array("type" => ilCopyWizardOptions::COPY_WIZARD_LINK);
+            }
+            else {
+
+                // check copy of sub object
+                if (!$objDefinition->allowCopy($node['type'])) {
+                    return $this->__raiseError("Copy for object " . $node['ref_id'] . " of type " . $node['type'] . " is not supported", 'Client');
+                }
+                if (!$access->checkAccess('copy', '', $node['ref_id'])) {
+                    return $this->__raiseError("Missing copy permissions for object with reference id " .  $node['ref_id'], 'Client');
+                }
+                $options[$node['ref_id']] = array("type" => ilCopyWizardOptions::COPY_WIZARD_COPY);
+            }
+        }
+
+        // get client id from sid
+        $clientid = substr($sid, strpos($sid, "::") + 2);
+        $sessionid = str_replace("::" . $clientid, "", $sid);
+
+        // call container clone
+        try {
+            $source_object = ilObjectFactory::getInstanceByRefId($sourceRefId);
+            $ret = $source_object->cloneAllObject(
+                $sessionid,
+                $clientid,
+                $source_object_type,
+                $targetRefId,
+                $sourceRefId,
+                $options,
+                true
+            );
+            return $ret['ref_id'];
+        }
+        catch (Exception $e) {
+            return $this->__raiseError($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function studonSetCourseProperties($sid, $refId,
+        $title = null, $description = null, $online = null,
+        $courseStart = null, $courseEnd = null,
+        $activationStart = null, $activationEnd = null) {
+
+        $this->initAuth($sid);
+        $this->initIlias();
+
+        global $DIC;
+        $access = $DIC->access();
+
+        // basic check of arguments
+        if (!$this->__checkSession($sid)) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+
+        // does source object exist
+        if (!$source_object_type = ilObject::_lookupType($refId, true)) {
+            return $this->__raiseError('No valid source given.', 'Client');
+        }
+
+        // check the source type
+        $allowed_source_types = array('crs');
+        if (!in_array($source_object_type, $allowed_source_types)) {
+            return $this->__raiseError('No valid source type. Source must be reference id of a course', 'Client');
+        }
+
+        // checking write permissions
+        if (!$access->checkAccess('write', '', $refId)) {
+            return $this->__raiseError("Missing write permissions for object with reference id " . $refId, 'Client');
+        }
+
+        try {
+            /** @var ilObjCourse $course */
+            $course = ilObjectFactory::getInstanceByRefId($refId);
+
+            if (isset($title)) {
+                $course->setTitle($title);
+            }
+            if (isset($description)) {
+                $course->setDescription($description);
+            }
+            if (isset($online)) {
+                $course->setOfflineStatus(!$online);
+            }
+            if (!empty($courseStart)) {
+                $course->setCourseStart(new ilDate((int) $courseStart, IL_CAL_UNIX));
+            }
+            if (!empty($courseEnd)) {
+                $course->setCourseEnd(new ilDate((int) $courseEnd, IL_CAL_UNIX));
+            }
+            if (isset($activationStart)) {
+                $course->setActivationStart($activationStart);
+            }
+            if (isset($activationEnd)) {
+                $course->setActivationEnd($activationEnd);
+            }
+
+            $course->update();
+            return true;
+        }
+        catch (Exception $e) {
+            return $this->__raiseError($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function studonAddCourseAdminsByIdentity($sid, $refId, $admins = []) {
+        $this->initAuth($sid);
+        $this->initIlias();
+
+        global $DIC;
+        $access = $DIC->access();
+        $lng = $DIC->language();
+        $settings = $DIC->settings();
+
+        // basic check of arguments
+        if (!$this->__checkSession($sid)) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+
+        // does source object exist
+        if (!$source_object_type = ilObject::_lookupType($refId, true)) {
+            return $this->__raiseError('No valid source given.', 'Client');
+        }
+
+        // check the source type
+        $allowed_source_types = array('crs');
+        if (!in_array($source_object_type, $allowed_source_types)) {
+            return $this->__raiseError('No valid source type. Source must be reference id of a course', 'Client');
+        }
+
+        // checking edit permissions permissions
+        if (!$access->checkAccess('edit_permission', '', $refId)) {
+            return $this->__raiseError("Missing edit permissions for object with reference id " . $refId, 'Client');
+        }
+
+        try {
+            $course_members = ilCourseParticipants::_getInstanceByObjId(ilObject::_lookupObjId($refId));
+            foreach ($admins as $identity) {
+                $user_id = ilObjUser::_findUserIdByAccount($identity);
+                if (!$user_id) {
+                    $user_id = ilUserUtil::_createDummyAccount(
+                        $identity,
+                        $lng->txt('dummy_admin_firstname_tca'),
+                        $lng->txt('dummy_admin_lastname_tca'),
+                        $settings->get('mail_external_sender_noreply')
+                    );
+                }
+                $course_members->add($user_id, IL_CRS_ADMIN);
+                $course_members->updateNotification($user_id, true);
+                $course_members->updateContact($user_id, true);
+
+                // remove the soap admin from contacts
+                $course_members->updateContact($DIC->user()->getId(), false);
+            }
+            return true;
+        }
+        catch (Exception $e) {
+            return $this->__raiseError($e->getMessage(), $e->getCode());
+        }
+
+    }
+
+    public function studonEnableLtiConsumer($sid, $refId, $consumerId,
+        $adminRole = 'admin', $instructorRole = 'tutor', $memberRole = 'member') {
+
+        $this->initAuth($sid);
+        $this->initIlias();
+
+        global $DIC;
+        $access = $DIC->access();
+
+        // basic check of arguments
+        if (!$this->__checkSession($sid)) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+
+        // does source object exist
+        if (!$source_object_type = ilObject::_lookupType($refId, true)) {
+            return $this->__raiseError('No valid source given.', 'Client');
+        }
+
+        // check the source type
+        $allowed_source_types = array('crs');
+        if (!in_array($source_object_type, $allowed_source_types)) {
+            return $this->__raiseError('No valid source type. Source must be reference id of a course', 'Client');
+        }
+
+        // checking edit permissions permissions
+        if (!$access->checkAccess('edit_permission', '', $refId)) {
+            return $this->__raiseError("Missing edit permissions for object with reference id " . $refId, 'Client');
+        }
+
+        try {
+            $connector = new ilLTIDataConnector();
+            $consumer = ilLTIToolConsumer::fromGlobalSettingsAndRefId($consumerId, $refId, $connector);
+
+            if (!$consumer->getEnabled()) {
+                $consumer->setExtConsumerId($consumerId);
+                $consumer->createSecret();
+                $consumer->setRefId($refId);
+                $consumer->setEnabled(true);
+                $consumer->saveLTI($connector);
+            }
+
+            $object_info = new ilLTIProviderObjectSetting($refId, $consumerId);
+            $object_info->setAdminRole($adminRole);
+            $object_info->setTutorRole($instructorRole);
+            $object_info->setMemberRole($memberRole);
+            $object_info->save();
+
+
+            return [
+                'consumerKey' => $consumer->getKey(),
+                'consumerSecret' => $consumer->getSecret()
+            ];
+        }
+        catch (Exception $e) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+    }
+
+
     /**
     *  check the admin permission via SOAP
     *

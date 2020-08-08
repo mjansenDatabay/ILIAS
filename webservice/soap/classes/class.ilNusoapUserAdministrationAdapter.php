@@ -1516,7 +1516,7 @@ class ilNusoapUserAdministrationAdapter
         
 
 
-        // fim: [soap] add new soap dunctions for meinCampus
+        // fim: [soap] add new soap functions for meinCampus
         $this->server->wsdl->addComplexType(
             'studonResource',
             'complexType',
@@ -1630,6 +1630,101 @@ class ilNusoapUserAdministrationAdapter
             SERVICE_USE,
             'studonExcludeMember(): excludes a user from a course or group by given univis_id'
         );
+
+
+        $this->server->wsdl->addComplexType(
+            'studonLtiCredentials',
+            'complexType',
+            'struct',
+            'all',
+            '',
+            array('consumerKey' => array('name' => 'consumerKey',
+                                       'type' => 'xsd:string'),
+                  'consumerSecret' => array('name' => 'consumerSecret',
+                                        'type' => 'xsd:string'))
+        );
+
+
+        $this->server->register(
+            'studonCopyCourse',
+            array('sid' => 'xsd:string', 'sourceRefId' => 'xsd:int', 'targetRefId' => 'xsd:int',
+                'typesToLink' => 'tns:stringArray'),
+            array('result' => 'xsd:int'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#studonCopyCourse',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'studonCopyCourse(): copies a course;
+                sid: session id;
+                sourceRefId: ref_id of the course to be copied;
+                targetRefId: ref_id of the place where copied course should be added;
+                typesToLink: types of course contents which should be linked instead of copied;
+                returns the ref_id of the copied course
+            '
+        );
+
+        $this->server->register(
+            'studonSetCourseProperties',
+            array('sid' => 'xsd:string', 'refId' => 'xsd:int',
+                  'title' => 'xsd:string', 'description' => 'xsd:string', 'online'=> 'xsd:boolean',
+                  'courseStart' => 'xsd:int', 'courseEnd' => 'xsd:int',
+                  'activationStart' => 'xsd:int', 'activationEnd' => 'xsd:int'),
+            array('result' => 'xsd:boolean'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#studonSetCourseProperties',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'studonCopyCourse(): sets the basic properties of a course;
+                sid: session id;
+                refId: ref_id of the course to be changed;
+                title: new course title;
+                description: new course description (shown below the title);
+                online: course should be visible to the members;
+                courseStart: new course start (unix timestamp, only day will be used);
+                courseEnd: new course end (unix timestamp, only day will be used);
+                activationStart: new start of availability (unix timestamp);
+                activationEnd: new end of availability (unix timestamp);
+                returns true in case of success
+            '
+        );
+
+        $this->server->register(
+            'studonAddCourseAdminsByIdentity',
+            array('sid' => 'xsd:string', 'refId' => 'xsd:int',
+                  'admins' => 'tns:stringArray'),
+            array('result' => 'xsd:boolean'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#studonAddCourseAdminsByIdentity',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'studonCopyCourse(): copies a course;
+                sid: session id;
+                refId: ref_id of the course;
+                admins: idm identities of users that should be added as course admins;
+                returns true in case of success
+            '
+        );
+
+        $this->server->register(
+            'studonEnableLtiConsumer',
+            array('sid' => 'xsd:string', 'refId' => 'xsd:int',
+                  'adminRole' => 'xsd:string', 'instructorRole' => 'xsd:string',  'memberRole' => 'xsd:string'),
+            array('result' => 'tns:studonLtiCredentials'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#studonEnableLtiConsumer',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'studonCopyCourse(): copies a course;
+                sid: session id;
+                refId: ref_id of the course; 
+                adminRole: studon course role of lti admins (admin|tutor|member);
+                instructorRole: studon course role of lti instructors (admin|tutor|member);
+                memberRole: studon course role of lti members (admin|tutor|member);
+                returns: lti credentials [consumerKey, consumerSecret]
+            '
+        );
+
+
         // fim.
 
                                     
