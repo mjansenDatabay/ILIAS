@@ -522,7 +522,7 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
             return $ret['ref_id'];
         }
         catch (Exception $e) {
-            return $this->__raiseError($e->getMessage(), $e->getCode());
+            return $this->__raiseError($e->getMessage(), $this->__getMessageCode());
         }
     }
 
@@ -588,7 +588,7 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
             return true;
         }
         catch (Exception $e) {
-            return $this->__raiseError($e->getMessage(), $e->getCode());
+            return $this->__raiseError($e->getMessage(), $this->__getMessageCode());
         }
     }
 
@@ -644,7 +644,7 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
             return true;
         }
         catch (Exception $e) {
-            return $this->__raiseError($e->getMessage(), $e->getCode());
+            return $this->__raiseError($e->getMessage(), $this->__getMessageCode());
         }
 
     }
@@ -690,6 +690,8 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
                 $consumer->setEnabled(true);
                 $consumer->saveLTI($connector);
             }
+            // needed to set the consumer key
+            $connector->loadToolConsumer($consumer);
 
             $object_info = new ilLTIProviderObjectSetting($refId, $consumerId);
             $object_info->setAdminRole($adminRole);
@@ -704,7 +706,7 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
             ];
         }
         catch (Exception $e) {
-            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+            return $this->__raiseError($e->getMessage(), $this->__getMessageCode());
         }
     }
 

@@ -1707,7 +1707,7 @@ class ilNusoapUserAdministrationAdapter
 
         $this->server->register(
             'studonEnableLtiConsumer',
-            array('sid' => 'xsd:string', 'refId' => 'xsd:int',
+            array('sid' => 'xsd:string', 'refId' => 'xsd:int', 'consumerId' => 'xsd:int',
                   'adminRole' => 'xsd:string', 'instructorRole' => 'xsd:string',  'memberRole' => 'xsd:string'),
             array('result' => 'tns:studonLtiCredentials'),
             SERVICE_NAMESPACE,
@@ -1717,6 +1717,7 @@ class ilNusoapUserAdministrationAdapter
             'studonCopyCourse(): copies a course;
                 sid: session id;
                 refId: ref_id of the course; 
+                consumerId: id of the lti consumer configuration in studon
                 adminRole: studon course role of lti admins (admin|tutor|member);
                 instructorRole: studon course role of lti instructors (admin|tutor|member);
                 memberRole: studon course role of lti members (admin|tutor|member);
