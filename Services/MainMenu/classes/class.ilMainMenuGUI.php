@@ -268,6 +268,7 @@ class ilMainMenuGUI
             $this->tpl->setVariable("HEADER_URL", $this->getHeaderURL());
             $this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
             $this->tpl->setVariable("HEADER_ICON_RESPONSIVE", ilUtil::getImagePath("HeaderIconResponsive.svg"));
+            $this->tpl->setVariable("LOGO_TITLE", $lng->txt("logo"));
 
             // #15759
             $header_top_title = ilObjSystemFolder::_getHeaderTitle();
@@ -434,6 +435,7 @@ class ilMainMenuGUI
             // fau.
             $this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
             $this->tpl->setVariable("HEADER_ICON_RESPONSIVE", ilUtil::getImagePath("HeaderIconResponsive.svg"));
+            $this->tpl->setVariable("LOGO_TITLE", $lng->txt("logo"));
         }
 
         // fau: pageLayout - don't show links in reduced mode
@@ -819,8 +821,8 @@ class ilMainMenuGUI
                 $element_id,
                 ilHelp::getMainMenuTooltip($help_id),
                 "",
-                "top center",
-                "bottom center",
+                "top right",
+                "top left",
                 false
             );
         }

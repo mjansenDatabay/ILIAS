@@ -1054,7 +1054,8 @@ class ilInfoScreenGUI
                 }
                 $tpl->setVariable("TCLASS", $this->getTableClass());
                 $tpl->setVariable("TXT_SECTION", $this->section[$i]["title"]);
-                $tpl->touchBlock("row");
+                $tpl->setCurrentBlock("row");
+                $tpl->parseCurrentBlock();
             }
         }
 
@@ -1442,6 +1443,9 @@ class ilInfoScreenGUI
             return;
         }
         $obj = $this->gui_object->object;
+        if ($obj->getRefId() <= 0) {
+            return;
+        }
 
         $conditions = ilConditionHandler::_getEffectiveConditionsOfTarget($obj->getRefId(), $obj->getId());
 

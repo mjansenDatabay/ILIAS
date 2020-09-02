@@ -1316,6 +1316,8 @@ class ilObjFile extends ilObject2
 
         $file = $this->getDirectory($this->getVersion()) . "/" . $a_filename;
 
+        $file = ilFileUtils::getValidFilename($file);
+
         ilFileUtils::rename($a_upload_file, $file);
 
         // create preview
@@ -1570,6 +1572,19 @@ class ilObjFile extends ilObject2
         if (empty($data[2])) {
             $data[2] = "1";
         }
+
+// BEGIN bugfix #27391
+        if (sizeof($data) > 3)
+        {
+          $last = sizeof($data) - 1;
+          for ($n = 1; $n < $last - 1; $n++)
+          {
+            $data[0] .= "," . $data[$n];
+          }
+          $data[1] = $data[$last - 1];
+          $data[2] = $data[$last];
+        }
+// END bugfix #27391
 
         $result = array(
             "filename" => $data[0],

@@ -107,14 +107,13 @@ class ilAuthProviderFactory
                 return new ilAuthProviderECS($credentials);
 
             case AUTH_SAML:
-                $saml_info = explode('_', $a_authmode);
                 $this->getLogger()->debug('Using apache authentication.');
 // fau: samlAuth - user StudOn Auth provider
                 require_once 'Services/Saml/classes/class.ilAuthProviderSamlStudOn.php';
                 require_once 'Services/Saml/classes/class.ilSamlIdp.php';
-                return new ilAuthProviderSamlStudOn($credentials, ilSamlIdp::getIdpIdByAuthMode($saml_info[1]));
+                return new ilAuthProviderSamlStudOn($credentials, ilSamlIdp::getIdpIdByAuthMode($a_authmode));
 // fau.
-                
+
             case AUTH_OPENID_CONNECT:
                 $this->getLogger()->debug('Using openid connect authentication.');
                 return new ilAuthProviderOpenIdConnect($credentials);

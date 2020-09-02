@@ -112,8 +112,7 @@ class ilTestParticipantsTimeExtensionGUI
         $participantList = $participantList->getAccessFilteredList(
             ilTestParticipantAccessFilter::getManageParticipantsUserFilter($this->getTestObj()->getRefId())
         );
-        
-        $times = $this->getTestObj()->getStartingTimeOfParticipants();
+
         $addons = $this->getTestObj()->getTimeExtensionsOfParticipants();
         
         $tableData = array();
@@ -124,10 +123,11 @@ class ilTestParticipantsTimeExtensionGUI
             }
             // fau.
             $tblRow = array();
-            
-            if ($times[$participant->getActiveId()]) {
+
+            $time = $this->getTestObj()->getStartingTimeOfUser($participant->getActiveId());
+            if ($time) {
                 $started = $DIC->language()->txt('tst_started') . ': ' . ilDatePresentation::formatDate(
-                    new ilDateTime($times[$participant->getActiveId()], IL_CAL_DATETIME)
+                    new ilDateTime($time, IL_CAL_UNIX)
                 );
                 
                 $tblRow['started'] = $started;
@@ -188,7 +188,6 @@ class ilTestParticipantsTimeExtensionGUI
             ilTestParticipantAccessFilter::getManageParticipantsUserFilter($this->getTestObj()->getRefId())
         );
         
-        $times = $this->getTestObj()->getStartingTimeOfParticipants();
         $addons = $this->getTestObj()->getTimeExtensionsOfParticipants();
         
         $participantslist = new ilSelectInputGUI($DIC->language()->txt('participants'), "participant");
@@ -206,9 +205,10 @@ class ilTestParticipantsTimeExtensionGUI
             } else {
                 $name = $participant->getLastname() . ', ' . $participant->getFirstname();
             }
-            
-            if ($times[$participant->getActiveId()]) {
-                $started = ", " . $DIC->language()->txt('tst_started') . ': ' . ilDatePresentation::formatDate(new ilDateTime($times[$participant->getActiveId()], IL_CAL_DATETIME));
+
+            $time = $this->getTestObj()->getStartingTimeOfUser($participant->getActiveId());
+            if ($time) {
+                $started = ", " . $DIC->language()->txt('tst_started') . ': ' . ilDatePresentation::formatDate(new ilDateTime($time, IL_CAL_UNIX));
             }
             
             if ($addons[$participant->getActiveId()] > 0) {

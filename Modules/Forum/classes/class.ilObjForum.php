@@ -574,7 +574,9 @@ class ilObjForum extends ilObject
                 $newThread,
                 ilForum::_lookupPostMessage($old_post_id),
                 $old_post['notify'],
-                0
+                0,
+                1,
+                false
             );
 
             // fau: copyForumSorting - clone the sorting of sticky threads in the forum

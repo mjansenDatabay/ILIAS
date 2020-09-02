@@ -339,7 +339,7 @@ il.TestPlayerQuestionEditControl = new function() {
      * @param jqXHR
      */
     function detectBackgroundChangesFailure(jqXHR) {
-        $('#autosavemessage').text(jqXHR.responseText)
+        $('#autosavemessage').text(jqXHR.responseText || ('Autosave error: ' + jqXHR.statusText))
             .fadeIn(500, function(){
                 $('#autosavemessage').fadeOut(5000)
             });
@@ -704,7 +704,7 @@ il.TestPlayerQuestionEditControl = new function() {
      */
     function autoSaveFailure(jqXHR) {
 
-        $('#autosavemessage').text(jqXHR.responseText)
+        $('#autosavemessage').text(jqXHR.responseText || ('Autosave error: ' + jqXHR.statusText))
             .fadeIn(500, function(){
                 $('#autosavemessage').fadeOut(5000)
         });

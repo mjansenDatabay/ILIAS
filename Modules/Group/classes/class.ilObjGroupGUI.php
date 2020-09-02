@@ -868,8 +868,8 @@ class ilObjGroupGUI extends ilContainerGUI
         $this->updateObject();
     }
     // fau.
-    
-    
+
+
     /**
     * Edit Map Settings
     */
@@ -1752,7 +1752,7 @@ class ilObjGroupGUI extends ilContainerGUI
         
         // title/description
         $this->initFormTitleDescription($form);
-        
+
         // fim: [univis] make univis id editable for global admins
         global $rbacsystem;
         if ($rbacsystem->checkAccess("visible,read", SYSTEM_FOLDER_ID)) {
@@ -1764,7 +1764,7 @@ class ilObjGroupGUI extends ilContainerGUI
             $form->addItem($import);
         }
         // fim.
-        
+
         $form = $this->initDidacticTemplate($form);
 
         // fim: [rights] show info about rights of group admins
@@ -1773,7 +1773,7 @@ class ilObjGroupGUI extends ilContainerGUI
             $grp_type->setInfo($this->lng->txt('grp_type_info_' . $a_mode));
         }
         // fim.
-        
+
         if ($a_mode == 'edit') {
             // group period
             include_once 'Services/Form/classes/class.ilDateDurationInputGUI.php';
@@ -1839,19 +1839,17 @@ class ilObjGroupGUI extends ilContainerGUI
             $reg_type->addOption($opt_deact);
 
             // fim: [memfix] customize use of registration codes
-
             if (ilCust::get('grp_enable_reg_codes')) {
-                // Registration codes
-                $reg_code = new ilCheckboxInputGUI($this->lng->txt('grp_reg_code'), 'reg_code_enabled');
-                $reg_code->setChecked($this->object->isRegistrationAccessCodeEnabled());
-                $reg_code->setValue(1);
-                $reg_code->setInfo($this->lng->txt('grp_reg_code_enabled_info'));
+            // Registration codes
+            $reg_code = new ilCheckboxInputGUI($this->lng->txt('grp_reg_code'), 'reg_code_enabled');
+            $reg_code->setChecked($this->object->isRegistrationAccessCodeEnabled());
+            $reg_code->setValue(1);
+            $reg_code->setInfo($this->lng->txt('grp_reg_code_enabled_info'));
             }
             // fim.
             $form->addItem($reg_type);
 
             // fim: [memfix] customize use of registration codes
-
             if (ilCust::get('grp_enable_reg_codes')) {
                 // Registration codes
                 if (!$this->object->getRegistrationAccessCode()) {
@@ -1865,7 +1863,7 @@ class ilObjGroupGUI extends ilContainerGUI
                 $link = new ilCustomInputGUI($this->lng->txt('grp_reg_code_link'));
                 include_once './Services/Link/classes/class.ilLink.php';
                 $val = ilLink::_getLink($this->object->getRefId(), $this->object->getType(), array(), '_rcode' . $this->object->getRegistrationAccessCode());
-                $link->setHTML('<font class="small">' . $val . '</font>');
+                $link->setHTML('<span class="small">' . $val . '</span>');
                 $reg_code->addSubItem($link);
                 $form->addItem($reg_code);
             }
