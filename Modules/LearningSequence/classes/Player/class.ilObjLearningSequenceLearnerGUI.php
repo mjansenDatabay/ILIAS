@@ -240,6 +240,16 @@ class ilObjLearningSequenceLearnerGUI
         );
         $html = $player->render($_GET, $_POST);
 
+        // fau: lsoManualRefresh - force a reload of the page if the LP status of a content page is toggled
+        // The toggle is processed in \ilContentPageKioskModeView::updateGet() called in the rendering process.
+        // This changes the availabilities of other items which are already loaded in getSequencePlayer() before.
+        // Normally the lp status of the current item is polled by javascript every two seconds and the navigation controls are refreshed.
+        // For performance reasons this is dectivated by this path, so we need to reload the page to see the changes
+        if ($_GET['lsocmd'] == 'toggleManualLearningProgress') {
+            $this->ctrl->redirect($this, self::CMD_VIEW);
+        }
+        // fau.
+
         if ($html === 'EXIT::' . $player::LSO_CMD_SUSPEND) {
             $cmd = self::CMD_STANDARD;
         }
