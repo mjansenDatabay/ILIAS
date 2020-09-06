@@ -76,7 +76,7 @@ class ilLSPlayer
             global $DIC;
 
             if (in_array($current_item_ref_id, $valid_ref_ids)
-                && $DIC->access()->checkAccess('read', '', $current_item->getRefId())) {
+                && $DIC->access()->checkAccess('read', '', $current_item_ref_id)) {
                 list($position, $current_item) = $this->findItemByRefId($current_item_ref_id);
             }
             // fau.
