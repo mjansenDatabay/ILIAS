@@ -592,6 +592,73 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
         }
     }
 
+    public function studonSetCourseInfo($sid, $refId,
+        $importantInformation = null, $syllabus = null, $contactName = null,
+        $contactResponsibility = null, $contactPhone = null,
+        $contactEmail = null, $contactConsultation = null) {
+
+        $this->initAuth($sid);
+        $this->initIlias();
+
+        global $DIC;
+        $access = $DIC->access();
+
+        // basic check of arguments
+        if (!$this->__checkSession($sid)) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+
+        // does source object exist
+        if (!$source_object_type = ilObject::_lookupType($refId, true)) {
+            return $this->__raiseError('No valid source given.', 'Client');
+        }
+
+        // check the source type
+        $allowed_source_types = array('crs');
+        if (!in_array($source_object_type, $allowed_source_types)) {
+            return $this->__raiseError('No valid source type. Source must be reference id of a course', 'Client');
+        }
+
+        // checking write permissions
+        if (!$access->checkAccess('write', '', $refId)) {
+            return $this->__raiseError("Missing write permissions for object with reference id " . $refId, 'Client');
+        }
+
+        try {
+            /** @var ilObjCourse $course */
+            $course = ilObjectFactory::getInstanceByRefId($refId);
+
+            if (isset($importantInformation)) {
+                $course->setImportantInformation($importantInformation);
+            }
+            if (isset($syllabus)) {
+                $course->setSyllabus($syllabus);
+            }
+            if (isset($contactName)) {
+                $course->setContactName($contactName);
+            }
+            if (isset($contactResponsibility)) {
+                $course->setContactResponsibility($contactResponsibility);
+            }
+            if (isset($contactPhone)) {
+                $course->setContactPhone($contactPhone);
+            }
+            if (isset($contactEmail)) {
+                $course->setContactEmail($contactEmail);
+            }
+            if (isset($contactConsultation)) {
+                $course->setContactConsultation($contactConsultation);
+            }
+
+            $course->update();
+            return true;
+        }
+        catch (Exception $e) {
+            return $this->__raiseError($e->getMessage(), $this->__getMessageCode());
+        }
+    }
+
+
     public function studonAddCourseAdminsByIdentity($sid, $refId, $admins = []) {
         $this->initAuth($sid);
         $this->initIlias();
@@ -648,6 +715,85 @@ class ilSoapStudOnAdministration extends ilSoapAdministration
         }
 
     }
+
+    public function studonSetCourseAdminsByIdentity($sid, $refId, $admins = []) {
+        $this->initAuth($sid);
+        $this->initIlias();
+
+        global $DIC;
+        $access = $DIC->access();
+        $lng = $DIC->language();
+        $settings = $DIC->settings();
+
+        // basic check of arguments
+        if (!$this->__checkSession($sid)) {
+            return $this->__raiseError($this->__getMessage(), $this->__getMessageCode());
+        }
+
+        // does source object exist
+        if (!$source_object_type = ilObject::_lookupType($refId, true)) {
+            return $this->__raiseError('No valid source given.', 'Client');
+        }
+
+        // check the source type
+        $allowed_source_types = array('crs');
+        if (!in_array($source_object_type, $allowed_source_types)) {
+            return $this->__raiseError('No valid source type. Source must be reference id of a course', 'Client');
+        }
+
+        // checking edit permissions permissions
+        if (!$access->checkAccess('edit_permission', '', $refId)) {
+            return $this->__raiseError("Missing edit permissions for object with reference id " . $refId, 'Client');
+        }
+
+        try {
+            $course_members = ilCourseParticipants::_getInstanceByObjId(ilObject::_lookupObjId($refId));
+            $old_admin_ids = $course_members->getAdmins();
+            $new_admin_ids = [];
+
+            // get the users ids of thre new admins
+            foreach ($admins as $identity) {
+                $user_id = ilObjUser::_findUserIdByAccount($identity);
+                if (!$user_id) {
+                    $user_id = ilUserUtil::_createDummyAccount(
+                        $identity,
+                        $lng->txt('dummy_admin_firstname_tca'),
+                        $lng->txt('dummy_admin_lastname_tca'),
+                        $settings->get('mail_external_sender_noreply')
+                    );
+                }
+                $new_admin_ids[] = $user_id;
+            }
+
+            // keep at least the soap administrator as course admin
+            if (empty($new_admin_ids)) {
+                $new_admin_ids[] = $DIC->user()->getId();
+            }
+
+            // remove old admins if they are not longer on the list
+            foreach ($old_admin_ids as $admin_id) {
+                if (!in_array($admin_id, $new_admin_ids)) {
+                    $course_members->delete($admin_id);
+                }
+            }
+
+            // add new admins if they are not yet in course
+            foreach ($new_admin_ids as $admin_id) {
+                if (!in_array($admin_id, $old_admin_ids)) {
+                    $course_members->add($admin_id, IL_CRS_ADMIN);
+                    $course_members->updateNotification($admin_id, true);
+                    $course_members->updateContact($admin_id, true);
+                }
+            }
+
+            return true;
+        }
+        catch (Exception $e) {
+            return $this->__raiseError($e->getMessage(), $this->__getMessageCode());
+        }
+
+    }
+
 
     public function studonEnableLtiConsumer($sid, $refId, $consumerId,
         $adminRole = 'admin', $instructorRole = 'tutor', $memberRole = 'member') {

@@ -1631,6 +1631,7 @@ class ilNusoapUserAdministrationAdapter
             'studonExcludeMember(): excludes a user from a course or group by given univis_id'
         );
 
+        // functions for TCA
 
         $this->server->wsdl->addComplexType(
             'studonLtiCredentials',
@@ -1654,7 +1655,7 @@ class ilNusoapUserAdministrationAdapter
             SERVICE_NAMESPACE . '#studonCopyCourse',
             SERVICE_STYLE,
             SERVICE_USE,
-            'studonCopyCourse(): copies a course;
+            'studonCopyCourse(): copies a course.
                 sid: session id;
                 sourceRefId: ref_id of the course to be copied;
                 targetRefId: ref_id of the place where copied course should be added;
@@ -1674,7 +1675,7 @@ class ilNusoapUserAdministrationAdapter
             SERVICE_NAMESPACE . '#studonSetCourseProperties',
             SERVICE_STYLE,
             SERVICE_USE,
-            'studonCopyCourse(): sets the basic properties of a course;
+            'studonSetCourseProperties(): sets the basic properties of a course.
                 sid: session id;
                 refId: ref_id of the course to be changed;
                 title: new course title;
@@ -1689,6 +1690,32 @@ class ilNusoapUserAdministrationAdapter
         );
 
         $this->server->register(
+            'studonSetCourseInfo',
+            array('sid' => 'xsd:string', 'refId' => 'xsd:int',
+                  'importantInformation' => 'xsd:string', 'syllabus' => 'xsd:string', 'contactName'=> 'xsd:string',
+                  'contactResponsibility' => 'xsd:string', 'contactPhone' => 'xsd:string',
+                  'contactEmail' => 'xsd:string', 'contactConsultation' => 'xsd:string'),
+            array('result' => 'xsd:boolean'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#studonSetCourseInfo',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'studonSetCourseInfo(): sets the data shown on the info page of a course.
+                sid: session id;
+                refId: ref_id of the course to be changed;
+                importantInformation: important information for course participants;
+                syllabus: description of the course contents, learning ourcomes etc.;
+                contactName: name of the organizational contact person;
+                contactResponsibility: responsibility of the contect person;
+                contactPhone: phone number of the contact person;
+                contactEmail: email address of the contact person;
+                contactConsultation: consultation hours of the contact person;
+                returns true in case of success
+            '
+        );
+
+
+        $this->server->register(
             'studonAddCourseAdminsByIdentity',
             array('sid' => 'xsd:string', 'refId' => 'xsd:int',
                   'admins' => 'tns:stringArray'),
@@ -1697,13 +1724,35 @@ class ilNusoapUserAdministrationAdapter
             SERVICE_NAMESPACE . '#studonAddCourseAdminsByIdentity',
             SERVICE_STYLE,
             SERVICE_USE,
-            'studonCopyCourse(): copies a course;
+            'studonAddCourseAdminsByIdentity(): add course administrators with their idm accounts.
+                Dummy accounts will be created if the users do not yet exist.
+                Existing administrators will be kept.
                 sid: session id;
                 refId: ref_id of the course;
                 admins: idm identities of users that should be added as course admins;
                 returns true in case of success
             '
         );
+
+        $this->server->register(
+            'studonSetCourseAdminsByIdentity',
+            array('sid' => 'xsd:string', 'refId' => 'xsd:int',
+                  'admins' => 'tns:stringArray'),
+            array('result' => 'xsd:boolean'),
+            SERVICE_NAMESPACE,
+            SERVICE_NAMESPACE . '#studonSetCourseAdminsByIdentity',
+            SERVICE_STYLE,
+            SERVICE_USE,
+            'studonSetCourseAdminsByIdentity(): sets course administrators with their idm accounts.
+                Dummy accounts will be created if the users do not yet exist.
+                Existing administrators will be removed if they do not match.
+                sid: session id;
+                refId: ref_id of the course;
+                admins: idm identities of users that should be set as course admins;
+                returns true in case of success
+            '
+        );
+
 
         $this->server->register(
             'studonEnableLtiConsumer',
@@ -1714,7 +1763,7 @@ class ilNusoapUserAdministrationAdapter
             SERVICE_NAMESPACE . '#studonEnableLtiConsumer',
             SERVICE_STYLE,
             SERVICE_USE,
-            'studonCopyCourse(): copies a course;
+            'studonEnableLtiConsumer(): enables an LTI consumer for a course.
                 sid: session id;
                 refId: ref_id of the course; 
                 consumerId: id of the lti consumer configuration in studon
