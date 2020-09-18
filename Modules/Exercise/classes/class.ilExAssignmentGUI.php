@@ -206,19 +206,28 @@ class ilExAssignmentGUI
         $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
 
         if ($state->areInstructionsVisible()) {
+            // fau: exFileSuffixes - Show the allowed suffixes in the exercise instructions
             $inst = $a_ass->getInstruction();
+            $suffixes = $a_ass->getFileSuffixesInfo();
+            if (trim($inst) || $suffixes) {
+                $a_info->addSection($lng->txt("exc_instruction"));
+            }
+
             if (trim($inst)) {
                 // fau: exInstRte - process latex
                 $inst = ilUtil::prepareTextareaOutput($inst, true);
                 // fau.
-                $a_info->addSection($lng->txt("exc_instruction"));
 
                 $is_html = (strlen($inst) != strlen(strip_tags($inst)));
                 if (!$is_html) {
                     $inst = nl2br(ilUtil::makeClickable($inst, true));
                 }
-                $a_info->addProperty("", $inst);
+                $a_info->addProperty(" ", $inst);
             }
+            if ($suffixes) {
+                $a_info->addProperty($lng->txt('exc_file_suffixes'), $suffixes);
+            }
+            // fau.
         }
     }
     

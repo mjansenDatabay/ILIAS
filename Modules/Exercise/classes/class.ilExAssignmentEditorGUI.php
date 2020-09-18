@@ -506,6 +506,17 @@ class ilExAssignmentEditorGUI
             $max_file->setSize(3);
             $max_file->setMinValue(1);
             $max_file_tgl->addSubItem($max_file);
+
+            // fau: exFileSuffixes - add form controls
+            $file_suffixes = new ilTextInputGUI($lng->txt('exc_file_suffixes'), 'file_suffixes');
+            $file_suffixes->setInfo($lng->txt("exc_file_suffixes_info"));
+            $file_suffixes->setMaxLength(250);
+            $form->addItem($file_suffixes);
+
+            $file_suffixes_case = new ilCheckboxInputGUI($lng->txt('exc_file_suffixes_case_checked'), 'file_suffixes_case');
+            $file_suffixes_case->setChecked($this->assignment->getFileSuffixesCase());
+            $file_suffixes->addSubItem($file_suffixes_case);
+            // fau.
         }
 
         // after submission
@@ -799,6 +810,10 @@ class ilExAssignmentEditorGUI
                     ,"max_file" => $a_form->getInput("max_file_tgl")
                         ? $a_form->getInput("max_file")
                         : null
+                    // fau: exFileSuffixes - add file suffixes settings to form result
+                    ,"file_suffixes" => $a_form->getInput('file_suffixes')
+                    ,"file_suffixes_case" => $a_form->getInput('file_suffixes_case')
+                    // fau.
                 );
 
                 if ($a_form->getInput("team_creator") == ilExAssignment::TEAMS_FORMED_BY_TUTOR) {
@@ -906,13 +921,18 @@ class ilExAssignmentEditorGUI
         $a_ass->setDeadline($a_input["deadline"]);
         $a_ass->setExtendedDeadline($a_input["deadline_ext"]);
 
-        // fau: exResTime - set the result tme ffrom the form
+        // fau: exResTime - set the result time from the form
         $a_ass->setResultTime($a_input["result_time"]);
         // fau.
         $a_ass->setDeadlineMode($a_input["deadline_mode"]);
         $a_ass->setRelativeDeadline($a_input["relative_deadline"]);
         
         $a_ass->setMaxFile($a_input["max_file"]);
+        // fau: exFileSuffixes - set the list of allowed file suffixes
+        $a_ass->setFileSuffixesAsList($a_input["file_suffixes"]);
+        $a_ass->setFileSuffixesCase($a_input["file_suffixes_case"]);
+        // fau.
+
         $a_ass->setTeamTutor($a_input["team_creator"]);
 
         //$a_ass->setPortfolioTemplateId($a_input['template_id']);
@@ -1108,6 +1128,11 @@ class ilExAssignmentEditorGUI
                 }
             }
         }
+
+        // fau: exFileSuffixes - set the form value
+        $values['file_suffixes'] = $this->assignment->getFileSuffixesAsList();
+        $values['file_suffixes_case'] = $this->assignment->getFileSuffixesCase();
+        // fau.
                     
         if ($this->assignment->getAssignmentType()->usesTeams()) {
             $values["team_creator"] = $this->assignment->getTeamTutor();

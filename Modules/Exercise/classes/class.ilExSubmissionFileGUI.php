@@ -223,6 +223,12 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         include_once("./Services/Form/classes/class.ilFileWizardInputGUI.php");
         $fi = new ilFileWizardInputGUI($lng->txt("file"), "deliver");
         $fi->setFilenames(array(0 => ''));
+        // fau: exFileSuffixes - set the allowed suffixes in upload form
+        if (!empty($this->assignment->getFileSuffixes())) {
+            $fi->setInfo($lng->txt('exc_file_suffixes'). ': ' . $this->assignment->getFileSuffixesInfo());
+        }
+        // fau.
+
         $fi->setRequired(true);
         $form->addItem($fi);
     
@@ -249,6 +255,11 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
         include_once("./Services/Form/classes/class.ilFileInputGUI.php");
         $fi = new ilFileInputGUI($lng->txt("file"), "deliver");
         $fi->setSuffixes(array("zip"));
+        // fau: exFileSuffixes - show the allowed suffixes for the zip upload
+        if (!empty($this->assignment->getFileSuffixes())) {
+            $fi->setInfo(sprintf($lng->txt('exc_file_suffixes_in_zip'), $this->assignment->getFileSuffixesInfo()));
+        }
+        // fau.
         $fi->setRequired(true);
         $form->addItem($fi);
     
@@ -278,6 +289,25 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
             }
             
             $success = false;
+
+
+            // fau: exFileSuffixes - check uploaded files
+            $wrong_names = [];
+            if (!empty($this->assignment->getFileSuffixes())) {
+                foreach ($_FILES["deliver"]["name"] as $key => $filename) {
+                    $pi = pathinfo($filename);
+                    if (!$this->assignment->checkFileSuffix($pi["extension"])) {
+                        $wrong_names[] = $filename;
+                    }
+                }
+            }
+            if (!empty($wrong_names)) {
+                ilUtil::sendFailure(sprintf($this->lng->txt("exc_wrong_filenames"), implode(', ', $wrong_names)), true);
+                $ilCtrl->redirect($this, "submissionScreen");
+            }
+            // fau.
+
+
             foreach ($_FILES["deliver"]["name"] as $k => $v) {
                 $file = array(
                     "name" => $_FILES["deliver"]["name"][$k],

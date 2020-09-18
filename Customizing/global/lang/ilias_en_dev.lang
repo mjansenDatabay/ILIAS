@@ -612,6 +612,13 @@ exc#:#exc_result_time_not_for_peer_feedback#:#The result availability is not val
 exc#:#exc_result_available_after#:#Result available after
 exc#:#exc_not_attempted#:#Not Submitted
 exc#:#exc_comment_for_learner_info_nosend#:#No Notification is sent. The Feedback will be shown in the units oberview after reaching the result availability.
+exc#:#exc_file_suffixes#:#Allowed filename suffixes
+exc#:#exc_file_suffixes_info#:#Comma separated list of allowed filename suffixes for upload files, e.g. doc, docx
+exc#:#exc_file_suffixes_case_checked#:#Upper/lowercase will be checked
+exc#:#exc_file_suffixes_case_ignored#:#Upper/lowercase will be ignored
+exc#:#exc_file_suffixes_in_zip#:#Allowed filename in the archive: %s
+exc#:#exc_wrong_filenames#:#The following filenames have a wrong suffix: %s
+exc#:#exc_wrong_filenames_in_zip#:#The following filenames in the archive have a wrong suffix: %s
 exercise#:#exc_mark#:#grade/Points
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.

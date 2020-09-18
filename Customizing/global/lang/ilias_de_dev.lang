@@ -572,6 +572,13 @@ exc#:#exc_result_time_not_for_peer_feedback#:#Der Ergebnistermin gilt nicht für
 exc#:#exc_result_available_after#:#Ergebnis verfügbar ab
 exc#:#exc_not_attempted#:#Noch nicht eingereicht
 exc#:#exc_comment_for_learner_info_nosend#:#Es wird keine Benachrichtigung gesendet. Nach Erreichen des Ergebnistermins wird das Feedback in der Übungseinheiten-Übersicht angezeigt.
+exc#:#exc_file_suffixes#:#Erlaubte Dateiendungen
+exc#:#exc_file_suffixes_info#:#Kommagetrennte Liste der erlaubten Endungen für hochgeladenen Dateien, z.B. doc, docx
+exc#:#exc_file_suffixes_case_checked#:#Die Groß-/Kleinschreibung wird beachtet
+exc#:#exc_file_suffixes_case_ignored#:#Die Groß-/Kleinschreibung wird ignoriert
+exc#:#exc_file_suffixes_in_zip#:#Erlaubte Dateiendungen im Archiv: %s
+exc#:#exc_wrong_filenames#:#Die folgenden Dateien haben eine falsche Dateiendung: %s
+exc#:#exc_wrong_filenames_in_zip#:#Die folgenden Dateien im Archiv haben eine falschen Dateiendung: %s
 exercise#:#exc_mark#:#Note/Punkte
 grp#:#crs_grp_info_reg#:#Sie können nur Mitglied in einem der folgenden Kurse werden:
 grp#:#group_req_direct_studycond#:#Direkter Beitritt (sonst Aufnahmeantrag) für folgende Studierende:<p class="small">%s</p>

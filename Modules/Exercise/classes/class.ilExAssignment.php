@@ -103,6 +103,11 @@ class ilExAssignment
     protected $team_tutor = false;
     protected $max_file;
 
+    // fau: exFileSuffixes - variables for allowed suffixes
+    protected $file_suffixes = [];
+    protected $file_suffixes_case = false;
+    // fau.
+
     protected $portfolio_template;
     protected $min_char_limit;
     protected $max_char_limit;
@@ -916,7 +921,7 @@ class ilExAssignment
         }
         $this->max_file = $a_value;
     }
-    
+
     /**
      * Get max number of uploads
      *
@@ -926,6 +931,114 @@ class ilExAssignment
     {
         return $this->max_file;
     }
+
+    // fau: exFileSuffixes - getters and setters and check
+
+    /**
+     * Set the allowed file suffixes
+     * Dots, commas and spaces will be removed
+     * @param string[] $suffixes
+     */
+    public function setFileSuffixes($suffixes)
+    {
+        $this->file_suffixes = [];
+        foreach ((array) $suffixes as $suffix) {
+            $suffix = str_replace(' ', '', $suffix);
+            $suffix = str_replace('.', '', $suffix);
+            $suffix = str_replace(',', '', $suffix);
+            $this->file_suffixes[] = $suffix;
+
+        }
+        $this->file_suffixes = array_unique($this->file_suffixes);
+    }
+
+    /**
+     * Get the allowed file suffixes
+     * @return string[]
+     */
+    public function getFileSuffixes()
+    {
+        return $this->file_suffixes;
+    }
+
+    /**
+     * Set the list of allowed suffixes as a comma separated List
+     * Dots, commas and spaces will be removed
+     * @param string  $list
+     */
+    public function setFileSuffixesAsList($list)
+    {
+        $this->setFileSuffixes(explode(',', $list));
+    }
+
+    /**
+     * Get the list of allowed suffixes as a comma separated List
+     * @return string
+     */
+    public function getFileSuffixesAsList()
+    {
+         return implode(', ', $this->file_suffixes);
+    }
+
+    /**
+     * Set the case sensitivity of the file suffixes
+     * @param boolean $case
+     */
+    public function setFileSuffixesCase($case) {
+        $this->file_suffixes_case = (bool) $case;
+    }
+
+    /**
+     * Get the case sensitivity of the file suffixes
+     * @return boolean
+     */
+    public function getFileSuffixesCase() {
+        return $this->file_suffixes_case;
+    }
+
+    /**
+     * Get the info string for allowed file suffixes
+     * @return string
+     */
+    public function getFileSuffixesInfo()
+    {
+        global $DIC;
+        $lng = $DIC->language();
+
+        if (empty($this->file_suffixes)) {
+            return '';
+        }
+
+        $suffixes = [];
+        foreach ($this->file_suffixes as $suffix) {
+            $suffixes[] = '.' . $suffix;
+        }
+
+        $case = $lng->txt($this->file_suffixes_case ?  'exc_file_suffixes_case_checked' : 'exc_file_suffixes_case_ignored');
+        return  implode(', ', $suffixes) . ' (' . $case . ')';
+    }
+
+
+    /**
+     * Check a file suffix
+     * @param string $suffix
+     * @return boolean
+     */
+    public function checkFileSuffix($suffix) {
+        if ($this->file_suffixes_case) {
+            return in_array($suffix, $this->file_suffixes);
+        }
+        else {
+            foreach ($this->file_suffixes as $allowed) {
+                if (strtolower($suffix) == strtolower($allowed)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    // fau.
+
 
     /**
      * Set portfolio template id
@@ -1005,6 +1118,10 @@ class ilExAssignment
         $this->setFeedbackCron($a_set["fb_cron"]);
         $this->setTeamTutor($a_set["team_tutor"]);
         $this->setMaxFile($a_set["max_file"]);
+        // fau: exFileSuffixes - read the file suffixes from the database
+        $this->setFileSuffixesAsList($a_set["file_suffixes"]);
+        $this->setFileSuffixesCase($a_set["file_suffixes_case"]);
+        // fau.
         $this->setPortfolioTemplateId($a_set["portfolio_template"]);
         $this->setMinCharLimit($a_set["min_char_limit"]);
         $this->setMaxCharLimit($a_set["max_char_limit"]);
@@ -1058,6 +1175,10 @@ class ilExAssignment
             "fb_cron" => array("integer", $this->hasFeedbackCron()),
             "team_tutor" => array("integer", $this->getTeamTutor()),
             "max_file" => array("integer", $this->getMaxFile()),
+            // fau: exFileSuffixes - save the file suffixes in the database
+            "file_suffixes" => array("text", $this->getFileSuffixesAsList()),
+            "file_suffixes_case" => array("integer", $this->getFileSuffixesCase()),
+            // fau.
             "portfolio_template" => array("integer", $this->getPortFolioTemplateId()),
             "min_char_limit" => array("integer", $this->getMinCharLimit()),
             "max_char_limit" => array("integer", $this->getMaxCharLimit()),
@@ -1111,6 +1232,10 @@ class ilExAssignment
             "fb_cron" => array("integer", $this->hasFeedbackCron()),
             "team_tutor" => array("integer", $this->getTeamTutor()),
             "max_file" => array("integer", $this->getMaxFile()),
+            // fau: exFileSuffixes - update the file suffixes in the database
+            "file_suffixes" => array("text", $this->getFileSuffixesAsList()),
+            "file_suffixes_case" => array("integer", $this->getFileSuffixesCase()),
+            // fau.
             "portfolio_template" => array("integer", $this->getPortFolioTemplateId()),
             "min_char_limit" => array("integer", $this->getMinCharLimit()),
             "max_char_limit" => array("integer", $this->getMaxCharLimit()),

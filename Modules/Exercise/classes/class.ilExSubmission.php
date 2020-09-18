@@ -387,7 +387,26 @@ class ilExSubmission
                     ilUtil::sendFailure($lng->txt("exc_upload_error") . " [Zip1]", true);
                 }
             }
-            
+
+            // fau: exFileSuffixes - check zip file contents
+            if ($success) {
+                $wrong_names = [];
+                if (!empty($this->assignment->getFileSuffixes())) {
+                    foreach ($filearray["file"] as $key => $filename) {
+                        $filename = utf8_encode($filename);
+                        $pi = pathinfo($filename);
+                        if (!$this->assignment->checkFileSuffix($pi["extension"])) {
+                            $wrong_names[] = $filename;
+                        }
+                    }
+                }
+                if (!empty($wrong_names)) {
+                    ilUtil::sendFailure(sprintf($lng->txt("exc_wrong_filenames_in_zip"), implode(', ', $wrong_names)), true);
+                    $success = false;
+                }
+            }
+            // fau.
+
             if ($success) {
                 foreach ($filearray["file"] as $key => $filename) {
                     $a_http_post_files["name"] = ilFileUtils::utf8_encode($filename);

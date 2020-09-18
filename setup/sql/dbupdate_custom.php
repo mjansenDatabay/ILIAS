@@ -1204,3 +1204,29 @@ $ilDB->manipulate($query);
 $query = "UPDATE usr_study set degree_id = NULL WHERE degree_id = 0";
 $ilDB->manipulate($query);
 ?>
+<#72>
+<?php
+/**
+ * fau: exFileSuffixes - add the file_suffixes column to db
+ */
+if (!$ilDB->tableColumnExists('exc_assignment', 'file_suffixes')) {
+    $ilDB->addTableColumn(
+        'exc_assignment',
+        'file_suffixes',
+        array('type' => 'text', 'length' => 250, 'notnull' => false, 'default' => null)
+    );
+}
+?>
+<#73>
+<?php
+/**
+ * fau: exFileSuffixes - add the file_suffixes_case column to db
+ */
+if (!$ilDB->tableColumnExists('exc_assignment', 'file_suffixes_case')) {
+    $ilDB->addTableColumn(
+        'exc_assignment',
+        'file_suffixes_case',
+        array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0)
+    );
+}
+?>
