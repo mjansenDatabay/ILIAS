@@ -1232,6 +1232,13 @@ class ilExerciseManagementGUI
     */
     public function confirmDeassignMembersObject()
     {
+        // fau: exMemDelete - check edit permission
+        global $DIC;
+        if (!$DIC->access()->checkAccess('write', '',$this->exercise->getRefId())) {
+            throw new ilObjectException($this->lng->txt("permission_denied"));
+        }
+        // fau.
+
         $ilCtrl = $this->ctrl;
         $tpl = $this->tpl;
         $lng = $this->lng;
@@ -1262,6 +1269,13 @@ class ilExerciseManagementGUI
      */
     public function deassignMembersObject()
     {
+        // fau: exMemDelete - check edit permission
+        global $DIC;
+        if (!$DIC->access()->checkAccess('write', '',$this->exercise->getRefId())) {
+            throw new ilObjectException($this->lng->txt("permission_denied"));
+        }
+        // fau.
+
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
         

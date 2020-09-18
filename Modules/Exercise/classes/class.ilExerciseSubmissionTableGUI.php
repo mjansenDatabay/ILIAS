@@ -122,7 +122,12 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         }
         
         if ($this->mode == self::MODE_BY_ASSIGNMENT) {
-            $this->addMultiCommand("confirmDeassignMembers", $this->lng->txt("exc_deassign_members"));
+            // fau: exMemDelete - check edit permission
+            global $DIC;
+            if ($DIC->access()->checkAccess('write', '', $this->exc->getRefId())) {
+                $this->addMultiCommand("confirmDeassignMembers", $this->lng->txt("exc_deassign_members"));
+            }
+            // fau.
         }
         
         $this->setFilterCommand($this->getParentCmd() . "Apply");
