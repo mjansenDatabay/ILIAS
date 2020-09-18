@@ -946,8 +946,10 @@ class ilExAssignment
             $suffix = str_replace(' ', '', $suffix);
             $suffix = str_replace('.', '', $suffix);
             $suffix = str_replace(',', '', $suffix);
-            $this->file_suffixes[] = $suffix;
-
+            $suffix=trim($suffix);
+            if (!empty($suffix)) {
+                $this->file_suffixes[] = $suffix;
+            }
         }
         $this->file_suffixes = array_unique($this->file_suffixes);
     }

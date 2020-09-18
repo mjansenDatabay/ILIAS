@@ -514,7 +514,7 @@ class ilExAssignmentEditorGUI
             $form->addItem($file_suffixes);
 
             $file_suffixes_case = new ilCheckboxInputGUI($lng->txt('exc_file_suffixes_case_checked'), 'file_suffixes_case');
-            $file_suffixes_case->setChecked($this->assignment->getFileSuffixesCase());
+            $file_suffixes_case->setChecked(isset($this->assignment) ? $this->assignment->getFileSuffixesCase() : false);
             $file_suffixes->addSubItem($file_suffixes_case);
             // fau.
         }
