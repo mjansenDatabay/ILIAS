@@ -108,6 +108,10 @@ class ilExAssignment
     protected $file_suffixes_case = false;
     // fau.
 
+    // fau: exMultiFeedbackStructure - variable that indicates that a submission download is uploaded for multi feedback
+    protected $multi_feedback_by_submissions_download = false;
+    // fau.
+
     protected $portfolio_template;
     protected $min_char_limit;
     protected $max_char_limit;
@@ -1882,6 +1886,12 @@ class ilExAssignment
             }
         }
 
+        // fau: exMultiFeedbackStructure - search forsubdir
+        if ($subdir == "notfound") {
+            $subdir = $this->getMultiFeedbackBySubmissionsSubDirectory($mfu, 'notfound');
+        }
+        // fau.
+
         if (!is_dir($mfu . "/" . $subdir)) {
             throw new ilExerciseException($lng->txt("exc_no_feedback_dir_found_in_zip"));
         }
@@ -1924,7 +1934,13 @@ class ilExAssignment
                 $subdir = $s;
             }
         }
-        
+
+        // fau: exMultiFeedbackStructure - search forsubdir
+        if ($subdir == "notfound") {
+            $subdir = $this->getMultiFeedbackBySubmissionsSubDirectory($mfu, 'notfound');
+        }
+        // fau.
+
         $items = ilUtil::getDir($mfu . "/" . $subdir);
         foreach ($items as $k => $i) {
             // check directory
@@ -1953,7 +1969,43 @@ class ilExAssignment
         }
         return $mf_files;
     }
-    
+
+    // fau: exMultiFeedbackStructure - new function getMultiFeedbackBySubmissionsSubDirectory
+    /**
+     * Get the sub directory for multi feedback if the zip from the submissions download is used
+     * @param string    $mfu    multi feedback upload path
+     * @param string    $notfound   return value if the directory is not found
+     * @return string           sub directory (or path) or empty if not found
+     */
+    protected function getMultiFeedbackBySubmissionsSubDirectory($mfu, $notfound) {
+
+        $download_name = ilUtil::getASCIIFilename(ilExAssignment::lookupTitle($this->getId()));
+
+        if (is_dir($mfu . DIRECTORY_SEPARATOR . $download_name)) {
+            $subdirs = ilUtil::getDir($mfu . DIRECTORY_SEPARATOR . $download_name);
+            foreach ($subdirs as $s => $j) {
+                if ($j["type"] == "dir" && $s == $this->lng->txt('exc_ass_submission_zip')) {
+                    $this->multi_feedback_by_submissions_download = true;
+                    return $download_name . DIRECTORY_SEPARATOR . $s;
+                }
+            }
+        }
+
+        return $notfound;
+    }
+
+
+    // fau: exMultiFeedbackStructure - new function getMultiFeedbackBySubmissionsDownload()
+    /**
+     * Get if multi feedback is done with a zip from the submissions download
+     * IMPORTANT: Must be called after uploadMultiFeedbackFile() or getMultiFeedbackFiles()
+     * @return bool
+     */
+    public function isMultiFeedbackBySubmissionsDownload() {
+        return (bool) $this->multi_feedback_by_submissions_download;
+    }
+    // fau.
+
     /**
      * Clear multi feedback directory
      *

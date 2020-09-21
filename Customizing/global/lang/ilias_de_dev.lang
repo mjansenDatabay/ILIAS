@@ -562,6 +562,8 @@ exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamterg
 exc#:#exc_calc_status_info#:#Der "Bestanden"-Status wird anhand der ermittelten Noten/Punkte berechnet.
 exc#:#exc_calculate_overall_results#:#Gesamtergebnisse berechnen
 exc#:#exc_mark#:#Note/Punkte
+exc#:#exc_multi_feedback_by_submissions_hint#:#Wenn Sie Ihr Feedback direkt als Kommentare in den abgegebenen Dateien (z.B. bei PDFs) geben, können Sie auch mit dem unter "Alle Abgaben herunterladen" Archiv arbeiten.
+exc#:#exc_multi_feedback_by_submissions_warning#:#Sie haben wahrscheinlich das unter "Alle Abgaben herunterladen" bereitgestellte Archiv hochgeladen. Enthalten die Dateien darin ihr Feedback, z.B. als Kommentare? Dann können sie sie als Feedback speichern.
 exc#:#exc_pass_manual#:#Manuell
 exc#:#exc_pass_manual_description#:#Beschreibung der Anforderung auf der Info-Seite
 exc#:#exc_pass_manual_info#:#Das Bestehen der Übung wird durch die Tutoren bestimmt. In der Notenübersicht kann eine automatische Berechnung der Gesamtergebnisse auf Basis der Teilnoten/Punkte erfolgen.

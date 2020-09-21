@@ -1772,8 +1772,9 @@ class ilExerciseManagementGUI
         $ilToolbar = $this->toolbar;
         $lng = $this->lng;
         $tpl = $this->tpl;
-        
-        ilUtil::sendInfo($lng->txt("exc_multi_feedb_info"));
+        // fau: exMultiFeedbackStructure - show hint that the submission structure can be used
+        ilUtil::sendInfo($lng->txt("exc_multi_feedb_info") . '<br /><br />' . $lng->txt("exc_multi_feedback_by_submissions_hint"));
+        // fau.
         
         $this->addSubTabs("assignment");
         

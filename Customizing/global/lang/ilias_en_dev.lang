@@ -620,6 +620,8 @@ exc#:#exc_file_suffixes_in_zip#:#Allowed filename in the archive: %s
 exc#:#exc_wrong_filenames#:#The following filenames have a wrong suffix: %s
 exc#:#exc_wrong_filenames_in_zip#:#The following filenames in the archive have a wrong suffix: %s
 exercise#:#exc_mark#:#grade/Points
+exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
+exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.
 grp#:#group_password_registration_lot#:#When you received the group-password, you can register for the lottery of this group.
