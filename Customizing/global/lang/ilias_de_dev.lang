@@ -572,6 +572,12 @@ exc#:#exc_result_time_info#:#Wenn gesetzt, können die Bewertung und das Feedbac
 exc#:#exc_result_time_should_be_after_end_date#:#Der Ergebnistermin muss nach dem Abgabetermin sein.
 exc#:#exc_result_time_not_for_peer_feedback#:#Der Ergebnistermin gilt nicht für das Peer-Feedback. Bitte verwenden Sie die dortige Einstellung zum Ende des Bewertungszeitraums.
 exc#:#exc_result_available_after#:#Ergebnis verfügbar ab
+exc#:#exc_status_file_wrong_titles#:#Die Kopfzeile enthält falsche Spaltentitel.
+exc#:#exc_status_file_wrong_status#:#Der Status '%s' ist ungültig.
+exc#:#exc_status_file_error#:#Beim Einlesen der Datei %s gab es folgenden Fehler (die Datei wird beim Speichern ignoriert): <p class="small">%s</p>
+exc#:#exc_status_file_no_updates#:#In der Datei %s wurden keine geeigneten Benutzer zum Update gefunden.
+exc#:#exc_status_file_update_users#:#Beim Speichern wird aus der Datei %s der Status der folgenden Benutzer aktualisiert: <p class="small">%s</p>
+exc#:#exc_status_file_updated_users#:#Der Status der folgenden Benutzer wurde aktualisiert: <p class="small">%s</p>
 exc#:#exc_not_attempted#:#Noch nicht eingereicht
 exc#:#exc_comment_for_learner_info_nosend#:#Es wird keine Benachrichtigung gesendet. Nach Erreichen des Ergebnistermins wird das Feedback in der Übungseinheiten-Übersicht angezeigt.
 exc#:#exc_file_suffixes#:#Erlaubte Dateiendungen

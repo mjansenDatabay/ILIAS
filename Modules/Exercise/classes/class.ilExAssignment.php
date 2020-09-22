@@ -112,6 +112,11 @@ class ilExAssignment
     protected $multi_feedback_by_submissions_download = false;
     // fau.
 
+    // fau: exStatusFile - class variable
+    /** @var ilExAssignmentStatusFile */
+    protected $status_file;
+    // fau.
+
     protected $portfolio_template;
     protected $min_char_limit;
     protected $max_char_limit;
@@ -1845,13 +1850,22 @@ class ilExAssignment
             $subdir = ilUtil::getASCIIFilename($subdir);
             ilUtil::makeDir($mfdir . "/" . $subdir);
         }
-        
+
+        // fau: exStatusFile - write the status files
+        $status = $this->getStatusFile();
+        $status->init($this, $mems);
+        $status->setFormat(ilExAssignmentStatusFile::FORMAT_XML);
+        $status->writeToFile($mfdir . '/'. $status->getFilename());
+        $status->setFormat(ilExAssignmentStatusFile::FORMAT_CSV);
+        $status->writeToFile($mfdir . '/'. $status->getFilename());
+        // fau.
+
         // create the zip file
         chdir($tmpdir);
         $tmpzipfile = $tmpdir . "/multi_feedback.zip";
         ilUtil::zip($tmpdir, $tmpzipfile, true);
         chdir($cdir);
-        
+
 
         ilUtil::deliverFile($tmpzipfile, $deliverFilename . ".zip", "", false, true);
     }
@@ -1935,9 +1949,26 @@ class ilExAssignment
             }
         }
 
-        // fau: exMultiFeedbackStructure - search forsubdir
+        // fau: exMultiFeedbackStructure - search for subdir
         if ($subdir == "notfound") {
             $subdir = $this->getMultiFeedbackBySubmissionsSubDirectory($mfu, 'notfound');
+        }
+        // fau.
+
+
+        // fau: exStatusFile - load the file
+        $status_file = $this->getStatusFile();
+        $status_file->init($this, $mems);
+
+        // first look in excel
+        $status_file->setFormat(ilExAssignmentStatusFile::FORMAT_XML);
+        $status_file->loadFromFile($mfu . '/' . $subdir . '/' . $status_file->getFilename());
+
+        // then look in csv if excel has no updates
+        // but keep excel if an error was produced
+        if (!$status_file->hasError() && !$status_file->hasUpdates()) {
+            $status_file->setFormat(ilExAssignmentStatusFile::FORMAT_CSV);
+            $status_file->loadFromFile($mfu . '/' . $subdir . '/' . $status_file->getFilename());
         }
         // fau.
 
@@ -1981,12 +2012,12 @@ class ilExAssignment
 
         $download_name = ilUtil::getASCIIFilename(ilExAssignment::lookupTitle($this->getId()));
 
-        if (is_dir($mfu . DIRECTORY_SEPARATOR . $download_name)) {
-            $subdirs = ilUtil::getDir($mfu . DIRECTORY_SEPARATOR . $download_name);
+        if (is_dir($mfu . '/' . $download_name)) {
+            $subdirs = ilUtil::getDir($mfu . '/' . $download_name);
             foreach ($subdirs as $s => $j) {
                 if ($j["type"] == "dir" && $s == $this->lng->txt('exc_ass_submission_zip')) {
                     $this->multi_feedback_by_submissions_download = true;
-                    return $download_name . DIRECTORY_SEPARATOR . $s;
+                    return $download_name . '/' . $s;
                 }
             }
         }
@@ -2005,6 +2036,22 @@ class ilExAssignment
         return (bool) $this->multi_feedback_by_submissions_download;
     }
     // fau.
+
+    // fau: exStatusFile - get the file after reading
+    /**
+     * Get the status file
+     * @return ilExAssignmentStatusFile
+     */
+    public function getStatusFile() {
+        if (!isset($this->status_file)) {
+            require_once (__DIR__ . '/class.ilExAssignmentStatusFile.php');
+            $this->status_file = new ilExAssignmentStatusFile();
+
+        }
+        return $this->status_file;
+    }
+    // fau.
+
 
     /**
      * Clear multi feedback directory

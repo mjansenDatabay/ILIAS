@@ -1038,6 +1038,19 @@ class ilExSubmission
         //		chdir($this->getExercisePath());
 
         $tmpdir = $storage->getTempPath();
+
+        // fau: exStatusFile - save the file status file in submissions
+        // must be done here before directory is changed
+        // otherwise autoloader of phpspreadsheet fails
+        $status_file = $a_ass->getStatusFile();
+        $status_file->init($a_ass, array_keys($members));
+        $status_file->setFormat(ilExAssignmentStatusFile::FORMAT_XML);
+        $status_file->writeToFile($tmpdir . '/'. $status_file->getFilename());
+        $status_file->setFormat(ilExAssignmentStatusFile::FORMAT_CSV);
+        $status_file->writeToFile($tmpdir . '/'. $status_file->getFilename());
+        // fau.
+
+
         chdir($tmpdir);
         $zip = PATH_TO_ZIP;
 

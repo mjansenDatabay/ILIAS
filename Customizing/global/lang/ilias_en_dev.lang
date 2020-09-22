@@ -610,6 +610,12 @@ exc#:#exc_result_time_info#:#The result and tutor Feedback will be available aft
 exc#:#exc_result_time_should_be_after_end_date#:#The result availability must be after the deadline.
 exc#:#exc_result_time_not_for_peer_feedback#:#The result availability is not valid for peer feedback. Please use the feedback deadline there.
 exc#:#exc_result_available_after#:#Result available after
+exc#:#exc_status_file_wrong_titles#:#The head row has wrong column titles.
+exc#:#exc_status_file_wrong_status#:#The status %s is not valid.
+exc#:#exc_status_file_error#:#Reading the file %s produced the following error (the file will be ignored at saving): <p class="small">%s</p>
+exc#:#exc_status_file_no_updates#:#The file %s nas no matching users for an update.
+exc#:#exc_status_file_update_users#:#Saving will process the file %s to update the status of the following users: <p class="small">%s</p>
+exc#:#exc_status_file_updated_users#:#The status of the following users was updated: <p class="small">%s</p>
 exc#:#exc_not_attempted#:#Not Submitted
 exc#:#exc_comment_for_learner_info_nosend#:#No Notification is sent. The Feedback will be shown in the units oberview after reaching the result availability.
 exc#:#exc_file_suffixes#:#Allowed filename suffixes

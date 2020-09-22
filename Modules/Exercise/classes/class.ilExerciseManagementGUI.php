@@ -1836,6 +1836,16 @@ class ilExerciseManagementGUI
                 
         include_once("./Modules/Exercise/classes/class.ilFeedbackConfirmationTable2GUI.php");
         $tab = new ilFeedbackConfirmationTable2GUI($this, "showMultiFeedbackConfirmationTable", $this->assignment);
+
+        // fau: exStatusFile - show info message about status updates
+        $status_file = $this->assignment->getStatusFile();
+        if ($status_file->hasError()) {
+            ilUtil::sendFailure($status_file->getInfo());
+        }
+        elseif ($status_file->hasUpdates()) {
+            ilUtil::sendInfo($status_file->getInfo());
+        }
+        // fau.
         $tpl->setContent($tab->getHTML());
     }
     
@@ -1854,7 +1864,15 @@ class ilExerciseManagementGUI
     public function saveMultiFeedbackObject()
     {
         $this->assignment->saveMultiFeedbackFiles($_POST["file"], $this->exercise);
-        
+
+        // fau: exStatusFile - process the status update
+        $status_file = $this->assignment->getStatusFile();
+        if (!$status_file->hasError() && $status_file->hasUpdates()) {
+            $status_file->applyStatusUpdates();
+            ilUtil::sendInfo($status_file->getInfo(), true);
+        }
+        // fau.
+
         ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
         $this->ctrl->redirect($this, "members");
     }
