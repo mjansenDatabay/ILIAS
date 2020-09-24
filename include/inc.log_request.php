@@ -89,7 +89,7 @@ class RequestLog
         if ($a_name) {
             $a_name = '<b>' . $a_name . ': </b>';
         }
-        $this->write('<pre>' . $a_name . $this->getVarDump($a_var) . '</pre>');
+        $this->write("<pre>" . $a_name . $this->getVarDump($a_var) . "</pre>\n");
     }
 
 
