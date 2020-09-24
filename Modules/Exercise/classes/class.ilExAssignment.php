@@ -71,7 +71,7 @@ class ilExAssignment
     const DEADLINE_ABSOLUTE = 0;
     const DEADLINE_RELATIVE = 1;
 
-    
+
     protected $id;
     protected $exc_id;
     protected $type;
@@ -106,6 +106,10 @@ class ilExAssignment
     // fau: exFileSuffixes - variables for allowed suffixes
     protected $file_suffixes = [];
     protected $file_suffixes_case = false;
+    // fau.
+
+    // fau: exMaxPoints - class cariable
+    protected $max_points;
     // fau.
 
     // fau: exMultiFeedbackStructure - variable that indicates that a submission download is uploaded for multi feedback
@@ -471,6 +475,25 @@ class ilExAssignment
     {
         return $this->title;
     }
+
+    // fau: exMaxPoints - new function getTitleWithInfo()
+    /**
+     * Get the title with basic info in parenthesis
+     * @return string
+     */
+    public function getTitleWithInfo() {
+        $title_infos = [];
+        if ($this->getMandatory()) {
+            $title_infos[] = $this->lng->txt("exc_mandatory");
+        }
+        if ($this->getMaxPoints()) {
+            $title_infos[] = sprintf($this->lng->txt('exc_max_x_points'), $this->getMaxPoints());
+        }
+        $suffix = empty($title_infos) ? '' : ' (' . implode(', ', $title_infos) . ')';
+
+        return $this->getTitle() . $suffix;
+    }
+    // fau.
 
     /**
      * Set mandatory
@@ -941,6 +964,70 @@ class ilExAssignment
         return $this->max_file;
     }
 
+
+    // fau: exMaxPoints - getter, setter and check
+    /**
+     * Set maximum points
+     *
+     * @param float|null $a_value
+     */
+    public function setMaxPoints($a_value)
+    {
+        if ($a_value !== null) {
+            $a_value = (float) $a_value;
+        }
+        $this->max_points = $a_value;
+    }
+
+    /**
+     * Get maximum points
+     *
+     * @return float|null
+     */
+    public function getMaxPoints()
+    {
+        return $this->max_points;
+    }
+
+    /**
+     * Check if a mark is allowed
+     * @param $a_mark
+     * @return bool
+     */
+    public function checkMark($a_mark) {
+        if (empty($a_mark)) {
+            return true;
+        }
+        if (isset($this->max_points)) {
+            if (!is_numeric($a_mark)) {
+                return false;
+            }
+            if ((float) $a_mark > $this->max_points) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get the mark with an extended info
+     * @param string $a_mark
+     * @return string
+     */
+    public function getMarkWithInfo ($a_mark) {
+        if ($this->getMaxPoints() && $a_mark) {
+            if ($this->checkMark($a_mark)) {
+                $percent = 100 * (float) $a_mark /  $this->getMaxPoints();
+                return sprintf($this->lng->txt("exc_mark_percent"), $a_mark, $percent);
+            }
+            else {
+                return sprintf($this->lng->txt("exc_mark_invalid"), $a_mark);
+            }
+        }
+        return $a_mark;
+    }
+    // fau.
+
     // fau: exFileSuffixes - getters and setters and check
 
     /**
@@ -1111,6 +1198,9 @@ class ilExAssignment
         $this->setStartTime($a_set["start_time"]);
         $this->setOrderNr($a_set["order_nr"]);
         $this->setMandatory($a_set["mandatory"]);
+        // fau: exFMaxPoints - read the max points
+        $this->setMaxPoints($a_set["max_points"]);
+        // fau.
         $this->setType($a_set["type"]);
         $this->setPeerReview($a_set["peer"]);
         $this->setPeerReviewMin($a_set["peer_min"]);
@@ -1168,6 +1258,9 @@ class ilExAssignment
 // fau.
             "order_nr" => array("integer", $this->getOrderNr()),
             "mandatory" => array("integer", $this->getMandatory()),
+            // fau: exMaxPoints - save the max points
+            "max_points" => array("float", $this->getMaxPoints()),
+            // fau.
             "type" => array("integer", $this->getType()),
             "peer" => array("integer", $this->getPeerReview()),
             "peer_min" => array("integer", $this->getPeerReviewMin()),
@@ -1225,6 +1318,9 @@ class ilExAssignment
 // fau.
             "order_nr" => array("integer", $this->getOrderNr()),
             "mandatory" => array("integer", $this->getMandatory()),
+            // fau: exMaxPoints - update the max points in the database
+            "max_points" => array("float", $this->getMaxPoints()),
+            // fau.
             "type" => array("integer", $this->getType()),
             "peer" => array("integer", $this->getPeerReview()),
             "peer_min" => array("integer", $this->getPeerReviewMin()),
@@ -1347,6 +1443,9 @@ class ilExAssignment
             $new_ass = new ilExAssignment();
             $new_ass->setExerciseId($a_new_exc_id);
             $new_ass->setTitle($d->getTitle());
+            // fau: clone max points
+            $new_ass->setMaxPoints($d->getMaxPoints());
+            // fau.
             $new_ass->setDeadline($d->getDeadline());
             $new_ass->setExtendedDeadline($d->getExtendedDeadline());
             $new_ass->setInstruction($d->getInstruction());
@@ -1379,7 +1478,7 @@ class ilExAssignment
             $new_ass->setPortfolioTemplateId($d->getPortfolioTemplateId());
             $new_ass->setDeadlineMode($d->getDeadlineMode());
             $new_ass->setRelativeDeadline($d->getRelativeDeadline());
-            
+
             // criteria catalogue(s)
             if ($d->getPeerReviewCriteriaCatalogue() &&
                 array_key_exists($d->getPeerReviewCriteriaCatalogue(), $a_crit_cat_map)) {
@@ -1701,6 +1800,9 @@ class ilExAssignment
                 $mem[$rec["usr_id"]]["notice"] = $rec["notice"];
                 $mem[$rec["usr_id"]]["status"] = $rec["status"];
                 $mem[$rec["usr_id"]]["mark"] = $rec["mark"];
+                // fau: exMaxPoints - add max_points to the member list data
+                $mem[$rec["usr_id"]]["max_points"] = $this->getMaxPoints();
+                // fau.
                 $mem[$rec["usr_id"]]["comment"] = $rec["u_comment"];
             }
         }

@@ -602,6 +602,12 @@ exc#:#exc_calc_status_default_info#:#Is because of lack of single results the ov
 exc#:#exc_calc_status_info#:#The "passed"-status will be calculated by the ascertained grades/credits.
 exc#:#exc_calculate_overall_results#:#calculate overall results
 exc#:#exc_mark#:#Grade/Credits
+exc#:#exc_limit_points#:#Limit Points
+exc#:#exc_max_points#:#Maximum Points
+exc#:#exc_max_points_info#:#The mark must be a number (points) which can't exceed this value
+exc#:#exc_max_x_points#:#max. %s points
+exc#:#exc_mark_percent#:#%s (%s %%)
+exc#:#exc_mark_ignored#:#The points given for the following users exceed the maximum points and are ignored:
 exc#:#exc_pass_manual#:#Manual
 exc#:#exc_pass_manual_description#:#Description of the requirement on the info-page
 exc#:#exc_pass_manual_info#:#If a exercise is passed, is decided by the tutors. In the grade-view an automatical calculation of the totalresult based on the partgrades/credits can take place.
@@ -611,6 +617,7 @@ exc#:#exc_result_time_should_be_after_end_date#:#The result availability must be
 exc#:#exc_result_time_not_for_peer_feedback#:#The result availability is not valid for peer feedback. Please use the feedback deadline there.
 exc#:#exc_result_available_after#:#Result available after
 exc#:#exc_status_file_wrong_titles#:#The head row has wrong column titles.
+exc#:#exc_status_file_wrong_mark#:#The value "%s" in "mark" is not numeric or exceeds the maximum points %s.
 exc#:#exc_status_file_wrong_status#:#The status %s is not valid.
 exc#:#exc_status_file_error#:#Reading the file %s produced the following error (the file will be ignored at saving): <p class="small">%s</p>
 exc#:#exc_status_file_no_updates#:#The file %s nas no matching users for an update.

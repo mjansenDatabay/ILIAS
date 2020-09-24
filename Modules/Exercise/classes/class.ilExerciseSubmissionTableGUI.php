@@ -32,10 +32,11 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
     // needs PH P5.6 for array support
     protected $cols_mandatory = array("name", "status");
     protected $cols_default = array("login", "submission_date", "idl", "calc_deadline");
+    // fau: exMaxPoints - put max_points in cols order
     protected $cols_order = array("image", "name", "login", "team_members",
-            "sent_time", "submission", "calc_deadline", "idl", "status", "mark", "status_time",
+            "sent_time", "submission", "calc_deadline", "idl", "status", "mark", "max_points","status_time",
             "feedback_time", "comment", "notice");
-    
+    // fau.
     /**
      * Constructor
      *
@@ -203,7 +204,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         $cols["submission"] = array($this->lng->txt("exc_tbl_submission_date"), "submission");
         
         $cols["status"] = array($this->lng->txt("exc_tbl_status"), "status");
-        $cols["mark"] = array($this->lng->txt("exc_tbl_mark"), "mark");
+        // fau: exMaxPoints - rename mark column and add max points column
+        $cols["mark"] = array($this->lng->txt("exc_mark"), "mark");
+        $cols["max_points"] = array($this->lng->txt("exc_max_points"), "max_points");
+        // fau.
         $cols["status_time"] = array($this->lng->txt("exc_tbl_status_time"), "status_time");
         
         $cols["sent_time"] = array($this->lng->txt("exc_tbl_sent_time"), "sent_time");

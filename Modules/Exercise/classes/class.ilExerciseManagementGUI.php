@@ -1406,7 +1406,14 @@ class ilExerciseManagementGUI
                     }
                     $member_status->setStatus($status);
                     if (array_key_exists("mark", $values)) {
-                        $member_status->setMark($values["mark"]);
+                        // fau: exMaxPoints - check for manual saving
+                        if ($ass->checkMark($values["mark"])) {
+                            $member_status->setMark($values["mark"]);
+                        }
+                        else {
+                            $mark_ignored_for[$sub_user_id] = $uname["lastname"] . ", " . $uname["firstname"];
+                        }
+                        // fau.
                     }
                     if (array_key_exists("notice", $values)) {
                         $member_status->setNotice($values["notice"]);
@@ -1415,10 +1422,17 @@ class ilExerciseManagementGUI
                 }
             }
         }
-        
-        if (count($saved_for) > 0) {
-            $save_for_str = "(" . implode($saved_for, " - ") . ")";
+
+        // fau: exMaxPoints - show message about ignored marks
+        if (!empty($mark_ignored_for)) {
+            $mark_ignored_for = implode(" - ", $mark_ignored_for);
+            ilUtil::sendInfo($this->lng->txt("exc_mark_ignored") . " " . $mark_ignored_for, $a_redirect);
         }
+
+        if (count($saved_for) > 0) {
+            $save_for_str = "(" . implode(" - ", $saved_for) . ")";
+        }
+        // fau.
 
         if ($a_redirect) {
             ilUtil::sendSuccess($this->lng->txt("exc_status_saved") . " " . $save_for_str, true);

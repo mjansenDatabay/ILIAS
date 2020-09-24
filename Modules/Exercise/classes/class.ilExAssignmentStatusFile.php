@@ -247,6 +247,10 @@ class ilExAssignmentStatusFile extends ilExcel
                 throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_status'), $data['status']));
             }
 
+            if (!$this->assignment->checkMark($data['mark'])) {
+                throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_mark'), $data['mark'], $this->assignment->getMaxPoints()));
+            }
+
             $this->updates[] = $data;
         }
     }

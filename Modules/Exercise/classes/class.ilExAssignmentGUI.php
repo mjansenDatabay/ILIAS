@@ -130,11 +130,12 @@ class ilExAssignmentGUI
         }
         // fau.
 
-        $mand = "";
-        if ($a_ass->getMandatory()) {
-            $mand = " (" . $lng->txt("exc_mandatory") . ")";
+        // fau: exMaxPoints - add info about maximum points and reached points
+        if ((int) $a_ass->getResultTime() <= time()) {
+            $tag = $a_ass->getMarkWithInfo($a_ass->getMemberStatus()->getMark());
         }
-        $tpl->setVariable("TITLE", $a_ass->getTitle() . $mand);
+        $tpl->setVariable("TITLE", $a_ass->getTitleWithInfo() . ($tag ? ' <span class="ilTag">'. $tag.'</span>' : ''));
+        // fau.
 
         // status icon
         // fau: exResTime - don't show the result status before the result time is reached
@@ -485,7 +486,9 @@ class ilExAssignmentGUI
             if ($mark != "") {
                 $a_info->addProperty(
                     $lng->txt("exc_mark"),
-                    $mark
+                    // fau: exMaxPoints - show extended mark
+                    $a_ass->getMarkWithInfo($mark)
+                    // fau.
                 );
             }
 

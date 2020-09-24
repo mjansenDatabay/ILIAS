@@ -88,6 +88,9 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
                 "name" => $ass->getTitle(),
                 "status" => $member_status->getStatus(),
                 "mark" => $member_status->getMark(),
+                // fau: exMaxPoints - add table data
+                "max_points" => $ass->getMaxPoints(),
+                // fau.
                 "sent_time" => $member_status->getSentTime(),
                 "status_time" => $member_status->getStatusTime(),
                 "feedback_time" => $member_status->getFeedbackTime(),

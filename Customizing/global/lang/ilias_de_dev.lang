@@ -562,6 +562,12 @@ exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamterg
 exc#:#exc_calc_status_info#:#Der "Bestanden"-Status wird anhand der ermittelten Noten/Punkte berechnet.
 exc#:#exc_calculate_overall_results#:#Gesamtergebnisse berechnen
 exc#:#exc_mark#:#Note/Punkte
+exc#:#exc_limit_points#:#Punkte begrenzen
+exc#:#exc_max_points#:#Maximale Punktzahl
+exc#:#exc_max_points_info#:#Wenn angegeben, muss bei Note/Punkte eine Zahl eingegeben werden, die diesen Wert nicht übersteigen darf
+exc#:#exc_max_x_points#:#max. %s Punkte
+exc#:#exc_mark_percent#:#%s (%s %%)
+exc#:#exc_mark_ignored#:#Die Punkte der folgenden Nutzer überschreiten die maximale Punktzahl und wurden ignoriert:
 exc#:#exc_multi_feedback_by_submissions_hint#:#Wenn Sie Ihr Feedback direkt als Kommentare in den abgegebenen Dateien (z.B. bei PDFs) geben, können Sie auch mit dem unter "Alle Abgaben herunterladen" Archiv arbeiten.
 exc#:#exc_multi_feedback_by_submissions_warning#:#Sie haben wahrscheinlich das unter "Alle Abgaben herunterladen" bereitgestellte Archiv hochgeladen. Enthalten die Dateien darin ihr Feedback, z.B. als Kommentare? Dann können sie sie als Feedback speichern.
 exc#:#exc_pass_manual#:#Manuell
@@ -574,6 +580,7 @@ exc#:#exc_result_time_not_for_peer_feedback#:#Der Ergebnistermin gilt nicht für
 exc#:#exc_result_available_after#:#Ergebnis verfügbar ab
 exc#:#exc_status_file_wrong_titles#:#Die Kopfzeile enthält falsche Spaltentitel.
 exc#:#exc_status_file_wrong_status#:#Der Status '%s' ist ungültig.
+exc#:#exc_status_file_wrong_mark#:#Der Wert "%s" in "mark" ist nicht numerisch oder übersteigt die maximale Punktzahl %s.
 exc#:#exc_status_file_error#:#Beim Einlesen der Datei %s gab es folgenden Fehler (die Datei wird beim Speichern ignoriert): <p class="small">%s</p>
 exc#:#exc_status_file_no_updates#:#In der Datei %s wurden keine geeigneten Benutzer zum Update gefunden.
 exc#:#exc_status_file_update_users#:#Beim Speichern wird aus der Datei %s der Status der folgenden Benutzer aktualisiert: <p class="small">%s</p>

@@ -66,12 +66,9 @@ class ilExGradesTableGUI extends ilTable2GUI
         foreach ($this->ass_data as $ass) {
             $ilCtrl->setParameter($this->parent_obj, "ass_id", $ass->getId());
             $cnt_str = '<a href="' . $ilCtrl->getLinkTarget($this->parent_obj, "members") . '">' . $cnt . '</a>';
-            if ($ass->getMandatory()) {
-                $this->addColumn("<u>" . $cnt_str . "</u>", "", "", false, "", $ass->getTitle() . " " .
-                    "(" . $lng->txt("exc_mandatory") . ")");
-            } else {
-                $this->addColumn($cnt_str, "", "", false, "", $ass->getTitle());
-            }
+            // fau: exMaxPoints - use getTitleWithInfo() as tooltip
+            $this->addColumn($cnt_str, "", "", false, "", $ass->getTitleWithInfo());
+            // fau.
             $cnt++;
         }
         $ilCtrl->setParameter($this->parent_obj, "ass_id", "");
@@ -138,7 +135,9 @@ class ilExGradesTableGUI extends ilTable2GUI
             
             // mark
             $mark = $member_status->getMark();
-            $this->tpl->setVariable("VAL_ONLY_MARK", $mark);
+            // fau: exMaxPoints - show extended mark
+            $this->tpl->setVariable("VAL_ONLY_MARK", $ass->getMarkWithInfo($mark));
+            // fau.
             
             $this->tpl->parseCurrentBlock();
         }

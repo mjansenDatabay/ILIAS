@@ -375,6 +375,16 @@ class ilExAssignmentEditorGUI
         $cb->setChecked(true);
         $form->addItem($cb);
 
+        // fau: exMaxPoints - add form element
+        $max_points_tgl = new ilCheckboxInputGUI($lng->txt("exc_limit_points"), "max_points_tgl");
+        $form->addItem($max_points_tgl);
+        $max_points = new ilNumberInputGUI($lng->txt("exc_max_points"), "max_points");
+        $max_points->setInfo($lng->txt("exc_max_points_info"));
+        $max_points->setRequired(true);
+        $max_points->setSize(3);
+        $max_points_tgl->addSubItem($max_points);
+        // fau.
+
         // Work Instructions
         $sub_header = new ilFormSectionHeaderGUI();
         $sub_header->setTitle($lng->txt("exc_work_instructions"), "work_instructions");
@@ -800,13 +810,18 @@ class ilExAssignmentEditorGUI
                     ,"title" => trim($a_form->getInput("title"))
                     ,"instruction" => trim($a_form->getInput("instruction"))
                     ,"mandatory" => $a_form->getInput("mandatory")
+                    // fau: exMaxPoints - add max points to form result
+                    ,"max_points" => $a_form->getInput("max_points_tgl")
+                        ? $a_form->getInput("max_points")
+                        : null
+                    // fau.
                     // dates
                     ,"start" => $time_start
                     ,"deadline" => $time_deadline
                     ,"deadline_ext" => $time_deadline_ext
-// fau: exResTime - add result date to form result
+                    // fau: exResTime - add result date to form result
                     ,"result_time" => $result_date
-// fau.
+                    // fau.
                     ,"max_file" => $a_form->getInput("max_file_tgl")
                         ? $a_form->getInput("max_file")
                         : null
@@ -916,6 +931,10 @@ class ilExAssignmentEditorGUI
         $a_ass->setTitle($a_input["title"]);
         $a_ass->setInstruction($a_input["instruction"]);
         $a_ass->setMandatory($a_input["mandatory"]);
+
+        // fau: exMaxPoints - set th points from the form
+        $a_ass->setMaxPoints($a_input["max_points"]);
+        // fau.
 
         $a_ass->setStartTime($a_input["start"]);
         $a_ass->setDeadline($a_input["deadline"]);
@@ -1091,6 +1110,14 @@ class ilExAssignmentEditorGUI
         $values["title"] = $this->assignment->getTitle();
         $values["mandatory"] = $this->assignment->getMandatory();
         $values["instruction"] = $this->assignment->getInstruction();
+
+        // fau: exResTime - set the form values fpr max points
+        if ($this->assignment->getMaxPoints()) {
+            $values["max_points_tgl"] = true;
+            $values["max_points"] = $this->assignment->getMaxPoints();
+        }
+        // fau.
+
         //$values['template_id'] = $this->assignment->getPortfolioTemplateId();
 
         //if($this->assignment->getPortfolioTemplateId())

@@ -1230,3 +1230,16 @@ if (!$ilDB->tableColumnExists('exc_assignment', 'file_suffixes_case')) {
     );
 }
 ?>
+<#74>
+<?php
+/**
+ * fau: exMaxPoints - add the max_points column to db
+ */
+if (!$ilDB->tableColumnExists('exc_assignment', 'max_points')) {
+    $ilDB->addTableColumn(
+        'exc_assignment',
+        'max_points',
+        array('type' => 'float', 'notnull' => false, 'default' => null)
+    );
+}
+?>
