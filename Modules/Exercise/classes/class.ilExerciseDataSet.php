@@ -148,9 +148,13 @@ class ilExerciseDataSet extends ilDataSet
                         ,"FeedbackCron" => "integer"
                         ,"FeedbackDate" => "integer"
                         ,"FeedbackDir" => "directory"
-// fau: exResTime - add result time to export structure
+                        // fau: exResTime - add result time to export structure
                         ,"ResultTime" => "integer"
-// fau.
+                        // fau.
+                        // fau: exMaxPoints - add max points to export structure
+                        ,"MaxPoints" => "float"
+                        // fau.
+
                     );
                     
                 case "5.1.0":
@@ -375,6 +379,10 @@ class ilExerciseDataSet extends ilDataSet
 // fau: exResTime - query for result time at export
                         ",res_time result_time" .
 // fau.
+// fau: exMaxPoints - query for max points at export
+                        ",max_points" .
+// fau.
+
                         " FROM exc_assignment" .
                         " WHERE " . $ilDB->in("exc_id", $a_ids, false, "integer"));
                     break;
@@ -640,6 +648,10 @@ class ilExerciseDataSet extends ilDataSet
 
                     // 5.3
                     $ass->setFeedbackDateCustom($a_rec["FbDateCustom"]);
+
+                    // fau: exMaxPoints - import data
+                    $ass->setMaxPoints($a_rec["MaxPoints"]);
+                    // fau.
                     
                     // criteria catalogue
                     if ($a_rec["PeerCritCat"]) {

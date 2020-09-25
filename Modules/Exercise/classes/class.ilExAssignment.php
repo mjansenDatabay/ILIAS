@@ -1443,7 +1443,7 @@ class ilExAssignment
             $new_ass = new ilExAssignment();
             $new_ass->setExerciseId($a_new_exc_id);
             $new_ass->setTitle($d->getTitle());
-            // fau: clone max points
+            // fau: exMaxPoints - clone max points
             $new_ass->setMaxPoints($d->getMaxPoints());
             // fau.
             $new_ass->setDeadline($d->getDeadline());
