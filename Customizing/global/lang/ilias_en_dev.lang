@@ -602,6 +602,9 @@ exc#:#exc_calc_status_default#:#Default value
 exc#:#exc_calc_status_default_info#:#Is because of lack of single results the overall result empty, the status will become this value
 exc#:#exc_calc_status_info#:#The "passed"-status will be calculated by the ascertained grades/credits.
 exc#:#exc_calculate_overall_results#:#calculate overall results
+exc#:#exc_grade_time#:#Grading Time
+exc#:#exc_grade_time_info#:#If set, then feedback and grading will be possible after the given Date
+exc#:#exc_grade_start#:#Grading Start
 exc#:#exc_mark#:#Grade/Credits
 exc#:#exc_limit_points#:#Limit Points
 exc#:#exc_max_points#:#Maximum Points

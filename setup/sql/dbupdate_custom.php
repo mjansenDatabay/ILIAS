@@ -1243,3 +1243,16 @@ if (!$ilDB->tableColumnExists('exc_assignment', 'max_points')) {
     );
 }
 ?>
+<#75>
+<?php
+/**
+ * fau: exeGradeTime - add column for grading availability date
+ */
+if (!$ilDB->tableColumnExists('exc_assignment', 'grade_start')) {
+    $ilDB->addTableColumn(
+        'exc_assignment',
+        'grade_start',
+        array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
+    );
+}
+?>

@@ -223,6 +223,9 @@ class ilExerciseDataSet extends ilDataSet
                         ,"FeedbackDate" => "integer"
                         ,"FeedbackDir" => "directory"
                         ,"FbDateCustom" => "integer"
+                        // fau: exGradeTime - add grade time to export structure
+                        ,"GradeStart" => "integer"
+                        // fau.
                         // fau: exResTime - add result time to export structure
                         ,"ResultTime" => "integer"
                         // fau.
@@ -379,6 +382,9 @@ class ilExerciseDataSet extends ilDataSet
                         " peer_dl peer_deadline, peer_file, peer_prsl peer_personal, peer_char, peer_unlock, peer_valid," .
                         " peer_text, peer_rating, peer_crit_cat, fb_file feedback_file, fb_cron feedback_cron, fb_date feedback_date," .
                         " fb_date_custom" .
+                        // fau: exGradeTime - query for grade time at export
+                        ",grade_start" .
+                        // fau.
                         // fau: exResTime - query for result time at export
                         ",res_time result_time" .
                         // fau.
@@ -469,6 +475,13 @@ class ilExerciseDataSet extends ilDataSet
                 $deadline = new ilDateTime($a_set["Deadline2"], IL_CAL_UNIX);
                 $a_set["Deadline2"] = $deadline->get(IL_CAL_DATETIME, '', 'UTC');
             }
+
+            // fau: exGradeTime - convert grade time to utc
+            if ($a_set["GradeStart"] != "") {
+                $grade_start = new ilDateTime($a_set["GradeStart"], IL_CAL_UNIX);
+                $a_set["GradeStart"] = $grade_start->get(IL_CAL_DATETIME, '', 'UTC');
+            }
+            // fau.
 
             // fau: exResTime - convert result time to utc
             if ($a_set["ResultTime"] != "") {
@@ -613,6 +626,12 @@ class ilExerciseDataSet extends ilDataSet
                         $ass->setDeadline($deadline->get(IL_CAL_UNIX));
                     }
 
+                    // fau: exGradeTime - convert result time to utc
+                    if ($a_rec["GradeStart"] != "") {
+                        $grade_start = new ilDateTime($a_rec["GradeStart"], IL_CAL_DATETIME, "UTC");
+                        $ass->setGradeStart($grade_start->get(IL_CAL_UNIX));
+                    }
+                    // fau.
                     // fau: exResTime - convert result time to utc
                     if ($a_rec["ResultTime"] != "") {
                         $result_time = new ilDateTime($a_rec["ResultTime"], IL_CAL_DATETIME, "UTC");

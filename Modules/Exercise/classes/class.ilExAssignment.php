@@ -76,6 +76,9 @@ class ilExAssignment
     protected $exc_id;
     protected $type;
     protected $start_time;
+    // fau: exGradeTime - class variable
+    protected $grade_start;
+    // fau.
     // fau: exResTime - class variable
     protected $result_time;
     // fau.
@@ -435,6 +438,39 @@ class ilExAssignment
         return $this->result_time;
     }
     // fau.
+
+    // fau: exGradeTime - get/set and check the grade time
+    /**
+     * Set the grading start (timestamp)
+     *
+     * @param	int		grading start (timestamp)
+     */
+    public function setGradeStart($a_val)
+    {
+        $this->grade_start = $a_val;
+    }
+
+    /**
+     * get the grading start (timestamp)
+     *
+     * @return	int		grading start (timestamp)
+     */
+    public function getGradeStart()
+    {
+        return $this->grade_start;
+    }
+
+    /**
+     *  Check if the grading is allowed
+     */
+    public function checkInGradeTime()
+    {
+        if (!empty($this->grade_start)) {
+            return $this->grade_start <= time();
+        }
+    }
+    // fau.
+
 
     /**
      * Set instruction
@@ -1190,7 +1226,10 @@ class ilExAssignment
         $this->setExerciseId($a_set["exc_id"]);
         $this->setDeadline($a_set["time_stamp"]);
         $this->setExtendedDeadline($a_set["deadline2"]);
-        // fau: exeResTime - read the result time from the database
+        // fau: exGradeTime - read the grade time from the database
+        $this->setGradeStart($a_set["grade_start"]);
+        // fau.
+        // fau: exResTime - read the result time from the database
         $this->setResultTime($a_set["res_time"]);
         // fau.
         $this->setInstruction($a_set["instruction"]);
@@ -1198,7 +1237,7 @@ class ilExAssignment
         $this->setStartTime($a_set["start_time"]);
         $this->setOrderNr($a_set["order_nr"]);
         $this->setMandatory($a_set["mandatory"]);
-        // fau: exFMaxPoints - read the max points
+        // fau: exMaxPoints - read the max points
         $this->setMaxPoints($a_set["max_points"]);
         // fau.
         $this->setType($a_set["type"]);
@@ -1253,9 +1292,12 @@ class ilExAssignment
             "instruction" => array("clob", $this->getInstruction()),
             "title" => array("text", $this->getTitle()),
             "start_time" => array("integer", $this->getStartTime()),
-// fau: exeResTime - save the result time to the database
+            // fau: exGradeTime - save the grade start to the database
+            "grade_start" => array("integer", $this->getGradeStart()),
+            // fau.
+            // fau: exResTime - save the result time to the database
             "res_time" => array("integer", $this->getResultTime()),
-// fau.
+            // fau.
             "order_nr" => array("integer", $this->getOrderNr()),
             "mandatory" => array("integer", $this->getMandatory()),
             // fau: exMaxPoints - save the max points
@@ -1313,9 +1355,12 @@ class ilExAssignment
             "instruction" => array("clob", $this->getInstruction()),
             "title" => array("text", $this->getTitle()),
             "start_time" => array("integer", $this->getStartTime()),
-// fau: exeResTime - update the result time in the database
+            // fau: exGradeTime - update the grading time in the database
+            "grade_start" => array("integer", $this->getGradeStart()),
+            // fau.
+            // fau: exResTime - update the result time in the database
             "res_time" => array("integer", $this->getResultTime()),
-// fau.
+            // fau.
             "order_nr" => array("integer", $this->getOrderNr()),
             "mandatory" => array("integer", $this->getMandatory()),
             // fau: exMaxPoints - update the max points in the database
@@ -1408,9 +1453,12 @@ class ilExAssignment
                 "instruction" => $rec["instruction"],
                 "title" => $rec["title"],
                 "start_time" => $rec["start_time"],
-// fau: exResTime - add result time to assignments data
+                // fau: exGradeTime - add grade_start to assignments data
+                "grade_start" => $rec["grade_start"],
+                // fau.
+                // fau: exResTime - add result time to assignments data
                 "res_time" => $rec["res_time"],
-// fau.
+                // fau.
                 "order_val" => $order_val,
                 "mandatory" => $rec["mandatory"],
                 "type" => $rec["type"],
@@ -1452,6 +1500,9 @@ class ilExAssignment
             $new_ass->setMandatory($d->getMandatory());
             $new_ass->setOrderNr($d->getOrderNr());
             $new_ass->setStartTime($d->getStartTime());
+            // fau: exGradeTime - clone grade time
+            $new_ass->setGradeStart($d->getGradeStart());
+            // fau.
             // fau: exResTime - clone result time
             $new_ass->setResultTime($d->getResultTime());
             // fau.
@@ -2215,7 +2266,7 @@ class ilExAssignment
                     // rename file
                     rename($file_path, $target);
                                         
-                    // fau: exResTime - revent sending of multi feedback notification
+                    // fau: exResTime - prevent sending of multi feedback notification
                     if ($noti_rec_ids and (int) $this->getResultTime() <= time()) {
                         // fau.
                         foreach ($noti_rec_ids as $user_id) {

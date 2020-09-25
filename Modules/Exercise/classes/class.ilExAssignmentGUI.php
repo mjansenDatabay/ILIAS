@@ -118,6 +118,18 @@ class ilExAssignmentGUI
             }
         }
 
+        // fau: exGradeTime - add info about grade time
+        if ($a_ass->getGradeStart() > 0) {
+            $tpl->setCurrentBlock("prop");
+            $tpl->setVariable("PROP", $lng->txt("exc_grade_start"));
+            $tpl->setVariable(
+                "PROP_VAL",
+                ilDatePresentation::formatDate(new ilDateTime($a_ass->getGradeStart(), IL_CAL_UNIX))
+            );
+            $tpl->parseCurrentBlock();
+        }
+        // fau.
+
         // fau: exResTime - add info about result availability
         if ($a_ass->getResultTime() > 0) {
             $tpl->setCurrentBlock("prop");

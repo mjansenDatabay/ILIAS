@@ -436,13 +436,23 @@ class ilExAssignmentEditorGUI
         $deadline2->setInfo($lng->txt("exc_deadline_extended_info"));
         $deadline2->setShowTime(true);
         $deadline->addSubItem($deadline2);
-        
+
+        // fau: exGradeTime - property elements for grade time
+        // grade time y/n
+        $grade_time_cb = new ilCheckboxInputGUI($lng->txt("exc_grade_time"), "grade_time_cb");
+        $grade_time_cb->setInfo($lng->txt('exc_grade_time_info'));
+        $form->addItem($grade_time_cb);
+        // grade start
+        $grade_start = new ilDateTimeInputGUI($lng->txt("exc_grade_start"), "grade_start");
+        $grade_start->setShowTime(true);
+        $grade_time_cb->addSubItem($grade_start);
+        // fau.
+
         // fau: exResTime - property elements for result time
         // result time y/n
         $result_time_cb = new ilCheckboxInputGUI($lng->txt("exc_result_time"), "result_time_cb");
         $result_time_cb->setInfo($lng->txt('exc_result_time_info'));
         $form->addItem($result_time_cb);
-        
         // result time
         $result_time = new ilDateTimeInputGUI($lng->txt("date"), "result_time");
         $result_time->setShowTime(true);
@@ -759,6 +769,16 @@ class ilExAssignmentEditorGUI
                 }
             }
 
+            // fau: exGradeTime - checks for grading time
+            $grade_start = null;
+            if ($a_form->getInput("grade_time_cb")) {
+                $grade_start_obj = $a_form->getItemByPostVar("grade_start")->getDate();
+                if ($grade_start_obj instanceof ilDateTime) {
+                    $grade_start = $grade_start_obj->get(IL_CAL_UNIX);
+                }
+            }
+            // fau.
+
             // fau: exResTime - checks for result time
             if ($a_form->getInput("result_time_cb")) {
                 $result_date_obj = $a_form->getItemByPostVar("result_time")->getDate();
@@ -819,6 +839,9 @@ class ilExAssignmentEditorGUI
                     ,"start" => $time_start
                     ,"deadline" => $time_deadline
                     ,"deadline_ext" => $time_deadline_ext
+                    // fau: exGradeTime - add grade time to form result
+                    ,"grade_start" => $grade_start
+                    // fau.
                     // fau: exResTime - add result date to form result
                     ,"result_time" => $result_date
                     // fau.
@@ -939,6 +962,10 @@ class ilExAssignmentEditorGUI
         $a_ass->setStartTime($a_input["start"]);
         $a_ass->setDeadline($a_input["deadline"]);
         $a_ass->setExtendedDeadline($a_input["deadline_ext"]);
+
+        // fau: exGradeTime - set the grading time from the form
+        $a_ass->setGradeStart($a_input["grade_start"]);
+        // fau.
 
         // fau: exResTime - set the result time from the form
         $a_ass->setResultTime($a_input["result_time"]);
@@ -1111,7 +1138,7 @@ class ilExAssignmentEditorGUI
         $values["mandatory"] = $this->assignment->getMandatory();
         $values["instruction"] = $this->assignment->getInstruction();
 
-        // fau: exResTime - set the form values fpr max points
+        // fau: exMaxPoints - set the form values for max points
         if ($this->assignment->getMaxPoints()) {
             $values["max_points_tgl"] = true;
             $values["max_points"] = $this->assignment->getMaxPoints();
@@ -1139,6 +1166,12 @@ class ilExAssignmentEditorGUI
         if ($this->assignment->getStartTime()) {
             $values["start_time"] = new ilDateTime($this->assignment->getStartTime(), IL_CAL_UNIX);
         }
+
+        // fau: exGradeTime - set the checkbox for grade time
+        if ($this->assignment->getGradeStart() > 0) {
+            $values["grade_time_cb"] = true;
+        }
+        // fau.
 
         // fau: exResTime - set the checkbox for result time
         if ($this->assignment->getResultTime() > 0) {
@@ -1196,7 +1229,15 @@ class ilExAssignmentEditorGUI
 
         $a_form->setValuesByArray($values);
 
-        // fau: exResTime - set the checkbox for result time
+        // fau: exGradeTime - set the data for grading time
+        if ($this->assignment->getGradeStart() > 0) {
+            $grade_start_date = new ilDateTime($this->assignment->getGradeStart(), IL_CAL_UNIX);
+            $grade_start_item = $a_form->getItemByPostVar("grade_start");
+            $grade_start_item->setDate($grade_start_date);
+        }
+        // fau.
+
+        // fau: exResTime - set the data for result time
         if ($this->assignment->getResultTime() > 0) {
             $edit_date = new ilDateTime($this->assignment->getResultTime(), IL_CAL_UNIX);
             $ed_item = $a_form->getItemByPostVar("result_time");

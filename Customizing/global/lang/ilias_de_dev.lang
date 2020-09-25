@@ -562,6 +562,9 @@ exc#:#exc_calc_status_default#:#Standardwert
 exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamtergebnis leer, wird der Status auf diesen Wert
 exc#:#exc_calc_status_info#:#Der "Bestanden"-Status wird anhand der ermittelten Noten/Punkte berechnet.
 exc#:#exc_calculate_overall_results#:#Gesamtergebnisse berechnen
+exc#:#exc_grade_time#:#Korrekturzeit
+exc#:#exc_grade_time_info#:#Wenn gesetzt, sind Feedback und Bewertung für die Tutoren erst ab einem bestimmten Datum möglich.
+exc#:#exc_grade_start#:#Korrektur-Start
 exc#:#exc_mark#:#Note/Punkte
 exc#:#exc_limit_points#:#Punkte begrenzen
 exc#:#exc_max_points#:#Maximale Punktzahl
