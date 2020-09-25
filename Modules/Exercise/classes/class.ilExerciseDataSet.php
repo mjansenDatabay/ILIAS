@@ -151,10 +151,6 @@ class ilExerciseDataSet extends ilDataSet
                         // fau: exResTime - add result time to export structure
                         ,"ResultTime" => "integer"
                         // fau.
-                        // fau: exMaxPoints - add max points to export structure
-                        ,"MaxPoints" => "float"
-                        // fau.
-
                     );
                     
                 case "5.1.0":
@@ -189,9 +185,9 @@ class ilExerciseDataSet extends ilDataSet
                         ,"FeedbackCron" => "integer"
                         ,"FeedbackDate" => "integer"
                         ,"FeedbackDir" => "directory"
-// fau: exResTime - add result time to export structure
+                        // fau: exResTime - add result time to export structure
                         ,"ResultTime" => "integer"
-// fau.
+                        // fau.
                     );
                 case "5.3.0":
                     return array(
@@ -227,9 +223,16 @@ class ilExerciseDataSet extends ilDataSet
                         ,"FeedbackDate" => "integer"
                         ,"FeedbackDir" => "directory"
                         ,"FbDateCustom" => "integer"
-// fau: exResTime - add result time to export structure
+                        // fau: exResTime - add result time to export structure
                         ,"ResultTime" => "integer"
-// fau.
+                        // fau.
+                        // fau: exMaxPoints - add max points to export structure
+                        ,"MaxPoints" => "float"
+                        // fau.
+                        // fau: exFileSuffixes - add suffix fields to export structure
+                        ,"FileSuffixes" => "text"
+                        ,"FileSuffixesCase" => "integer"
+                        // fau.
                     );
             }
         }
@@ -361,9 +364,9 @@ class ilExerciseDataSet extends ilDataSet
                     $this->getDirectDataFromQuery("SELECT id, exc_id exercise_id, type, time_stamp deadline," .
                         " instruction, title, start_time, mandatory, order_nr, peer, peer_min, peer_dl peer_deadline," .
                         " peer_file, peer_prsl peer_personal, fb_file feedback_file, fb_cron feedback_cron, fb_date feedback_date" .
-// fau: exResTime - query for result time at export
+                        // fau: exResTime - query for result time at export
                         ",res_time result_time" .
-// fau.
+                        // fau.
                         " FROM exc_assignment" .
                         " WHERE " . $ilDB->in("exc_id", $a_ids, false, "integer"));
                     break;
@@ -376,13 +379,16 @@ class ilExerciseDataSet extends ilDataSet
                         " peer_dl peer_deadline, peer_file, peer_prsl peer_personal, peer_char, peer_unlock, peer_valid," .
                         " peer_text, peer_rating, peer_crit_cat, fb_file feedback_file, fb_cron feedback_cron, fb_date feedback_date," .
                         " fb_date_custom" .
-// fau: exResTime - query for result time at export
+                        // fau: exResTime - query for result time at export
                         ",res_time result_time" .
-// fau.
-// fau: exMaxPoints - query for max points at export
+                        // fau.
+                        // fau: exMaxPoints - query for max points at export
                         ",max_points" .
-// fau.
-
+                        // fau.
+                        // fau: exFileSuffixes - query for file suffixes at export
+                        ",file_suffixes" .
+                        ",file_suffixes_case" .
+                        // fau.
                         " FROM exc_assignment" .
                         " WHERE " . $ilDB->in("exc_id", $a_ids, false, "integer"));
                     break;
@@ -652,7 +658,12 @@ class ilExerciseDataSet extends ilDataSet
                     // fau: exMaxPoints - import data
                     $ass->setMaxPoints($a_rec["MaxPoints"]);
                     // fau.
-                    
+
+                    // fau: exFileSuffixes - import data
+                    $ass->setFileSuffixesAsList($a_rec["FileSuffixes"]);
+                    $ass->setFileSuffixesCase($a_rec["FileSuffixesCase"]);
+                    // fau.
+
                     // criteria catalogue
                     if ($a_rec["PeerCritCat"]) {
                         $ass->setPeerReviewCriteriaCatalogue($a_mapping->getMapping("Modules/Exercise", "exc_crit_cat", $a_rec["PeerCritCat"]));

@@ -1473,6 +1473,10 @@ class ilExAssignment
             $new_ass->setFeedbackCron($d->hasFeedbackCron()); // #16295
             $new_ass->setTeamTutor($d->getTeamTutor());
             $new_ass->setMaxFile($d->getMaxFile());
+            // fau: exFileSuffixes - clone settings
+            $new_ass->setFileSuffixes($d->getFileSuffixes());
+            $new_ass->setFileSuffixesCase($d->getFileSuffixesCase());
+            // fau.
             $new_ass->setMinCharLimit($d->getMinCharLimit());
             $new_ass->setMaxCharLimit($d->getMaxCharLimit());
             $new_ass->setPortfolioTemplateId($d->getPortfolioTemplateId());
