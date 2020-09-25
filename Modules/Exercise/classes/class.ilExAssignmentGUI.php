@@ -133,8 +133,11 @@ class ilExAssignmentGUI
         // fau: exMaxPoints - add info about maximum points and reached points
         if ((int) $a_ass->getResultTime() <= time()) {
             $tag = $a_ass->getMarkWithInfo($a_ass->getMemberStatus()->getMark());
+            if ($tag) {
+                $tag = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ':' . $tag.'</span>';
+            }
         }
-        $tpl->setVariable("TITLE", $a_ass->getTitleWithInfo() . ($tag ? ' <span class="ilTag">'. $tag.'</span>' : ''));
+        $tpl->setVariable("TITLE", $a_ass->getTitleWithInfo() . $tag);
         // fau.
 
         // status icon
