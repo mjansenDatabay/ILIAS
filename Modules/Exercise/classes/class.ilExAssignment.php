@@ -195,6 +195,25 @@ class ilExAssignment
         return $data;
     }
 
+    // fau: exGradeTime - new function getInstancesForGrading()
+    /**
+     * Get the assignments that are allowed for grading
+     * @param int $a_exc_id
+     * @return ilExAssignment[]
+     */
+    public static function getInstancesForGrading($a_exc_id) {
+        /** @var ilExAssignment[] $assignments */
+        $assignments = self::getInstancesByExercise($a_exc_id);
+        $allowed = [];
+        foreach ($assignments as $ass) {
+            if ($ass->checkInGradeTime()) {
+                $allowed[] = $ass;
+            }
+        }
+        return $allowed;
+    }
+    // fau.
+
     /**
      * @param array $a_file_data
      * @param integer $a_ass_id assignment id.
@@ -468,6 +487,7 @@ class ilExAssignment
         if (!empty($this->grade_start)) {
             return $this->grade_start <= time();
         }
+        return true;
     }
     // fau.
 

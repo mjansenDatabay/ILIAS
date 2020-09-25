@@ -605,6 +605,8 @@ exc#:#exc_calculate_overall_results#:#calculate overall results
 exc#:#exc_grade_time#:#Grading Time
 exc#:#exc_grade_time_info#:#If set, then feedback and grading will be possible after the given Date
 exc#:#exc_grade_start#:#Grading Start
+exc#:#exc_no_assignments_for_grading#:#No assignments available for grading.
+exc#:#exc_not_available_for_grading#:#The selected assignment is not available for grading!
 exc#:#exc_mark#:#Grade/Credits
 exc#:#exc_limit_points#:#Limit Points
 exc#:#exc_max_points#:#Maximum Points

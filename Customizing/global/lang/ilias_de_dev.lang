@@ -565,6 +565,8 @@ exc#:#exc_calculate_overall_results#:#Gesamtergebnisse berechnen
 exc#:#exc_grade_time#:#Korrekturzeit
 exc#:#exc_grade_time_info#:#Wenn gesetzt, sind Feedback und Bewertung für die Tutoren erst ab einem bestimmten Datum möglich.
 exc#:#exc_grade_start#:#Korrektur-Start
+exc#:#exc_no_assignments_for_grading#:#Keine Übungseinheiten zur Bewertung verfügbar.
+exc#:#exc_not_available_for_grading#:#Die ausgewählte Übungseinheit ist nicht zur Bewertung verfügbar!
 exc#:#exc_mark#:#Note/Punkte
 exc#:#exc_limit_points#:#Punkte begrenzen
 exc#:#exc_max_points#:#Maximale Punktzahl

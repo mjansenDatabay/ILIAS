@@ -117,7 +117,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
         if ($participant_id > 0) {
             $this->participant_id = $participant_id;
-            $assignments = ilExAssignment::getInstancesByExercise($this->exercise_id);
+            // fau: exGradeTime - get only the available instances
+            $assignments = ilExAssignment::getInstancesForGrading($this->exercise_id);
+            // fau.
             foreach ($assignments as $assignment) {
                 $this->collectAssignmentData($assignment->getId());
             }

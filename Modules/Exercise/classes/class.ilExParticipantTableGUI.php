@@ -59,7 +59,9 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
     
         $data = array();
         /** @var ilExAssignment $ass */
-        foreach (ilExAssignment::getInstancesByExercise($this->exc->getId()) as $ass) {
+        // fau: exGradeTime - get only available instances
+        foreach (ilExAssignment::getInstancesForGrading($this->exc->getId()) as $ass) {
+            // fau.
             // ilExAssignment::getMemberListData()
             $member_status = $ass->getMemberStatus($this->user->getId());
                             

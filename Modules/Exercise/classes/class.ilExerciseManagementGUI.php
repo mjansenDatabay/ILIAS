@@ -106,7 +106,7 @@ class ilExerciseManagementGUI
             $this->assignment = $a_ass;
             $this->ass_id = $this->assignment->getId();
         }
-        
+
         $this->ctrl->saveParameter($this, array("vw", "member_id"));
     }
     
@@ -118,9 +118,17 @@ class ilExerciseManagementGUI
         
         $class = $ilCtrl->getNextClass($this);
         //$cmd = $ilCtrl->getCmd("listPublicSubmissions");
-        
+
+        // fau: exGradeTime - check if selected assignment is available
+        if (isset($this->assignment) && !$this->assignment->checkInGradeTime()) {
+            ilUtil::sendFailure( $this->lng->txt("exc_not_available_for_grading"), true);
+            $this->ctrl->setParameter($this, "ass_id", "");
+            $this->ctrl->redirect($this, $this->getViewBack());
+        }
+        // fau.
+
         switch ($class) {
-// fau: exManCalc - call calculation GUI
+            // fau: exManCalc - call calculation GUI
             case "ilexcalculategui":
                 include_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
                 $calc_gui = new ilExCalculateGUI($this->exercise);
@@ -128,7 +136,7 @@ class ilExerciseManagementGUI
                 $this->ctrl->setReturn($this, 'showGradesOverview');
                 $this->ctrl->forwardCommand($calc_gui);
                 break;
-// fau.
+            // fau.
 
             case "ilfilesystemgui":
                 $ilTabs->clearTargets();
@@ -137,11 +145,11 @@ class ilExerciseManagementGUI
                     $ilCtrl->getLinkTarget($this, $this->getViewBack())
                 );
 
-// fau: exResTime - prevent sending of feedback file notification
+                // fau: exResTime - prevent sending of feedback file notification
                 if ((int) $this->assignment->getResultTime() <= time()) {
                     ilUtil::sendInfo($lng->txt("exc_fb_tutor_info"));
                 }
-// fau.
+                // fau.
                 include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
                 $fstorage = new ilFSStorageExercise($this->exercise->getId(), $this->assignment->getId());
                 $fstorage->create();
@@ -348,7 +356,12 @@ class ilExerciseManagementGUI
         
         // assignment selection
         include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-        $ass = ilExAssignment::getInstancesByExercise($this->exercise->getId());
+        // fau: exGradeTime - get only the allowed assignment
+        $ass = ilExAssignment::getInstancesForGrading($this->exercise->getId());
+        if (empty($ass)) {
+            ilUtil::sendInfo($lng->txt("exc_no_assignments_for_grading"));
+        }
+        // fau.
         
         if (!$this->assignment) {
             $this->assignment = current($ass);
@@ -908,7 +921,9 @@ class ilExerciseManagementGUI
         
         // participant selection
         include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-        $ass = ilExAssignment::getAssignmentDataOfExercise($this->exercise->getId());
+        // fau: exGradeTime - seems to be unused
+        // $ass = ilExAssignment::getAssignmentDataOfExercise($this->exercise->getId());
+        // fau.
         $members = $this->exercise->members_obj->getMembers();
         
         $members = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
