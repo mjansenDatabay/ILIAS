@@ -1248,9 +1248,9 @@ class ilExerciseManagementGUI
     public function confirmDeassignMembersObject()
     {
         // fau: exMemDelete - check edit permission
-        global $DIC;
-        if (!$DIC->access()->checkAccess('write', '',$this->exercise->getRefId())) {
-            throw new ilObjectException($this->lng->txt("permission_denied"));
+        if (!$this->exercise->isMemberDeleteAllowed()) {
+            ilUtil::sendFailure($this->lng->txt("exc_mem_delete_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
         }
         // fau.
 
@@ -1286,8 +1286,9 @@ class ilExerciseManagementGUI
     {
         // fau: exMemDelete - check edit permission
         global $DIC;
-        if (!$DIC->access()->checkAccess('write', '',$this->exercise->getRefId())) {
-            throw new ilObjectException($this->lng->txt("permission_denied"));
+        if (!$this->exercise->isMemberDeleteAllowed()) {
+            ilUtil::sendFailure($this->lng->txt("exc_mem_delete_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
         }
         // fau.
 

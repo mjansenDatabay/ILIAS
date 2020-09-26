@@ -760,7 +760,18 @@ class ilObjExercise extends ilObject
     {
         return $this->completion_by_submission;
     }
-    
+
+    /**
+     * Check if delete of members and their submissions is allowed
+     * @return bool
+     */
+    public function isMemberDeleteAllowed() {
+        global $DIC;
+
+        return ($DIC->access()->checkAccess('write', '', $this->getRefId())
+                && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
+    }
+
     /**
      *
      * Enabled/Disable completion by submission
