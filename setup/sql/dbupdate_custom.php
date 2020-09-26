@@ -1246,13 +1246,33 @@ if (!$ilDB->tableColumnExists('exc_assignment', 'max_points')) {
 <#75>
 <?php
 /**
- * fau: exeGradeTime - add column for grading availability date
+ * fau: exGradeTime - add column for grading availability date
  */
 if (!$ilDB->tableColumnExists('exc_assignment', 'grade_start')) {
     $ilDB->addTableColumn(
         'exc_assignment',
         'grade_start',
         array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => null)
+    );
+}
+?>
+<#76>
+<?php
+/**
+ * fau: exPlag - add columns for plagiarism state and comment
+ */
+if (!$ilDB->tableColumnExists('exc_mem_ass_status', 'plag_flag')) {
+    $ilDB->addTableColumn(
+        'exc_mem_ass_status',
+        'plag_flag',
+        array('type' => 'text', 'length' => 10, 'notnull' => false, 'default' => 'none')
+    );
+}
+if (!$ilDB->tableColumnExists('exc_mem_ass_status', 'plag_comment')) {
+    $ilDB->addTableColumn(
+        'exc_mem_ass_status',
+        'plag_comment',
+        array('type' => 'text', 'length' => 4000, 'notnull' => false, 'default' => null)
     );
 }
 ?>

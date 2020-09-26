@@ -9,6 +9,12 @@
  */
 class ilExAssignmentMemberStatus
 {
+    // fau: exPlag - constants
+    const PLAG_NONE = 'none';
+    const PLAG_SUSPICION = 'suspicion';
+    const PLAG_DETECTED = 'detected';
+    // fau.
+
     /**
      * @var ilDB
      */
@@ -30,7 +36,13 @@ class ilExAssignmentMemberStatus
     protected $db_exists; // [bool]
     protected $returned_update; // [bool]
     protected $status_update; // [bool]
-    
+
+    // fau: exPlag - class variables
+    protected $plag_flag; // [int]
+    protected $plag_comment; // [string]
+    // fau,
+
+
     public function __construct($a_ass_id, $a_user_id)
     {
         global $DIC;
@@ -168,7 +180,62 @@ class ilExAssignmentMemberStatus
     {
         return $this->comment;
     }
-    
+
+    // fau: exPlag - getter, setter and checker
+    /**
+     * @return string
+     */
+    public function getPlagFlag()
+    {
+        return $this->plag_flag;
+    }
+
+    /**
+     * @param string $plag_flag
+     */
+    public function setPlagFlag($plag_flag)
+    {
+        $this->plag_flag = $plag_flag;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlagComment()
+    {
+        return $this->plag_comment;
+    }
+
+    /**
+     * @param string $plag_comment
+     */
+    public function setPlagComment($plag_comment)
+    {
+        $this->plag_comment = $plag_comment;
+    }
+
+    /**
+     * Is a plagiarism detected
+     * @return bool
+     */
+    public function isPlagDetected()
+    {
+        return ($this->plag_flag == self::PLAG_DETECTED);
+    }
+
+    /**
+     * Is a plagiarism suspected
+     * @return bool
+     */
+    public function isPlagSuspected()
+    {
+        return ($this->plag_flag == self::PLAG_SUSPICION);
+    }
+
+    // fau.
+
+
+
     protected function read()
     {
         $ilDB = $this->db;
@@ -191,6 +258,10 @@ class ilExAssignmentMemberStatus
             $this->status = $row["status"];
             $this->mark = $row["mark"];
             $this->comment = $row["u_comment"];
+            // fau: exPlag - read values
+            $this->plag_flag = $row["plag_flag"];
+            $this->plag_comment = $row["plag_cmment"];
+            // fau.
             $this->db_exists = true;
         }
     }
@@ -209,6 +280,10 @@ class ilExAssignmentMemberStatus
             ,"status" => array("text", $this->getStatus())
             ,"mark" => array("text", $this->getMark())
             ,"u_comment" => array("text", $this->getComment())
+            // fau: exPlag - get the plag fields
+            ,"plag_flag" => array("text", $this->getPlagFlag())
+            ,"plag_comment" => array("text", $this->getPlagComment())
+            // fau.
         );
     }
     
