@@ -155,6 +155,12 @@ class ilExAssignmentMemberStatus
     
     public function getStatus()
     {
+        // fau: exPlag - return failed if plagiarism is detected
+        if ($this->isPlagDetected()) {
+            return 'failed';
+        }
+        // fau.
+
         return $this->status;
     }
     
@@ -168,9 +174,54 @@ class ilExAssignmentMemberStatus
     
     public function getMark()
     {
+        // fau: exPlag - suppress mark if plagiarism is detected
+        if ($this->isPlagDetected()) {
+            return null;
+        }
+        // fau.
         return $this->mark;
     }
-    
+
+    // fau: exMaxPoints - new function getMarkWithInfo
+    /**
+     * Get the mark with an extended info
+     * @param ilExAssignment $assignment
+     * @return string
+     */
+    public function getMarkWithInfo (ilExAssignment $assignment) {
+        global $DIC;
+        $lng = $DIC->language();
+
+        if ($assignment->getMaxPoints() && $this->getMark()) {
+            if ($assignment->checkMark($this->getMark())) {
+                $percent = 100 * (float) $this->getMark() /  $assignment->getMaxPoints();
+                return sprintf($lng->txt("exc_mark_percent"), $this->getMark(), $percent);
+            }
+            else {
+                return sprintf($lng->txt("exc_mark_invalid"), $this->getMark());
+            }
+        }
+        return $this->getMark();
+    }
+    // fau.
+
+
+    // fau: exPlag -get info about plagiarism
+    public function getPlagInfo() {
+        global $DIC;
+        $lng = $DIC->language();
+
+        if ($this->getPlagFlag() == self::PLAG_DETECTED) {
+            $text = $lng->txt('exc_plag_detected_info');
+            if (!empty($this->getPlagComment())) {
+                $text .= $lng->txt('exc_plag_see_comment');
+            }
+            return $text;
+        }
+        return '';
+    }
+    // fau.
+
     public function setComment($a_value)
     {
         $this->comment = $a_value;
@@ -196,6 +247,10 @@ class ilExAssignmentMemberStatus
     public function setPlagFlag($plag_flag)
     {
         $this->plag_flag = $plag_flag;
+        if ($this->isPlagDetected()) {
+            $this->status = 'failed';
+            $this->mark = null;
+        }
     }
 
     /**
@@ -260,7 +315,7 @@ class ilExAssignmentMemberStatus
             $this->comment = $row["u_comment"];
             // fau: exPlag - read values
             $this->plag_flag = $row["plag_flag"];
-            $this->plag_comment = $row["plag_cmment"];
+            $this->plag_comment = $row["plag_comment"];
             // fau.
             $this->db_exists = true;
         }

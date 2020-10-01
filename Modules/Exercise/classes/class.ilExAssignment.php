@@ -1064,24 +1064,6 @@ class ilExAssignment
         }
         return true;
     }
-
-    /**
-     * Get the mark with an extended info
-     * @param string $a_mark
-     * @return string
-     */
-    public function getMarkWithInfo ($a_mark) {
-        if ($this->getMaxPoints() && $a_mark) {
-            if ($this->checkMark($a_mark)) {
-                $percent = 100 * (float) $a_mark /  $this->getMaxPoints();
-                return sprintf($this->lng->txt("exc_mark_percent"), $a_mark, $percent);
-            }
-            else {
-                return sprintf($this->lng->txt("exc_mark_invalid"), $a_mark);
-            }
-        }
-        return $a_mark;
-    }
     // fau.
 
     // fau: exFileSuffixes - getters and setters and check
@@ -1877,6 +1859,10 @@ class ilExAssignment
                 $mem[$rec["usr_id"]]["mark"] = $rec["mark"];
                 // fau: exMaxPoints - add max_points to the member list data
                 $mem[$rec["usr_id"]]["max_points"] = $this->getMaxPoints();
+                // fau.
+                // fau: exPlag - add plagiarism info to member list data
+                $mem[$rec["usr_id"]]["plag_flag"] = $rec["plag_flag"];
+                $mem[$rec["usr_id"]]["plag_comment"] = $rec["plag_comment"];
                 // fau.
                 $mem[$rec["usr_id"]]["comment"] = $rec["u_comment"];
             }

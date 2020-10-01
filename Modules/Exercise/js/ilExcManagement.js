@@ -18,6 +18,17 @@ il.ExcManagement = {
 
 				var comment = $('#lcomment_'+ass_id+'_'+member_id).val();
 
+				// fau: exPlag - set form values
+				var plag_toggle = $('#plag_toggle_'+ass_id+'_'+member_id).val();
+				var plag_flag = $('#plag_flag_'+ass_id+'_'+member_id).val();
+				var plag_comment = $('#plag_comment_'+ass_id+'_'+member_id).val();
+				// fau.
+
+				if (!plag_toggle) {
+					plag_flag = "none";
+					plag_comment = "";
+				}
+
 				$.ajax({
 					url: il.ExcManagement.ajax_url,
 					dataType: 'json',
@@ -25,11 +36,23 @@ il.ExcManagement = {
 					data: {
 						ass_id: ass_id,
 						mem_id: member_id,
-						comm: comment
+						comm: comment,
+						// fau: exPlag - add data to ajax call
+						plag_flag: plag_flag,
+						plag_comment: plag_comment
+						// fau.
 					},
 					success: function (response) {		
 						$("#"+form_id.substr(5)+"_snip").html(response.snippet);
 
+						// fau: exPlag - extended row update after saving
+						$("#"+form_id.substr(5)+"_plag_info").html(response.plag_info);
+						$("#"+form_id.substr(5)+"_plag_comment").html(response.plag_comment);
+						if (plag_flag === 'detected') {
+							$("#"+form_id.substr(5)+"_status").val('failed');
+							$("#"+form_id.substr(5)+"_mark").val('');
+						}
+						// fau.
 					}
 				}).fail(function() {
 

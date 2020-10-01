@@ -99,6 +99,10 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
                 "submission" => $submission->getLastSubmission(),
                 "notice" => $member_status->getNotice(),
                 "comment" => $member_status->getComment(),
+                // fau: exPlag - add plag info to table row
+                "plag_flag" => $member_status->getPlagFlag(),
+                "plag_comment" => $member_status->getPlagComment(),
+                // fau.
                 "order_nr" => $ass->getOrderNr()
             );
             

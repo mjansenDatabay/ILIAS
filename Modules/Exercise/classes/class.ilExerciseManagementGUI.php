@@ -1467,6 +1467,21 @@ class ilExerciseManagementGUI
             $ass_id = (int) $_POST["ass_id"];
             $user_id = (int) $_POST["mem_id"];
             $comment = trim($_POST["comm"]);
+            // fau: exPlag - get posted data
+            $plag_flag = trim($_POST["plag_flag"]);
+            $plag_comment = trim ($_POST['plag_comment']);
+            switch($plag_flag) {
+                case ilExAssignmentMemberStatus::PLAG_SUSPICION:
+                    $plag_info = $this->lng->txt('exc_plag_suspicion_info') . ' (' .$this->lng->txt('exc_visible_for_tutors') . ')';
+                    break;
+                case ilExAssignmentMemberStatus::PLAG_DETECTED:
+                    $plag_info = $this->lng->txt('exc_plag_detected_info') . ' (' .$this->lng->txt('exc_visible_for_student') . ')';
+                    break;
+                default:
+                    $plag_flag =  ilExAssignmentMemberStatus::PLAG_NONE;
+                    $plag_info = "";
+            }
+            // fau.
             
             if ($ass_id && $user_id) {
                 $submission = new ilExSubmission($this->assignment, $user_id);
@@ -1483,6 +1498,11 @@ class ilExerciseManagementGUI
                         $member_status->setComment(ilUtil::stripSlashes($comment, false));
                         // fau.
                         $member_status->setFeedback(true);
+                        // fau: exPlag - save plagiarism state
+                        $member_status->setPlagFlag($plag_flag);
+                        $member_status->setPlagComment(ilUtil::stripSlashes($plag_comment, false));
+                        // fau.
+
                         $member_status->update();
                         
                         if (trim($comment)) {
@@ -1502,8 +1522,15 @@ class ilExerciseManagementGUI
                         true
                     );
                 }
-                
-                $res = array("result" => true, "snippet" => nl2br($comment));
+
+                // fau: exPlag - send plagiarism state back
+                $res = array(
+                    "result" => true,
+                    "snippet" => nl2br($comment),
+                    "plag_info" => $plag_info,
+                    "plag_comment" => $plag_comment,
+                );
+                // fau.
             }
         }
         

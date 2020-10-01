@@ -624,7 +624,8 @@ exc#:#exc_result_time_not_for_peer_feedback#:#The result availability is not val
 exc#:#exc_result_available_after#:#Result available after
 exc#:#exc_status_file_wrong_titles#:#The head row has wrong column titles.
 exc#:#exc_status_file_wrong_mark#:#The value "%s" in "mark" is not numeric or exceeds the maximum points %s.
-exc#:#exc_status_file_wrong_status#:#The status %s is not valid.
+exc#:#exc_status_file_wrong_status#:#The status %s is not valid. It must be 'notgraded', 'passed' or 'failed'.
+exc#:#exc_status_file_wrong_plag_flag#:#The plagiarism flag '%s' ist not valid. It must be 'none', 'suspicion', 'detected' or empty.
 exc#:#exc_status_file_error#:#Reading the file %s produced the following error (the file will be ignored at saving): <p class="small">%s</p>
 exc#:#exc_status_file_no_updates#:#The file %s nas no matching users for an update.
 exc#:#exc_status_file_update_users#:#Saving will process the file %s to update the status of the following users: <p class="small">%s</p>
@@ -639,7 +640,19 @@ exc#:#exc_file_suffixes_in_zip#:#Allowed filename in the archive: %s
 exc#:#exc_wrong_filenames#:#The following filenames have a wrong suffix: %s
 exc#:#exc_wrong_filenames_in_zip#:#The following filenames in the archive have a wrong suffix: %s
 exc#:#exc_mem_delete_perm_failure#:#You need the permission to edit the exercise settings in order to delete submissions!
-exercise#:#exc_mark#:#grade/Points
+exc#:#exc_plagiarism#:#Plagiarism
+exc#:#exc_plag_state#:#Status
+exc#:#exc_plag_none#:#None
+exc#:#exc_plag_suspicion#:#Suspicion
+exc#:#exc_plag_detected#:#Detected
+exc#:#exc_plag_comment#:#Plagiarism comment
+exc#:#exc_plag_suspicion_info#:#Plagiarism suspicion
+exc#:#exc_plag_detected_info#:#Plagiarism detected
+exc#:#exc_plag_see_comment#:#, see Comment
+exc#:#exc_plag_visible_info#:#A suspected plagiarismn will be shown to the tutors only. A detected plagiarism will be shown to the learner. It will set the status to 'failed' and remove the mark.
+exc#:#exc_visible_for_tutors#:#only visible for tutors
+exc#:#exc_visible_for_student#:#visible for learners
+exercise#:#exc_mark#:#Grade/Points
 exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
 exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:

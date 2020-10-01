@@ -143,13 +143,18 @@ class ilExAssignmentGUI
         // fau.
 
         // fau: exMaxPoints - add info about maximum points and reached points
+        // fau: exPlag - add info about plagiarism
         if ((int) $a_ass->getResultTime() <= time()) {
-            $tag = $a_ass->getMarkWithInfo($a_ass->getMemberStatus()->getMark());
-            if ($tag) {
-                $tag = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ':' . $tag.'</span>';
+
+            if ($tag1 = $a_ass->getMemberStatus()->getMarkWithInfo($a_ass)) {
+                $tag1 = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ':' . $tag1.'</span>';
+            }
+
+            if ($tag2 = $a_ass->getMemberStatus()->getPlagInfo()) {
+                $tag2 = ' <span class="ilTag">'. $tag2.'</span>';
             }
         }
-        $tpl->setVariable("TITLE", $a_ass->getTitleWithInfo() . $tag);
+        $tpl->setVariable("TITLE", $a_ass->getTitleWithInfo() . $tag1 . $tag2);
         // fau.
 
         // status icon
@@ -502,10 +507,25 @@ class ilExAssignmentGUI
                 $a_info->addProperty(
                     $lng->txt("exc_mark"),
                     // fau: exMaxPoints - show extended mark
-                    $a_ass->getMarkWithInfo($mark)
+                    $a_ass->getMemberStatus()->getMarkWithInfo($a_ass)
                     // fau.
                 );
             }
+
+            // fau: exPlag - show plagiarism info
+            if ($a_ass->getMemberStatus()->isPlagDetected()) {
+                $a_info->addProperty(
+                    $lng->txt("exc_plagiarism"),
+                    $a_ass->getMemberStatus()->getPlagInfo()
+                );
+                if ($a_ass->getMemberStatus()->getPlagComment()) {
+                    $a_info->addProperty(
+                        $lng->txt("exc_plag_comment"),
+                        $a_ass->getMemberStatus()->getPlagComment()
+                    );
+                }
+            }
+            // fau.
 
             if ($status == "") {
                 //				  $a_info->addProperty($lng->txt("status"),

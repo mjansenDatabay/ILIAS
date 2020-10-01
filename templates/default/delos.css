@@ -13926,7 +13926,7 @@ th.ilSkillEntryHead {
   border-color: #dcb496;
 }
 .ilSkillEvalItem.ilSkillEvalType2 {
-  border-color: #21c5d8;
+  border-color: #1d588d;
 }
 .ilSkillDescription,
 .ilSkillMaterial,
@@ -13956,7 +13956,7 @@ th.ilSkillEntryHead {
   color: #dcb496;
 }
 .ilSkillEvalItem > .row > .ilSkillEvalType2 {
-  color: #21c5d8;
+  color: #1d588d;
 }
 .ilSkillEvalItem > .row > .ilSkillEvalType3 {
   color: #6ea03c;
@@ -15713,7 +15713,7 @@ div.ilSurveyPageEditActionMenu {
   font-size: 90%;
 }
 .ilTag {
-  background-color: #75deea;
+  background-color: #3a8cd6;
   /* background-color: lighten(@brand-primary, 10%); */
   color: white;
   display: inline-block;
@@ -15726,19 +15726,19 @@ a.ilTag:hover,
 a.ilTag:active {
   text-decoration: none;
   color: white;
-  background-color: #60eeff;
+  background-color: #118eff;
 }
 .ilTagRelHigh {
-  background-color: #85d1da;
+  background-color: #518bbf;
 }
 .ilTagRelMiddle {
-  background-color: #95c5ca;
+  background-color: #698aa7;
 }
 .ilTagRelLow {
-  background-color: #a5b8ba;
+  background-color: #81888f;
 }
 .ilTagRelVeryLow {
-  background-color: #b0b0b0;
+  background-color: #888888;
 }
 .ilTag.ilHighlighted {
   background-color: #ea6705;

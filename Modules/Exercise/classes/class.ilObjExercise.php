@@ -761,6 +761,7 @@ class ilObjExercise extends ilObject
         return $this->completion_by_submission;
     }
 
+    // fau: exMemDelete - new function isMemberDeleteAllowed()
     /**
      * Check if delete of members and their submissions is allowed
      * @return bool
@@ -771,6 +772,21 @@ class ilObjExercise extends ilObject
         return ($DIC->access()->checkAccess('write', '', $this->getRefId())
                 && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
     }
+    // fau.
+
+    // fau: exPlag - new function isPlagiarismSettingAllowed()
+    /**
+     * Check if the flag and comment for plagiarism can be set
+     * @return bool
+     */
+    public function isPlagiarismSettingAllowed() {
+        global $DIC;
+
+        return ($DIC->access()->checkAccess('write', '', $this->getRefId())
+            && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
+    }
+    // fau.
+
 
     /**
      *

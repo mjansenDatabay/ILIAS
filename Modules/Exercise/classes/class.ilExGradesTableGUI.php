@@ -136,7 +136,14 @@ class ilExGradesTableGUI extends ilTable2GUI
             // mark
             $mark = $member_status->getMark();
             // fau: exMaxPoints - show extended mark
-            $this->tpl->setVariable("VAL_ONLY_MARK", $ass->getMarkWithInfo($mark));
+            // fau: exPlag - show detected plagiarism
+            if ($member_status->isPlagDetected()) {
+                $this->tpl->setVariable("VAL_ONLY_MARK", $lng->txt('exc_plagiarism'));
+            }
+            else {
+                $this->tpl->setVariable("VAL_ONLY_MARK", $member_status->getMarkWithInfo($ass));
+
+            }
             // fau.
             
             $this->tpl->parseCurrentBlock();

@@ -27,13 +27,16 @@ class ilExAssignmentStatusFile extends ilExcel
     protected $teams = [];
 
     /** @var string[] */
-    protected $member_titles =  ['update','usr_id','login','lastname','firstname','status','mark','notice','comment'];
+    protected $member_titles =  ['update','usr_id','login','lastname','firstname','status','mark','notice','comment', 'plagiarism', 'plag_comment'];
 
     /** @var string[] */
-    protected $team_titles =  ['update','team_id','logins','status','mark','notice','comment'];
+    protected $team_titles =  ['update','team_id','logins','status','mark','notice','comment', 'plagiarism', 'plag_comment'];
 
     /** @var string[] */
     protected $valid_states = ['notgraded','passed','failed'];
+
+    /** @var string[] */
+    protected $valid_plag_flags = ['none','suspicion','detected'];
 
     /** @var array[] row data to be used for updates */
     protected $updates = [];
@@ -209,7 +212,9 @@ class ilExAssignmentStatusFile extends ilExcel
             $this->setCell($row, $col++, $member['status'], DataType::TYPE_STRING);
             $this->setCell($row, $col++, $member['mark'], DataType::TYPE_STRING);
             $this->setCell($row, $col++, $member['notice'], DataType::TYPE_STRING);
-            $this->setCell($row, $col, $member['comment'], DataType::TYPE_STRING);
+            $this->setCell($row, $col++, $member['comment'], DataType::TYPE_STRING);
+            $this->setCell($row, $col++, ($member['plag_flag'] == 'none' ? '' : $member['plag_flag']), DataType::TYPE_STRING);
+            $this->setCell($row, $col, $member['plag_comment'], DataType::TYPE_STRING);
             $row++;
         }
     }
@@ -238,6 +243,8 @@ class ilExAssignmentStatusFile extends ilExcel
             $data['mark'] = (string) $rowdata[$index['mark']];
             $data['notice'] = (string) $rowdata[$index['notice']];
             $data['comment'] = (string) $rowdata[$index['comment']];
+            $data['plag_flag'] = ((string) $rowdata[$index['plagiarism']] ? (string) $rowdata[$index['plagiarism']] : 'none');
+            $data['plag_comment'] = (string) $rowdata[$index['plag_comment']];
 
             if (!$data['update'] || !isset($this->members[$data['usr_id']])) {
                 continue;
@@ -249,6 +256,10 @@ class ilExAssignmentStatusFile extends ilExcel
 
             if (!$this->assignment->checkMark($data['mark'])) {
                 throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_mark'), $data['mark'], $this->assignment->getMaxPoints()));
+            }
+
+            if (!in_array($data['plag_flag'], $this->valid_plag_flags)) {
+                throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_plag_flag'), $data['plag_flag']));
             }
 
             $this->updates[] = $data;
@@ -288,6 +299,8 @@ class ilExAssignmentStatusFile extends ilExcel
                 $status->setMark($data['mark']);
                 $status->setComment($data['comment']);
                 $status->setNotice($data['notice']);
+                $status->setPlagFlag($data['plag_flag']);
+                $status->setPlagComment($data['plag_comment']);
                 $status->update();
             }
         }

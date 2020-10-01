@@ -33,9 +33,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
     protected $cols_mandatory = array("name", "status");
     protected $cols_default = array("login", "submission_date", "idl", "calc_deadline");
     // fau: exMaxPoints - put max_points in cols order
+    // fau: exPlag - put plagiarism in cols order
     protected $cols_order = array("image", "name", "login", "team_members",
             "sent_time", "submission", "calc_deadline", "idl", "status", "mark", "max_points","status_time",
-            "feedback_time", "comment", "notice");
+            "feedback_time", "comment", "notice", "plagiarism");
     // fau.
     /**
      * Constructor
@@ -218,7 +219,11 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         }
         
         $cols["notice"] = array($this->lng->txt("exc_tbl_notice"), "note");
-        
+
+        // fau: exPlag - parse column
+        $cols['plagiarism'] = array($this->lng->txt('exc_plagiarism'), "plagiarism");
+        // fau.
+
         return $cols;
     }
     
@@ -292,6 +297,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         // do not grade or mark if no team yet
         if (!$has_no_team_yet) {
             // status
+            // fau: exPlag - add id for update by ajax success
+            $comment_id = "excasscomm_" . $a_ass->getId() . "_" . $a_user_id;
+            $this->tpl->setVariable("STATUS_ID", $comment_id . "_status");
+            // fau.
             $this->tpl->setVariable("SEL_" . strtoupper($a_row["status"]), ' selected="selected" ');
             $this->tpl->setVariable("TXT_NOTGRADED", $this->lng->txt("exc_notgraded"));
             $this->tpl->setVariable("TXT_PASSED", $this->lng->txt("exc_passed"));
@@ -326,6 +335,31 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
             $lcomment->setCols(45);
             $lcomment->setRows(10);
             $lcomment_form->addItem($lcomment);
+
+            // fau: exPlag - add plagiarism form elements
+            if ($this->exc->isPlagiarismSettingAllowed()) {
+                $plag_toggle = new ilCheckboxInputGUI($this->lng->txt('exc_plagiarism'), 'plag_toggle_' . $a_ass->getId() . "_" . $a_user_id);
+                $plag_flag = new ilSelectInputGUI($this->lng->txt('exc_plag_state'), 'plag_flag_' . $a_ass->getId() . "_" . $a_user_id);
+                $plag_flag->setOptions([
+                    ilExAssignmentMemberStatus::PLAG_NONE => $this->lng->txt('exc_plag_none'),
+                    ilExAssignmentMemberStatus::PLAG_SUSPICION => $this->lng->txt('exc_plag_suspicion'),
+                    ilExAssignmentMemberStatus::PLAG_DETECTED => $this->lng->txt('exc_plag_detected')
+                ]);
+                $plag_flag->setInfo($this->lng->txt('exc_plag_visible_info'));
+                $plag_flag->setValue($a_row['plag_flag']);
+                $plag_comment = new ilTextAreaInputGUI($this->lng->txt("exc_plag_comment"), "plag_comment_" . $a_ass->getId() . "_" . $a_user_id);
+                $plag_comment->setValue($a_row["plag_comment"]);
+
+                $lcomment_form->addItem($plag_toggle);
+                $plag_toggle->addSubItem($plag_flag);
+                $plag_toggle->addSubItem($plag_comment);
+
+                if ($a_row['plag_flag'] == ilExAssignmentMemberStatus::PLAG_SUSPICION ||
+                    $a_row['plag_flag'] == ilExAssignmentMemberStatus::PLAG_DETECTED) {
+                    $plag_toggle->setChecked(true);
+                }
+            }
+            // fau.
 
             $lcomment_form->addCommandButton("save", $this->lng->txt("save"));
             // $lcomment_form->addCommandButton("cancel", $lng->txt("cancel"));
@@ -389,7 +423,14 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                     if ($has_no_team_yet) {
                         break;
                     }
-                    // fallthrough
+                    // fau: exPlag - add id for update by ajax success
+                    else {
+                        $this->tpl->setVariable("MARK_ID", $comment_id . "_mark");
+                        $this->tpl->setVariable("VAL_" . strtoupper($col), ilUtil::prepareFormOutput(trim($a_row[$col])));
+                        break;
+                    }
+                    // fau.
+                 // fallthrough
                     
                     // no break
                 case "notice":
@@ -406,7 +447,24 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                         ? nl2br(trim($a_row[$col]))
                         : "&nbsp;");
                     break;
-                                
+
+                // fau: exPlag - show column content
+                case "plagiarism":
+                    // for js-updating
+                    $this->tpl->setVariable("PLAG_INFO_ID", $comment_id . "_plag_info");
+                    $this->tpl->setVariable("PLAG_COMMENT_ID", $comment_id . "_plag_comment");
+
+                    if ($a_row['plag_flag'] == ilExAssignmentMemberStatus::PLAG_SUSPICION) {
+                        $info = $this->lng->txt("exc_plag_suspicion_info") . " (" .$this->lng->txt("exc_visible_for_tutors") . ")";
+                    }
+                    if ($a_row['plag_flag'] == ilExAssignmentMemberStatus::PLAG_DETECTED) {
+                        $info = $this->lng->txt("exc_plag_detected_info") . " (" .$this->lng->txt("exc_visible_for_student") . ")";
+                    }
+                    $this->tpl->setVariable("VAL_PLAG_INFO", ilUtil::prepareFormOutput($info));
+                    $this->tpl->setVariable("VAL_PLAG_COMMENT", nl2br(ilUtil::prepareFormOutput($a_row['plag_comment'])));
+                    break;
+                    // fau.
+
                 case "submission":
                     if ($a_row["submission_obj"]) {
                         foreach ($a_row["submission_obj"]->getFiles() as $file) {
@@ -435,7 +493,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                         break;
                     }
                     // fallthrough
-                
+
                     // no break
                 default:
                     $this->tpl->setVariable("VAL_" . strtoupper($col), $a_row[$col]

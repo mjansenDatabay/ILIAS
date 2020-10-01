@@ -104,7 +104,9 @@
   
   <!-- BEGIN status -->
   <td class="std small">
-	<select class="form-control" name="status[{VAL_ID}]" >
+	  <!-- fau: exPlag - add id for update by ajax success -->
+	<select id="{STATUS_ID}"  class="form-control" name="status[{VAL_ID}]" >
+		<!-- fau. -->
 		<option value="notgraded" {SEL_NOTGRADED}>{TXT_NOTGRADED}</option>
 		<option value="passed" {SEL_PASSED}>{TXT_PASSED}</option>
 		<option value="failed" {SEL_FAILED}>{TXT_FAILED}</option>
@@ -114,7 +116,9 @@
   
   <!-- BEGIN mark -->
   <td class="std small">
-	<input class="form-control" type="text" name="mark[{VAL_ID}]" value="{VAL_MARK}" size="4" maxlength="32" />
+	<!-- fau: exPlag - add id for update by ajax success -->
+	<input id="{MARK_ID}" class="form-control" type="text" name="mark[{VAL_ID}]" value="{VAL_MARK}" size="4" maxlength="32" />
+	<!-- fau. -->
   </td>
   <!-- END mark -->
 
@@ -153,8 +157,18 @@
 	  <input class="form-control" type="text" name="notice[{VAL_ID}]" value="{VAL_NOTICE}" size="25" maxlength="200" />
   </td>
   <!-- END notice -->
-  
-  <td class="std small">
+
+	<!-- fau: exPlag - new column -->
+	<!-- BEGIN plagiarism -->
+	<td class="std small">
+		<strong id="{PLAG_INFO_ID}">{VAL_PLAG_INFO}</strong></p>
+		<p id="{PLAG_COMMENT_ID}">{VAL_PLAG_COMMENT}</p>
+		<!-- END plag_student -->
+	</td>
+	<!-- END plagiarism -->
+	<!-- fau. -->
+
+	<td class="std small">
 	  {ACTIONS}
   </td>
   
