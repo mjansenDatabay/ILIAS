@@ -47,6 +47,9 @@ class ilExAssignmentStatusFile extends ilExcel
     /** @var string */
     protected $error;
 
+    /** @var bool */
+    protected $allow_plag_update = false;
+
     /**
      * Initialize the data
      * @param ilExAssignment $assignment
@@ -65,6 +68,14 @@ class ilExAssignmentStatusFile extends ilExcel
         if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
             $this->initTeams($user_ids);
         }
+    }
+
+    /**
+     * Alow the update of plagiarism status
+     * @param bool $allow
+     */
+    public function allowPlagiarismUpdate($allow = true) {
+        $this->allow_plag_update = (bool) $allow;
     }
 
     /**
@@ -299,8 +310,10 @@ class ilExAssignmentStatusFile extends ilExcel
                 $status->setMark($data['mark']);
                 $status->setComment($data['comment']);
                 $status->setNotice($data['notice']);
-                $status->setPlagFlag($data['plag_flag']);
-                $status->setPlagComment($data['plag_comment']);
+                if ($this->allow_plag_update) {
+                    $status->setPlagFlag($data['plag_flag']);
+                    $status->setPlagComment($data['plag_comment']);
+                }
                 $status->update();
             }
         }
@@ -339,9 +352,14 @@ class ilExAssignmentStatusFile extends ilExcel
                 $logins[] = $data['login'];
             }
             if ($this->updates_applied) {
-                return sprintf($this->lng->txt('exc_status_file_updated_users'),  implode(', ', $logins));
+                return sprintf(
+                    $this->lng->txt($this->allow_plag_update ? 'exc_status_file_updated_users' : 'exc_status_file_updated_users_no_plag'),
+                    implode(', ', $logins));
             }
-            return sprintf($this->lng->txt('exc_status_file_update_users'),  $this->getFilename(), implode(', ', $logins));
+            return sprintf(
+                $this->lng->txt($this->allow_plag_update ? 'exc_status_file_update_users' : 'exc_status_file_update_users_no_plag'),
+                $this->getFilename(),
+                implode(', ', $logins));
         }
     }
 }

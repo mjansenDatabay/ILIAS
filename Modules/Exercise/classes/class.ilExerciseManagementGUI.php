@@ -1468,18 +1468,22 @@ class ilExerciseManagementGUI
             $user_id = (int) $_POST["mem_id"];
             $comment = trim($_POST["comm"]);
             // fau: exPlag - get posted data
-            $plag_flag = trim($_POST["plag_flag"]);
-            $plag_comment = trim ($_POST['plag_comment']);
-            switch($plag_flag) {
-                case ilExAssignmentMemberStatus::PLAG_SUSPICION:
-                    $plag_info = $this->lng->txt('exc_plag_suspicion_info') . ' (' .$this->lng->txt('exc_visible_for_tutors') . ')';
-                    break;
-                case ilExAssignmentMemberStatus::PLAG_DETECTED:
-                    $plag_info = $this->lng->txt('exc_plag_detected_info') . ' (' .$this->lng->txt('exc_visible_for_student') . ')';
-                    break;
-                default:
-                    $plag_flag =  ilExAssignmentMemberStatus::PLAG_NONE;
-                    $plag_info = "";
+            $set_plag = false;
+            if ($this->exercise->isPlagiarismSettingAllowed()) {
+                $set_plag = true;
+                $plag_flag = trim($_POST["plag_flag"]);
+                $plag_comment = trim($_POST['plag_comment']);
+                switch ($plag_flag) {
+                    case ilExAssignmentMemberStatus::PLAG_SUSPICION:
+                        $plag_info = $this->lng->txt('exc_plag_suspicion_info') . ' (' . $this->lng->txt('exc_visible_for_tutors') . ')';
+                        break;
+                    case ilExAssignmentMemberStatus::PLAG_DETECTED:
+                        $plag_info = $this->lng->txt('exc_plag_detected_info') . ' (' . $this->lng->txt('exc_visible_for_student') . ')';
+                        break;
+                    default:
+                        $plag_flag = ilExAssignmentMemberStatus::PLAG_NONE;
+                        $plag_info = "";
+                }
             }
             // fau.
             
@@ -1498,9 +1502,11 @@ class ilExerciseManagementGUI
                         $member_status->setComment(ilUtil::stripSlashes($comment, false));
                         // fau.
                         $member_status->setFeedback(true);
-                        // fau: exPlag - save plagiarism state
-                        $member_status->setPlagFlag($plag_flag);
-                        $member_status->setPlagComment(ilUtil::stripSlashes($plag_comment, false));
+                        // fau: exPlag - save plagiarism state sent by ajax
+                        if ($set_plag) {
+                            $member_status->setPlagFlag($plag_flag);
+                            $member_status->setPlagComment(ilUtil::stripSlashes($plag_comment, false));
+                        }
                         // fau.
 
                         $member_status->update();
@@ -1527,6 +1533,7 @@ class ilExerciseManagementGUI
                 $res = array(
                     "result" => true,
                     "snippet" => nl2br($comment),
+                    "set_plag" => $set_plag,
                     "plag_info" => $plag_info,
                     "plag_comment" => $plag_comment,
                 );
@@ -1896,6 +1903,7 @@ class ilExerciseManagementGUI
 
         // fau: exStatusFile - show info message about status updates
         $status_file = $this->assignment->getStatusFile();
+        $status_file->allowPlagiarismUpdate($this->exercise->isPlagiarismSettingAllowed());
         if ($status_file->hasError()) {
             ilUtil::sendFailure($status_file->getInfo());
         }
@@ -1924,6 +1932,7 @@ class ilExerciseManagementGUI
 
         // fau: exStatusFile - process the status update
         $status_file = $this->assignment->getStatusFile();
+        $status_file->allowPlagiarismUpdate($this->exercise->isPlagiarismSettingAllowed());
         if (!$status_file->hasError() && $status_file->hasUpdates()) {
             $status_file->applyStatusUpdates();
             ilUtil::sendInfo($status_file->getInfo(), true);

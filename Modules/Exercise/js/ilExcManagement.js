@@ -46,11 +46,13 @@ il.ExcManagement = {
 						$("#"+form_id.substr(5)+"_snip").html(response.snippet);
 
 						// fau: exPlag - extended row update after saving
-						$("#"+form_id.substr(5)+"_plag_info").html(response.plag_info);
-						$("#"+form_id.substr(5)+"_plag_comment").html(response.plag_comment);
-						if (plag_flag === 'detected') {
-							$("#"+form_id.substr(5)+"_status").val('failed');
-							$("#"+form_id.substr(5)+"_mark").val('');
+						if (response.set_plag) {
+							$("#"+form_id.substr(5)+"_plag_info").html(response.plag_info);
+							$("#"+form_id.substr(5)+"_plag_comment").html(response.plag_comment);
+							if (plag_flag === 'detected') {
+								$("#"+form_id.substr(5)+"_status").val('failed');
+								$("#"+form_id.substr(5)+"_mark").val('');
+							}
 						}
 						// fau.
 					}
