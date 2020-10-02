@@ -616,6 +616,8 @@ exc#:#exc_plag_see_comment#:#, siehe Kommentar
 exc#:#exc_plag_visible_info#:#Bei Verdacht werden Status und Kommentar nur den Tutoren angezeigt. Ein erkanntes Plagiat wird auch dem Teilnehmer angezeigt. Der Status wird dann auf "nicht bestanden" gesetzt und die Note/Punkte gelöscht.
 exc#:#exc_visible_for_tutors#:#nur für Tutoren sichtbar
 exc#:#exc_visible_for_student#:#für Teilnehmer sichtbar
+exc#:#exc_max_team_size#:#Maximale Teamgröße
+exc#:#exc_max_team_members_reached#:#Die maximale Teamgröße ist erreicht.
 exercise#:#exc_mark#:#Note/Punkte
 grp#:#crs_grp_info_reg#:#Sie können nur Mitglied in einem der folgenden Kurse werden:
 grp#:#group_req_direct_studycond#:#Direkter Beitritt (sonst Aufnahmeantrag) für folgende Studierende:<p class="small">%s</p>

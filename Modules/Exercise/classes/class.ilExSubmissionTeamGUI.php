@@ -44,7 +44,11 @@ class ilExSubmissionTeamGUI
     protected $exercise; // [ilObjExercise]
     protected $assignment; // [ilExAssignment]
     protected $submission; // [ilExSubmission]
-    protected $team; // [ilExAssignmentTeam]
+
+    // fau: exTeamLimit - add type hint
+    /** @var ilExAssignmentTeam */
+    protected $team;
+    // fau.
     
     public function __construct(ilObjExercise $a_exercise, ilExSubmission $a_submission)
     {
@@ -115,6 +119,12 @@ class ilExSubmissionTeamGUI
         if (!$a_submission->getAssignment()->hasTeam()) {
             return;
         }
+
+        // fau: exTeamLimit - add info about max team size
+        if ($a_submission->getAssignment()->getMaxTeamMembers()) {
+            $a_info->addProperty($lng->txt("exc_max_team_size"), $a_submission->getAssignment()->getMaxTeamMembers());
+        }
+        // fau.
 
         $state = ilExcAssMemberState::getInstanceByIds($a_submission->getAssignment()->getId(), $a_submission->getUserId());
                                 
@@ -223,6 +233,10 @@ class ilExSubmissionTeamGUI
                 
         if ($this->submission->getAssignment()->afterDeadlineStrict(false)) {
             ilUtil::sendInfo($this->lng->txt("exercise_time_over"));
+            // fau: exTeamLimit - show limit info instead of add function
+        } elseif ($this->assignment->isMaxTeamMembersReached(count($this->team->getMembers())) ) {
+            ilUtil::sendInfo($this->lng->txt("exc_max_team_members_reached"));
+            // fau.
         } elseif (!$read_only) {
             $add_search = $this->submission->isTutor();
             // add member
@@ -237,6 +251,11 @@ class ilExSubmissionTeamGUI
                     'add_from_container' => $this->exercise->getRefId()
                 )
             );
+            // fau: exTeamLimit - show info about max team size
+            if ($this->assignment->getMaxTeamMembers()) {
+                ilUtil::sendInfo($this->lng->txt("exc_max_team_size") . ": " . $this->assignment->getMaxTeamMembers());
+            }
+            // fau.
         } elseif ($this->submission->getAssignment()->getTeamTutor()) {
             ilUtil::sendInfo($this->lng->txt("exc_no_team_yet_info_tutor"));
         }
@@ -259,7 +278,14 @@ class ilExSubmissionTeamGUI
         if (!$this->canEditTeam()) {
             $this->ctrl->redirect("submissionScreenTeam");
         }
-        
+
+        // fau: exTeamLimit - check team size when member is added
+        if ($this->assignment->isMaxTeamMembersReached(count($this->team->getMembers())) ) {
+            ilUtil::sendFailure($this->lng->txt("exc_max_team_members_reached"), true);
+            return false;
+        }
+        // fau.
+
         if (!count($a_user_ids)) {
             ilUtil::sendFailure($this->lng->txt("no_checkbox"));
             return false;

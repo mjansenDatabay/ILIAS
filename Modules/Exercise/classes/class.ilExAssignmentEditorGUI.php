@@ -278,6 +278,16 @@ class ilExAssignmentEditorGUI
                 $lng->txt("exc_team_by_participants_info")
             );
 
+            // fau: exTeamLimit - input for maximum team members
+            $max_team_members_by_participants = new ilNumberInputGUI($lng->txt("exc_max_team_size"), "max_team_members_by_participants");
+            $max_team_members_by_participants->setSize(3);
+            $max_team_members_by_participants->setMinValue(1);
+            $max_team_members_by_participants->setMaxValue($this->getExerciseTotalMembers());
+            $max_team_members_by_participants->setRequired(false);
+            $max_team_members_by_participants->setSuffix($lng->txt("exc_participants"));
+            $radio_participants->addSubItem($max_team_members_by_participants);
+            // fau.
+
             $radio_tutors = new ilRadioOption(
                 $lng->txt("exc_team_by_tutors"),
                 ilExAssignment::TEAMS_FORMED_BY_TUTOR,
@@ -854,6 +864,11 @@ class ilExAssignmentEditorGUI
                     // fau.
                 );
 
+                // fau: exTeamLimit - add input to form results
+                if ($a_form->getInput("team_creator") == ilExAssignment::TEAMS_FORMED_BY_PARTICIPANTS) {
+                    $res['max_team_members_by_participants'] = $a_form->getInput("max_team_members_by_participants");
+                }
+                // fau.
                 if ($a_form->getInput("team_creator") == ilExAssignment::TEAMS_FORMED_BY_TUTOR) {
                     $res['team_creator'] = $a_form->getInput("team_creator");
                     $res["team_creation"] = $a_form->getInput("team_creation");
@@ -980,6 +995,12 @@ class ilExAssignmentEditorGUI
         // fau.
 
         $a_ass->setTeamTutor($a_input["team_creator"]);
+
+        // fau: exTeamLimit - set the max team members
+        if ($a_input["team_creator"] == ilExAssignment::TEAMS_FORMED_BY_PARTICIPANTS) {
+           $a_ass->setMaxTeamMembers($a_input["max_team_members_by_participants"]);
+        }
+        // fau.
 
         //$a_ass->setPortfolioTemplateId($a_input['template_id']);
 
@@ -1196,6 +1217,10 @@ class ilExAssignmentEditorGUI
                     
         if ($this->assignment->getAssignmentType()->usesTeams()) {
             $values["team_creator"] = $this->assignment->getTeamTutor();
+
+            // fau: exTeamLimit - set the form value
+            $values["max_team_members_by_participants"] = $this->assignment->getMaxTeamMembers();
+            // fau.
         }
 
         if ($this->assignment->getFeedbackDateCustom()) {

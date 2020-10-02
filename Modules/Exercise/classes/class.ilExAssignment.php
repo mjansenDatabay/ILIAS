@@ -104,6 +104,9 @@ class ilExAssignment
     protected $feedback_date;
     protected $feedback_date_custom;
     protected $team_tutor = false;
+    // fau: exTeamLimit - class variable
+    protected $max_team_members;
+    // fau.
     protected $max_file;
 
     // fau: exFileSuffixes - variables for allowed suffixes
@@ -111,7 +114,7 @@ class ilExAssignment
     protected $file_suffixes_case = false;
     // fau.
 
-    // fau: exMaxPoints - class cariable
+    // fau: exMaxPoints - class variable
     protected $max_points;
     // fau.
 
@@ -996,7 +999,47 @@ class ilExAssignment
     {
         return $this->team_tutor;
     }
-    
+
+    // fau: exTeamLimit - getter and setter
+    /**
+     * Set maximum team members
+     *
+     * @param int|null $a_value
+     */
+    public function setMaxTeamMembers($a_value)
+    {
+        if ($a_value !== null && $a_value > 0) {
+            $a_value = (int) $a_value;
+        }
+        elseif ($a_value == 0) {
+            $a_value = null;
+        }
+        $this->max_team_members = $a_value;
+    }
+
+    /**
+     * Get maximum team members
+     *
+     * @return int|null
+     */
+    public function getMaxTeamMembers()
+    {
+        return $this->max_team_members;
+    }
+
+    /**
+     * Check if max team members is reached
+     * @param $members
+     * @return bool
+     */
+    public function isMaxTeamMembersReached($members) {
+        if (isset($this->max_team_members)) {
+            return $members >= $this->max_team_members;
+        }
+        return false;
+    }
+    // fau.
+
     /**
      * Set max number of uploads
      *
@@ -1259,6 +1302,9 @@ class ilExAssignment
         $this->setFeedbackDateCustom($a_set["fb_date_custom"]);
         $this->setFeedbackCron($a_set["fb_cron"]);
         $this->setTeamTutor($a_set["team_tutor"]);
+        // fau: exTeamLimit - read the max team members
+        $this->setMaxTeamMembers($a_set["max_team_members"]);
+        // fau.
         $this->setMaxFile($a_set["max_file"]);
         // fau: exFileSuffixes - read the file suffixes from the database
         $this->setFileSuffixesAsList($a_set["file_suffixes"]);
@@ -1322,6 +1368,9 @@ class ilExAssignment
             "fb_date_custom" => array("integer", $this->getFeedbackDateCustom()),
             "fb_cron" => array("integer", $this->hasFeedbackCron()),
             "team_tutor" => array("integer", $this->getTeamTutor()),
+            // fau: exTeamLimit - save the max team members
+            "max_team_members" => array("float", $this->getMaxTeamMembers()),
+            // fau.
             "max_file" => array("integer", $this->getMaxFile()),
             // fau: exFileSuffixes - save the file suffixes in the database
             "file_suffixes" => array("text", $this->getFileSuffixesAsList()),
@@ -1385,6 +1434,9 @@ class ilExAssignment
             "fb_date_custom" => array("integer", $this->getFeedbackDateCustom()),
             "fb_cron" => array("integer", $this->hasFeedbackCron()),
             "team_tutor" => array("integer", $this->getTeamTutor()),
+            // fau: exTeamLimit - update the max team members in the database
+            "max_team_members" => array("int", $this->getMaxTeamMembers()),
+            // fau.
             "max_file" => array("integer", $this->getMaxFile()),
             // fau: exFileSuffixes - update the file suffixes in the database
             "file_suffixes" => array("text", $this->getFileSuffixesAsList()),
@@ -1525,6 +1577,9 @@ class ilExAssignment
             $new_ass->setFeedbackDateCustom($d->getFeedbackDateCustom());
             $new_ass->setFeedbackCron($d->hasFeedbackCron()); // #16295
             $new_ass->setTeamTutor($d->getTeamTutor());
+            // fau: exTeamLimit - clone max team members
+            $new_ass->setMaxTeamMembers($d->getMaxTeamMembers());
+            // fau.
             $new_ass->setMaxFile($d->getMaxFile());
             // fau: exFileSuffixes - clone settings
             $new_ass->setFileSuffixes($d->getFileSuffixes());

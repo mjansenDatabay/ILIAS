@@ -229,6 +229,9 @@ class ilExerciseDataSet extends ilDataSet
                         // fau: exResTime - add result time to export structure
                         ,"ResultTime" => "integer"
                         // fau.
+                        // fau: exTeamLimit - add max team members to export structure
+                        ,"MaxTeamMembers" => "integer"
+                        // fau.
                         // fau: exMaxPoints - add max points to export structure
                         ,"MaxPoints" => "float"
                         // fau.
@@ -387,6 +390,9 @@ class ilExerciseDataSet extends ilDataSet
                         // fau.
                         // fau: exResTime - query for result time at export
                         ",res_time result_time" .
+                        // fau.
+                        // fau: exTeamLimit - query for max team members at export
+                        ",max_team_members" .
                         // fau.
                         // fau: exMaxPoints - query for max points at export
                         ",max_points" .
@@ -673,6 +679,10 @@ class ilExerciseDataSet extends ilDataSet
 
                     // 5.3
                     $ass->setFeedbackDateCustom($a_rec["FbDateCustom"]);
+
+                    // fau: exTeamLimit - import data
+                    $ass->setMaxTeamMembers($a_rec["MaxTeamMembers"]);
+                    // fau.
 
                     // fau: exMaxPoints - import data
                     $ass->setMaxPoints($a_rec["MaxPoints"]);

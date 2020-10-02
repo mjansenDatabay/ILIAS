@@ -1276,3 +1276,16 @@ if (!$ilDB->tableColumnExists('exc_mem_ass_status', 'plag_comment')) {
     );
 }
 ?>
+<#77>
+<?php
+/**
+ * fau: exTeamLimit - add the max_team_members
+ */
+if (!$ilDB->tableColumnExists('exc_assignment', 'max_team_members')) {
+    $ilDB->addTableColumn(
+        'exc_assignment',
+        'max_team_members',
+        array('type' => 'integer', 'notnull' => false, 'default' => null)
+    );
+}
+?>
