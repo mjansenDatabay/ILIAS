@@ -618,6 +618,7 @@ exc#:#exc_visible_for_tutors#:#nur für Tutoren sichtbar
 exc#:#exc_visible_for_student#:#für Teilnehmer sichtbar
 exc#:#exc_max_team_size#:#Maximale Teamgröße
 exc#:#exc_max_team_members_reached#:#Die maximale Teamgröße ist erreicht.
+exc#:#exc_team_member_remove_new_team#:#Die entfernten Mitglieder bilden ein neues Team, um ihre Abgaben vor Übernahme durch andere zu schützen.
 exercise#:#exc_mark#:#Note/Punkte
 grp#:#crs_grp_info_reg#:#Sie können nur Mitglied in einem der folgenden Kurse werden:
 grp#:#group_req_direct_studycond#:#Direkter Beitritt (sonst Aufnahmeantrag) für folgende Studierende:<p class="small">%s</p>

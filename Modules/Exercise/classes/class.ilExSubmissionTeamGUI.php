@@ -366,7 +366,9 @@ class ilExSubmissionTeamGUI
         include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
         $cgui = new ilConfirmationGUI();
         $cgui->setFormAction($this->ctrl->getFormAction($this));
-        $cgui->setHeaderText($this->lng->txt("exc_team_member_remove_sure"));
+        // fau: exTeamRemove - add notice about forming of a new team
+        $cgui->setHeaderText($this->lng->txt("exc_team_member_remove_sure") . ' ' . $this->lng->txt("exc_team_member_remove_new_team"));
+        // fau.
         $cgui->setConfirm($this->lng->txt("remove"), "removeTeamMember");
         $cgui->setCancel($this->lng->txt("cancel"), $this->submission->isTutor()
             ? "returnToParent"
@@ -430,7 +432,25 @@ class ilExSubmissionTeamGUI
         foreach ($ids as $user_id) {
             $this->team->removeTeamMember($user_id, $this->exercise->getRefId());
         }
-        
+
+        // fau: exTeamRemove - form a new team with the new members
+        if (!$team_deleted) {
+            $first_id = $ids[0];
+            $newTeam = new ilExAssignmentTeam($this->team->createTeam($this->assignment->getId(), $first_id));
+            $idl = ilExcIndividualDeadline::getInstance($this->assignment->getId(), $this->team->getId(), true);
+            if ($idl->getStartingTimestamp() > 0) {
+                $newIdl = ilExcIndividualDeadline::getInstance($this->assignment->getId(), $newTeam->getId(), true);
+                $newIdl->setStartingTimestamp($newIdl->getStartingTimestamp());
+                $newIdl->save();
+            }
+            if (count($ids) > 1) {
+                for ($i = 1; $i < count($ids); $i++) {
+                    $newTeam->addTeamMember($ids[$i], $this->exercise->getRefId());
+                }
+            }
+        }
+        // fau.
+
         // reset ex team members, as any submission is not valid without team
         $this->exercise->processExerciseStatus(
             $this->assignment,
