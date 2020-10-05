@@ -65,7 +65,7 @@ class ilExAssignmentStatusFile extends ilExcel
 
         $this->initMembers($user_ids);
 
-        if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+        if ($this->assignment->getAssignmentType()->usesTeams()) {
             $this->initTeams($user_ids);
         }
     }
@@ -116,7 +116,7 @@ class ilExAssignmentStatusFile extends ilExcel
         try {
             if (file_exists($filename)) {
                 $this->workbook = IOFactory::load($filename);
-                if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+                if ($this->assignment->getAssignmentType()->usesTeams()) {
                     $this->loadTeamSheet();
                 }
                 else {
@@ -140,7 +140,7 @@ class ilExAssignmentStatusFile extends ilExcel
      */
     public function writeToFile($a_file) {
         try {
-            if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam()) {
+            if ($this->assignment->getAssignmentType()->usesTeams()) {
                 $this->writeTeamSheet();
             }
             else {
@@ -281,7 +281,37 @@ class ilExAssignmentStatusFile extends ilExcel
      * Add the sheet for teams
      */
     protected function writeTeamSheet() {
+        $this->addSheet('teams');
 
+        // write the title line
+        $col = 0;
+        foreach ($this->team_titles as $title) {
+            $this->setCell(1, $col++, $title);
+        }
+
+        // write the member line
+        $row = 2;
+        foreach ($this->teams as $team) {
+            $logins = [];
+            $member = [];
+            foreach ($team->getMembers() as $usr_id) {
+                $logins[] = $this->members[$usr_id]['login'];
+                // the last wins, but all should have the same value
+                $member = $this->members[$usr_id];
+            }
+
+            $col = 0;
+            $this->setCell($row, $col++, 0, DataType::TYPE_NUMERIC);
+            $this->setCell($row, $col++, $team->getId(), DataType::TYPE_NUMERIC);
+            $this->setCell($row, $col++, implode(', ', $logins), DataType::TYPE_STRING);
+            $this->setCell($row, $col++, $member['status'], DataType::TYPE_STRING);
+            $this->setCell($row, $col++, $member['mark'], DataType::TYPE_STRING);
+            $this->setCell($row, $col++, $member['notice'], DataType::TYPE_STRING);
+            $this->setCell($row, $col++, $member['comment'], DataType::TYPE_STRING);
+            $this->setCell($row, $col++, ($member['plag_flag'] == 'none' ? '' : $member['plag_flag']), DataType::TYPE_STRING);
+            $this->setCell($row, $col, $member['plag_comment'], DataType::TYPE_STRING);
+            $row++;
+        }
     }
 
     /**

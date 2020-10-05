@@ -435,8 +435,10 @@ class ilExerciseManagementGUI
                     
                     $ilToolbar->addSeparator();
                 }
-            } elseif ($this->exercise->hasTutorFeedbackFile()) {
-                if (!$this->assignment->getAssignmentType()->usesTeams()) {
+            }
+            // fau: exMultiFeedbackStucture - allow multi feedback for teams
+            if ($this->exercise->hasTutorFeedbackFile()) {
+                // if (!$this->assignment->getAssignmentType()->usesTeams()) {
                     // multi-feedback
                     $ilToolbar->addButton(
                         $this->lng->txt("exc_multi_feedback"),
@@ -444,8 +446,9 @@ class ilExerciseManagementGUI
                     );
 
                     $ilToolbar->addSeparator();
-                }
+                // }
             }
+            // fau.
                                 
             if (ilExSubmission::hasAnySubmissions($this->assignment->getId())) {
                 $ass_type = $this->assignment->getType();

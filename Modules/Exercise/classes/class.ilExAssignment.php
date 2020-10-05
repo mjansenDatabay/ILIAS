@@ -2062,12 +2062,34 @@ class ilExAssignment
             $exercise->getRefId(),
             $mems
         );
-        foreach ($mems as $mem) {
-            $name = ilObjUser::_lookupName($mem);
-            $subdir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
-            $subdir = ilUtil::getASCIIFilename($subdir);
-            ilUtil::makeDir($mfdir . "/" . $subdir);
+
+        // fau: exMultiFeedbackStructure - create structure for teams
+        if ($this->getAssignmentType()->usesTeams()) {
+            /** @var ilExAssignmentTeam[] $teams */
+            $teams = ilExAssignmentTeam::getInstancesFromMap($this->getId());
+            foreach ($teams as $team_id => $team) {
+                $team_dir = $this->lng->txt("exc_team") . " " . $team_id;
+                ilUtil::makeDir($mfdir . "/" . $team_dir);
+
+                if (!$this->getAssignmentType()->isSubmissionAssignedToTeam() && count(array_intersect($team->getMembers(), $mems)) > 0) {
+                    foreach ($team->getMembers() as $mem) {
+                        $name = ilObjUser::_lookupName($mem);
+                        $subdir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
+                        $subdir = ilUtil::getASCIIFilename($subdir);
+                        ilUtil::makeDir($mfdir . "/" . $team_dir . "/" . $subdir);
+                    }
+                }
+            }
         }
+        else {
+            foreach ($mems as $mem) {
+                $name = ilObjUser::_lookupName($mem);
+                $subdir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
+                $subdir = ilUtil::getASCIIFilename($subdir);
+                ilUtil::makeDir($mfdir . "/" . $subdir);
+            }
+        }
+        // fau.
 
         // fau: exStatusFile - write the status files
         $status = $this->getStatusFile();
