@@ -2212,6 +2212,57 @@ class ilExAssignment
         }
         // fau.
 
+        // fau: exMultiFeedbackStructure - read feedback files from teams
+        if ($this->getAssignmentType()->usesTeams()) {
+            /** @var ilExAssignmentTeam[] $teams */
+            $teams = ilExAssignmentTeam::getInstancesFromMap($this->getId());
+            foreach ($teams as $team_id => $team) {
+                $team_dir = $mfu . "/" . $subdir . "/" .  $this->lng->txt("exc_team") . " " . $team_id;
+                $members = [];
+                foreach ($team->getMembers() as $user_id) {
+                    $name = ilObjUser::_lookupName($user_id);
+                    $members[] = $name;
+                }
+
+                // add the feedback files in the team folder
+                foreach (ilUtil::getDir($team_dir) as $filename => $item) {
+                    if ($item['type'] == "file" && substr($filename, 0, 1) != ".") {
+                        $mf_files[] = [
+                            'team_id' => $team_id,
+                            'members' => $members,
+                            "full_path" => $team_dir . "/" . $filename,
+                            "folder" => '',
+                            "file" => $filename
+                        ];
+                    }
+                }
+
+                // add the feedback files in folders of team members
+                foreach ($members as $name) {
+                    $mem_dir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
+                    $mem_dir = ilUtil::getASCIIFilename($mem_dir);
+
+                    if (is_dir($team_dir . "/" . $mem_dir)) {
+                        foreach (ilUtil::getDir($team_dir . "/" . $mem_dir) as $filename => $item) {
+                            if ($item['type'] == "file" && substr($filename, 0, 1) != ".") {
+                                $mf_files[] = [
+                                    'team_id' => $team_id,
+                                    'members' => $members,
+                                    "full_path" => $team_dir . "/" . $mem_dir . "/" . $filename,
+                                    "folder" => $mem_dir,
+                                    "file" => $filename
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $mf_files;
+        }
+        // fau.
+
+
         $items = ilUtil::getDir($mfu . "/" . $subdir);
         foreach ($items as $k => $i) {
             // check directory
@@ -2266,7 +2317,7 @@ class ilExAssignment
     }
 
 
-    // fau: exMultiFeedbackStructure - new function getMultiFeedbackBySubmissionsDownload()
+    // fau: exMultiFeedbackStructure - new function isMultiFeedbackBySubmissionsDownload()
     /**
      * Get if multi feedback is done with a zip from the submissions download
      * IMPORTANT: Must be called after uploadMultiFeedbackFile() or getMultiFeedbackFiles()
@@ -2370,10 +2421,71 @@ class ilExAssignment
         
         $this->clearMultiFeedbackDirectory();
     }
-    
-    
-    
-    
+
+
+    /**
+     * Save multi feedback files
+     *
+     * @param
+     * @return
+     */
+    public function saveMultiFeedbackFilesTeam($a_files, ilObjExercise $a_exc)
+    {
+        if ($this->getExerciseId() != $a_exc->getId()) {
+            return;
+        }
+
+        $fstorage = new ilFSStorageExercise($this->getExerciseId(), $this->getId());
+        $fstorage->create();
+
+        $mf_files = $this->getMultiFeedbackFiles();
+        foreach ($mf_files as $f) {
+            $team_id = $f["team_id"];
+            $members = $f["members"];
+            $file_path = $f["full_path"];
+            $file_name = $f["file"];
+            $folder = $f["folder"];
+
+            // if checked in confirmation gui
+            if ($a_files[$team_id][md5($folder . '/' . $file_name)] != "") {
+                $submission = new ilExSubmission($this, $members[0]['user_id']);
+                $feedback_id = $submission->getFeedbackId();
+                $noti_rec_ids = $submission->getUserIds();
+
+                if ($feedback_id) {
+                    $fb_path = $fstorage->getFeedbackPath($feedback_id);
+
+                    // use the member folder as filename prefix to prevent double file names
+                    $target = $fb_path . "/" . ($folder ? $folder . '_' : '') . $file_name;
+                    if (is_file($target)) {
+                        unlink($target);
+                    }
+                    // rename file
+                    rename($file_path, $target);
+
+                    // fau: exResTime - prevent sending of multi feedback notification
+                    if ($noti_rec_ids and (int) $this->getResultTime() <= time()) {
+                        // fau.
+                        foreach ($noti_rec_ids as $user_id) {
+                            $member_status = $this->getMemberStatus($user_id);
+                            $member_status->setFeedback(true);
+                            $member_status->update();
+                        }
+
+                        $a_exc->sendFeedbackFileNotification(
+                            $file_name,
+                            $noti_rec_ids,
+                            (int) $this->getId()
+                        );
+                    }
+                }
+            }
+        }
+
+        $this->clearMultiFeedbackDirectory();
+    }
+
+
     /**
      * Handle calendar entries for deadline(s)
      *

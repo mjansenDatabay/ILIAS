@@ -632,6 +632,10 @@ exc#:#exc_status_file_update_users#:#Saving will process the file %s to update t
 exc#:#exc_status_file_update_users_no plag#:#Saving will process the file %s to update the status of the following users (without plagiarism settings): <p class="small">%s</p>
 exc#:#exc_status_file_updated_users#:#The status of the following users was updated: <p class="small">%s</p>
 exc#:#exc_status_file_updated_users_no_plag#:#The status of the following users was updated (without plagiarism settings): <p class="small">%s</p>
+exc#:#exc_status_file_update_teams#:#Saving will process the file %s to update the status of the following teams: <p class="small">%s</p>
+exc#:#exc_status_file_update_teams_no plag#:#Saving will process the file %s to update the status of the following teams (without plagiarism settings): <p class="small">%s</p>
+exc#:#exc_status_file_updated_teams#:#The status of the following teams was updated: <p class="small">%s</p>
+exc#:#exc_status_file_updated_teams_no_plag#:#The status of the following teams was updated (without plagiarism settings): <p class="small">%s</p>
 exc#:#exc_not_attempted#:#Not Submitted
 exc#:#exc_comment_for_learner_info_nosend#:#No Notification is sent. The Feedback will be shown in the units oberview after reaching the result availability.
 exc#:#exc_file_suffixes#:#Allowed filename suffixes

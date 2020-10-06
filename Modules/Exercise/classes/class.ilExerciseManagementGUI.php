@@ -1900,9 +1900,23 @@ class ilExerciseManagementGUI
         $tpl = $this->tpl;
         
         $this->addSubTabs("assignment");
-                
-        include_once("./Modules/Exercise/classes/class.ilFeedbackConfirmationTable2GUI.php");
-        $tab = new ilFeedbackConfirmationTable2GUI($this, "showMultiFeedbackConfirmationTable", $this->assignment);
+
+        // fau: exMultiFeedbackStructure - use team specific table
+        if ($this->assignment->getAssignmentType()->usesTeams()) {
+            include_once("./Modules/Exercise/classes/class.ilFeedbackConfirmationTable2TeamsGUI.php");
+            $tab = new ilFeedbackConfirmationTable2TeamsGUI($this, "showMultiFeedbackConfirmationTable", $this->assignment);
+        }
+        else {
+            include_once("./Modules/Exercise/classes/class.ilFeedbackConfirmationTable2GUI.php");
+            $tab = new ilFeedbackConfirmationTable2GUI($this, "showMultiFeedbackConfirmationTable", $this->assignment);
+        }
+        // fau.
+
+        // fau: exMultiFeedbackStructure - show warning if submission structure is detected
+        if ($this->assignment->isMultiFeedbackBySubmissionsDownload()) {
+            ilUtil::sendQuestion($this->lng->txt('exc_multi_feedback_by_submissions_warning'));
+        }
+        // fau.
 
         // fau: exStatusFile - show info message about status updates
         $status_file = $this->assignment->getStatusFile();
@@ -1914,6 +1928,7 @@ class ilExerciseManagementGUI
             ilUtil::sendInfo($status_file->getInfo());
         }
         // fau.
+
         $tpl->setContent($tab->getHTML());
     }
     
@@ -1931,7 +1946,14 @@ class ilExerciseManagementGUI
      */
     public function saveMultiFeedbackObject()
     {
-        $this->assignment->saveMultiFeedbackFiles($_POST["file"], $this->exercise);
+        // fau: exMultiFeedbackStructure - save for teams
+        if ($this->assignment->getAssignmentType()->usesTeams()) {
+            $this->assignment->saveMultiFeedbackFilesTeam($_POST["file"], $this->exercise);
+        }
+        else {
+            $this->assignment->saveMultiFeedbackFiles($_POST["file"], $this->exercise);
+        }
+        // fau.
 
         // fau: exStatusFile - process the status update
         $status_file = $this->assignment->getStatusFile();

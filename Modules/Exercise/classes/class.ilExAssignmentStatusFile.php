@@ -261,18 +261,7 @@ class ilExAssignmentStatusFile extends ilExcel
                 continue;
             }
 
-            if (!in_array($data['status'], $this->valid_states)) {
-                throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_status'), $data['status']));
-            }
-
-            if (!$this->assignment->checkMark($data['mark'])) {
-                throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_mark'), $data['mark'], $this->assignment->getMaxPoints()));
-            }
-
-            if (!in_array($data['plag_flag'], $this->valid_plag_flags)) {
-                throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_plag_flag'), $data['plag_flag']));
-            }
-
+            $this->checkRowData($data);
             $this->updates[] = $data;
         }
     }
@@ -318,6 +307,53 @@ class ilExAssignmentStatusFile extends ilExcel
      * Load the sheet data for members
      */
     protected function loadTeamSheet() {
+        $sheet = $this->getSheetAsArray();
+
+        // check the titles row (all titles must be present)
+        $titles = array_shift($sheet);
+        if (count(array_diff($this->team_titles, (array) $titles)) > 0) {
+            throw new ilExerciseException($this->lng->txt('exc_status_file_wrong_titles'));
+        }
+
+        // load the update data from the file
+        $index = array_flip($this->team_titles);
+        foreach ($sheet as $rowdata) {
+            $data = [];
+            $data['update'] = (bool)  $rowdata[$index['update']];
+            $data['team_id'] = (string) $rowdata[$index['team_id']];
+            $data['status'] = (string) $rowdata[$index['status']];
+            $data['mark'] = (string) $rowdata[$index['mark']];
+            $data['notice'] = (string) $rowdata[$index['notice']];
+            $data['comment'] = (string) $rowdata[$index['comment']];
+            $data['plag_flag'] = ((string) $rowdata[$index['plagiarism']] ? (string) $rowdata[$index['plagiarism']] : 'none');
+            $data['plag_comment'] = (string) $rowdata[$index['plag_comment']];
+
+            if (!$data['update'] || !isset($this->teams[$data['team_id']])) {
+                continue;
+            }
+
+            $this->checkRowData($data);
+            $this->updates[] = $data;
+        }
+    }
+
+    /**
+     * Check the entered row data
+     * @param $data
+     * @throws ilExerciseException
+     */
+    protected function checkRowData($data) {
+        if (!in_array($data['status'], $this->valid_states)) {
+            throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_status'), $data['status']));
+        }
+
+        if (!$this->assignment->checkMark($data['mark'])) {
+            throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_mark'), $data['mark'], $this->assignment->getMaxPoints()));
+        }
+
+        if (!in_array($data['plag_flag'], $this->valid_plag_flags)) {
+            throw new ilExerciseException(sprintf($this->lng->txt('exc_status_file_wrong_plag_flag'), $data['plag_flag']));
+        }
 
     }
 
@@ -377,19 +413,25 @@ class ilExAssignmentStatusFile extends ilExcel
             return sprintf($this->lng->txt('exc_status_file_no_updates'),  $this->getFilename());
         }
         else {
-            $logins = [];
+            $list = [];
             foreach ($this->updates as $data) {
-                $logins[] = $data['login'];
+                $list[] = (empty($this->teams) ? $data['login'] : $this->lng->txt('exc_team') . ' ' . $data['team_id']);
             }
+
             if ($this->updates_applied) {
-                return sprintf(
-                    $this->lng->txt($this->allow_plag_update ? 'exc_status_file_updated_users' : 'exc_status_file_updated_users_no_plag'),
-                    implode(', ', $logins));
+                $var =  'exc_status_file_updated'
+                    . (empty($this->teams) ? '_users' : '_teams')
+                    . ($this->allow_plag_update ? '' : '_no_plag');
+
+                return sprintf($this->lng->txt($var), implode(', ', $list));
             }
-            return sprintf(
-                $this->lng->txt($this->allow_plag_update ? 'exc_status_file_update_users' : 'exc_status_file_update_users_no_plag'),
-                $this->getFilename(),
-                implode(', ', $logins));
+            else {
+                $var =  'exc_status_file_update'
+                    . (empty($this->teams) ? '_users' : '_teams')
+                    . ($this->allow_plag_update ? '' : '_no_plag');
+
+                return sprintf($this->lng->txt($var), $this->getFilename(), implode(', ', $list));
+            }
         }
     }
 }
