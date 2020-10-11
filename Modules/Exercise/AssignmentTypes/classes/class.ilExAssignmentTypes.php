@@ -11,6 +11,25 @@
  */
 class ilExAssignmentTypes
 {
+    // fau: exAssHook - load the plugins
+
+    /** @var ilAssignmentHookPlugin[] */
+    protected $plugins;
+
+    /**
+     * Get the active plugins
+     */
+    protected function getActivePlugins() {
+        if (!isset($this->plugins)) {
+            $names = ilPluginAdmin::getActivePluginsForSlot(IL_COMP_MODULE, 'Exercise', 'exashk');
+            foreach ($names as $name) {
+                $this->plugins[] = ilPlugin::getPluginObject(IL_COMP_MODULE, 'Exercise','exashk', $name);
+            }
+        }
+        return $this->plugins;
+    }
+    // fau.
+
     /**
      * Constructor
      */
@@ -36,7 +55,8 @@ class ilExAssignmentTypes
      */
     public function getAllIds()
     {
-        return [
+        // fau: exAssHook - add plugin ids to the type ids
+        $ids = [
             ilExAssignment::TYPE_UPLOAD,
             ilExAssignment::TYPE_UPLOAD_TEAM,
             ilExAssignment::TYPE_TEXT,
@@ -44,6 +64,13 @@ class ilExAssignmentTypes
             ilExAssignment::TYPE_PORTFOLIO,
             ilExAssignment::TYPE_WIKI_TEAM
         ];
+
+        foreach ($this->getActivePlugins() as $plugin) {
+            $ids = array_merge($ids, $plugin->getAssignmentTypeIds());
+        }
+
+        return $ids;
+        // fau.
     }
 
     /**
@@ -134,6 +161,15 @@ class ilExAssignmentTypes
                 include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeWikiTeam.php");
                 return new ilExAssTypeWikiTeam();
                 break;
+
+                // fau: exAssHook - return the type of a plugin for the id
+            default:
+                foreach ($this->getActivePlugins() as $plugin) {
+                    if (in_array($a_id, $plugin->getAssignmentTypeIds())) {
+                        return $plugin->getAssignmentTypeById($a_id);
+                    }
+                }
+                // fau.
         }
 
         // we should throw some exception here
