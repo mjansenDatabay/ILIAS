@@ -1289,3 +1289,10 @@ if (!$ilDB->tableColumnExists('exc_assignment', 'max_team_members')) {
     );
 }
 ?>
+<#78>
+<?php
+/**
+ * fau: exAssHook - load the hook definition
+ */
+$ilCtrlStructureReader->getStructure();
+?>
