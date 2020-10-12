@@ -285,7 +285,7 @@ class ilIdmData
                 $this->gender = $fromShibboleth ? 'f': 'm';
                break;
             default:
-                $this->gender = '';
+                $this->gender = 'n';
                 break;
         }
         $this->coded_password = $raw['user_password'];
