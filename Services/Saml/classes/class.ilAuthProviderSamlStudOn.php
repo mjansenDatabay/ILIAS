@@ -74,11 +74,9 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
                 if (
                     empty($this->data->firstname)
                     || empty($this->data->lastname)
-                    || empty($this->data->gender)
-                    //|| empty($this->data->email)
                 ) {
                     $this->getLogger()->warning('Could not create new user because firstname, lastname or gender is m missing in SAML attributes.');
-                    $this->handleAuthenticationFail($status, 'shib_shib_data_missing');
+                    $this->handleAuthenticationFail($status, 'shib_data_missing');
                     return false;
                 }
                 $user = $this->getNewUser($login);

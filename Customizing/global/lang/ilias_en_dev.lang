@@ -302,11 +302,7 @@ common#:#sahs_helptext#:#Here you can import Learn modules, which have been deve
 common#:#select_all_page_only#:#Select all on this page. Show more rows per page to select all!
 common#:#score#:#Points
 common#:#sess_helptext#:#A session represents a presence event on StudOn. You can apply this object for pure presence courses as well as in the frame of Blended Learning-Scenarios. By creating sessions you can indicate framedata of the presence event (time, location, etc.) as well as personal data of the lecturer and adding files to the session like for example the program of the event or work materials.
-common#:#shib_data_missing#:#Your Single Sign-On did work, but too less data has been transferred to be able to create a useraccount for StudOn.<ul>%s</ul>Please contact<a href="sso-support@rrze.uni-erlangen.de"><strong>sso-support@rrze.uni-erlangen.de</strong></a>, to solve the problem and tell your user identification and the missing data.
-common#:#shib_data_missing_email#:#<li>your email-address is missing.</li>
-common#:#shib_data_missing_firstname#:#<li>Your first name is missing.</li>
-common#:#shib_data_missing_gender#:#<li>Your gender is missing.</li>
-common#:#shib_data_missing_lastname#:#<li>Your last name is missing.</li>
+common#:#shib_data_missing#:#Your Single Sign-On did work, some data is missing (firstname or lastname) to create a user account for StudOn. Please contact<a href="idm@fau.de">idm@fau.de</a>, to solve the problem and tell your user identification and the missing data.
 common#:#shib_general_login_instructions#:#Use this login if you have a central user identification of the FAU.<div style="text-align:right;"><a href="http://www.studon.uni-erlangen.de/cat166816.html">What is that?</a></div>
 common#:#shib_help_title#:#Help for single sign-on
 common#:#shib_login_used#:#The username %s is already in use by another user. Please mail to <a href="mailto:studon@fau.de">studon@fau.de</a> to solve the problem!
