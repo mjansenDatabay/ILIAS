@@ -731,6 +731,7 @@ class ilObjUser extends ilObject
     // fau.
 
 
+    // fau: videoPortal new function _findUserIdByAccount
     /**
     * fim: [soap] new function _findUserIdByAccount
     *
@@ -762,6 +763,7 @@ class ilObjUser extends ilObject
         }
     }
     // fim.
+    // fau.
 
 
     /**

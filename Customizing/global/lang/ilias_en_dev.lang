@@ -926,6 +926,12 @@ user#:#browser_agent#:#Browser Family
 user#:#browser_platform#:#Platform
 user#:#browser_version#:#Browser Version
 user#:#is_mobile#:#Mobile
+videoportal#:#vp_authorization_failed#:#The Authentication by the video portal failed..
+videoportal#:#vp_no_interface_active#:#The Interface of StudOn to the video portal is currently not active.
+videoportal#:#vp_no_user_found#:#No StudOn user is found for the given IDM account.
+videoportal#:#vp_no_reference_found#:#No Reference to this clip or course is found in StudOn.
+videoportal#:#vp_access_granted#:#Access is granted by a StudOn object.
+videoportal#:#vp_no_access_granted#:#No access is granted for the user.
 webform#:#webform_all_categories#:#All Categories
 webform#:#webform_all_corrected#:#corrected
 webform#:#webform_all_courses#:#All courses

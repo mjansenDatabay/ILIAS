@@ -3,19 +3,18 @@
 
 chdir('../../..');
 
+// we need access handling
 include_once 'Services/Context/classes/class.ilContext.php';
-ilContext::init(ilContext::CONTEXT_REST);
+ilContext::init(ilContext::CONTEXT_RSS);
 
-$_COOKIE['client_id'] = $_GET['client_id'] = $_REQUEST['client_id'];
-
-include_once './include/inc.header.php';
-
+require_once("Services/Init/classes/class.ilInitialisation.php");
+ilInitialisation::initILIAS();
 
 include_once './Services/WebServices/VP/classes/class.ilVideoPortalServer.php';
 $server = new ilVideoPortalServer(
     [
         'settings' => [
-            'displayErrorDetails' => true
+            'displayErrorDetails' => DEVMODE ? true : false
         ]
     ]
 );

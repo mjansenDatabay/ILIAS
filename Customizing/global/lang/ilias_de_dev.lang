@@ -873,6 +873,12 @@ user#:#browser_agent#:#Browser-Familie
 user#:#browser_platform#:#Betriebssystem
 user#:#browser_version#:#Browser-Version
 user#:#is_mobile#:#Mobil
+videoportal#:#vp_authorization_failed#:#Die Authentifizierung des Videoportals ist fehlgeschlagen.
+videoportal#:#vp_no_interface_active#:#Die StudOn-Schnittstelle zum Videoportal ist aktuell nicht aktiv.
+videoportal#:#vp_no_user_found#:#Zum IDM-Benutzer wurde kein entsprechender StudOn-Nutzer gefunden.
+videoportal#:#vp_no_reference_found#:#Es wurde keine Referenz auf den Clip oder Kurs gefunden.
+videoportal#:#vp_access_granted#:#Der Zugriff wird über ein StudOn-Objekt gewährt.
+videoportal#:#vp_no_access_granted#:#Für den Benutzer wird kein Zugriff gewährt.
 webform#:#webform_all_categories#:#Alle Bereiche
 webform#:#webform_all_corrected#:#korrigierte
 webform#:#webform_all_courses#:#Alle Kurse
@@ -942,3 +948,9 @@ webform#:#webform_tutor#:#Tutor
 webform#:#webform_uncorrect#:#Als unkorrigiert markieren
 webform#:#webform_uncorrected_entries#:#Die Einsendungen wurden als unkorrigiert markiert.
 webform#:#webform_uncorrected_entry#:#Die Einsendung wurden als unkorrigiert markiert.
+videoportal#:#vp_authorization_failed#:#Die Authentifizierung des Videoportals ist fehlgeschlagen.
+videoportal#:#vp_no_interface_active#:#Die StudOn-Schnittstelle zum Videoportal ist aktuell nicht aktiv.
+videoportal#:#vp_no_user_found#:#Zum IDM-Benutzer wurde kein entsprechender StudOn-Nutzer gefunden.
+videoportal#:#vp_no_reference_found#:#Es wurde keine Referenz auf den Clip oder Kurs gefunden.
+videoportal#:#vp_access_granted#:#Der Zugriff wird über ein StudOn-Objekt gewährt.
+videoportal#:#vp_no_access_granted#:#Für den Benutzer wird kein Zugriff gewährt.
