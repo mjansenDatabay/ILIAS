@@ -365,25 +365,31 @@ class ilInitialisation
             self::abortAndDie('Fatal Error: ilInitialisation::determineClient called without initialisation of ILIAS ini file object.');
         }
 
-        if (isset($_GET['client_id']) && strlen($_GET['client_id']) > 0) {
-            $_GET['client_id'] = \ilUtil::getClientIdByString((string) $_GET['client_id'])->toString();
-            if (!defined('IL_PHPUNIT_TEST')) {
-                if (ilContext::supportsPersistentSessions()) {
-                    ilUtil::setCookie('ilClientId', $_GET['client_id']);
-                }
-            }
-        } elseif (!isset($_COOKIE['ilClientId'])) {
-            ilUtil::setCookie('ilClientId', $ilIliasIniFile->readVariable('clients', 'default'));
-            // fau: shortRssLink - set default client when called from context without cookies
-            $_GET['client_id'] = $ilIliasIniFile->readVariable('clients', 'default');
-            // fau.
-        }
+        // fau: shortRssLink - set default client when called from context without cookies
+        // fau: videoPortal - set default client when called from context without cookies
+        // fim: [univis] set default client when called from context without cookies
+        if (!empty($_GET['client_id'])) {
+            $clientId = ilUtil::getClientIdByString((string) $_GET['client_id'])->toString();
+            $_GET['client_id'] = $clientId;
 
-        if (!defined('IL_PHPUNIT_TEST') && ilContext::supportsPersistentSessions()) {
-            $clientId = $_COOKIE['ilClientId'];
-        } else {
-            $clientId = $_GET['client_id'];
+            if (!defined('IL_PHPUNIT_TEST') && ilContext::supportsPersistentSessions()) {
+                $_COOKIE['ilClientId'] = $clientId;
+                ilUtil::setCookie('ilClientId', $clientId);
+            }
+        } elseif (!defined('IL_PHPUNIT_TEST') && ilContext::supportsPersistentSessions()) {
+            if (!empty($_COOKIE['ilClientId'])) {
+                $clientId = $_COOKIE['ilClientId'];
+            }
+            else {
+                $clientId = $ilIliasIniFile->readVariable('clients', 'default');
+                $_COOKIE['ilClientId'] = $clientId;
+                ilUtil::setCookie('ilClientId', $clientId);
+            }
         }
+        else {
+            $clientId = $ilIliasIniFile->readVariable('clients', 'default');
+        }
+        // fau.
 
         define('CLIENT_ID', \ilUtil::getClientIdByString((string) $clientId)->toString());
     }
