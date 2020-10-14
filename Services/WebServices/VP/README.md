@@ -1,4 +1,4 @@
-Simple StudOn Service for fau.tv
+﻿Simple StudOn Service for fau.tv
 --------------------------------
 
 Call example:
