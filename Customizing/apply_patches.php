@@ -22,6 +22,7 @@ $p->login();
 //$p->applyPatch('ilSpecificPatches.convertAccountingQuestionResults');
 //$p->applyPatch('ilSpecificPatches.changeRemoteMediaUrlPrefix', array('search'=> 'http://', 'replace' => 'https://', 'update' => false));
 //$p->applyPatch('ilSpecificPatches.removeCourseMembersWhenOnWaitingList', array('obj_id' => 2569770));
+//$p->applyPatch('ilSpecificPatches.countExerciseUploads', array('start_id'=> 737000));
 
 
 /***********
