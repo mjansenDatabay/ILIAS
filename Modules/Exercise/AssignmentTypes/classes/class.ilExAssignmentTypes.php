@@ -21,6 +21,7 @@ class ilExAssignmentTypes
      */
     protected function getActivePlugins() {
         if (!isset($this->plugins)) {
+            $this->plugins = [];
             $names = ilPluginAdmin::getActivePluginsForSlot(IL_COMP_MODULE, 'Exercise', 'exashk');
             foreach ($names as $name) {
                 $this->plugins[] = ilPlugin::getPluginObject(IL_COMP_MODULE, 'Exercise','exashk', $name);
