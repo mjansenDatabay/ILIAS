@@ -10,6 +10,11 @@
  */
 trait ilExAssignmentTypeGUIBase
 {
+    // fau: exAssHook - add assignment to trait
+    /** @var ilExAssignment */
+    protected $assignment;
+    // fau.
+
     /**
      * @var ilExSubmission
      */
@@ -59,4 +64,22 @@ trait ilExAssignmentTypeGUIBase
     {
         return $this->exercise;
     }
+
+    // fau: exAssHook - setter and getter for assignment
+    /**
+     * @return ilExAssignment
+     */
+    public function getAssignment() : ilExAssignment
+    {
+        return $this->assignment;
+    }
+
+    /**
+     * @param ilExAssignment $assignment
+     */
+    public function setAssignment(ilExAssignment $assignment)
+    {
+        $this->assignment = $assignment;
+    }
+    // fau.
 }
