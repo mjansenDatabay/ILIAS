@@ -270,12 +270,12 @@ class ilExAssignmentEditorGUI
         // type specific start
         //
 
-        // fau: exAssHook - set assignment for type gui to allow form customization
+        // fau: exAssHook - set assignment and exercise_id for type gui to allow form customization
         if (isset($this->assignment)) {
             $ass_type_gui->setAssignment($this->assignment);
         }
+        $ass_type_gui->addEditFormCustomProperties($form, $this->exercise_id);
         // fau.
-        $ass_type_gui->addEditFormCustomProperties($form);
 
         //
         // type specific end
