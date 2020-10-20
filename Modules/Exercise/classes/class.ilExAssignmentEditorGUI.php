@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
@@ -144,6 +143,16 @@ class ilExAssignmentEditorGUI
                 break;
             
             default:
+
+                // fau: exAssHook - forward to type gui (analogous to ilExSubmissionGUI)
+                if ($this->type_guis->isExAssTypeGUIClass($class)) {
+                    $this->setAssignmentHeader();
+                    $type_gui = $this->type_guis->getByClassName($class);
+                    $type_gui->setAssignment($this->assignment);
+                    return $ilCtrl->forwardCommand($type_gui);
+                }
+                // fau.
+
                 $this->{$cmd . "Object"}();
                 break;
         }
@@ -1525,6 +1534,12 @@ class ilExAssignmentEditorGUI
             $lng->txt("exc_instruction_files"),
             $ilCtrl->getLinkTargetByClass(array("ilexassignmenteditorgui", "ilexassignmentfilesystemgui"), "listFiles")
         );
+
+        // fau: exAssHook - handle the editor tabs
+        $typeGUI = $this->type_guis->getById($this->assignment->getType());
+        $typeGUI->setAssignment($this->assignment);
+        $typeGUI->handleEditorTabs($this->tabs);
+        // fau.
     }
     
     public function downloadGlobalFeedbackFileObject()

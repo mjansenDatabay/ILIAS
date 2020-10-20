@@ -82,4 +82,15 @@ trait ilExAssignmentTypeGUIBase
         $this->assignment = $assignment;
     }
     // fau.
+
+    // fau: exAssHook - add tab manipulation
+    /**
+     * Manipulate the assignment editor tabs
+     * @param ilTabsGUI $tabs
+     */
+    public function handleEditorTabs(ilTabsGUI $tabs)
+    {
+        // add or remove tabs
+    }
+    // fau.
 }
