@@ -661,6 +661,8 @@ exc#:#exc_visible_for_student#:#visible for learners
 exc#:#exc_max_team_size#:#Maximum Team Size
 exc#:#exc_max_team_members_reached#:#The maximum team size is reached.
 exc#:#exc_team_member_remove_new_team#:#The removed team members will form a new team, to prevent their submission from a take over by others.
+exc#:#exc_type_inactive#:#Inaktive
+exc#:#exc_type_inactive_info#:#This assignment type is currently not active. Please inform the StudOn team: <a href="mailto://studon@fau.de">studon@fau.de</a>
 exercise#:#exc_mark#:#Grade/Points
 exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
 exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
