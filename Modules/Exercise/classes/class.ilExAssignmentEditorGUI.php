@@ -246,11 +246,25 @@ class ilExAssignmentEditorGUI
         $ti->setRequired(true);
         $form->addItem($ti);
 
+        // fau: exAssHook - use
         // type
-        $ty = $this->getTypeDropdown();
-        $ty->setValue($a_type);
-        $ty->setDisabled(true);
-        $form->addItem($ty);
+        if ($ass_type->isActive()) {
+            $ty = $this->getTypeDropdown();
+            $ty->setValue($a_type);
+            $ty->setDisabled(true);
+            $form->addItem($ty);
+        }
+        else {
+            $ty = new ilHiddenInputGUI('type');
+            $ty->setValue($a_type);
+            $form->addItem($ty);
+
+            $tyi = new ilNonEditableValueGUI($lng->txt("exc_assignment_type"));
+            $tyi->setValue($lng->txt("exc_type_inactive"));
+            $tyi->setInfo($lng->txt("exc_type_inactive_info"));
+            $form->addItem($tyi);
+        }
+
 
         //
         // type specific start

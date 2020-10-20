@@ -56,7 +56,7 @@ class ilExAssignmentTypes
      */
     public function getAllIds()
     {
-        // fau: exAssHook - add plugin ids to the type ids
+        // fau: exAssHook - add dummy plugin ids to the type ids
         $ids = [
             ilExAssignment::TYPE_UPLOAD,
             ilExAssignment::TYPE_UPLOAD_TEAM,
@@ -82,7 +82,10 @@ class ilExAssignmentTypes
      */
     public function isValidId($a_id)
     {
-        return in_array($a_id, $this->getAllIds());
+        // fau: exAssHook - allow type ids of inaxtive plugins
+        return true;
+        // return in_array($a_id, $this->getAllIds());
+        // fau.
     }
 
 
@@ -170,6 +173,9 @@ class ilExAssignmentTypes
                         return $plugin->getAssignmentTypeById($a_id);
                     }
                 }
+
+                include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeInactive.php");
+                return new ilExAssTypeInactive();
                 // fau.
         }
 

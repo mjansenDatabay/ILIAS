@@ -15,6 +15,10 @@ class ilExSubmission
     const TYPE_TEXT = "Text";
     const TYPE_REPO_OBJECT = "RepoObject";	// Wikis
 
+    // fau: exAssHook - add inactive submission type
+    const TYPE_INACTIVE = "Inactive";
+    // fau.
+
     /**
      * @var ilObjUser
      */

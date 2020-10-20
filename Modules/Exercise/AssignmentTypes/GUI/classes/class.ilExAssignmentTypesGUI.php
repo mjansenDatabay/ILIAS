@@ -20,6 +20,7 @@ class ilExAssignmentTypesGUI
      */
     protected function getActivePlugins() {
         if (!isset($this->plugins)) {
+            $this->plugins = [];
             $names = ilPluginAdmin::getActivePluginsForSlot(IL_COMP_MODULE, 'Exercise', 'exashk');
             foreach ($names as $name) {
                 $this->plugins[] = ilPlugin::getPluginObject(IL_COMP_MODULE, 'Exercise','exashk', $name);
@@ -112,6 +113,10 @@ class ilExAssignmentTypesGUI
                         return $plugin->getAssignmentTypeGuiById($a_id);
                     }
                 }
+
+                include_once("./Modules/Exercise/AssignmentTypes/GUI/classes/class.ilExAssTypeInactiveGUI.php");
+                return new ilExAssTypeInactiveGUI();
+
             // fau.
 
         }

@@ -54,7 +54,12 @@ class ilExAssignment
      * @deprecated
      */
     const TYPE_WIKI_TEAM = 6;
-    
+
+    // fau: exAssHook - dummy type id for inactive type
+    const TYPE_INACTIVE = -1;
+    // fau.
+
+
     const FEEDBACK_DATE_DEADLINE = 1;
     const FEEDBACK_DATE_SUBMISSION = 2;
     const FEEDBACK_DATE_CUSTOM = 3;
