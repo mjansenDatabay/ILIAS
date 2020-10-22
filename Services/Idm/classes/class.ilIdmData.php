@@ -417,6 +417,7 @@ class ilIdmData
 
         // time limit and activation
         if ($mode == 'create') {
+            // can be used in test platform for limited access
             if (ilCust::get('shib_create_limited')) {
                 $limit = new ilDateTime(ilCust::get('shib_create_limited'), IL_CAL_DATE);
                 $userObj->setTimeLimitUnlimited(0);
@@ -431,7 +432,7 @@ class ilIdmData
         $userObj->setActive(1, 6);
         $userObj->setTimeLimitOwner(7);
 
-        // always update matriculation number
+        // always update the matriculation number
         if (!empty($this->matriculation)) {
             $userObj->setMatriculation($this->matriculation);
         }
