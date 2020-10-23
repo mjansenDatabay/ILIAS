@@ -147,7 +147,7 @@ class ilExAssignmentGUI
         if ((int) $a_ass->getResultTime() <= time()) {
 
             if ($tag1 = $a_ass->getMemberStatus()->getMarkWithInfo($a_ass)) {
-                $tag1 = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ':' . $tag1.'</span>';
+                $tag1 = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ': ' . $tag1.'</span>';
             }
 
             if ($tag2 = $a_ass->getMemberStatus()->getPlagInfo()) {

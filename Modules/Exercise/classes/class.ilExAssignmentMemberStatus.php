@@ -192,16 +192,17 @@ class ilExAssignmentMemberStatus
         global $DIC;
         $lng = $DIC->language();
 
-        if ($assignment->getMaxPoints() && $this->getMark()) {
-            if ($assignment->checkMark($this->getMark())) {
-                $percent = 100 * (float) $this->getMark() /  $assignment->getMaxPoints();
-                return sprintf($lng->txt("exc_mark_percent"), $this->getMark(), $percent);
+        $mark = $this->getMark();
+        if ($assignment->getMaxPoints() && isset($mark)) {
+            if ($assignment->checkMark($mark)) {
+                $percent = 100 * (float) $mark /  $assignment->getMaxPoints();
+                return sprintf($lng->txt("exc_mark_percent"), $mark, round($percent, 2));
             }
             else {
-                return sprintf($lng->txt("exc_mark_invalid"), $this->getMark());
+                return sprintf($lng->txt("exc_mark_invalid"), $mark);
             }
         }
-        return $this->getMark();
+        return $mark;
     }
     // fau.
 
