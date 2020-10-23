@@ -774,6 +774,20 @@ class ilObjExercise extends ilObject
     }
     // fau.
 
+    // fau: exGradeTime - new function isIndividualDeadlineSettingAllowed()
+    /**
+     * Check if setting of individual deadlines is allowed
+     * @return bool
+     */
+    public function isIndividualDeadlineSettingAllowed() {
+        global $DIC;
+
+        return ($DIC->access()->checkAccess('write', '', $this->getRefId())
+            && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
+    }
+    // fau.
+
+
     // fau: exPlag - new function isPlagiarismSettingAllowed()
     /**
      * Check if the flag and comment for plagiarism can be set

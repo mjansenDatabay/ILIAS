@@ -104,6 +104,9 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 
         // see 0021530 and parseRow here with similar action per user
         if ($this->mode == self::MODE_BY_ASSIGNMENT &&
+            // fau: exGradeTime - check if individual deadline setting is allowed
+            $this->exc->isIndividualDeadlineSettingAllowed() &&
+            // fau.
             $this->ass->hasActiveIDl() &&
             !$this->ass->hasReadOnlyIDl()) {
             $this->addMultiCommand("setIndividualDeadline", $this->lng->txt("exc_individual_deadline_action"));
@@ -533,6 +536,9 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         }
         
         if (!$has_no_team_yet &&
+            // fau: exGradeTime - check if individual deadline setting is allowed
+            $this->exc->isIndividualDeadlineSettingAllowed() &&
+            // fau.
             $a_ass->hasActiveIDl() &&
             !$a_ass->hasReadOnlyIDl()) {
             $idl_id = $a_ass->hasTeam()

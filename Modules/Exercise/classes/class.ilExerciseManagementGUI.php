@@ -1977,7 +1977,13 @@ class ilExerciseManagementGUI
     {
         $lng = $this->lng;
         $tpl = $this->tpl;
-        
+
+        // fau: exGradeTime - check if individual deadline setting is allowed
+        if (!$this->exercise->isIndividualDeadlineSettingAllowed()) {
+            return "";
+        }
+        // fau.
+
         // prepare modal+
         include_once "./Services/UIComponent/Modal/classes/class.ilModalGUI.php";
         $modal = ilModalGUI::getInstance();
@@ -2028,6 +2034,13 @@ class ilExerciseManagementGUI
         $tpl = $this->tpl;
         
         $this->ctrl->saveParameter($this, "part_id");
+
+        // fau: exGradeTime - check if individual deadline setting is allowed
+        if (!$this->exercise->isIndividualDeadlineSettingAllowed()) {
+            echo $this->lng->txt("permission_denied");
+            exit;
+        }
+        // fau.
         
         // we are done
         if ((bool) $_GET["dn"]) {
