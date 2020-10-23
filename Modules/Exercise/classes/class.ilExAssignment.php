@@ -214,7 +214,7 @@ class ilExAssignment
         $assignments = self::getInstancesByExercise($a_exc_id);
         $allowed = [];
         foreach ($assignments as $ass) {
-            if ($ass->checkInGradeTime()) {
+            if ($ass->checkInGradeTime() || ilObjExerciseAccess::checkExtendedGradingAccess($a_exc_id, false)) {
                 $allowed[] = $ass;
             }
         }

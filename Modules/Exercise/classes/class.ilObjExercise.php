@@ -767,10 +767,7 @@ class ilObjExercise extends ilObject
      * @return bool
      */
     public function isMemberDeleteAllowed() {
-        global $DIC;
-
-        return ($DIC->access()->checkAccess('write', '', $this->getRefId())
-                && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
+        return ilObjExerciseAccess::checkExtendedGradingAccess($this->getRefId(), true);
     }
     // fau.
 
@@ -780,10 +777,7 @@ class ilObjExercise extends ilObject
      * @return bool
      */
     public function isIndividualDeadlineSettingAllowed() {
-        global $DIC;
-
-        return ($DIC->access()->checkAccess('write', '', $this->getRefId())
-            && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
+        return ilObjExerciseAccess::checkExtendedGradingAccess($this->getRefId(), true);
     }
     // fau.
 
@@ -794,10 +788,7 @@ class ilObjExercise extends ilObject
      * @return bool
      */
     public function isPlagiarismSettingAllowed() {
-        global $DIC;
-
-        return ($DIC->access()->checkAccess('write', '', $this->getRefId())
-            && $DIC->access()->checkAccess('edit_submissions_grades', '', $this->getRefId()));
+        return ilObjExerciseAccess::checkExtendedGradingAccess($this->getRefId(), true);
     }
     // fau.
 

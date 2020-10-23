@@ -120,7 +120,9 @@ class ilExerciseManagementGUI
         //$cmd = $ilCtrl->getCmd("listPublicSubmissions");
 
         // fau: exGradeTime - check if selected assignment is available
-        if (isset($this->assignment) && !$this->assignment->checkInGradeTime()) {
+        if (isset($this->assignment)
+            && !$this->assignment->checkInGradeTime()
+            && !ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId(), true)) {
             ilUtil::sendFailure( $this->lng->txt("exc_not_available_for_grading"), true);
             $this->ctrl->setParameter($this, "ass_id", "");
             $this->ctrl->redirect($this, $this->getViewBack());
@@ -360,6 +362,7 @@ class ilExerciseManagementGUI
         $ass = ilExAssignment::getInstancesForGrading($this->exercise->getId());
         if (empty($ass)) {
             ilUtil::sendInfo($lng->txt("exc_no_assignments_for_grading"));
+            return;
         }
         // fau.
         
@@ -924,7 +927,14 @@ class ilExerciseManagementGUI
         
         // participant selection
         include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-        // fau: exGradeTime - seems to be unused
+        // fau: exGradeTime - get only the allowed assignment
+        $ass = ilExAssignment::getInstancesForGrading($this->exercise->getId());
+        if (empty($ass)) {
+            ilUtil::sendInfo($lng->txt("exc_no_assignments_for_grading"));
+            return;
+        }
+        // fau.
+
         // $ass = ilExAssignment::getAssignmentDataOfExercise($this->exercise->getId());
         // fau.
         $members = $this->exercise->members_obj->getMembers();
