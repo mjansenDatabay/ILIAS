@@ -661,7 +661,8 @@ exc#:#exc_visible_for_student#:#visible for learners
 exc#:#exc_max_team_size#:#Maximum Team Size
 exc#:#exc_max_team_size_info#:#Leave the field empty to set no limit
 exc#:#exc_max_team_members_reached#:#The maximum team size is reached.
-exc#:#exc_team_member_remove_new_team#:#The removed team members will form a new team, to prevent their submission from a take over by others.
+exc#:#exc_team_remove_self_with_submission#:#You can't fully dissolve yor team as long as you have a submission!
+exc#:#exc_team_member_remove_new_team#:#The removed team members with submissions will form single user teams, to prevent their submission from a take over by others.
 exc#:#exc_type_inactive#:#Inaktive
 exc#:#exc_type_inactive_info#:#This assignment type is currently not active. Please inform the StudOn team: <a href="mailto://studon@fau.de">studon@fau.de</a>
 exercise#:#exc_mark#:#Grade/Points

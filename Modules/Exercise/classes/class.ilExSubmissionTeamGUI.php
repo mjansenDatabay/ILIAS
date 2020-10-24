@@ -428,25 +428,36 @@ class ilExSubmissionTeamGUI
                 }
             }
         }
-        
+
+        // fau: exTeamRemove - form single user teams for all users users that have submitted something
+        $items = $this->submission->getFiles();
+        $remove_with_submissison_ids = [];
+        foreach ($items as $item) {
+            if (in_array($item['owner_id'], $ids)) {
+                $remove_with_submissison_ids[] = $item['owner_id'];
+            }
+        }
+        // check if team should be dissolved with an own submission
+        if ($team_deleted && in_array($this->user->getId(), $remove_with_submissison_ids)) {
+            ilUtil::sendFailure($this->lng->txt("exc_team_remove_self_with_submission"), true);
+            $this->ctrl->redirect($this, $cancel_cmd);
+        }
+        // fau.
+
+
+
         foreach ($ids as $user_id) {
             $this->team->removeTeamMember($user_id, $this->exercise->getRefId());
         }
 
-        // fau: exTeamRemove - form a new team with the new members
-        if (!$team_deleted) {
-            $first_id = $ids[0];
-            $newTeam = new ilExAssignmentTeam($this->team->createTeam($this->assignment->getId(), $first_id));
+        // fau: exTeamRemove - form single user teams for all users users that have submitted something
+        foreach (array_unique($remove_with_submissison_ids) as $user_id) {
+            $newTeam = new ilExAssignmentTeam($this->team->createTeam($this->assignment->getId(), $user_id));
             $idl = ilExcIndividualDeadline::getInstance($this->assignment->getId(), $this->team->getId(), true);
             if ($idl->getStartingTimestamp() > 0) {
                 $newIdl = ilExcIndividualDeadline::getInstance($this->assignment->getId(), $newTeam->getId(), true);
                 $newIdl->setStartingTimestamp($newIdl->getStartingTimestamp());
                 $newIdl->save();
-            }
-            if (count($ids) > 1) {
-                for ($i = 1; $i < count($ids); $i++) {
-                    $newTeam->addTeamMember($ids[$i], $this->exercise->getRefId());
-                }
             }
         }
         // fau.
@@ -469,6 +480,13 @@ class ilExSubmissionTeamGUI
         }
                 
         ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
+
+        // fau: exTeamRemove - return to overview if self removed and not in new team
+        if (in_array($this->user->getId(), $ids) && !in_array($this->user->getId(), $remove_with_submissison_ids)) {
+            $this->ctrl->redirect($this, "returnToParent");
+        }
+        // fau.
+
         if (!$team_deleted) {
             $this->ctrl->redirect($this, $cancel_cmd);
         } else {
