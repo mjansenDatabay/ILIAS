@@ -255,7 +255,7 @@ class ilExAssignmentEditorGUI
         $ti->setRequired(true);
         $form->addItem($ti);
 
-        // fau: exAssHook - use
+        // fau: exAssHook - use hidden field for inactive type
         // type
         if ($ass_type->isActive()) {
             $ty = $this->getTypeDropdown();
@@ -309,8 +309,8 @@ class ilExAssignmentEditorGUI
             // fau: exTeamLimit - input for maximum team members
             $max_team_members_by_participants = new ilNumberInputGUI($lng->txt("exc_max_team_size"), "max_team_members_by_participants");
             $max_team_members_by_participants->setSize(3);
+            $max_team_members_by_participants->setInfo($this->lng->txt('exc_max_team_size_info'));
             $max_team_members_by_participants->setMinValue(1);
-            $max_team_members_by_participants->setMaxValue($this->getExerciseTotalMembers());
             $max_team_members_by_participants->setRequired(false);
             $max_team_members_by_participants->setSuffix($lng->txt("exc_participants"));
             $radio_participants->addSubItem($max_team_members_by_participants);

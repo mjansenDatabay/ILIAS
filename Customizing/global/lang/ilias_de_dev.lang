@@ -621,6 +621,7 @@ exc#:#exc_plag_visible_info#:#Bei Verdacht werden Status und Kommentar nur den T
 exc#:#exc_visible_for_tutors#:#nur für Tutoren sichtbar
 exc#:#exc_visible_for_student#:#für Teilnehmer sichtbar
 exc#:#exc_max_team_size#:#Maximale Teamgröße
+exc#:#exc_max_team_size_info#:#Lassen Sie das Feld leer, wenn Sie kein Limit setzen möchten
 exc#:#exc_max_team_members_reached#:#Die maximale Teamgröße ist erreicht.
 exc#:#exc_team_member_remove_new_team#:#Die entfernten Mitglieder bilden ein neues Team, um ihre Abgaben vor Übernahme durch andere zu schützen.
 exc#:#exc_type_inactive#:#Inaktiv

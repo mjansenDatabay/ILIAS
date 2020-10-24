@@ -659,6 +659,7 @@ exc#:#exc_plag_visible_info#:#A suspected plagiarismn will be shown to the tutor
 exc#:#exc_visible_for_tutors#:#only visible for tutors
 exc#:#exc_visible_for_student#:#visible for learners
 exc#:#exc_max_team_size#:#Maximum Team Size
+exc#:#exc_max_team_size_info#:#Leave the field empty to set no limit
 exc#:#exc_max_team_members_reached#:#The maximum team size is reached.
 exc#:#exc_team_member_remove_new_team#:#The removed team members will form a new team, to prevent their submission from a take over by others.
 exc#:#exc_type_inactive#:#Inaktive
