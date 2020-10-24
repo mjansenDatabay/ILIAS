@@ -2230,15 +2230,17 @@ class ilExAssignment
                 }
 
                 // add the feedback files in the team folder
-                foreach (ilUtil::getDir($team_dir) as $filename => $item) {
-                    if ($item['type'] == "file" && substr($filename, 0, 1) != ".") {
-                        $mf_files[] = [
-                            'team_id' => $team_id,
-                            'members' => $members,
-                            "full_path" => $team_dir . "/" . $filename,
-                            "folder" => '',
-                            "file" => $filename
-                        ];
+                if (is_dir($team_dir)) {
+                    foreach (ilUtil::getDir($team_dir) as $filename => $item) {
+                        if ($item['type'] == "file" && substr($filename, 0, 1) != ".") {
+                            $mf_files[] = [
+                                'team_id' => $team_id,
+                                'members' => $members,
+                                "full_path" => $team_dir . "/" . $filename,
+                                "folder" => '',
+                                "file" => $filename
+                            ];
+                        }
                     }
                 }
 
@@ -2460,8 +2462,12 @@ class ilExAssignment
                 if ($feedback_id) {
                     $fb_path = $fstorage->getFeedbackPath($feedback_id);
 
-                    // use the member folder as filename prefix to prevent double file names
-                    $target = $fb_path . "/" . ($folder ? $folder . '_' : '') . $file_name;
+                    // keep the folder structure of uploaded feedback files
+                    $target_dir = $fb_path . "/" . ($folder ? '/' . $folder : '');
+                    $target = $target_dir . "/" . $file_name;
+                    if (!is_dir($target_dir)) {
+                        ilUtil::makeDirParents($target_dir)   ;
+                    }
                     if (is_file($target)) {
                         unlink($target);
                     }

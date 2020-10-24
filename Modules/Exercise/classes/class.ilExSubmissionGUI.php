@@ -308,7 +308,9 @@ class ilExSubmissionGUI
         if (!$this->assignment->notStartedYet()) {
             // deliver file
             $p = $storage->getFeedbackFilePath($this->submission->getFeedbackId(), $file);
-            ilUtil::deliverFile($p, $file);
+            // fau: exMultiFeedbackStructure - use only the basename for download
+            ilUtil::deliverFile($p, basename($file));
+            // fau.
         }
     
         return true;

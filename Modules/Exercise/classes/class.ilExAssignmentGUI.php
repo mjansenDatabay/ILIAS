@@ -546,13 +546,17 @@ class ilExAssignmentGUI
 
                 if ($cnt_files > 0) {
                     $files = $storage->getFeedbackFiles($a_feedback_id);
+                    // fau: exMultiFeedbackStructure - better listing of nested files
+                    $member_data = $a_ass->getMemberListData();
+                    $i = 1;
                     foreach ($files as $file) {
                         $a_info->addProperty(
-                            $file,
-                            $lng->txt("download"),
+                            $lng->txt("file") . ' ' . $i++,
+                            $this->getFeedbackFileDisplay($file, $member_data),
                             $this->getSubmissionLink("downloadFeedbackFile", array("file" => urlencode($file)))
                         );
                     }
+                    // fau.
                 }
             }
 
@@ -568,7 +572,36 @@ class ilExAssignmentGUI
             }
         }
     }
-    
+
+    // fau: exMultiFeedbackStructure - new function getFeedbackFileDisplay()
+    /**
+     * Get the display title of a feedback file (extracting the member from the sub folder name)
+     * @param string $file
+     * @param array $member_data
+     * @return string
+     * @see ilExAssignment::getMemberListData()
+     */
+    public function getFeedbackFileDisplay($file, $member_data) {
+        //  $mem_dir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
+
+        $pi = pathinfo($file);
+        $dirname = $pi['dirname'];
+        $basename = $pi['basename'];
+        $parts = explode('_', $dirname);
+
+        $user_id = $parts[3];
+        $login = $parts[2];
+
+        if (isset($member_data[$user_id])) {
+            return $basename . ' (' .$member_data[$user_id]['firstname'] . ' ' . $member_data[$user_id]['lastname'] . ')';
+        }
+        else {
+            return $file;
+        }
+    }
+    // fau.
+
+
     /**
      * Get time string for deadline
      */
