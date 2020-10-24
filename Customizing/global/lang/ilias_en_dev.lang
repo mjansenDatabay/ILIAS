@@ -646,6 +646,7 @@ exc#:#exc_file_suffixes_in_zip#:#Allowed filename in the archive: %s
 exc#:#exc_wrong_filenames#:#The following filenames have a wrong suffix: %s
 exc#:#exc_wrong_filenames_in_zip#:#The following filenames in the archive have a wrong suffix: %s
 exc#:#exc_mem_delete_perm_failure#:#You need the permission to edit the exercise settings in order to delete submissions!
+exc#:#exc_team_manage_perm_failure#:#You need the permission to edit the exercise settings in order to create or dissolve teams!
 exc#:#exc_plagiarism#:#Plagiarism
 exc#:#exc_plag_state#:#Status
 exc#:#exc_plag_none#:#None

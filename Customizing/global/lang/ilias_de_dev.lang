@@ -608,6 +608,7 @@ exc#:#exc_file_suffixes_in_zip#:#Erlaubte Dateiendungen im Archiv: %s
 exc#:#exc_wrong_filenames#:#Die folgenden Dateien haben eine falsche Dateiendung: %s
 exc#:#exc_wrong_filenames_in_zip#:#Die folgenden Dateien im Archiv haben eine falschen Dateiendung: %s
 exc#:#exc_mem_delete_perm_failure#:#Sie benötigen zum Löschen von Abgaben das Recht, die Einstellungen der Übung zu bearbeiten.
+exc#:#exc_team_manage_perm_failure#:#Sie benötigen zum Erstellen oder Auflösen von Teams das Recht, die Einstellungen der Übung zu bearbeiten.
 exc#:#exc_plagiarism#:#Plagiat
 exc#:#exc_plag_state#:#Status
 exc#:#exc_plag_none#:#Nein

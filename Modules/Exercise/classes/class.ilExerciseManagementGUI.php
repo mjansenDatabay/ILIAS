@@ -1574,6 +1574,13 @@ class ilExerciseManagementGUI
     
     public function createTeamsObject()
     {
+        // fau: exTeamRemove - check extended permission for management
+        if (!ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId())) {
+            ilUtil::sendFailure($this->lng->txt("exc_team_manage_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+        // fau.
+
         $ilCtrl = $this->ctrl;
         
         $members = $this->getMultiActionUserIds(true);
@@ -1623,6 +1630,13 @@ class ilExerciseManagementGUI
     
     public function dissolveTeamsObject()
     {
+        // fau: exTeamRemove - check extended permission for management
+        if (!ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId())) {
+            ilUtil::sendFailure($this->lng->txt("exc_team_manage_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+        // fau.
+
         $ilCtrl = $this->ctrl;
         
         $members = $this->getMultiActionUserIds(true);
