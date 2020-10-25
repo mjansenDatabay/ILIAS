@@ -502,7 +502,9 @@ class ilObjExercise extends ilObject
         $passed_at_least_one = false;
         
         foreach ($ass as $a) {
-            $stat = $a->getMemberStatus($a_user_id)->getStatus();
+            // fau: exPlag - use effective status
+            $stat = $a->getMemberStatus($a_user_id)->getEffectiveStatus();
+            // fau.
             if ($a->getMandatory() && ($stat == "failed" || $stat == "notgraded")) {
                 $passed_all_mandatory = false;
             }
@@ -668,7 +670,7 @@ class ilObjExercise extends ilObject
 
             reset($ass_data);
             foreach ($ass_data as $ass) {
-                $status = $ass->getMemberStatus($user_id)->getStatus();
+                $status = $ass->getMemberStatus($user_id)->getEffectiveStatus();
                 $excel->setCell($row, $col++, $this->lng->txt("exc_" . $status));
             }
             
@@ -727,7 +729,9 @@ class ilObjExercise extends ilObject
 
             reset($ass_data);
             foreach ($ass_data as $ass) {
-                $excel->setCell($row, $col++, $ass->getMemberStatus($user_id)->getMark());
+                // fau: exPlag - export the effective mark
+                $excel->setCell($row, $col++, $ass->getMemberStatus($user_id)->getEffectiveMark());
+                // fau.
             }
             
             // total mark

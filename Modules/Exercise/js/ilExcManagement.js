@@ -19,15 +19,18 @@ il.ExcManagement = {
 				var comment = $('#lcomment_'+ass_id+'_'+member_id).val();
 
 				// fau: exPlag - set form values
-				var plag_toggle = $('#plag_toggle_'+ass_id+'_'+member_id).val();
-				var plag_flag = $('#plag_flag_'+ass_id+'_'+member_id).val();
-				var plag_comment = $('#plag_comment_'+ass_id+'_'+member_id).val();
-				// fau.
+				var plag_flag;
+				var plag_comment;
 
-				if (!plag_toggle) {
-					plag_flag = "none";
-					plag_comment = "";
+				if ($('#plag_toggle_'+ass_id+'_'+member_id).is(':checked')) {
+					plag_flag = $('#plag_flag_'+ass_id+'_'+member_id).val();
+					plag_comment = $('#plag_comment_'+ass_id+'_'+member_id).val();
 				}
+				else {
+					plag_flag = 'none';
+					plag_comment = '';
+				}
+				// fau.
 
 				$.ajax({
 					url: il.ExcManagement.ajax_url,
@@ -49,9 +52,13 @@ il.ExcManagement = {
 						if (response.set_plag) {
 							$("#"+form_id.substr(5)+"_plag_info").html(response.plag_info);
 							$("#"+form_id.substr(5)+"_plag_comment").html(response.plag_comment);
-							if (plag_flag === 'detected') {
-								$("#"+form_id.substr(5)+"_status").val('failed');
-								$("#"+form_id.substr(5)+"_mark").val('');
+							if (response.plag_flag === 'detected') {
+								$("#"+form_id.substr(5)+"_effective_status").show();
+								$("#"+form_id.substr(5)+"_effective_mark").show();
+							}
+							else {
+								$("#"+form_id.substr(5)+"_effective_status").hide();
+								$("#"+form_id.substr(5)+"_effective_mark").hide();
 							}
 						}
 						// fau.

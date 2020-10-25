@@ -1548,6 +1548,7 @@ class ilExerciseManagementGUI
                     "result" => true,
                     "snippet" => nl2br($comment),
                     "set_plag" => $set_plag,
+                    "plag_flag" => $plag_flag,
                     "plag_info" => $plag_info,
                     "plag_comment" => $plag_comment,
                 );

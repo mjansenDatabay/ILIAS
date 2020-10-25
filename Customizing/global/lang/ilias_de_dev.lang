@@ -618,7 +618,11 @@ exc#:#exc_plag_comment#:#Plagiats-Kommentar
 exc#:#exc_plag_suspicion_info#:#Plagiats-Verdacht
 exc#:#exc_plag_detected_info#:#Plagiat erkannt
 exc#:#exc_plag_see_comment#:#, siehe Kommentar
-exc#:#exc_plag_visible_info#:#Bei Verdacht werden Status und Kommentar nur den Tutoren angezeigt. Ein erkanntes Plagiat wird auch dem Teilnehmer angezeigt. Der Status wird dann auf "nicht bestanden" gesetzt und die Note/Punkte gelöscht.
+exc#:#exc_plag_original_mark#:#, originale Note/Punkte:
+exc#:#exc_plag_visible_info#:#Bei Verdacht werden Status und Kommentar nur den Tutoren angezeigt. Ein erkanntes Plagiat wird auch dem Teilnehmer angezeigt. Der effektive Status ist dann "nicht bestanden" und die Note/Punkte leer bzw. 0.
+exc#:#exc_plag_effective_failed#:#(effektiv "Nicht bestanden")
+exc#:#exc_plag_effective_zero#:#(effektiv 0)
+exc#:#exc_plag_effective_empty#:#(effektiv leer)
 exc#:#exc_visible_for_tutors#:#nur für Tutoren sichtbar
 exc#:#exc_visible_for_student#:#für Teilnehmer sichtbar
 exc#:#exc_max_team_size#:#Maximale Teamgröße

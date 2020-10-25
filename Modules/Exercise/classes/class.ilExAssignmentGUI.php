@@ -150,7 +150,7 @@ class ilExAssignmentGUI
                 $tag1 = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ': ' . $tag1.'</span>';
             }
 
-            if ($tag2 = $a_ass->getMemberStatus()->getPlagInfo()) {
+            if ($tag2 = $a_ass->getMemberStatus()->getPlagInfo($a_ass)) {
                 $tag2 = ' <span class="ilTag">'. $tag2.'</span>';
             }
         }
@@ -162,7 +162,9 @@ class ilExAssignmentGUI
         $stat = "not_attempted";
         $pic = "scorm/not_attempted.svg";
         if ((int) $a_ass->getResultTime() <= time()) {
-            $stat = $a_ass->getMemberStatus()->getStatus();
+            // fau: exPlag - use effective status and icon
+            $stat = $a_ass->getMemberStatus()->getEffectiveStatus();
+            // fau.
             $pic = $a_ass->getMemberStatus()->getStatusIcon();
         }
         if ($stat != "passed" and $stat != "failed") {
@@ -486,8 +488,10 @@ class ilExAssignmentGUI
         $cnt_files = $storage->countFeedbackFiles($a_feedback_id);
         
         $lpcomment = $a_ass->getMemberStatus()->getComment();
-        $mark = $a_ass->getMemberStatus()->getMark();
-        $status = $a_ass->getMemberStatus()->getStatus();
+        // fau: exPlag -get the effective mark and status
+        $mark = $a_ass->getMemberStatus()->getEffectiveMark();
+        $status = $a_ass->getMemberStatus()->getEffectiveStatus();
+        // fau.
         
         if ($lpcomment != "" ||
             $mark != "" ||
@@ -516,7 +520,7 @@ class ilExAssignmentGUI
             if ($a_ass->getMemberStatus()->isPlagDetected()) {
                 $a_info->addProperty(
                     $lng->txt("exc_plagiarism"),
-                    $a_ass->getMemberStatus()->getPlagInfo()
+                    $a_ass->getMemberStatus()->getPlagInfo($a_ass)
                 );
                 if ($a_ass->getMemberStatus()->getPlagComment()) {
                     $a_info->addProperty(

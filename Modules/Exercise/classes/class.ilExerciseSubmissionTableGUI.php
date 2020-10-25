@@ -300,9 +300,13 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
         // do not grade or mark if no team yet
         if (!$has_no_team_yet) {
             // status
-            // fau: exPlag - add id for update by ajax success
+            // fau: exPlag - add info about effective status
             $comment_id = "excasscomm_" . $a_ass->getId() . "_" . $a_user_id;
-            $this->tpl->setVariable("STATUS_ID", $comment_id . "_status");
+            $this->tpl->setVariable("EFFECTIVE_STATUS_ID", $comment_id . "_effective_status");
+            if ($a_row['plag_flag'] != ilExAssignmentMemberStatus::PLAG_DETECTED) {
+                $this->tpl->setVariable("EFFECTIVE_STATUS_HIDDEN", "display: none;");
+            }
+            $this->tpl->setVariable("TXT_EFFECTIVE_STATUS", $this->lng->txt('exc_plag_effective_failed'));
             // fau.
             $this->tpl->setVariable("SEL_" . strtoupper($a_row["status"]), ' selected="selected" ');
             $this->tpl->setVariable("TXT_NOTGRADED", $this->lng->txt("exc_notgraded"));
@@ -426,9 +430,15 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                     if ($has_no_team_yet) {
                         break;
                     }
-                    // fau: exPlag - add id for update by ajax success
+                    // fau: exPlag - info about effective mark
                     else {
-                        $this->tpl->setVariable("MARK_ID", $comment_id . "_mark");
+                        $this->tpl->setVariable("EFFECTIVE_MARK_ID", $comment_id . "_effective_mark");
+                        if ($a_row['plag_flag'] != ilExAssignmentMemberStatus::PLAG_DETECTED) {
+                            $this->tpl->setVariable("EFFECTIVE_MARK_HIDDEN", "display: none;");
+                        }
+                        $this->tpl->setVariable("TXT_EFFECTIVE_MARK", $this->lng->txt(
+                            is_numeric($a_row['mark']) ? 'exc_plag_effective_zero' : 'exc_plag_effective_empty'));
+
                         $this->tpl->setVariable("VAL_" . strtoupper($col), ilUtil::prepareFormOutput(trim($a_row[$col])));
                         break;
                     }

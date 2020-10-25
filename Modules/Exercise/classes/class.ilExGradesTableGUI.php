@@ -122,7 +122,9 @@ class ilExGradesTableGUI extends ilTable2GUI
 
             // grade
             $this->tpl->setCurrentBlock("grade");
-            $status = $member_status->getStatus();
+            // fau: exPlag - use effective status
+            $status = $member_status->getEffectiveStatus();
+            // fau.
             // fau: exManCalc- don't make status selectable for assignments
             //			$this->tpl->setVariable("SEL_".strtoupper($status), ' selected="selected" ');
             //			$this->tpl->setVariable("TXT_NOTGRADED", $lng->txt("exc_notgraded"));
@@ -134,7 +136,6 @@ class ilExGradesTableGUI extends ilTable2GUI
             $this->tpl->setVariable("ALT_STATUS", $lng->txt("exc_" . $status));
             
             // mark
-            $mark = $member_status->getMark();
             // fau: exMaxPoints - show extended mark
             // fau: exPlag - show detected plagiarism
             if ($member_status->isPlagDetected()) {
