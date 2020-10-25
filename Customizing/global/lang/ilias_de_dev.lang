@@ -573,7 +573,7 @@ exc#:#exc_max_points#:#Maximale Punktzahl
 exc#:#exc_max_points_info#:#Wenn angegeben, muss bei Note/Punkte eine Zahl eingegeben werden, die diesen Wert nicht übersteigen darf
 exc#:#exc_max_x_points#:#max. %s Punkte
 exc#:#exc_mark_percent#:#%s (%s %%)
-exc#:#exc_mark_ignored#:#Die Punkte der folgenden Nutzer überschreiten die maximale Punktzahl und wurden ignoriert:
+exc#:#exc_mark_adjusted#:#Die Punkte der folgenden Nutzer wurden an den gültigen Wertebereich angepasst:
 exc#:#exc_multi_feedback_by_submissions_hint#:#Wenn Sie Ihr Feedback direkt als Kommentare in den abgegebenen Dateien (z.B. bei PDFs) geben, können Sie auch mit dem unter "Alle Abgaben herunterladen" Archiv arbeiten.
 exc#:#exc_multi_feedback_by_submissions_warning#:#Sie haben wahrscheinlich das unter "Alle Abgaben herunterladen" bereitgestellte Archiv hochgeladen. Enthalten die Dateien darin ihr Feedback, z.B. als Kommentare? Dann können sie sie als Feedback speichern.
 exc#:#exc_pass_manual#:#Manuell

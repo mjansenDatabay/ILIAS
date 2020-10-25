@@ -613,7 +613,7 @@ exc#:#exc_max_points#:#Maximum Points
 exc#:#exc_max_points_info#:#The mark must be a number (points) which can't exceed this value
 exc#:#exc_max_x_points#:#max. %s points
 exc#:#exc_mark_percent#:#%s (%s %%)
-exc#:#exc_mark_ignored#:#The points given for the following users exceed the maximum points and are ignored:
+exc#:#exc_mark_ignored#:#The points given for the following users were adjusted to the valid range:
 exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
 exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
 exc#:#exc_pass_manual#:#Manual

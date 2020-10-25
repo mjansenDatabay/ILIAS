@@ -1106,11 +1106,37 @@ class ilExAssignment
             if (!is_numeric($a_mark)) {
                 return false;
             }
+            if ((float) $a_mark < 0) {
+                return false;
+            }
             if ((float) $a_mark > $this->max_points) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Check if a mark is allowed
+     * @param $a_mark
+     * @return bool
+     */
+    public function adjustMark($a_mark) {
+        if (empty($a_mark)) {
+            return $a_mark;
+        }
+        if (isset($this->max_points)) {
+            if (!is_numeric($a_mark)) {
+                return null;
+            }
+            if ((float) $a_mark < 0) {
+                return 0;
+            }
+            if ((float) $a_mark > $this->max_points) {
+                return $this->max_points;
+            }
+        }
+        return $a_mark;
     }
     // fau.
 

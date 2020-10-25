@@ -1440,7 +1440,8 @@ class ilExerciseManagementGUI
                             $member_status->setMark($values["mark"]);
                         }
                         else {
-                            $mark_ignored_for[$sub_user_id] = $uname["lastname"] . ", " . $uname["firstname"];
+                            $member_status->setMark($ass->adjustMark($values["mark"]));
+                            $mark_adjusted_for[$sub_user_id] = $uname["lastname"] . ", " . $uname["firstname"];
                         }
                         // fau.
                     }
@@ -1453,9 +1454,9 @@ class ilExerciseManagementGUI
         }
 
         // fau: exMaxPoints - show message about ignored marks
-        if (!empty($mark_ignored_for)) {
-            $mark_ignored_for = implode(" - ", $mark_ignored_for);
-            ilUtil::sendInfo($this->lng->txt("exc_mark_ignored") . " " . $mark_ignored_for, $a_redirect);
+        if (!empty($mark_adjusted_for)) {
+            $mark_adjusted_for = implode(" - ", $mark_adjusted_for);
+            ilUtil::sendInfo($this->lng->txt("exc_mark_adjusted") . " " . $mark_adjusted_for, $a_redirect);
         }
 
         if (count($saved_for) > 0) {
