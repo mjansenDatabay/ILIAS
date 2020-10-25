@@ -248,6 +248,10 @@ class ilObjExerciseGUI extends ilObjectGUI
     */
     protected function initEditCustomForm(ilPropertyFormGUI $a_form)
     {
+        // fau: editDidacticTemplateChoice - add the form properties for didactic templates
+        $this->initDidacticTemplate($a_form);
+        // fau.
+
         $obj_service = $this->getObjectService();
 
         $a_form->setTitle($this->lng->txt("exc_edit_exercise"));
@@ -326,7 +330,8 @@ class ilObjExerciseGUI extends ilObjectGUI
         $cb = new ilCheckboxInputGUI($this->lng->txt("exc_show_submissions"), "show_submissions");
         $cb->setInfo($this->lng->txt("exc_show_submissions_info"));
         $a_form->addItem($cb);
-        
+
+        // fau: exNotify - add form control for feedback notification
         $section = new ilFormSectionHeaderGUI();
         $section->setTitle($this->lng->txt('exc_notification'));
         $a_form->addItem($section);
@@ -335,7 +340,13 @@ class ilObjExerciseGUI extends ilObjectGUI
         $cbox = new ilCheckboxInputGUI($this->lng->txt("exc_submission_notification"), "notification");
         $cbox->setInfo($this->lng->txt("exc_submission_notification_info"));
         $a_form->addItem($cbox);
-        
+
+        // feedback notifications
+        $cbox = new ilCheckboxInputGUI($this->lng->txt("exc_feedback_notification"), "feedback_notification");
+        $cbox->setInfo($this->lng->txt("exc_feedback_notification_info"));
+        $cbox->setChecked(true);
+        $a_form->addItem($cbox);
+        // fau.
         
         // feedback settings
         
@@ -375,7 +386,22 @@ class ilObjExerciseGUI extends ilObjectGUI
             );
         }
     }
-    
+
+    // fau: editDidacticTemplaceChoice - new function getEditFormValues()
+    /**
+     * Add the didactic template setting to the form values
+     * @see ilContainerGUI
+     * @return array
+     */
+    protected function getEditFormValues()
+    {
+        $values = parent::getEditFormValues();
+        $values['didactic_type'] =
+            'dtpl_' . ilDidacticTemplateObjSettings::lookupTemplateId($this->object->getRefId());
+        return $values;
+    }
+    // fau.
+
     /**
     * Get values for properties form
     */
@@ -401,6 +427,10 @@ class ilObjExerciseGUI extends ilObjectGUI
             $ilUser->getId(),
             $this->object->getId()
         );
+
+        // fau: exNotify - get the form values
+        $a_values['feedback_notification'] = $this->object->hasFeedbackNotification();
+        // fau.
                 
         $a_values['completion_by_submission'] = (int) $this->object->isCompletionBySubmissionEnabled();
         
@@ -452,6 +482,10 @@ class ilObjExerciseGUI extends ilObjectGUI
             (bool) $a_form->getInput("notification")
         );
 
+        // fau: exNotify - update the feedback notification
+        $this->object->setFeedbackNotification($a_form->getInput('feedback_notification'));
+        // fau.
+
         // tile image
         $obj_service->commonSettings()->legacyForm($a_form, $this->object)->saveTileImage();
 
@@ -463,7 +497,28 @@ class ilObjExerciseGUI extends ilObjectGUI
             )
         );
     }
-  
+
+    // fau: editDidacticTemplaceChoice - new function afterUpdate()
+    /**
+     * Set the didactic template aftern an update without confirmat
+     * @see ilContainerGUI
+     */
+    protected function afterUpdate()
+    {
+        // check if template is changed
+        $current_tpl_id = (int) ilDidacticTemplateObjSettings::lookupTemplateId(
+            $this->object->getRefId()
+        );
+        $new_tpl_id = (int) $this->getDidacticTemplateVar('dtpl');
+
+        if ($new_tpl_id != $current_tpl_id) {
+            ilDidacticTemplateUtils::switchTemplate($this->object->getRefId(), $new_tpl_id);
+        }
+        parent::afterUpdate();
+    }
+    // fau.
+
+
     /**
      * Add subtabs of content view
      *

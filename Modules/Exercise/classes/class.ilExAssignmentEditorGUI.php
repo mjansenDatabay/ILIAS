@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
@@ -144,6 +143,16 @@ class ilExAssignmentEditorGUI
                 break;
             
             default:
+
+                // fau: exAssHook - forward to type gui (analogous to ilExSubmissionGUI)
+                if ($this->type_guis->isExAssTypeGUIClass($class)) {
+                    $this->setAssignmentHeader();
+                    $type_gui = $this->type_guis->getByClassName($class);
+                    $type_gui->setAssignment($this->assignment);
+                    return $ilCtrl->forwardCommand($type_gui);
+                }
+                // fau.
+
                 $this->{$cmd . "Object"}();
                 break;
         }
@@ -246,17 +255,36 @@ class ilExAssignmentEditorGUI
         $ti->setRequired(true);
         $form->addItem($ti);
 
+        // fau: exAssHook - use hidden field for inactive type
         // type
-        $ty = $this->getTypeDropdown();
-        $ty->setValue($a_type);
-        $ty->setDisabled(true);
-        $form->addItem($ty);
+        if ($ass_type->isActive()) {
+            $ty = $this->getTypeDropdown();
+            $ty->setValue($a_type);
+            $ty->setDisabled(true);
+            $form->addItem($ty);
+        }
+        else {
+            $ty = new ilHiddenInputGUI('type');
+            $ty->setValue($a_type);
+            $form->addItem($ty);
+
+            $tyi = new ilNonEditableValueGUI($lng->txt("exc_assignment_type"));
+            $tyi->setValue($lng->txt("exc_type_inactive"));
+            $tyi->setInfo($lng->txt("exc_type_inactive_info"));
+            $form->addItem($tyi);
+        }
+
 
         //
         // type specific start
         //
 
-        $ass_type_gui->addEditFormCustomProperties($form);
+        // fau: exAssHook - set assignment and exercise_id for type gui to allow form customization
+        if (isset($this->assignment)) {
+            $ass_type_gui->setAssignment($this->assignment);
+        }
+        $ass_type_gui->addEditFormCustomProperties($form, $this->exercise_id);
+        // fau.
 
         //
         // type specific end
@@ -281,8 +309,8 @@ class ilExAssignmentEditorGUI
             // fau: exTeamLimit - input for maximum team members
             $max_team_members_by_participants = new ilNumberInputGUI($lng->txt("exc_max_team_size"), "max_team_members_by_participants");
             $max_team_members_by_participants->setSize(3);
+            $max_team_members_by_participants->setInfo($this->lng->txt('exc_max_team_size_info'));
             $max_team_members_by_participants->setMinValue(1);
-            $max_team_members_by_participants->setMaxValue($this->getExerciseTotalMembers());
             $max_team_members_by_participants->setRequired(false);
             $max_team_members_by_participants->setSuffix($lng->txt("exc_participants"));
             $radio_participants->addSubItem($max_team_members_by_participants);
@@ -1506,6 +1534,12 @@ class ilExAssignmentEditorGUI
             $lng->txt("exc_instruction_files"),
             $ilCtrl->getLinkTargetByClass(array("ilexassignmenteditorgui", "ilexassignmentfilesystemgui"), "listFiles")
         );
+
+        // fau: exAssHook - handle the editor tabs
+        $typeGUI = $this->type_guis->getById($this->assignment->getType());
+        $typeGUI->setAssignment($this->assignment);
+        $typeGUI->handleEditorTabs($this->tabs);
+        // fau.
     }
     
     public function downloadGlobalFeedbackFileObject()

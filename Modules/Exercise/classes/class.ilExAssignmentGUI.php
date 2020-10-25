@@ -147,10 +147,10 @@ class ilExAssignmentGUI
         if ((int) $a_ass->getResultTime() <= time()) {
 
             if ($tag1 = $a_ass->getMemberStatus()->getMarkWithInfo($a_ass)) {
-                $tag1 = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ':' . $tag1.'</span>';
+                $tag1 = ' <span class="ilTag">'. $this->lng->txt('exc_mark') . ': ' . $tag1.'</span>';
             }
 
-            if ($tag2 = $a_ass->getMemberStatus()->getPlagInfo()) {
+            if ($tag2 = $a_ass->getMemberStatus()->getPlagInfo($a_ass)) {
                 $tag2 = ' <span class="ilTag">'. $tag2.'</span>';
             }
         }
@@ -162,7 +162,9 @@ class ilExAssignmentGUI
         $stat = "not_attempted";
         $pic = "scorm/not_attempted.svg";
         if ((int) $a_ass->getResultTime() <= time()) {
-            $stat = $a_ass->getMemberStatus()->getStatus();
+            // fau: exPlag - use effective status and icon
+            $stat = $a_ass->getMemberStatus()->getEffectiveStatus();
+            // fau.
             $pic = $a_ass->getMemberStatus()->getStatusIcon();
         }
         if ($stat != "passed" and $stat != "failed") {
@@ -486,8 +488,10 @@ class ilExAssignmentGUI
         $cnt_files = $storage->countFeedbackFiles($a_feedback_id);
         
         $lpcomment = $a_ass->getMemberStatus()->getComment();
-        $mark = $a_ass->getMemberStatus()->getMark();
-        $status = $a_ass->getMemberStatus()->getStatus();
+        // fau: exPlag -get the effective mark and status
+        $mark = $a_ass->getMemberStatus()->getEffectiveMark();
+        $status = $a_ass->getMemberStatus()->getEffectiveStatus();
+        // fau.
         
         if ($lpcomment != "" ||
             $mark != "" ||
@@ -516,7 +520,7 @@ class ilExAssignmentGUI
             if ($a_ass->getMemberStatus()->isPlagDetected()) {
                 $a_info->addProperty(
                     $lng->txt("exc_plagiarism"),
-                    $a_ass->getMemberStatus()->getPlagInfo()
+                    $a_ass->getMemberStatus()->getPlagInfo($a_ass)
                 );
                 if ($a_ass->getMemberStatus()->getPlagComment()) {
                     $a_info->addProperty(
@@ -546,13 +550,17 @@ class ilExAssignmentGUI
 
                 if ($cnt_files > 0) {
                     $files = $storage->getFeedbackFiles($a_feedback_id);
+                    // fau: exMultiFeedbackStructure - better listing of nested files
+                    $member_data = $a_ass->getMemberListData();
+                    $i = 1;
                     foreach ($files as $file) {
                         $a_info->addProperty(
-                            $file,
-                            $lng->txt("download"),
+                            $lng->txt("file") . ' ' . $i++,
+                            $this->getFeedbackFileDisplay($file, $member_data),
                             $this->getSubmissionLink("downloadFeedbackFile", array("file" => urlencode($file)))
                         );
                     }
+                    // fau.
                 }
             }
 
@@ -568,7 +576,36 @@ class ilExAssignmentGUI
             }
         }
     }
-    
+
+    // fau: exMultiFeedbackStructure - new function getFeedbackFileDisplay()
+    /**
+     * Get the display title of a feedback file (extracting the member from the sub folder name)
+     * @param string $file
+     * @param array $member_data
+     * @return string
+     * @see ilExAssignment::getMemberListData()
+     */
+    public function getFeedbackFileDisplay($file, $member_data) {
+        //  $mem_dir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
+
+        $pi = pathinfo($file);
+        $dirname = $pi['dirname'];
+        $basename = $pi['basename'];
+        $parts = explode('_', $dirname);
+
+        $user_id = $parts[3];
+        $login = $parts[2];
+
+        if (isset($member_data[$user_id])) {
+            return $basename . ' (' .$member_data[$user_id]['firstname'] . ' ' . $member_data[$user_id]['lastname'] . ')';
+        }
+        else {
+            return $file;
+        }
+    }
+    // fau.
+
+
     /**
      * Get time string for deadline
      */

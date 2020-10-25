@@ -54,7 +54,12 @@ class ilExAssignment
      * @deprecated
      */
     const TYPE_WIKI_TEAM = 6;
-    
+
+    // fau: exAssHook - dummy type id for inactive type
+    const TYPE_INACTIVE = -1;
+    // fau.
+
+
     const FEEDBACK_DATE_DEADLINE = 1;
     const FEEDBACK_DATE_SUBMISSION = 2;
     const FEEDBACK_DATE_CUSTOM = 3;
@@ -209,7 +214,7 @@ class ilExAssignment
         $assignments = self::getInstancesByExercise($a_exc_id);
         $allowed = [];
         foreach ($assignments as $ass) {
-            if ($ass->checkInGradeTime()) {
+            if ($ass->checkInGradeTime() || ilObjExerciseAccess::checkExtendedGradingAccess($a_exc_id, false)) {
                 $allowed[] = $ass;
             }
         }
@@ -1101,11 +1106,37 @@ class ilExAssignment
             if (!is_numeric($a_mark)) {
                 return false;
             }
+            if ((float) $a_mark < 0) {
+                return false;
+            }
             if ((float) $a_mark > $this->max_points) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Check if a mark is allowed
+     * @param $a_mark
+     * @return bool
+     */
+    public function adjustMark($a_mark) {
+        if (empty($a_mark)) {
+            return $a_mark;
+        }
+        if (isset($this->max_points)) {
+            if (!is_numeric($a_mark)) {
+                return null;
+            }
+            if ((float) $a_mark < 0) {
+                return 0;
+            }
+            if ((float) $a_mark > $this->max_points) {
+                return $this->max_points;
+            }
+        }
+        return $a_mark;
     }
     // fau.
 
@@ -2225,15 +2256,17 @@ class ilExAssignment
                 }
 
                 // add the feedback files in the team folder
-                foreach (ilUtil::getDir($team_dir) as $filename => $item) {
-                    if ($item['type'] == "file" && substr($filename, 0, 1) != ".") {
-                        $mf_files[] = [
-                            'team_id' => $team_id,
-                            'members' => $members,
-                            "full_path" => $team_dir . "/" . $filename,
-                            "folder" => '',
-                            "file" => $filename
-                        ];
+                if (is_dir($team_dir)) {
+                    foreach (ilUtil::getDir($team_dir) as $filename => $item) {
+                        if ($item['type'] == "file" && substr($filename, 0, 1) != ".") {
+                            $mf_files[] = [
+                                'team_id' => $team_id,
+                                'members' => $members,
+                                "full_path" => $team_dir . "/" . $filename,
+                                "folder" => '',
+                                "file" => $filename
+                            ];
+                        }
                     }
                 }
 
@@ -2455,8 +2488,12 @@ class ilExAssignment
                 if ($feedback_id) {
                     $fb_path = $fstorage->getFeedbackPath($feedback_id);
 
-                    // use the member folder as filename prefix to prevent double file names
-                    $target = $fb_path . "/" . ($folder ? $folder . '_' : '') . $file_name;
+                    // keep the folder structure of uploaded feedback files
+                    $target_dir = $fb_path . "/" . ($folder ? '/' . $folder : '');
+                    $target = $target_dir . "/" . $file_name;
+                    if (!is_dir($target_dir)) {
+                        ilUtil::makeDirParents($target_dir)   ;
+                    }
                     if (is_file($target)) {
                         unlink($target);
                     }

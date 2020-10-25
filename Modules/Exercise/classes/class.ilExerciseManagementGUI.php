@@ -120,7 +120,9 @@ class ilExerciseManagementGUI
         //$cmd = $ilCtrl->getCmd("listPublicSubmissions");
 
         // fau: exGradeTime - check if selected assignment is available
-        if (isset($this->assignment) && !$this->assignment->checkInGradeTime()) {
+        if (isset($this->assignment)
+            && !$this->assignment->checkInGradeTime()
+            && !ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId(), true)) {
             ilUtil::sendFailure( $this->lng->txt("exc_not_available_for_grading"), true);
             $this->ctrl->setParameter($this, "ass_id", "");
             $this->ctrl->redirect($this, $this->getViewBack());
@@ -360,6 +362,7 @@ class ilExerciseManagementGUI
         $ass = ilExAssignment::getInstancesForGrading($this->exercise->getId());
         if (empty($ass)) {
             ilUtil::sendInfo($lng->txt("exc_no_assignments_for_grading"));
+            return;
         }
         // fau.
         
@@ -924,7 +927,14 @@ class ilExerciseManagementGUI
         
         // participant selection
         include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-        // fau: exGradeTime - seems to be unused
+        // fau: exGradeTime - get only the allowed assignment
+        $ass = ilExAssignment::getInstancesForGrading($this->exercise->getId());
+        if (empty($ass)) {
+            ilUtil::sendInfo($lng->txt("exc_no_assignments_for_grading"));
+            return;
+        }
+        // fau.
+
         // $ass = ilExAssignment::getAssignmentDataOfExercise($this->exercise->getId());
         // fau.
         $members = $this->exercise->members_obj->getMembers();
@@ -1430,7 +1440,8 @@ class ilExerciseManagementGUI
                             $member_status->setMark($values["mark"]);
                         }
                         else {
-                            $mark_ignored_for[$sub_user_id] = $uname["lastname"] . ", " . $uname["firstname"];
+                            $member_status->setMark($ass->adjustMark($values["mark"]));
+                            $mark_adjusted_for[$sub_user_id] = $uname["lastname"] . ", " . $uname["firstname"];
                         }
                         // fau.
                     }
@@ -1443,9 +1454,9 @@ class ilExerciseManagementGUI
         }
 
         // fau: exMaxPoints - show message about ignored marks
-        if (!empty($mark_ignored_for)) {
-            $mark_ignored_for = implode(" - ", $mark_ignored_for);
-            ilUtil::sendInfo($this->lng->txt("exc_mark_ignored") . " " . $mark_ignored_for, $a_redirect);
+        if (!empty($mark_adjusted_for)) {
+            $mark_adjusted_for = implode(" - ", $mark_adjusted_for);
+            ilUtil::sendInfo($this->lng->txt("exc_mark_adjusted") . " " . $mark_adjusted_for, $a_redirect);
         }
 
         if (count($saved_for) > 0) {
@@ -1537,6 +1548,7 @@ class ilExerciseManagementGUI
                     "result" => true,
                     "snippet" => nl2br($comment),
                     "set_plag" => $set_plag,
+                    "plag_flag" => $plag_flag,
                     "plag_info" => $plag_info,
                     "plag_comment" => $plag_comment,
                 );
@@ -1564,6 +1576,13 @@ class ilExerciseManagementGUI
     
     public function createTeamsObject()
     {
+        // fau: exTeamRemove - check extended permission for management
+        if (!ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId())) {
+            ilUtil::sendFailure($this->lng->txt("exc_team_manage_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+        // fau.
+
         $ilCtrl = $this->ctrl;
         
         $members = $this->getMultiActionUserIds(true);
@@ -1613,6 +1632,13 @@ class ilExerciseManagementGUI
     
     public function dissolveTeamsObject()
     {
+        // fau: exTeamRemove - check extended permission for management
+        if (!ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId())) {
+            ilUtil::sendFailure($this->lng->txt("exc_team_manage_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+        // fau.
+
         $ilCtrl = $this->ctrl;
         
         $members = $this->getMultiActionUserIds(true);
@@ -1977,7 +2003,13 @@ class ilExerciseManagementGUI
     {
         $lng = $this->lng;
         $tpl = $this->tpl;
-        
+
+        // fau: exGradeTime - check if individual deadline setting is allowed
+        if (!$this->exercise->isIndividualDeadlineSettingAllowed()) {
+            return "";
+        }
+        // fau.
+
         // prepare modal+
         include_once "./Services/UIComponent/Modal/classes/class.ilModalGUI.php";
         $modal = ilModalGUI::getInstance();
@@ -2028,6 +2060,13 @@ class ilExerciseManagementGUI
         $tpl = $this->tpl;
         
         $this->ctrl->saveParameter($this, "part_id");
+
+        // fau: exGradeTime - check if individual deadline setting is allowed
+        if (!$this->exercise->isIndividualDeadlineSettingAllowed()) {
+            echo $this->lng->txt("permission_denied");
+            exit;
+        }
+        // fau.
         
         // we are done
         if ((bool) $_GET["dn"]) {

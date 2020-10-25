@@ -206,7 +206,9 @@ class ilExSubmissionGUI
         $submission_type = $a_submission->getSubmissionType();
         // old handling -> forward to submission type gui class
         // @todo migrate everything to new concept
-        if ($submission_type != ilExSubmission::TYPE_REPO_OBJECT) {
+        // fau: exAssHook - treat inactive submission type like repo object
+        if ($submission_type != ilExSubmission::TYPE_REPO_OBJECT && $submission_type != ilExSubmission::TYPE_INACTIVE) {
+        // fau.
             $class = "ilExSubmission" . $submission_type . "GUI";
             include_once "Modules/Exercise/classes/class." . $class . ".php";
             $class::getOverviewContent($a_info, $a_submission);
@@ -306,7 +308,9 @@ class ilExSubmissionGUI
         if (!$this->assignment->notStartedYet()) {
             // deliver file
             $p = $storage->getFeedbackFilePath($this->submission->getFeedbackId(), $file);
-            ilUtil::deliverFile($p, $file);
+            // fau: exMultiFeedbackStructure - use only the basename for download
+            ilUtil::deliverFile($p, basename($file));
+            // fau.
         }
     
         return true;

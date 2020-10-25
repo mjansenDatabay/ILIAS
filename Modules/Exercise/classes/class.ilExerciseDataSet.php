@@ -86,6 +86,9 @@ class ilExerciseDataSet extends ilDataSet
                         "PassNr" => "integer",
                         "ShowSubmissions" => "integer",
                         "ComplBySubmission" => "integer",
+                        // fau: exNotify - add feedback notifiction to export structure
+                        'FeedbackNotification' => "integer",
+                        // fau.
                         "Tfeedback" => "integer"
                     );
             }
@@ -341,10 +344,12 @@ class ilExerciseDataSet extends ilDataSet
                 
                 case "5.2.0":
                 case "5.3.0":
+                    // fau: exNotify - query for feedback notification
                     $this->getDirectDataFromQuery("SELECT exc_data.obj_id id, title, description," .
-                        " pass_mode, pass_nr, show_submissions, compl_by_submission, tfeedback" .
+                        " pass_mode, pass_nr, show_submissions, compl_by_submission, feedback_notification, tfeedback" .
                         " FROM exc_data JOIN object_data ON (exc_data.obj_id = object_data.obj_id)" .
                         " WHERE " . $ilDB->in("exc_data.obj_id", $a_ids, false, "integer"));
+                    // fau.
                     break;
             }
         }
@@ -600,6 +605,9 @@ class ilExerciseDataSet extends ilDataSet
                 $newObj->setShowSubmissions($a_rec["ShowSubmissions"]);
                 $newObj->setCompletionBySubmission($a_rec["ComplBySubmission"]);
                 $newObj->setTutorFeedback($a_rec["Tfeedback"]);
+                // fau: exNotify - import feedback notification
+                $newObj->setFeedbackNotification($a_rec["FeedbackNotification"]);
+                // fau.
                 $newObj->update();
                 $newObj->saveData();
                 $this->current_exc = $newObj;

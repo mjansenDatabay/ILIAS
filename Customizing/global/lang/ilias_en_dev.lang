@@ -609,7 +609,9 @@ exc#:#exc_max_points#:#Maximum Points
 exc#:#exc_max_points_info#:#The mark must be a number (points) which can't exceed this value
 exc#:#exc_max_x_points#:#max. %s points
 exc#:#exc_mark_percent#:#%s (%s %%)
-exc#:#exc_mark_ignored#:#The points given for the following users exceed the maximum points and are ignored:
+exc#:#exc_mark_ignored#:#The points given for the following users were adjusted to the valid range:
+exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
+exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
 exc#:#exc_pass_manual#:#Manual
 exc#:#exc_pass_manual_description#:#Description of the requirement on the info-page
 exc#:#exc_pass_manual_info#:#If a exercise is passed, is decided by the tutors. In the grade-view an automatical calculation of the totalresult based on the partgrades/credits can take place.
@@ -642,6 +644,7 @@ exc#:#exc_file_suffixes_in_zip#:#Allowed filename in the archive: %s
 exc#:#exc_wrong_filenames#:#The following filenames have a wrong suffix: %s
 exc#:#exc_wrong_filenames_in_zip#:#The following filenames in the archive have a wrong suffix: %s
 exc#:#exc_mem_delete_perm_failure#:#You need the permission to edit the exercise settings in order to delete submissions!
+exc#:#exc_team_manage_perm_failure#:#You need the permission to edit the exercise settings in order to create or dissolve teams!
 exc#:#exc_plagiarism#:#Plagiarism
 exc#:#exc_plag_state#:#Status
 exc#:#exc_plag_none#:#None
@@ -651,15 +654,26 @@ exc#:#exc_plag_comment#:#Plagiarism comment
 exc#:#exc_plag_suspicion_info#:#Plagiarism suspicion
 exc#:#exc_plag_detected_info#:#Plagiarism detected
 exc#:#exc_plag_see_comment#:#, see Comment
-exc#:#exc_plag_visible_info#:#A suspected plagiarismn will be shown to the tutors only. A detected plagiarism will be shown to the learner. It will set the status to 'failed' and remove the mark.
+exc#:#exc_plag_original_mark#:#, original Mark/Points:
+exc#:#exc_plag_visible_info#:#A suspected plagiarismn will be shown to the tutors only. A detected plagiarism will be shown to the learner. The effective status is then 'failed' with empty mark or 0 points.
+exc#:#exc_plag_effective_failed#:#(effective "Failed")
+exc#:#exc_plag_effective_zero#:#(effektive 0)
+exc#:#exc_plag_effective_empty#:#(effektive empty)
 exc#:#exc_visible_for_tutors#:#only visible for tutors
 exc#:#exc_visible_for_student#:#visible for learners
 exc#:#exc_max_team_size#:#Maximum Team Size
+exc#:#exc_max_team_size_info#:#Leave the field empty to set no limit
 exc#:#exc_max_team_members_reached#:#The maximum team size is reached.
-exc#:#exc_team_member_remove_new_team#:#The removed team members will form a new team, to prevent their submission from a take over by others.
+exc#:#exc_team_remove_self_with_submission#:#You can't fully dissolve yor team as long as you have a submission!
+exc#:#exc_team_member_remove_new_team#:#The removed team members with submissions will form single user teams, to prevent their submission from a take over by others.
+exc#:#exc_type_inactive#:#Inaktive
+exc#:#exc_type_inactive_info#:#This assignment type is currently not active. Please inform the StudOn team: <a href="mailto://studon@fau.de">studon@fau.de</a>
+exc#:#exc_notification#:#Notification###fau: exNotify
+exc#:#exc_feedback_notification#:#Notification at Feedback###fau: exNotify
+exc#:#exc_feedback_notification_info#:#Participants get an email notification when a new feedback is available. This setting is used for all participants.###fau: exNotify
+exc#:#exc_settings_feedback_file_info#:#Tutors upload a file. The participant can access the file at the assignment overview.###fau: exNotify
+exc#:#exc_settings_feedback_text_info#:#Tutors type their evaluation in a text field. The participant can view the text is at the assignment overview.###fau: exNotify
 exercise#:#exc_mark#:#Grade/Points
-exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
-exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.
 grp#:#group_password_registration_lot#:#When you received the group-password, you can register for the lottery of this group.

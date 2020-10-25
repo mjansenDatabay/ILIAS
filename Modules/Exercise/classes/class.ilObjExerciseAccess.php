@@ -155,6 +155,32 @@ class ilObjExerciseAccess extends ilObjectAccess implements ilConditionHandling
     }
 
     /**
+     * Check if a user has extended grading access to the exercise
+     * @param  int  $a_id
+     * @param bool $is_reference
+     * @return bool
+     */
+    public static function checkExtendedGradingAccess($a_id, $is_reference = true)
+    {
+        global $DIC;
+
+        if ($is_reference) {
+            $refs = [$a_id];
+        }
+        else {
+            $refs = ilObject2::_getAllReferences($a_id);
+        }
+
+        foreach ($refs as $ref_id) {
+            if ($DIC->access()->checkAccess('write', '', $ref_id)
+            && $DIC->access()->checkAccess('edit_submissions_grades', '', $ref_id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param ilWACPath $ilWACPath
      *
      * @return bool

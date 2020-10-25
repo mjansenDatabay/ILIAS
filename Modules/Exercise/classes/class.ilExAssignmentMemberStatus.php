@@ -155,15 +155,25 @@ class ilExAssignmentMemberStatus
     
     public function getStatus()
     {
-        // fau: exPlag - return failed if plagiarism is detected
+        return $this->status;
+    }
+
+
+    // fau: new function getEffectiveStatus()
+    /**
+     * Get the effective status if plagiarism is taken into account
+     * @return null
+     */
+    public function getEffectiveStatus()
+    {
         if ($this->isPlagDetected()) {
             return 'failed';
         }
-        // fau.
-
         return $this->status;
     }
-    
+    // fau.
+
+
     public function setMark($a_value)
     {
         if ($a_value != $this->mark) {
@@ -174,40 +184,57 @@ class ilExAssignmentMemberStatus
     
     public function getMark()
     {
-        // fau: exPlag - suppress mark if plagiarism is detected
-        if ($this->isPlagDetected()) {
-            return null;
-        }
-        // fau.
         return $this->mark;
     }
+
+    // fau: new function getEffectiveMark()
+    /**
+     * Get the effective mark if plagiarism is taken into account
+     * @return null
+     */
+    public function getEffectiveMark()
+    {
+        if ($this->isPlagDetected()) {
+            if (is_numeric($this->mark)) {
+                return 0;
+            }
+            else {
+                return null;
+            }
+        }
+        return $this->mark;
+    }
+    // fau.
+
 
     // fau: exMaxPoints - new function getMarkWithInfo
     /**
      * Get the mark with an extended info
      * @param ilExAssignment $assignment
+     * @param bool $effective
      * @return string
      */
-    public function getMarkWithInfo (ilExAssignment $assignment) {
+    public function getMarkWithInfo (ilExAssignment $assignment, $effective = true) {
         global $DIC;
         $lng = $DIC->language();
 
-        if ($assignment->getMaxPoints() && $this->getMark()) {
-            if ($assignment->checkMark($this->getMark())) {
-                $percent = 100 * (float) $this->getMark() /  $assignment->getMaxPoints();
-                return sprintf($lng->txt("exc_mark_percent"), $this->getMark(), $percent);
+        $mark = ($effective ? $this->getEffectiveMark() : $this->getMark());
+        if ($assignment->getMaxPoints() && isset($mark)) {
+            if ($assignment->checkMark($mark)) {
+                $percent = 100 * (float) $mark /  $assignment->getMaxPoints();
+                return sprintf($lng->txt("exc_mark_percent"), $mark, round($percent, 2));
             }
             else {
-                return sprintf($lng->txt("exc_mark_invalid"), $this->getMark());
+                return sprintf($lng->txt("exc_mark_invalid"), $mark);
             }
         }
-        return $this->getMark();
+        return $mark;
     }
     // fau.
 
 
     // fau: exPlag -get info about plagiarism
-    public function getPlagInfo() {
+    public function getPlagInfo(ilExAssignment $assignment) {
         global $DIC;
         $lng = $DIC->language();
 
@@ -215,6 +242,10 @@ class ilExAssignmentMemberStatus
             $text = $lng->txt('exc_plag_detected_info');
             if (!empty($this->getPlagComment())) {
                 $text .= $lng->txt('exc_plag_see_comment');
+            }
+            if ($this->getMark() != $this->getEffectiveMark()) {
+                $text .= $lng->txt('exc_plag_original_mark')
+                    . ' ' . $this->getMarkWithInfo($assignment, false);
             }
             return $text;
         }
@@ -247,10 +278,6 @@ class ilExAssignmentMemberStatus
     public function setPlagFlag($plag_flag)
     {
         $this->plag_flag = $plag_flag;
-        if ($this->isPlagDetected()) {
-            $this->status = 'failed';
-            $this->mark = null;
-        }
     }
 
     /**
@@ -393,7 +420,9 @@ class ilExAssignmentMemberStatus
     
     public function getStatusIcon()
     {
-        switch ($this->getStatus()) {
+        // fau: exPlag - use effective status for status icon
+        switch ($this->getEffectiveStatus()) {
+        // fau.
             case "passed":
                 return "scorm/passed.svg";
             

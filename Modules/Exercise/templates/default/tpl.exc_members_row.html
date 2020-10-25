@@ -104,21 +104,23 @@
   
   <!-- BEGIN status -->
   <td class="std small">
-	  <!-- fau: exPlag - add id for update by ajax success -->
-	<select id="{STATUS_ID}"  class="form-control" name="status[{VAL_ID}]" >
-		<!-- fau. -->
+	<select class="form-control" name="status[{VAL_ID}]" >
 		<option value="notgraded" {SEL_NOTGRADED}>{TXT_NOTGRADED}</option>
 		<option value="passed" {SEL_PASSED}>{TXT_PASSED}</option>
 		<option value="failed" {SEL_FAILED}>{TXT_FAILED}</option>
 	</select>
+	  <!-- fau: exPlag - add info for effective status -->
+	  <p style="{EFFECTIVE_STATUS_HIDDEN}" id="{EFFECTIVE_STATUS_ID}">{TXT_EFFECTIVE_STATUS}</p>
+	  <!-- fau. -->
   </td>
   <!-- END status -->
   
   <!-- BEGIN mark -->
   <td class="std small">
-	<!-- fau: exPlag - add id for update by ajax success -->
-	<input id="{MARK_ID}" class="form-control" type="text" name="mark[{VAL_ID}]" value="{VAL_MARK}" size="4" maxlength="32" />
-	<!-- fau. -->
+	<input class="form-control" type="text" name="mark[{VAL_ID}]" value="{VAL_MARK}" size="4" maxlength="32" />
+	  <!-- fau: exPlag - add info for effective mark -->
+	  <p style="{EFFECTIVE_MARK_HIDDEN}" id="{EFFECTIVE_MARK_ID}"> {TXT_EFFECTIVE_MARK}</p>
+	  <!-- fau. -->
   </td>
   <!-- END mark -->
 
