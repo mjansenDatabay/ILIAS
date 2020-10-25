@@ -628,6 +628,11 @@ exc#:#exc_team_member_remove_new_team#:#Die entfernten Mitglieder mit Abgaben bi
 exc#:#exc_team_remove_self_with_submission#:#Sie können Ihr Team nicht auflösen, solange Sie noch ein Abgabe haben!
 exc#:#exc_type_inactive#:#Inaktiv
 exc#:#exc_type_inactive_info#:#Der Typ dieser Übungseinheit ist zur Zeit nicht aktiv. Bitte informieren Sie das StudOn-Team: <a href="mailto://studon@fau.de">studon@fau.de</a>
+exc#:#exc_notification#:#Benachrichtigung###fau: exNotify
+exc#:#exc_feedback_notification#:#Benachrichtigung bei Feedback###fau: exNotify
+exc#:#exc_feedback_notification_info#:#Bei neuem Feedback erhalten die Teilnehmer der Übung eine Benachrichtigung per E-Mail. Diese Einstellung gilt für alle Teilnehmer.###fau: exNotify
+exc#:#exc_settings_feedback_text_info#:#Tutoren geben ihre Rückmeldungen in ein Textfeld ein. Dem jeweiligen Teilnehmer wird der Text in der Übungseinheiten-Übersicht angezeigt.###fau: exNotify
+exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Dem jeweiligen Teilnehmer wird die Datei in der Übungseinheiten-Übersicht angezeigt.###fau: exNotify
 exercise#:#exc_mark#:#Note/Punkte
 grp#:#crs_grp_info_reg#:#Sie können nur Mitglied in einem der folgenden Kurse werden:
 grp#:#group_req_direct_studycond#:#Direkter Beitritt (sonst Aufnahmeantrag) für folgende Studierende:<p class="small">%s</p>

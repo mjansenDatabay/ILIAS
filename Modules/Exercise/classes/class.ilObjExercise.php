@@ -35,6 +35,11 @@ class ilObjExercise extends ilObject
     public $year;
     public $instruction;
     public $certificate_visibility;
+
+    // fau: exNotify - property for feedback notification
+    /** @var bool */
+    public $feedback_notification = true;
+    // fau.
     
     public $tutor_feedback = 7; // [int]
     
@@ -219,7 +224,10 @@ class ilObjExercise extends ilObject
             "show_submissions" => array("integer", (int) $this->getShowSubmissions()),
             'compl_by_submission' => array('integer', (int) $this->isCompletionBySubmissionEnabled()),
             "certificate_visibility" => array("integer", (int) $this->getCertificateVisibility()),
-            "tfeedback" => array("integer", (int) $this->getTutorFeedback())
+            // fau: exNotify - save feedback notification
+            "feedback_notification" => array('integer', $this->hasFeedbackNotification()),
+            // fau.
+        "tfeedback" => array("integer", (int) $this->getTutorFeedback())
             ));
         return true;
     }
@@ -246,6 +254,9 @@ class ilObjExercise extends ilObject
         $new_obj->setCompletionBySubmission($this->isCompletionBySubmissionEnabled());
         $new_obj->setTutorFeedback($this->getTutorFeedback());
         $new_obj->setCertificateVisibility($this->getCertificateVisibility());
+        // fau: exNotify - clone feedback notification
+        $new_obj->setFeedbackNotification($this->hasFeedbackNotification());
+        // fau.
         $new_obj->update();
 
         $new_obj->saveCertificateVisibility($this->getCertificateVisibility());
@@ -344,6 +355,9 @@ class ilObjExercise extends ilObject
             $this->setCompletionBySubmission($row->compl_by_submission == 1 ? true : false);
             $this->setCertificateVisibility($row->certificate_visibility);
             $this->setTutorFeedback($row->tfeedback);
+            // fau: exNotify - read feedback notification
+            $this->setFeedbackNotification($row->feedback_notification);
+            // fau,
         }
         
         $this->members_obj = new ilExerciseMembers($this);
@@ -370,6 +384,9 @@ class ilObjExercise extends ilObject
             "pass_nr" => array("integer", $this->getPassNr()),
             "show_submissions" => array("integer", (int) $this->getShowSubmissions()),
             'compl_by_submission' => array('integer', (int) $this->isCompletionBySubmissionEnabled()),
+            // fau: exNotify - save feedback notification
+            "feedback_notification" => array('integer', $this->hasFeedbackNotification()),
+            // fau.
             'tfeedback' => array('integer', (int) $this->getTutorFeedback()),
             ), array(
             "obj_id" => array("integer", $this->getId())
@@ -726,6 +743,13 @@ class ilObjExercise extends ilObject
      */
     public function sendFeedbackFileNotification($a_feedback_file, $a_user_id, $a_ass_id, $a_is_text_feedback = false)
     {
+
+        // fau: exNotify - optionally prevent sending of the feedback notification
+        if (!$this->hasFeedbackNotification()) {
+            return;
+        }
+        // fau.
+
         $user_ids = $a_user_id;
         if (!is_array($user_ids)) {
             $user_ids = array($user_ids);
@@ -914,4 +938,22 @@ class ilObjExercise extends ilObject
         $exc_set = new ilSetting("excs");
         return (bool) $exc_set->get("add_to_pd", true);
     }
+
+    // fau: exNotify - getter and setter for feedback notification
+    /**
+     * @return bool
+     */
+    public function hasFeedbackNotification() : bool
+    {
+        return (bool) $this->feedback_notification;
+    }
+
+    /**
+     * @param bool $feedback_notification
+     */
+    public function setFeedbackNotification($feedback_notification)
+    {
+        $this->feedback_notification = $feedback_notification;
+    }
+    // fau.
 }

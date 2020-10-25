@@ -1296,3 +1296,16 @@ if (!$ilDB->tableColumnExists('exc_assignment', 'max_team_members')) {
  */
 $ilCtrlStructureReader->getStructure();
 ?>
+<#79>
+<?php
+/**
+ * fau: exNotify - add column for feedback notification
+ */
+if (!$ilDB->tableColumnExists('exc_data', 'feedback_notification')) {
+    $ilDB->addTableColumn(
+        'exc_data',
+        'feedback_notification',
+        array('type' => 'integer', 'length' => 4, 'notnull' => false, 'default' => 1)
+    );
+}
+?>
