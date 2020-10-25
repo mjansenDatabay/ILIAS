@@ -2241,6 +2241,30 @@ class ilTemplate extends HTML_Template_ITX
         }
     }
 
+    // fau: jumpMedia - new function removeJavaScript
+    /**
+     * Remove a javascript file that should not be included in the header.
+     */
+    public function removeJavaScript($a_js_file)
+    {
+        $keep = [];
+        foreach($this->js_files as $file) {
+            if ($file != $a_js_file) {
+                $keep[] = $file;
+            }
+        }
+        $this->js_files = $keep;
+
+        if (isset( $this->js_files_vp[$a_js_file])) {
+            unset($this->js_files_vp[$a_js_file]);
+        }
+        if (isset( $this->js_files_batch[$a_js_file])) {
+            unset($this->js_files_batch[$a_js_file]);
+        }
+    }
+    // fau.
+
+
     /**
      * Reset javascript files
      */
@@ -2284,6 +2308,18 @@ class ilTemplate extends HTML_Template_ITX
             $this->css_files[$a_css_file . $media] = array("file" => $a_css_file, "media" => $media);
         }
     }
+
+    // fau: jumpMedia - new function removeCss()
+    /**
+     * Remove a css file that should not be included in the header.
+     */
+    public function removeCss($a_css_file, $media = "screen") {
+        if (array_key_exists($a_css_file . $media, $this->css_files)) {
+            unset($this->css_files[$a_css_file . $media]);
+        }
+    }
+    // fau.
+
 
     // fau: customPage - new function to sdd a custom css file behind the standard files
     public function addCustomCss($a_css_file, $media = "screen")

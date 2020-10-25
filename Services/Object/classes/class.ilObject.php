@@ -2073,7 +2073,14 @@ class ilObject
     public function cloneMetaData($target_obj)
     {
         $md = new ilMD($this->getId(), 0, $this->getType());
-        $md->cloneMD($target_obj->getId(), 0, $target_obj->getType());
+        // fixCloneMd - fault tolerance if meta data can't be cloned
+        try {
+            $md->cloneMD($target_obj->getId(), 0, $target_obj->getType());
+        }
+        catch (Exception $e) {
+            return false;
+        }
+        // fau.
         return true;
     }
 

@@ -275,11 +275,7 @@ common#:#sahs_helptext#:#Hier können sie Lernmodule importieren, die nach den E
 common#:#score#:#Punkte
 common#:#select_all_page_only#:#Alle auf dieser Seite auswählen. Lassen Sie mehr Zeilen pro Seite anzeigen, um alle auswählen zu können!
 common#:#sess_helptext#:#Eine Sitzung repräsentiert in StudOn eine Präsenzveranstaltung. Sie können dieses Objekt sowohl für reine Präsenzkurse einsetzen als auch im Rahmen von Blended Learning-Szenarien. Beim Erstellen von Sitzungen können Sie Rahmendaten der Präsenzveranstaltung (Zeit, Ort etc.) sowie persönliche Daten der/des Vortragenden angeben und Dateien an die Sitzung anhängen wie z.B. das Programm der Veranstaltung oder Arbeitsmaterialien.
-common#:#shib_data_missing#:#Ihr Single Sign-On hat funktioniert, aber es wurden zuwenige Daten übermittelt, um ein Benutzerkonto in StudOn anlegen zu können:<ul>%s</ul>Bitte wenden Sie sich an <a href="sso-support@rrze.uni-erlangen.de"><strong>sso-support@rrze.uni-erlangen.de</strong></a>, um das Problem zu beheben und nennen Sie dabei Ihre Benutzerkennung und die fehlenden Daten.
-common#:#shib_data_missing_email#:#<li>Ihre E-Mail-Adresse fehlt.</li>
-common#:#shib_data_missing_firstname#:#<li>Ihr Vorname fehlt.</li>
-common#:#shib_data_missing_gender#:#<li>Ihr Geschlecht fehlt.</li>
-common#:#shib_data_missing_lastname#:#<li>Ihr Nachname fehlt.</li>
+common#:#shib_data_missing#:#Ihr Single Sign-On hat funktioniert, aber es fehlen Daten (Vor- oder Nachname), um ein Benutzerkonto in StudOn anlegen zu können. Bitte wenden Sie sich an den IDM-Support <a href="mailto:idm@fau.de">idm@fau.de</a>, um das Problem zu beheben und nennen Sie dabei Ihre Benutzerkennung und die fehlenden Daten.
 common#:#shib_help_title#:#Hilfe zum Single-Sign-On
 common#:#shib_login_used#:#Der Benutzername %s wird bereits von einem anderen Benutzer verwendet. Bitte wenden Sie sich an <a href="mailto:studon@fau.de">studon@fau.de</a> um das Problem zu lösen!
 common#:#shib_updated_field#:#Dieses Feld wird beim Single Sign-On übertragen
@@ -927,6 +923,12 @@ user#:#browser_agent#:#Browser-Familie
 user#:#browser_platform#:#Betriebssystem
 user#:#browser_version#:#Browser-Version
 user#:#is_mobile#:#Mobil
+videoportal#:#vp_authorization_failed#:#Die Authentifizierung des Videoportals ist fehlgeschlagen.
+videoportal#:#vp_no_interface_active#:#Die StudOn-Schnittstelle zum Videoportal ist aktuell nicht aktiv.
+videoportal#:#vp_no_user_found#:#Zum IDM-Benutzer wurde kein entsprechender StudOn-Nutzer gefunden.
+videoportal#:#vp_no_reference_found#:#Es wurde keine Referenz auf den Clip oder Kurs gefunden.
+videoportal#:#vp_access_granted#:#Der Zugriff wird über ein StudOn-Objekt gewährt.
+videoportal#:#vp_no_access_granted#:#Für den Benutzer wird kein Zugriff gewährt.
 webform#:#webform_all_categories#:#Alle Bereiche
 webform#:#webform_all_corrected#:#korrigierte
 webform#:#webform_all_courses#:#Alle Kurse
@@ -996,3 +998,9 @@ webform#:#webform_tutor#:#Tutor
 webform#:#webform_uncorrect#:#Als unkorrigiert markieren
 webform#:#webform_uncorrected_entries#:#Die Einsendungen wurden als unkorrigiert markiert.
 webform#:#webform_uncorrected_entry#:#Die Einsendung wurden als unkorrigiert markiert.
+videoportal#:#vp_authorization_failed#:#Die Authentifizierung des Videoportals ist fehlgeschlagen.
+videoportal#:#vp_no_interface_active#:#Die StudOn-Schnittstelle zum Videoportal ist aktuell nicht aktiv.
+videoportal#:#vp_no_user_found#:#Zum IDM-Benutzer wurde kein entsprechender StudOn-Nutzer gefunden.
+videoportal#:#vp_no_reference_found#:#Es wurde keine Referenz auf den Clip oder Kurs gefunden.
+videoportal#:#vp_access_granted#:#Der Zugriff wird über ein StudOn-Objekt gewährt.
+videoportal#:#vp_no_access_granted#:#Für den Benutzer wird kein Zugriff gewährt.

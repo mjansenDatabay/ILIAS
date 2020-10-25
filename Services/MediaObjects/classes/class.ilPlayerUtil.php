@@ -13,7 +13,14 @@
  */
 class ilPlayerUtil
 {
-    static $initialized = false;
+    /**
+     * Type of initialized player
+     * true: custom player (default)
+     * false: standard player (needed by interactive video)
+     * null: not yet initialized
+     * @var bool
+     */
+    static $initialized_type = null;
 
     /**
      * Get local path of jQuery file
@@ -43,11 +50,31 @@ class ilPlayerUtil
 
     /**
      * Init mediaelement.js scripts
+     * @param ilTemplate $a_tpl
      */
     public static function initMediaElementJs($a_tpl = null, $custom = true)
     {
-        if (self::$initialized) {
-            return;
+        // treat an already initialized player
+        // scripts should not be added twice
+        // a requested standard player (e.g. by interactive video) should take precedence over default custom player
+        if (isset(self::$initialized_type))  {
+            if ($custom == self::$initialized_type) {
+                // needed player is already added, nothing to change
+                return;
+            }
+            elseif ($custom == true) {
+                // custom player should not be used if standard player is already initialized
+                return;
+            }
+            elseif ($custom == false) {
+                // remove an already initialized custom player if standard player is requested
+                foreach (self::getJsFilePaths(true) as $js_path) {
+                    $a_tpl->removeJavaScript($js_path);
+                }
+                foreach (self::getCssFilePaths(true) as $css_path) {
+                    $a_tpl->removeCss($css_path);
+                }
+            }
         }
 
         global $DIC;
@@ -65,7 +92,7 @@ class ilPlayerUtil
             $a_tpl->addCss($css_path);
         }
 
-        self::$initialized = true;
+        self::$initialized_type = $custom;
     }
     
     /**

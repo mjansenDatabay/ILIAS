@@ -17,7 +17,7 @@ class ilUnivisRequest
         
         switch ($_GET['cmd']) {
             case "exists":
-                $this->getExistence($univis_id, $_GET['id']);
+                $this->getExistence($univis_id);
                 break;
             
             case "link":

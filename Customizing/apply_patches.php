@@ -22,21 +22,22 @@ $p->login();
 //$p->applyPatch('ilSpecificPatches.convertAccountingQuestionResults');
 //$p->applyPatch('ilSpecificPatches.changeRemoteMediaUrlPrefix', array('search'=> 'http://', 'replace' => 'https://', 'update' => false));
 //$p->applyPatch('ilSpecificPatches.removeCourseMembersWhenOnWaitingList', array('obj_id' => 2569770));
+//$p->applyPatch('ilSpecificPatches.countExerciseUploads', array('start_id'=> 737000));
 
 
 /***********
  * Cleanups
  **********/
-//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'bibl,blog,book,catr,chtr,crsr,dcl,exc,feed,frm,glo,htlm,itgr,lm,mcst,mep,poll,prg,prtt,qpl,sahs,sess,spl,svy,tst,webr,wiki,xcos,xhfp,xflc,xlvo,xpdl,xvid,xxco', 'deleted_before' => '2020-04-01 00:00:00', 'limit' => null));
-//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'file', 'deleted_before' => '2020-04-01 00:00:00', 'limit' => null));
-//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'fold', 'deleted_before' => '2020-04-01 00:00:00', 'limit' => null));
-//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'grp', 'deleted_before' => '2020-04-01 00:00:00', 'limit' => null));
-//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'crs', 'deleted_before' => '2020-04-01 00:00:00', 'limit' => null));
-//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'cat', 'deleted_before' => '2020-04-01 00:00:00', 'limit' => null));
-//$p->applyPatch('ilCleanupPatches.deleteOldPageHistory', array('delete_until' => '2020-04-01 00:00:00'));
-//$p->applyPatch('ilCleanupPatches.moveDeletedMediaObjects', array('keep_deleted_after' => '2020-04-01 00:00:00'));
+//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'bibl,blog,book,catr,chtr,crsr,dcl,exc,feed,frm,glo,htlm,itgr,lm,mcst,mep,poll,prg,prtt,qpl,sahs,sess,spl,svy,tst,webr,wiki,xcos,xhfp,xflc,xlvo,xpdl,xvid,xxco', 'deleted_before' => '2020-09-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'file', 'deleted_before' => '2020-09-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'fold', 'deleted_before' => '2020-09-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'grp', 'deleted_before' => '2020-09-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'crs', 'deleted_before' => '2020-09-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.RemoveTrashedObjects', array('types' => 'cat', 'deleted_before' => '2020-09-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.deleteOldPageHistory', array('delete_until' => '2020-09-01 00:00:00'));
+//$p->applyPatch('ilCleanupPatches.moveDeletedMediaObjects', array('keep_deleted_after' => '2020-09-01 00:00:00'));
 
-//$p->applyPatch('ilCleanupPatches.deleteInactiveUsers', array('inactive_since' => '2018-04-01 00:00:00', 'limit' => null));
+//$p->applyPatch('ilCleanupPatches.deleteInactiveUsers', array('inactive_since' => '2018-10-01 00:00:00', 'limit' => null));
 //$p->applyPatch('ilCleanupPatches.deleteObsoleteTestAccounts', array('limit' => null));
 
 /*******************

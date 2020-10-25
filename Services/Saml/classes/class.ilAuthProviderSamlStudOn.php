@@ -74,11 +74,9 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
                 if (
                     empty($this->data->firstname)
                     || empty($this->data->lastname)
-                    || empty($this->data->gender)
-                    //|| empty($this->data->email)
                 ) {
                     $this->getLogger()->warning('Could not create new user because firstname, lastname or gender is m missing in SAML attributes.');
-                    $this->handleAuthenticationFail($status, 'shib_shib_data_missing');
+                    $this->handleAuthenticationFail($status, 'shib_data_missing');
                     return false;
                 }
                 $user = $this->getNewUser($login);
@@ -165,35 +163,32 @@ class ilAuthProviderSamlStudOn extends ilAuthProviderSaml
     protected function getUpdatedUser($user_id)
     {
         $userObj = new ilObjUser($user_id);
+        $login = $userObj->getLogin();
 
-        // activate a timed out account via shibboleth
-        // it is assumed that all users coming from shibboleth are allowed to access studon
-        if (!$userObj->getActive() || !$userObj->checkTimeLimit()) {
-            // update the username if necessary
-            $login = $userObj->getLogin();
-            if ($login != $this->data->identity
+        // set account to standard sso, if possible
+        if (strpos($login, 'user.') === 0 or        // rewrite local dummy users
+                strpos($login, 'vhb.') === 0 or     // rewrite vhb users
+                strpos($login, '.') === false       // keep firstname.lastname
+            ) {
 
-                and (strpos($login, 'user.') === 0 or    // loca users
-                    strpos($login, 'vhb.') === 0 or     // vhb users
-                    strpos($login, '.') === false   // all other users except firstname.lastname
-                )) {
+            if ($login != $this->data->identity) {
                 $userObj->updateLogin($this->data->identity);
             }
 
             // set the authentication mode to shibboleth
-            // this will cause the profile fields to be updated below
+            // this will cause the profile fields to be updated in ilIdmData::applyToUser
             $userObj->setAuthMode("shibboleth");
+        }
 
-            // set tue user active
-            $userObj->setActive(true);
-
-            // delete a time limit
-            $userObj->setTimeLimitUnlimited(true);
-
-            // reset agreement to force a new acceptance
-            // set user active and unlimited
+        // reset agreement to force a new acceptance if user is not active
+        if (!$userObj->getActive() || !$userObj->checkTimeLimit()) {
             $userObj->setAgreeDate(null);
         }
+
+        // activate an inactive or timed out account via shibboleth
+        // it is assumed that all users coming from shibboleth are allowed to access studon
+        $userObj->setActive(true);
+        $userObj->setTimeLimitUnlimited(true);
 
         // apply the IDM data and update the user
         $this->data->applyToUser($userObj, 'update');

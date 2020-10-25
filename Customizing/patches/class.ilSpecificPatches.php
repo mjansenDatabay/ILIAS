@@ -361,5 +361,42 @@ class ilSpecificPatches
 			}
 		}
 	}
+
+    /**
+     * Count the uploads done in exercises and sum up the file sizes
+     */
+	function countExerciseUploads($params = array('start_id'=> 730000)) {
+	    global $DIC;
+
+	    $query = "
+	    SELECT filename from exc_returned t
+        WHERE returned_id > " . $DIC->database()->quote((int) $params['start_id'], 'integer') . "
+        AND filename IS NOT null
+	    ";
+
+	    $res = $DIC->database()->query($query);
+
+	    $count = 0;
+	    $sum = 0;
+	    $max = 0;
+
+	    while ($row = $DIC->database()->fetchAssoc($res)) {
+            $size = filesize($row['filename']);
+            if ($size) {
+                echo "\n" . $size . ' ' . $row['filename'];
+                $count++;
+                $sum += $size;
+                if ($size > $max) {
+                    $max = $size;
+                }
+            }
+         }
+
+        echo "\nResult: ";
+	    echo "\nCount: " . $count;
+	    echo "\nSum: " . $sum;
+        echo "\nMax: " . $max;
+	    echo "\nAverage: " . $sum / $count;
+    }
 }
 

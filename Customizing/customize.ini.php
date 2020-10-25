@@ -124,5 +124,7 @@ univis_prg_url = ""                     ;url if the prg interface (ending with /
 univis_temp_dir = ""                    ;temporary directory for storing fetched xml files
 univis_semester = ""                    ;set a specific semester for the import (if empty: current and following)
 univis_noimports = ""                   ;don't show imported lectures (1)
+
+videoportal_token = ""                  ;token for the videoportal to call the studon service
             
 webdav_show_warnings = "1"				;show warnings about locking and invisible names for webdav
