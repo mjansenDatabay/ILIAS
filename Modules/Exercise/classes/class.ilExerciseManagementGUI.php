@@ -130,11 +130,13 @@ class ilExerciseManagementGUI
         // fau.
 
         switch ($class) {
-            // fau: exManCalc - call calculation GUI
+            // fau: exCalc - call calculation GUI
             case "ilexcalculategui":
                 include_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
-                $calc_gui = new ilExCalculateGUI($this->exercise);
-                $ilTabs->activateTab("grades");
+                $calc_gui = new ilExCalculateGUI($this->exercise, true);
+                $this->addSubTabs('result_calculation');
+                $this->tabs_gui->activateTab("grades");
+                $this->tabs_gui->activateSubTab("result_calculation");
                 $this->ctrl->setReturn($this, 'showGradesOverview');
                 $this->ctrl->forwardCommand($calc_gui);
                 break;
@@ -324,6 +326,23 @@ class ilExerciseManagementGUI
             $lng->txt("exc_grades_overview"),
             $ilCtrl->getLinkTarget($this, "showGradesOverview")
         );
+
+        // fau: exCalc - add sub tab for calculation
+        // course tutors can only change the calculation settings in manual mode
+        // course admins can change the settings, here, too
+        /** @see ilExCalculateGUI::executeCommand() */
+        global $DIC;
+        if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL ||
+            ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC
+                && $DIC->access()->checkAccess('write', '', $this->exercise->getRefId()))) {
+            $this->tabs_gui->addSubTab(
+                "result_calculation",
+                $this->lng->txt("exc_pass_result_calculation"),
+                $this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui','ilexcalculategui'], "showForm")
+            );
+        }
+        // fau.
+
         $ilTabs->activateSubTab($a_activate);
         
         $ilCtrl->setParameter($this, "ass_id", $ass_id);
@@ -541,7 +560,7 @@ class ilExerciseManagementGUI
                 $marks_obj->setMark(ilUtil::stripSlashes($_POST["mark"][$k]));
                 $marks_obj->update();
 
-                // fau: exManCalc - save the status in manual mode
+                // fau: exCalc - save the status in manual mode
                 if ($this->exercise->getPassMode() == "man") {
                     ilExerciseMembers::_writeStatus($this->exercise->getId(), $k, $_POST["status"][$k]);
                 }
@@ -1069,14 +1088,6 @@ class ilExerciseManagementGUI
                 $ilCtrl->getLinkTarget($this, "exportExcel")
             );
 
-            // fau: exManCalc - add button to calculate the grades
-            if ($this->exercise->getPassMode() == "man") {
-                $ilToolbar->addButton(
-                    $lng->txt("exc_calculate_overall_results"),
-                    $ilCtrl->getLinkTargetByClass("ilExCalculateGUI")
-                );
-            }
-            // fau.
         }
         
         $this->ctrl->setParameter($this, "vw", self::VIEW_GRADES);

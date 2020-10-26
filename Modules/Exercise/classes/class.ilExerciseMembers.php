@@ -312,7 +312,7 @@ class ilExerciseMembers
         return false;
     }
 
-    // fau: exManCalc - new function lookupStatusTime
+    // fau: exCalc - new function lookupStatusTime
     /**
      * Get time when exercise has been set to solved.
      */

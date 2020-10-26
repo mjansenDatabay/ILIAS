@@ -46,6 +46,13 @@ class ilObjExercise extends ilObject
     const TUTOR_FEEDBACK_MAIL = 1;
     const TUTOR_FEEDBACK_TEXT = 2;
     const TUTOR_FEEDBACK_FILE = 4;
+
+    // fau: exCalc - constants for pass mode
+    const PASS_MODE_ALL = 'all';
+    const PASS_MODE_NR = 'nr';
+    const PASS_MODE_CALC = 'calc';
+    const PASS_MODE_MANUAL = 'man';
+    // fau.
     
     /**
      *
@@ -523,7 +530,7 @@ class ilObjExercise extends ilObject
             $passed_all_mandatory = false;
         }
 
-        // fau: exManCalc - respect take existing status in "manual" mode
+        // fau: exCalc - respect take existing status in "manual" mode
         if ($this->getPassMode() == "man") {
             $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
         } elseif ($this->getPassMode() != "nr") {

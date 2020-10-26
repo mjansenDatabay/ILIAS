@@ -125,7 +125,7 @@ class ilExGradesTableGUI extends ilTable2GUI
             // fau: exPlag - use effective status
             $status = $member_status->getEffectiveStatus();
             // fau.
-            // fau: exManCalc- don't make status selectable for assignments
+            // fau: exCalc- don't make status selectable for assignments
             //			$this->tpl->setVariable("SEL_".strtoupper($status), ' selected="selected" ');
             //			$this->tpl->setVariable("TXT_NOTGRADED", $lng->txt("exc_notgraded"));
             //			$this->tpl->setVariable("TXT_PASSED", $lng->txt("exc_passed"));
@@ -170,7 +170,7 @@ class ilExGradesTableGUI extends ilTable2GUI
         $this->tpl->setCurrentBlock("grade");
         $status = ilExerciseMembers::_lookupStatus($this->exc_id, $user_id);
 
-        // fau: exManCalc - make status changeable
+        // fau: exCalc - make status changeable
         switch ($status) {
             case "passed": 	$pic = "scorm/passed.svg"; break;
             case "failed":	$pic = "scorm/failed.svg"; break;

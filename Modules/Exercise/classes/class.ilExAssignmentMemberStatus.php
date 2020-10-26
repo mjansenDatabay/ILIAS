@@ -313,11 +313,12 @@ class ilExAssignmentMemberStatus
     {
         return ($this->plag_flag == self::PLAG_SUSPICION);
     }
-
     // fau.
 
-
-
+    // fau: exCalc - support getting multiple instances
+    /**
+     * Read the properties
+     */
     protected function read()
     {
         $ilDB = $this->db;
@@ -325,29 +326,61 @@ class ilExAssignmentMemberStatus
         $set = $ilDB->query("SELECT * FROM exc_mem_ass_status" .
             " WHERE ass_id = " . $ilDB->quote($this->ass_id, "integer") .
             " AND usr_id = " . $ilDB->quote($this->user_id, "integer"));
-        if ($ilDB->numRows($set)) {
-            $row = $ilDB->fetchAssoc($set);
-            
-            // not using setters to circumvent any datetime-logic/-magic
-            $this->notice = $row["notice"];
-            $this->returned = $row["returned"];
-            $this->solved = $row["solved"];
-            $this->status_time = $row["status_time"];
-            $this->sent = $row["sent"];
-            $this->sent_time = $row["sent_time"];
-            $this->feedback_time = $row["feedback_time"];
-            $this->feedback = $row["feedback"];
-            $this->status = $row["status"];
-            $this->mark = $row["mark"];
-            $this->comment = $row["u_comment"];
-            // fau: exPlag - read values
-            $this->plag_flag = $row["plag_flag"];
-            $this->plag_comment = $row["plag_comment"];
-            // fau.
-            $this->db_exists = true;
+        if ($row = $ilDB->fetchAssoc($set)) {
+            $this->setPropertiesByRow($row);
         }
     }
-    
+
+    /**
+     * Set the object data from a database row
+     * @param $row
+     */
+    protected function setPropertiesByRow($row) {
+        // not using setters to circumvent any datetime-logic/-magic
+        $this->notice = $row["notice"];
+        $this->returned = $row["returned"];
+        $this->solved = $row["solved"];
+        $this->status_time = $row["status_time"];
+        $this->sent = $row["sent"];
+        $this->sent_time = $row["sent_time"];
+        $this->feedback_time = $row["feedback_time"];
+        $this->feedback = $row["feedback"];
+        $this->status = $row["status"];
+        $this->mark = $row["mark"];
+        $this->comment = $row["u_comment"];
+        // fau: exPlag - read values
+        $this->plag_flag = $row["plag_flag"];
+        $this->plag_comment = $row["plag_comment"];
+        // fau.
+        $this->db_exists = true;
+    }
+
+    /**
+     * Get multiple instances, indexed by usr_id and ass_id
+     * @param int[] $a_usr_ids
+     * @param int[] $a_ass_ids
+     * @return self[][]
+     */
+    public static function getMultiple($a_usr_ids = [], $a_ass_ids = [])
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        $query = "SELECT * FROM exc_mem_ass_status WHERE "
+            . $ilDB->in('ass_id', $a_ass_ids, false, 'integer') . " AND "
+            . $ilDB->in('usr_id', $a_usr_ids, false, 'integer');
+        $result = $ilDB->query($query);
+
+        $return = [];
+        while ($row = $ilDB->fetchAssoc($result)) {
+            $status = new self($row['ass_id'], $row['usr_id']);
+            $status->setPropertiesByRow($row);
+            $return[$row['usr_id']][$row['ass_id']] = $row;
+        }
+        return $return;
+    }
+    // fau.
+
     protected function getFields()
     {
         return array(
