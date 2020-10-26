@@ -467,13 +467,14 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
                     $this->tpl->setVariable("PLAG_INFO_ID", $comment_id . "_plag_info");
                     $this->tpl->setVariable("PLAG_COMMENT_ID", $comment_id . "_plag_comment");
 
+                    $plag_info = '';
                     if ($a_row['plag_flag'] == ilExAssignmentMemberStatus::PLAG_SUSPICION) {
-                        $info = $this->lng->txt("exc_plag_suspicion_info") . " (" .$this->lng->txt("exc_visible_for_tutors") . ")";
+                        $plag_info = $this->lng->txt("exc_plag_suspicion_info") . " (" .$this->lng->txt("exc_visible_for_tutors") . ")";
                     }
                     if ($a_row['plag_flag'] == ilExAssignmentMemberStatus::PLAG_DETECTED) {
-                        $info = $this->lng->txt("exc_plag_detected_info") . " (" .$this->lng->txt("exc_visible_for_student") . ")";
+                        $plag_info = $this->lng->txt("exc_plag_detected_info") . " (" .$this->lng->txt("exc_visible_for_student") . ")";
                     }
-                    $this->tpl->setVariable("VAL_PLAG_INFO", ilUtil::prepareFormOutput($info));
+                    $this->tpl->setVariable("VAL_PLAG_INFO", ilUtil::prepareFormOutput($plag_info));
                     $this->tpl->setVariable("VAL_PLAG_COMMENT", nl2br(ilUtil::prepareFormOutput($a_row['plag_comment'])));
                     break;
                     // fau.
