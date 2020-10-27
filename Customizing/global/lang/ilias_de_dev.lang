@@ -575,10 +575,12 @@ exc#:#exc_mark_adjusted#:#Die Punkte der folgenden Nutzer wurden an den gültige
 exc#:#exc_multi_feedback_by_submissions_hint#:#Wenn Sie Ihr Feedback direkt als Kommentare in den abgegebenen Dateien (z.B. bei PDFs) geben, können Sie auch mit dem unter "Alle Abgaben herunterladen" Archiv arbeiten.
 exc#:#exc_multi_feedback_by_submissions_warning#:#Sie haben wahrscheinlich das unter "Alle Abgaben herunterladen" bereitgestellte Archiv hochgeladen. Enthalten die Dateien darin ihr Feedback, z.B. als Kommentare? Dann können sie sie als Feedback speichern.
 exc#:#exc_pass_calc#:#Berechnet
-exc#:#exc_pass_calc_info#:#Das Bestehen der Übung und die Gesamtnote werden auf Basis der Teilneoten/Punkte automatisch berechnet. Die Einstellungen dazu nehmen Sie nach dem Speichern dieser Option auf dem Unter-Reiter "Ergebnisberechnung" vor.
+exc#:#exc_pass_calc_info#:#Das Bestehen der Übung und die Gesamtnote werden auf Basis der Teilpunkte automatisch berechnet.
+exc#:#exc_pass_calc_info_tip#:#Die Einstellungen dazu nehmen Sie nach dem Speichern dieser Option auf dem Unter-Reiter "Ergebnisberechnung" vor.
 exc#:#exc_pass_manual#:#Manuell
-exc#:#exc_pass_manual_info#:#Das Bestehen der Übung wird durch die Tutoren bestimmt. In der Notenübersicht kann eine automatische Berechnung der Gesamtergebnisse auf Basis der Teilnoten/Punkte erfolgen.
-exc#:#exc_pass_description#:#Beschreibung der Anforderung auf der Info-Seite
+exc#:#exc_pass_manual_info#:#Das Bestehen der Übung und die Gesamtnote werden durch die Tutoren auf Basis der Teilpunkte bestimmt.
+exc#:#exc_pass_manual_info_tip#:#In der Notenübersicht kann eine automatische Berechnung der Gesamtergebnisse auf Basis der Teilnpunkte erfolgen.
+exc#:#exc_pass_description#:#Beschreibung der Anforderung auf der Info-Seite und der Übersicht der Übungseinheiten. Sie ersetzt eine automatisch generierte Beschreibung.
 exc#:#exc_pass_result_calculation#:#Ergebnisberechnung
 exc#:#exc_result_time#:#Ergebnistermin
 exc#:#exc_result_time_info#:#Wenn gesetzt, können die Bewertung und das Feedback des Tutors erst ab diesem Termin eingesehen werden. Vorher erfolgt auch keine automatische Benachrichtigung.

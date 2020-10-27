@@ -56,8 +56,11 @@ class ilExCalculate
     /** @var ilObjExercise */
     protected $exercise;
 
-    /** @var ilExAssignment[]   indexed by assignment id */
-    protected $assignments = [];
+    /**
+     * @var ilExAssignment[]   indexed by assignment id
+     * @see initAssignments
+     */
+    protected $assignments;
 
     
     /**
@@ -68,10 +71,6 @@ class ilExCalculate
     public function __construct(ilObjExercise $exercise)
     {
         $this->exercise = $exercise;
-        /** @var ilExAssignment $assignment */
-        foreach(ilExAssignment::getInstancesByExercise($exercise->getId()) as $assignment) {
-            $this->assignments[$assignment->getId()] = $assignment;
-        }
         $this->readOptions();
     }
 
@@ -149,6 +148,19 @@ class ilExCalculate
         $ilDB->executeMultiple($prepared, $params);
     }
 
+    /**
+     * Init the list of assignments for calculation
+     * Prevent a read in the constructor
+     */
+    protected function initAssignments()
+    {
+        if (!isset($this->assignments)) {
+            /** @var ilExAssignment $assignment */
+            foreach(ilExAssignment::getInstancesByExercise($this->exercise->getId()) as $assignment) {
+                $this->assignments[$assignment->getId()] = $assignment;
+            }
+        }
+    }
 
     /**
      * Calculate the overall results and store them in the learning progress
@@ -157,6 +169,7 @@ class ilExCalculate
     public function calculateResults($a_usr_ids = [])
     {
         // get the list of assignments
+        $this->initAssignments();
         $ass_ids = array_keys($this->assignments);
         
         // get the list of users
@@ -185,6 +198,13 @@ class ilExCalculate
         }
     }
 
+    /**
+     * TODO: Generate a description text for the Calculation settings
+     */
+    public function getDescriptionText()
+    {
+        return '';
+    }
     
     /**
      * calculate the mark depending on assignment results

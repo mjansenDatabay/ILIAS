@@ -117,7 +117,37 @@ class ilObjExercise extends ilObject
     {
         return $this->instruction;
     }
-    
+
+    // fau: exCalc - new function getInstructionDisplayText()
+    /**
+     * Get the text displayed for instructions
+     * Either the configured itext is taken or a generated text
+     */
+    public function getInstructionDisplayText()
+    {
+        if (!empty($this->getInstruction())) {
+            return $this->getInstruction();
+        }
+        switch ($this->getPassMode()) {
+            case self::PASS_MODE_ALL:
+                return $this->lng->txt("exc_msg_all_mandatory_ass");
+
+            case self::PASS_MODE_NR:
+                return sprintf($this->lng->txt("exc_msg_min_number_ass"), $this->getPassNr());
+
+            case self::PASS_MODE_MANUAL:
+            case self::PASS_MODE_CALC:
+                include_once "./Modules/Exercise/classes/class.ilExCalculate.php";
+                $exCalc = new ilExCalculate($this);
+                $text = $exCalc->getDescriptionText();
+                if (!empty($text)) {
+                    return $text;
+                }
+                return ($this->lng->txt($this->getPassMode() == self::PASS_MODE_MANUAL ? 'exc_pass_manual_info' : 'exc_pass_calc_info'));
+        }
+    }
+    // fau.
+
     /**
      * Set pass mode (all | nr)
      *
@@ -531,9 +561,9 @@ class ilObjExercise extends ilObject
         }
 
         // fau: exCalc - respect take existing status in "manual" mode
-        if ($this->getPassMode() == "man") {
+        if ($this->getPassMode() == self::PASS_MODE_MANUAL) {
             $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
-        } elseif ($this->getPassMode() != "nr") {
+        } elseif ($this->getPassMode() != self::PASS_MODE_NR) {
             // fau.
             //echo "5";
             $overall_stat = "notgraded";

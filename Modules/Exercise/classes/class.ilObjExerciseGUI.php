@@ -330,7 +330,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         // fau: exCalc - add instruction for calculation
         $instruction = new ilTextAreaInputGUI($this->lng->txt("description"), "instruction");
         $instruction->setInfo($this->lng->txt("exc_pass_description"));
-        $radg->addSubItem($instruction);
+        $a_form->addItem($instruction);
         // fau.
 
 
@@ -713,24 +713,12 @@ class ilObjExerciseGUI extends ilObjectGUI
         }
         $info->addProperty($lng->txt("exc_assignments"), $cnt);
         $info->addProperty($lng->txt("exc_mandatory"), $mcnt);
-        // fau: exCalc - add instruction for manual status
-        if ($this->object->getPassMode() == "man") {
-            $info->addProperty(
-                $lng->txt("exc_pass_mode"),
-                $this->object->getInstruction()
-            );
-        } elseif ($this->object->getPassMode() != "nr") {
-            // fau.
-            $info->addProperty(
-                $lng->txt("exc_pass_mode"),
-                $lng->txt("exc_msg_all_mandatory_ass")
-            );
-        } else {
-            $info->addProperty(
-                $lng->txt("exc_pass_mode"),
-                sprintf($lng->txt("exc_msg_min_number_ass"), $this->object->getPassNr())
-            );
+        // fau: exCalc - get the instruction text from the object
+        $instruction_text = $this->object->getInstructionDisplayText();
+        if (!empty($instruction_text)) {
+            $info->addProperty($lng->txt("exc_pass_mode"), $instruction_text);
         }
+        // fau.
 
         // feedback from tutor
         include_once("Services/Tracking/classes/class.ilLPMarks.php");
@@ -1000,6 +988,14 @@ class ilObjExerciseGUI extends ilObjectGUI
 
         $mtpl = new ilTemplate("tpl.exc_ass_overview.html", true, true, "Modules/Exercise");
         $mtpl->setVariable("CONTENT", $acc->getHTML());
+
+        // fau: exCalc - add instruction text to the assignments overview
+        $instruction_text = $this->object->getInstructionDisplayText();
+        if (!empty($instruction_text)) {
+            $mtpl->setVariable("TXT_INSTRUCTION", $instruction_text);
+        }
+        // fau.
+
 
         $tpl->setContent($mtpl->get());
     }

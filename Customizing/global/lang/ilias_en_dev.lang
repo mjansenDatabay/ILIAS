@@ -616,10 +616,12 @@ exc#:#exc_mark_ignored#:#The points given for the following users were adjusted 
 exc#:#exc_multi_feedback_by_submissions_hint#:#You may use the Archive created with "Download All Submissions" if you insert your comments directly in the submitted files (e.h. PDFs).
 exc#:#exc_multi_feedback_by_submissions_warning#:#You probably uploaded the archive provided by "Download All Submissions". Did you enter your feedback directly in the submitted files? Then you can save them as feedback.
 exc#:#exc_pass_calc#:#Calculated
-exc#:#exc_pass_calc_info#:#The passing of the exercise and the overall score are automatically calculated based on the partial marks/points. The settings for this are made after saving this option on the "Result Calculation" sub-tab.
+exc#:#exc_pass_calc_info#:#The passing of the exercise and the overall mark/points are automatically calculated based on the partial points.
+exc#:#exc_pass_calc_info_tip#:#The settings for this are made after saving this option on the "Result Calculation" sub-tab.
 exc#:#exc_pass_manual#:#Manual
-exc#:#exc_pass_manual_info#:#If a exercise is passed, is decided by the tutors. In the grade-view an automatical calculation of the totalresult based on the partgrades/credits can take place.
-exc#:#exc_pass_description#:#Description of the requirement on the info-page
+exc#:#exc_pass_manual_info#:#The passing of the exercise and the overall mark/points are manually set by the tutors based on the partial points.
+exc#:#exc_pass_manual_info#:#In the grade view an automatical calculation of the total result can be made based on the partial points.
+exc#:#exc_pass_description#:#Description of the requirement on the info page and on the list of assignments. It will replace an automatic generated description.
 exc#:#exc_pass_result_calculation#:#Result Calculation
 exc#:#exc_result_time#:#Result Availability
 exc#:#exc_result_time_info#:#The result and tutor Feedback will be available after this date. No feedback email is automatically sent before this date.
