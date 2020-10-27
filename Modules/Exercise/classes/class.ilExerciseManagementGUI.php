@@ -132,11 +132,11 @@ class ilExerciseManagementGUI
         switch ($class) {
             // fau: exCalc - call calculation GUI
             case "ilexcalculategui":
-                include_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
-                $calc_gui = new ilExCalculateGUI($this->exercise, true);
-                $this->addSubTabs('result_calculation');
+                require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+                $calc_gui = new ilExCalculateGUI($this->exercise, ilExCalculateGUI::PARENT_GRADING);
+                $this->addSubTabs($calc_gui->getDisplayType() == ilExCalculateGUI::DISPLAY_PARENT ?
+                    'grades' : 'result_calculation');
                 $this->tabs_gui->activateTab("grades");
-                $this->tabs_gui->activateSubTab("result_calculation");
                 $this->ctrl->setReturn($this, 'showGradesOverview');
                 $this->ctrl->forwardCommand($calc_gui);
                 break;
@@ -328,17 +328,13 @@ class ilExerciseManagementGUI
         );
 
         // fau: exCalc - add sub tab for calculation
-        // course tutors can only change the calculation settings in manual mode
-        // course admins can change the settings, here, too
-        /** @see ilExCalculateGUI::executeCommand() */
-        global $DIC;
-        if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL ||
-            ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC
-                && $DIC->access()->checkAccess('write', '', $this->exercise->getRefId()))) {
+        require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+        $calcGui = new ilExCalculateGUI($this->exercise,ilExCalculateGUI::PARENT_GRADING);
+        if ($calcGui->canEditSettings()) {
             $this->tabs_gui->addSubTab(
                 "result_calculation",
                 $this->lng->txt("exc_pass_result_calculation"),
-                $this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui','ilexcalculategui'], "showForm")
+                $this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui','ilexcalculategui'])
             );
         }
         // fau.
@@ -1087,8 +1083,18 @@ class ilExerciseManagementGUI
                 $lng->txt("exc_export_excel"),
                 $ilCtrl->getLinkTarget($this, "exportExcel")
             );
-
         }
+
+        // fau: exCalc - add button to calculate the results
+        require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+        $calcGUI = new ilExCalculateGUI($this->exercise, ilExCalculateGUI::PARENT_GRADING);
+        if ($calcGUI->canCalculate()) {
+            $button = ilLinkButton::getInstance();
+            $button->setCaption('exc_calculate_overall_results');
+            $button->setUrl($this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui', 'ilexcalculategui'], 'callCalculateAll'));
+            $this->toolbar->addButtonInstance($button);
+        }
+        // fau.
         
         $this->ctrl->setParameter($this, "vw", self::VIEW_GRADES);
 

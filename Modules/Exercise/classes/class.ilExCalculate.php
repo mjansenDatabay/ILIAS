@@ -56,7 +56,7 @@ class ilExCalculate
     /** @var ilObjExercise */
     protected $exercise;
 
-    /** @var ilExAssignment[]   indexed by id */
+    /** @var ilExAssignment[]   indexed by assignment id */
     protected $assignments = [];
 
     
@@ -162,7 +162,7 @@ class ilExCalculate
         // get the list of users
         $usr_ids = (count($a_usr_ids) ? $a_usr_ids : ilExerciseMembers::_getMembers($this->exercise->getId()));
 
-        // get the status info
+        // get the status objects
         $results = ilExAssignmentMemberStatus::getMultiple($usr_ids, $ass_ids);
         
         // calculate and write the overall mark and status
@@ -192,7 +192,7 @@ class ilExCalculate
      * @param 	ilExAssignmentMemberStatus[]  $a_results  indexed by assignment id
      * @return	int		calculated mark (or null if mark couldn't be calculated)
      */
-    protected function calculateMarkOfUser($a_results)
+    protected function calculateMarkOfUser(array $a_results)
     {
         // lists of marks
         $selected = [];

@@ -530,6 +530,7 @@ dcl#:#dcl_max_import_simulate#:#Die Datei enthält %s Datensätze, aber es könn
 dcl#:#dcl_max_import_done#:#Die Datei enthält %s Datensätze, aber es wurden nur die ersten %s importiert. Wenn Sie mehr Datensätze importieren möchten, teilen Sie Ihre Datei bitte auf.###fau: dcImportLimit
 exc#:#exc_calc_all_calculated#:#Alle Gesamtergebnisse wurden neu berechnet.
 exc#:#exc_calc_calculate#:#Berechnen
+exc#:#exc_calc_settings#:#Einstellungen zur Berechnung des Gesamtergebnisses
 exc#:#exc_calc_mark_function#:#Noten/Punkte-Berechnung
 exc#:#exc_calc_mark_function_average#:#Durchschnitt
 exc#:#exc_calc_mark_function_average_info#:#Es wird eine Durchschnittsnote der ausgewählten Übungseinheiten gebildet.

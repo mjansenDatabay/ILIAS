@@ -202,11 +202,11 @@ class ilObjExerciseGUI extends ilObjectGUI
             //  fau: exCalc - delegate command to calculation gui
             case "ilexcalculategui":
                 $this->checkPermission("write");
-                include_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+                require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
                 $ilTabs->activateTab("settings");
                 $this->setSettingsSubTabs();
                 $ilTabs->activateSubTab("result_calculation");
-                $gui = new ilExCalculateGUI($this->object);
+                $gui = new ilExCalculateGUI($this->object, ilExCalculateGUI::PARENT_SETTINGS);
                 $this->ctrl->setReturn($this, 'edit');
                 $this->ctrl->forwardCommand($gui);
                 break;
@@ -813,7 +813,7 @@ class ilObjExerciseGUI extends ilObjectGUI
             $this->tabs_gui->addSubTab(
                 "result_calculation",
                 $this->lng->txt("exc_pass_result_calculation"),
-                $this->ctrl->getLinkTargetByClass(['ilobjexercisegui','ilExcalculategui'], "showForm")
+                $this->ctrl->getLinkTargetByClass(['ilobjexercisegui','ilexcalculategui'])
             );
         }
         // fau.

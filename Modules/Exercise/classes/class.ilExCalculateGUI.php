@@ -1,44 +1,59 @@
 <?php
 
-include_once "./Modules/Exercise/classes/class.ilExCalculate.php";
 
 /**
  * fau: exCalc - new GUI class for result calculations.
- * @author Fred Neumann <fred.neumann@fau.de>
- * @ingroup ModulesExercise
- *
+ * @author            Fred Neumann <fred.neumann@fau.de>
+ * @ingroup           ModulesExercise
  * @ilCtrl_IsCalledBy ilExCalculateGUI: ilObjExerciseGUI, ilExerciseManagementGUI
  */
 class ilExCalculateGUI
 {
-    /** @var ilObjExercise */
-    protected $object;
-    
-    /** @var ilExCalculate  */
-    protected $calc;
-    
-    /** @var ilTemplate  */
+    /**
+     * Where is the gui embedded (settings tab or grading tab)
+     */
+    const PARENT_SETTINGS = 'settings';
+    const PARENT_GRADING = 'grading';
+
+    /**
+     * How is the gui galled (on own subtab or from a parent tab)
+     */
+    const DISPLAY_SUBTAB = 'subtab';
+    const DISPLAY_PARENT = 'parent';
+
+    /** @var ilTemplate */
     protected $tpl;
 
-    /** @var ilCtrl  */
+    /** @var ilCtrl */
     protected $ctrl;
 
-
-    /** @var ilLanguage  */
+    /** @var ilLanguage */
     protected $lng;
 
     /** @var ilObjExercise */
     protected $exercise;
 
-    /** @var bool */
-    protected $allow_calculate;
+    /** @var ilExCalculate */
+    protected $calculator;
+
+    /**
+     * Where is the gui embedded (settings tab or grading tab)
+     * @var string
+     */
+    protected $parent_type;
+
+    /**
+     * How is the gui galled (on own subtab or from a parent tab)
+     * @var string
+     */
+    protected $display_type;
 
     /**
      * Constructor
      * @param ilObjExercise $a_exercise
-     * @param bool $a_allow_calculate
+     * @param string $a_parent_type (PARENT_SETTINGS | PARENT_GRADING)
      */
-    public function __construct(ilObjExercise $a_exercise, $a_allow_calculate = false)
+    public function __construct(ilObjExercise $a_exercise, $a_parent_type)
     {
         global $DIC;
 
@@ -47,88 +62,123 @@ class ilExCalculateGUI
         $this->lng = $DIC->language();
 
         $this->exercise = $a_exercise;
-        $this->allow_calculate = $a_allow_calculate;
-        $this->calc = new ilExCalculate($this->exercise);
+        $this->parent_type = $a_parent_type;
+        
+        // set if gui is shown on its own sub tab on on another parent tab
+        if ($_GET['display'] == 'parent' || in_array($this->ctrl->getCmd(), ['callCalculateAll']))
+        {
+            $this->display_type = self::DISPLAY_PARENT;
+            $this->ctrl->setParameter($this, 'display', 'parent');
+        }
+        else {
+            $this->display_type = self::DISPLAY_SUBTAB;
+        }
     }
 
+    /**
+     * Get how the gui is displayed 
+     * @return string   (DISPLAY_SUBTAB | DISPLAY_PARENT)
+     */
+    public function getDisplayType() {
+        return $this->display_type;
+    }
+
+    /**
+     * Check if the current user can edit the settings
+     */
+    public function canEditSettings() {
+        global $DIC;
+        return (
+            $this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL ||
+                ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC 
+                    && $DIC->access()->checkAccess('write', '', $this->exercise->getRefId())));
+    }
+
+    /**
+     * Check if the current user can calculate results
+     * @return bool
+     */
+    public function canCalculate() {
+        // permission check is already done by parent
+        return ($this->parent_type == self::PARENT_GRADING &&
+                ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL ||
+                    $this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC));
+    }
     
     /**
      * Main entry
      */
     public function executeCommand()
     {
-        global $DIC;
+        // set the calculator here to prevent database reads in constructor
+        include_once "./Modules/Exercise/classes/class.ilExCalculate.php";
+        $this->calculator = new ilExCalculate($this->exercise);
 
         $next_class = $this->ctrl->getNextClass($this);
-        $cmd = $this->ctrl->getCmd("showForm");
-  
+        $cmd = $this->ctrl->getCmd("editSettings");
+
         switch ($next_class) {
             default:
-            {
                 switch ($cmd) {
-                    case 'showForm':
+                    case 'editSettings':
                     case 'saveSettings':
-                        /** @see ilExerciseManagementGUI::addSubTabs() */
-                        if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL ||
-                            ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC
-                                && $DIC->access()->checkAccess('write', '', $this->exercise->getRefId()))) {
-
-                            if ($this->allow_calculate) {
-                                $button = ilLinkButton::getInstance();
-                                $button->setUrl($this->ctrl->getLinkTarget($this, 'confirmCalculateAll'));
-                                $button->setCaption('exc_calculate_overall_results');
-                                $DIC->toolbar()->addButtonInstance($button);
-                            }
+                        if ($this->canEditSettings()) {
                             $this->$cmd();
                         }
                         break;
 
+                    case 'callCalculateAll':
                     case 'confirmCalculateAll':
                     case 'calculateAll':
-                        if ($this->allow_calculate && (
-                            $this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL ||
-                            ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC))) {
+                        if ($this->canCalculate()) {
                             $this->$cmd();
                         }
                         break;
 
-                    case 'cancel':
+                    case 'cancelOrReturn':
                         $this->$cmd();
                         break;
-
-                    default:
-                        $this->ctrl->returnToParent($this);
                 }
-            }
         }
     }
-    
+
     /**
      * Show the settings form with the saved options
      */
-    protected function showForm()
+    protected function editSettings()
     {
+        global $DIC;
+        
+        if ($this->canCalculate()) {
+            $button = ilLinkButton::getInstance();
+            $button->setCaption('exc_calculate_overall_results');
+            $button->setUrl($this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui', 'ilexcalculategui'], 'confirmCalculateAll'));
+            $DIC->toolbar()->addButtonInstance($button);
+        }
+
         $form = $this->initForm();
         $this->readFormValues($form);
         $this->tpl->setContent($form->getHTML());
     }
-    
+
     /**
      * Save the settings
      */
     protected function saveSettings()
     {
-        $this->processForm();
+        $form = $this->initForm();
+        if ($this->validateForm($form)) {
+            $this->saveFormValues($form);
+            ilUtil::sendInfo($this->lng->txt("settings_saved"), true);
+            $this->ctrl->redirect($this, 'editSettings');
+        }
+        else {
+            ilUtil::sendFailure($this->lng->txt("form_input_not_valid"));
+            $form->setValuesByPost();
+            $this->tpl->setContent($form->getHTML());
+        }
     }
 
-    /**
-     * Cancel the calculation
-     */
-    protected function cancel()
-    {
-        $this->ctrl->returnToParent($this);
-    }
-    
     /**
      * Initialize the settings form
      * @return ilPropertyFormGUI
@@ -138,8 +188,8 @@ class ilExCalculateGUI
         include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this, "submitExportForm"));
-        $form->setTitle($this->lng->txt("exc_pass_result_calculation"));
-        
+        $form->setTitle($this->lng->txt("exc_calc_settings"));
+
         // calculate selection
         $group = new ilRadioGroupInputGUI($this->lng->txt('exc_calc_mark_select'), 'mark_select');
         $group->setInfo($this->lng->txt('exc_calc_mark_select_info'));
@@ -152,16 +202,16 @@ class ilExCalculateGUI
         $group->addOption($option);
 
         $option = new ilRadioOption($this->lng->txt('exc_calc_mark_select_number'), ilExCalculate::SELECT_NUMBER);
-        
+
         // order
         $subitem = new ilSelectInputGUI($this->lng->txt('exc_calc_mark_select_order'), 'mark_select_order');
         $subitem->setRequired(true);
         $subitem->setOptions(array(
-                ilExCalculate::ORDER_HIGHEST => $this->lng->txt('exc_calc_mark_select_highest'),
-                ilExCalculate::ORDER_LOWEST => $this->lng->txt('exc_calc_mark_select_lowest')
-            ));
+            ilExCalculate::ORDER_HIGHEST => $this->lng->txt('exc_calc_mark_select_highest'),
+            ilExCalculate::ORDER_LOWEST => $this->lng->txt('exc_calc_mark_select_lowest')
+        ));
         $option->addSubItem($subitem);
-            
+
         // number
         $subitem = new ilNumberInputGUI($this->lng->txt('exc_calc_mark_select_count'), 'mark_select_count');
         $subitem->setInfo($this->lng->txt('exc_calc_mark_select_count_info'));
@@ -170,7 +220,7 @@ class ilExCalculateGUI
         $subitem->setDecimals(0);
         $subitem->setRequired(true);
         $option->addSubItem($subitem);
-                        
+
         $group->addOption($option);
         $form->addItem($group);
 
@@ -181,13 +231,13 @@ class ilExCalculateGUI
         $option = new ilRadioOption($this->lng->txt('exc_calc_mark_function_sum'), ilExCalculate::FUNCTION_SUM);
         $option->setInfo($this->lng->txt('exc_calc_mark_function_sum_info'));
         $group->addOption($option);
-        
+
         $option = new ilRadioOption($this->lng->txt('exc_calc_mark_function_average'), ilExCalculate::FUNCTION_AVERAGE);
         $option->setInfo($this->lng->txt('exc_calc_mark_function_average_info'));
         $group->addOption($option);
-        
+
         $form->addItem($group);
-        
+
         // status calculation
         $item = new ilCheckboxInputGUI($this->lng->txt('exc_calc_status'), 'status_calculate');
         $item->setInfo($this->lng->txt('exc_calc_status_info'));
@@ -196,51 +246,48 @@ class ilExCalculateGUI
         $subitem = new ilSelectInputGUI($this->lng->txt('exc_calc_status_compare'), 'status_compare');
         $subitem->setRequired(true);
         $subitem->setOptions(array(
-                ilExCalculate::COMPARE_LOWER => $this->lng->txt('exc_calc_status_compare_lower'),
-                ilExCalculate::COMPARE_HIGHER => $this->lng->txt('exc_calc_status_compare_higher'),
-                ilExCalculate::COMPARE_LOWER_EQUAL => $this->lng->txt('exc_calc_status_compare_lower_equal'),
-                ilExCalculate::COMPARE_HIGHER_EQUAL => $this->lng->txt('exc_calc_status_compare_higher_equal')
-            ));
+            ilExCalculate::COMPARE_LOWER => $this->lng->txt('exc_calc_status_compare_lower'),
+            ilExCalculate::COMPARE_HIGHER => $this->lng->txt('exc_calc_status_compare_higher'),
+            ilExCalculate::COMPARE_LOWER_EQUAL => $this->lng->txt('exc_calc_status_compare_lower_equal'),
+            ilExCalculate::COMPARE_HIGHER_EQUAL => $this->lng->txt('exc_calc_status_compare_higher_equal')
+        ));
         $item->addSubItem($subitem);
-        
+
         // number
         $subitem = new ilNumberInputGUI($this->lng->txt('exc_calc_status_compare_value'), 'status_compare_value');
         $subitem->setInfo($this->lng->txt('exc_calc_status_compare_info'));
         $subitem->setSize(5);
         $subitem->setRequired(true);
         $item->addSubItem($subitem);
-            
+
         // default value
         $subitem = new ilSelectInputGUI($this->lng->txt('exc_calc_status_default'), 'status_default');
         $subitem->setRequired(true);
         $subitem->setInfo($this->lng->txt('exc_calc_status_default_info'));
         $subitem->setOptions(array(
-                ilExCalculate::STATUS_NOTGRADED => $this->lng->txt('exc_notgraded'),
-                ilExCalculate::STATUS_PASSED => $this->lng->txt('exc_passed'),
-                ilExCalculate::STATUS_FAILED => $this->lng->txt('exc_failed')
-            ));
+            ilExCalculate::STATUS_NOTGRADED => $this->lng->txt('exc_notgraded'),
+            ilExCalculate::STATUS_PASSED => $this->lng->txt('exc_passed'),
+            ilExCalculate::STATUS_FAILED => $this->lng->txt('exc_failed')
+        ));
         $item->addSubItem($subitem);
-        
+
         $form->addItem($item);
 
         $form->addCommandButton("saveSettings", $this->lng->txt("save"));
-        $form->addCommandButton("cancel", $this->lng->txt("cancel"));
-
         return $form;
     }
-    
-    
-    /**
-     * Process the form
-     */
-    protected function processForm()
-    {
-        $form = $this->initForm();
-        $form->setDisableStandardMessage(true);
 
+    /**
+     * Validate the form inputs
+     * @param ilPropertyFormGUI $form
+     * @return bool
+     */
+    protected function validateForm(ilPropertyFormGUI $form)
+    {
         // standard checks
+        $form->setDisableStandardMessage(true);
         $ok = $form->checkInput();
-    
+
         // check for mandatory assignments
         if ($form->getInput('mark_select') == ilExCalculate::SELECT_NUMBER and $form->getInput('mark_select_count') != '') {
             include_once "./Modules/Exercise/classes/class.ilExAssignment.php";
@@ -252,76 +299,89 @@ class ilExCalculateGUI
                 $item->setAlert(sprintf($this->lng->txt('exc_calc_mark_select_count_message'), $mandatory));
             }
         }
-        
-        if ($ok) {
-            $this->saveFormValues($form);
-                ilUtil::sendInfo($this->lng->txt("settings_saved"), true);
-                $this->ctrl->redirect($this, 'showForm');
 
-        } else {
-            ilUtil::sendFailure($this->lng->txt("form_input_not_valid"));
-            $form->setValuesByPost();
-            $this->tpl->setContent($form->getHTML());
-        }
+        return $ok;
     }
-        
-    
+
     /**
      * Read the form values
-     * @param ilPropertyFormGUI	$form
+     * @param ilPropertyFormGUI $form
      */
     protected function readFormValues(ilPropertyFormGUI $form)
     {
         $values = array();
-        $values['mark_function'] = $this->calc->mark_function;
-        $values['mark_select'] = $this->calc->mark_select;
-        $values['mark_select_order'] = $this->calc->mark_select_order;
-        $values['mark_select_count'] = $this->calc->mark_select_count;
-        $values['status_calculate'] = $this->calc->status_calculate;
-        $values['status_compare'] = $this->calc->status_compare;
-        $values['status_compare_value'] = $this->calc->status_compare_value;
-        $values['status_default'] = $this->calc->status_default;
+        $values['mark_function'] = $this->calculator->mark_function;
+        $values['mark_select'] = $this->calculator->mark_select;
+        $values['mark_select_order'] = $this->calculator->mark_select_order;
+        $values['mark_select_count'] = $this->calculator->mark_select_count;
+        $values['status_calculate'] = $this->calculator->status_calculate;
+        $values['status_compare'] = $this->calculator->status_compare;
+        $values['status_compare_value'] = $this->calculator->status_compare_value;
+        $values['status_default'] = $this->calculator->status_default;
         $form->setValuesByArray($values);
     }
-    
-    
+
     /**
      * Save the form values
-     * @param ilPropertyFormGUI	$form
+     * @param ilPropertyFormGUI $form
      */
     protected function saveFormValues(ilPropertyFormGUI $form)
     {
-        $this->calc->mark_function = (string) $form->getInput('mark_function');
-        $this->calc->mark_select =  (string) $form->getInput('mark_select');
-        $this->calc->mark_select_order =  (string) $form->getInput('mark_select_order');
-        $this->calc->mark_select_count = (int) $form->getInput('mark_select_count');
-        $this->calc->status_calculate = (bool) $form->getInput('status_calculate');
-        $this->calc->status_compare =  (string) $form->getInput('status_compare');
-        $this->calc->status_compare_value = (float) $form->getInput('status_compare_value');
-        $this->calc->status_default =  (string) $form->getInput('status_default');
-        $this->calc->writeOptions();
+        $this->calculator->mark_function = (string) $form->getInput('mark_function');
+        $this->calculator->mark_select = (string) $form->getInput('mark_select');
+        $this->calculator->mark_select_order = (string) $form->getInput('mark_select_order');
+        $this->calculator->mark_select_count = (int) $form->getInput('mark_select_count');
+        $this->calculator->status_calculate = (bool) $form->getInput('status_calculate');
+        $this->calculator->status_compare = (string) $form->getInput('status_compare');
+        $this->calculator->status_compare_value = (float) $form->getInput('status_compare_value');
+        $this->calculator->status_default = (string) $form->getInput('status_default');
+        $this->calculator->writeOptions();
+    }
+
+    /**
+     * Entry function to set determine the display type
+     */
+    protected function callCalculateAll()
+    {
+        $this->confirmCalculateAll();
     }
 
     /**
      * Confirm the calculation
      */
-    protected function confirmCalculateAll() {
-
+    protected function confirmCalculateAll()
+    {
         $gui = new ilConfirmationGUI();
         $gui->setFormAction($this->ctrl->getFormAction($this));
         $gui->setHeaderText($this->lng->txt('exc_calc_confirm_all'));
-        $gui->setCancel($this->lng->txt('cancel'), 'cancel');
-        $gui->setConfirm($this->lng->txt('exc_calc_calculate'), 'calculate');
+        $gui->setCancel($this->lng->txt('cancel'), 'cancelOrReturn');
+        $gui->setConfirm($this->lng->txt('exc_calc_calculate'), 'calculateAll');
         $this->tpl->setContent($gui->getHTML());
     }
 
     /**
      * Calculate the results for all participants
      */
-    protected function calculateAll() {
-
-        $this->calc->calculateResults();
+    protected function calculateAll()
+    {
+        $this->calculator->calculateResults();
         ilUtil::sendSuccess($this->lng->txt("exc_calc_all_calculated"), true);
         $this->ctrl->returnToParent($this);
+    }
+
+    /**
+     * Cancel the or return from an operation
+     */
+    protected function cancelOrReturn()
+    {
+        switch ($this->display_type) {
+            case self::DISPLAY_SUBTAB:
+                $this->ctrl->redirect($this);
+                break;
+
+            case self::DISPLAY_PARENT:
+                $this->ctrl->returnToParent($this);
+                break;
+        }
     }
 }

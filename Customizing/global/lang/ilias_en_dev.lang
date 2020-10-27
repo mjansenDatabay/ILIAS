@@ -570,6 +570,7 @@ dcl#:#dcl_max_import_simulate#:#The file has %s records, but only %s can be impo
 dcl#:#dcl_max_import_done#:#The file has %s records, but only the first %s were imported. Please split your file if you need to import more records.###fau: dcImportLimit
 exc#:#exc_calc_all_calculated#:#All overall results have been recalculated.
 exc#:#exc_calc_calculate#:#Calculate
+exc#:#exc_calc_settings#:#Settings for Calculation of Overall Results
 exc#:#exc_calc_mark_function#:#Grades/Credits-Calculation
 exc#:#exc_calc_mark_function_average#:#Average
 exc#:#exc_calc_mark_function_average_info#:#An average-grade of the selected exercise units will be calculated.
