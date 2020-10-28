@@ -542,6 +542,13 @@ class ilObjExercise extends ilObject
             // fau: exPlag - use effective status
             $stat = $a->getMemberStatus($a_user_id)->getEffectiveStatus();
             // fau.
+
+            // fau: exResTime - force "notgraded" status if result time is not reached
+            if ((int) $a->getResultTime() > time()) {
+                $stat = "notgraded";
+            }
+            // fau.
+
             if ($a->getMandatory() && ($stat == "failed" || $stat == "notgraded")) {
                 $passed_all_mandatory = false;
             }
@@ -560,11 +567,20 @@ class ilObjExercise extends ilObject
             $passed_all_mandatory = false;
         }
 
-        // fau: exCalc - respect take existing status in "manual" mode
-        if ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+        // fau: exCalc - add status determination for calc and manual modes, use constants
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            // trigger a calculation
+            include_once("./Modules/Exercise/classes/class.ilExCalculate.php");
+            $calculator = new ilExCalculate($this);
+            $calculator->calculateResults([$a_user_id]);
+            // lookup the calculation result
+            $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
+        }
+        elseif ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+            // lookup the existing status (manually set or previously calculated)
             $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
         } elseif ($this->getPassMode() != self::PASS_MODE_NR) {
-            // fau.
+        // fau.
             //echo "5";
             $overall_stat = "notgraded";
             if ($failed_a_mandatory) {
@@ -601,11 +617,28 @@ class ilObjExercise extends ilObject
      */
     public function updateUserStatus($a_user_id = 0)
     {
+        // fau: exCalc - prevent an update in PASS_MODE_MANUAL
+        // in PASS_MODE_MANUAL the status is manually set in ilExerciseManagementGUI::saveGradesObject
+        if ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+            return;
+        }
+        // fau.
+
         $ilUser = $this->user;
         
         if ($a_user_id == 0) {
             $a_user_id = $ilUser->getId();
         }
+
+        // fau: exCalc - call calculation directly in PASS_MODE_CALC
+        // in PASS_MODE_CALC the status is written by ilExCalculate
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            include_once("./Modules/Exercise/classes/class.ilExCalculate.php");
+            $calculator = new ilExCalculate($this);
+            $calculator->calculateResults([$a_user_id]);
+            return;
+        }
+        // fau.
 
         $st = $this->determinStatusOfUser($a_user_id);
 
@@ -622,11 +655,29 @@ class ilObjExercise extends ilObject
      */
     public function updateAllUsersStatus()
     {
+        // fau: exCalc - prevent an update in PASS_MODE_MANUAL
+        // in PASS_MODE_MANUAL the status is manually set in ilExerciseManagementGUI::saveGradesObject
+        if ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+            return;
+        }
+        // fau.
+
         if (!is_object($this->members_obj)) {
             $this->members_obj = new ilExerciseMembers($this);
         }
         
         $mems = $this->members_obj->getMembers();
+
+        // fau: exCalc - call calculation directly in PASS_MODE_CALC
+        // in PASS_MODE_CALC the status is written by ilExCalculate
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            include_once("./Modules/Exercise/classes/class.ilExCalculate.php");
+            $calculator = new ilExCalculate($this);
+            $calculator->calculateResults($mems);
+            return;
+        }
+        // fau.
+
         foreach ($mems as $mem) {
             $this->updateUserStatus($mem);
         }
@@ -767,7 +818,7 @@ class ilObjExercise extends ilObject
             reset($ass_data);
             foreach ($ass_data as $ass) {
                 // fau: exPlag - export the effective mark
-                $excel->setCell($row, $col++, $ass->getMemberStatus($user_id)->getEffectiveMark());
+                $excel->setCell($row, $col++, $ass->getMemberStatus($user_id)->getEffectiveMark($ass->hasNumericPoints()));
                 // fau.
             }
             

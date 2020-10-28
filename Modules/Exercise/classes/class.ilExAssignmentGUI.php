@@ -489,7 +489,7 @@ class ilExAssignmentGUI
         
         $lpcomment = $a_ass->getMemberStatus()->getComment();
         // fau: exPlag -get the effective mark and status
-        $mark = $a_ass->getMemberStatus()->getEffectiveMark();
+        $mark = $a_ass->getMemberStatus()->getEffectiveMark($a_ass->hasNumericPoints());
         $status = $a_ass->getMemberStatus()->getEffectiveStatus();
         // fau.
         

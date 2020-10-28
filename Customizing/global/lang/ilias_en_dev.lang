@@ -571,6 +571,7 @@ dcl#:#dcl_max_import_done#:#The file has %s records, but only the first %s were 
 exc#:#exc_calc_all_calculated#:#All overall results have been recalculated.
 exc#:#exc_calc_calculate#:#Calculate
 exc#:#exc_calc_settings#:#Settings for Calculation of Overall Results
+exc#:#exc_calc_settings_update_status#:#When the settings are saved the overall result for all students will be recalculated.
 exc#:#exc_calc_mark_function#:#Grades/Credits-Calculation
 exc#:#exc_calc_mark_function_average#:#Average
 exc#:#exc_calc_mark_function_average_info#:#An average-grade of the selected exercise units will be calculated.
@@ -587,6 +588,8 @@ exc#:#exc_calc_mark_select_mandatory#:#All affirmative exercise units
 exc#:#exc_calc_mark_select_marked#:#All exercise units with grades/credits
 exc#:#exc_calc_mark_select_number#:#fixed number
 exc#:#exc_calc_mark_select_order#:#Selection
+exc#:#exc_calc_mark_force_zero#:#Force 0 for Missing Values
+exc#:#exc_calc_mark_force_zero_info#:#NNot evaluated submissions or assignments before the result date should be counted with 0 points
 exc#:#exc_calc_status#:#Status-Calculation
 exc#:#exc_calc_status_compare#:#passed, if
 exc#:#exc_calc_status_compare_higher#:#bigger than the threshold

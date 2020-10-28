@@ -148,12 +148,16 @@ class ilExCalculateGUI
     protected function editSettings()
     {
         global $DIC;
-        
+
         if ($this->canCalculate()) {
             $button = ilLinkButton::getInstance();
             $button->setCaption('exc_calculate_overall_results');
             $button->setUrl($this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui', 'ilexcalculategui'], 'confirmCalculateAll'));
             $DIC->toolbar()->addButtonInstance($button);
+        }
+
+        if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC) {
+            ilUtil::sendInfo($this->lng->txt('exc_calc_settings_update_status'));
         }
 
         $form = $this->initForm();
@@ -223,6 +227,10 @@ class ilExCalculateGUI
 
         $group->addOption($option);
         $form->addItem($group);
+
+        $force = new ilCheckboxInputGUI($this->lng->txt('exc_calc_mark_force_zero'), 'mark_force_zero');
+        $force->setInfo($this->lng->txt('exc_calc_mark_force_zero_info'));
+        $form->addItem($force);
 
         // calculate function
         $group = new ilRadioGroupInputGUI($this->lng->txt('exc_calc_mark_function'), 'mark_function');
@@ -314,6 +322,7 @@ class ilExCalculateGUI
         $values['mark_select'] = $this->calculator->mark_select;
         $values['mark_select_order'] = $this->calculator->mark_select_order;
         $values['mark_select_count'] = $this->calculator->mark_select_count;
+        $values['mark_force_zero'] = $this->calculator->mark_force_zero;
         $values['status_calculate'] = $this->calculator->status_calculate;
         $values['status_compare'] = $this->calculator->status_compare;
         $values['status_compare_value'] = $this->calculator->status_compare_value;
@@ -331,6 +340,7 @@ class ilExCalculateGUI
         $this->calculator->mark_select = (string) $form->getInput('mark_select');
         $this->calculator->mark_select_order = (string) $form->getInput('mark_select_order');
         $this->calculator->mark_select_count = (int) $form->getInput('mark_select_count');
+        $this->calculator->mark_force_zero = (bool) $form->getInput('mark_force_zero');
         $this->calculator->status_calculate = (bool) $form->getInput('status_calculate');
         $this->calculator->status_compare = (string) $form->getInput('status_compare');
         $this->calculator->status_compare_value = (float) $form->getInput('status_compare_value');

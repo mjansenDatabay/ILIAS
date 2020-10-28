@@ -531,6 +531,7 @@ dcl#:#dcl_max_import_done#:#Die Datei enthält %s Datensätze, aber es wurden nu
 exc#:#exc_calc_all_calculated#:#Alle Gesamtergebnisse wurden neu berechnet.
 exc#:#exc_calc_calculate#:#Berechnen
 exc#:#exc_calc_settings#:#Einstellungen zur Berechnung des Gesamtergebnisses
+exc#:#exc_calc_settings_update_status#:#Beim Speichern der Einstellungen wird das Gesamtergebnis alle Übungsteilnehmer/innen neu berechnet.
 exc#:#exc_calc_mark_function#:#Noten/Punkte-Berechnung
 exc#:#exc_calc_mark_function_average#:#Durchschnitt
 exc#:#exc_calc_mark_function_average_info#:#Es wird eine Durchschnittsnote der ausgewählten Übungseinheiten gebildet.
@@ -547,6 +548,8 @@ exc#:#exc_calc_mark_select_mandatory#:#Alle verpflichtenden Übungseinheiten
 exc#:#exc_calc_mark_select_marked#:#Alle Übungseinheiten mit Note/Punkten
 exc#:#exc_calc_mark_select_number#:#Festgelegte Anzahl
 exc#:#exc_calc_mark_select_order#:#Auswahl
+exc#:#exc_calc_mark_force_zero#:#Fehlende Werte auf 0 setzen
+exc#:#exc_calc_mark_force_zero_info#:#Nicht bewertete Abgaben oder Übungseinheiten vor dem Ergebnistermin sollen mit 0 Punkten in die Berechnung einfließen.
 exc#:#exc_calc_status#:#Status-Berechnung
 exc#:#exc_calc_status_compare#:#Bestanden, wenn
 exc#:#exc_calc_status_compare_higher#:#größer als der Schwellwert

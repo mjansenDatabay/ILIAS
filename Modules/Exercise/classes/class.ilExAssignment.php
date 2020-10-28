@@ -176,7 +176,14 @@ class ilExAssignment
             $this->read();
         }
     }
-            
+
+    // fau: exCalc - add type hint
+    /**
+     * Get the assignments of the exercise
+     * @param $a_exc_id
+     * @return self[]
+     */
+    // fau.
     public static function getInstancesByExercise($a_exc_id)
     {
         global $DIC;
@@ -1094,6 +1101,15 @@ class ilExAssignment
     }
 
     /**
+     * Get if the mark/points are numeric
+     * @return bool
+     */
+    public function hasNumericPoints()
+    {
+        return isset($this->max_points);
+    }
+
+    /**
      * Check if a mark is allowed
      * @param $a_mark
      * @return bool
@@ -1102,7 +1118,7 @@ class ilExAssignment
         if (empty($a_mark)) {
             return true;
         }
-        if (isset($this->max_points)) {
+        if ($this->hasNumericPoints()) {
             if (!is_numeric($a_mark)) {
                 return false;
             }

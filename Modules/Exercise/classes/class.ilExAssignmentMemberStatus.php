@@ -53,7 +53,20 @@ class ilExAssignmentMemberStatus
         
         $this->read();
     }
-    
+
+    // fau: exCalc - getter for user id
+    public function getUserId() {
+        return $this->user_id;
+    }
+    // fau.
+
+    // fau: exCalc - getter for assignment id
+    public function getAssignmentId() {
+        return $this->ass_id;
+    }
+    // fau.
+
+
     public function setNotice($a_value)
     {
         $this->notice = $a_value;
@@ -159,7 +172,7 @@ class ilExAssignmentMemberStatus
     }
 
 
-    // fau: new function getEffectiveStatus()
+    // fau: exPlag - new function getEffectiveStatus()
     /**
      * Get the effective status if plagiarism is taken into account
      * @return null
@@ -178,6 +191,9 @@ class ilExAssignmentMemberStatus
     {
         if ($a_value != $this->mark) {
             $this->setStatusTime(ilUtil::now());
+            // fau: exCalc - force a recalculation of the exercise status if mark is changed (postUpdateStatus)
+            $this->status_update = true;
+            // fau.
         }
         $this->mark = $a_value;
     }
@@ -187,21 +203,40 @@ class ilExAssignmentMemberStatus
         return $this->mark;
     }
 
-    // fau: new function getEffectiveMark()
+    // fau: exPlag - new function getEffectiveMark()
+    // fau: exCalc - new function getEffectiveMark()
     /**
      * Get the effective mark if plagiarism is taken into account
-     * @return null
+     * @param bool $a_numeric
+     * @return float|null
      */
-    public function getEffectiveMark()
+    public function getEffectiveMark($a_numeric = false)
     {
+        $a_numeric = (bool) $a_numeric;
+
+        // treat plagiarism
         if ($this->isPlagDetected()) {
-            if (is_numeric($this->mark)) {
+            if ($a_numeric) {
                 return 0;
             }
             else {
                 return null;
             }
         }
+
+        // treat non numeric marks
+        if ($a_numeric) {
+            $mark = str_replace(',', '.', $this->mark);
+
+            if (!is_numeric($mark)) {
+                return null;
+            }
+            else {
+                return (float) $mark;
+            }
+
+        }
+
         return $this->mark;
     }
     // fau.
@@ -218,7 +253,7 @@ class ilExAssignmentMemberStatus
         global $DIC;
         $lng = $DIC->language();
 
-        $mark = ($effective ? $this->getEffectiveMark() : $this->getMark());
+        $mark = ($effective ? $this->getEffectiveMark($assignment->hasNumericPoints()) : $this->getMark());
         if ($assignment->getMaxPoints() && isset($mark)) {
             if ($assignment->checkMark($mark)) {
                 $percent = 100 * (float) $mark /  $assignment->getMaxPoints();
@@ -243,7 +278,7 @@ class ilExAssignmentMemberStatus
             if (!empty($this->getPlagComment())) {
                 $text .= $lng->txt('exc_plag_see_comment');
             }
-            if ($this->getMark() != $this->getEffectiveMark()) {
+            if ($this->getMark() != $this->getEffectiveMark($assignment->hasNumericPoints())) {
                 $text .= $lng->txt('exc_plag_original_mark')
                     . ' ' . $this->getMarkWithInfo($assignment, false);
             }
@@ -277,6 +312,11 @@ class ilExAssignmentMemberStatus
      */
     public function setPlagFlag($plag_flag)
     {
+        // fau: exPlag - force a recalculation of the exercise status if plag flag is changed (postUpdateStatus)
+        if ($plag_flag != $this->plag_flag) {
+            $this->status_update = true;
+        }
+        // fau.
         $this->plag_flag = $plag_flag;
     }
 
@@ -359,7 +399,7 @@ class ilExAssignmentMemberStatus
      * Get multiple instances, indexed by usr_id and ass_id
      * @param int[] $a_usr_ids
      * @param int[] $a_ass_ids
-     * @return self[][]
+     * @return self[]
      */
     public static function getMultiple($a_usr_ids = [], $a_ass_ids = [])
     {
@@ -371,13 +411,13 @@ class ilExAssignmentMemberStatus
             . $ilDB->in('usr_id', $a_usr_ids, false, 'integer');
         $result = $ilDB->query($query);
 
-        $return = [];
+        $instances = [];
         while ($row = $ilDB->fetchAssoc($result)) {
             $status = new self($row['ass_id'], $row['usr_id']);
             $status->setPropertiesByRow($row);
-            $return[$row['usr_id']][$row['ass_id']] = $status;
+            $return[] = $status;
         }
-        return $return;
+        return $instances;
     }
     // fau.
 

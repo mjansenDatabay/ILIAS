@@ -176,7 +176,7 @@ class ilExerciseXMLWriter extends ilXmlWriter
 
         // fau: exPlag - use effective status and mark
         $amark = $ass->getMemberStatus($user_id)->getEffectiveStatus();
-        $astatus = $ass->getMemberStatus($user_id)->getEffectiveMark();
+        $astatus = $ass->getMemberStatus($user_id)->getEffectiveMark($ass->hasNumericPoints());
         // fau.
         $acomment = $ass->getMemberStatus($user_id)->getComment();
         $anotice = $ass->getMemberStatus($user_id)->getNotice();

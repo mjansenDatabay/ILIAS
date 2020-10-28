@@ -40,6 +40,9 @@ class ilExCalculate
     /** @var integer */
     public $mark_select_count = 0;
 
+    /** @var bool  */
+    public $mark_force_zero = false;
+
     /** @var bool */
     public $status_calculate = false;
 
@@ -99,16 +102,19 @@ class ilExCalculate
                     $this->mark_select_order = (string) $row['option_value'];
                     break;
                 case 'mark_select_count':
-                    $this->mark_select_count = (string) $row['option_value'];
+                    $this->mark_select_count = (int) $row['option_value'];
+                    break;
+                case 'mark_force_zero':
+                    $this->mark_force_zero = (bool) $row['option_value'];
                     break;
                 case 'status_calculate':
-                    $this->status_calculate = (string) $row['option_value'];
+                    $this->status_calculate = (bool) $row['option_value'];
                     break;
                 case 'status_compare':
                     $this->status_compare = (string) $row['option_value'];
                     break;
                 case 'status_compare_value':
-                    $this->status_compare_value = (string) $row['option_value'];
+                    $this->status_compare_value = (float) $row['option_value'];
                     break;
                 case 'status_default':
                     $this->status_default = (string) $row['option_value'];
@@ -135,6 +141,7 @@ class ilExCalculate
             ['mark_select', (string) $this->mark_select],
             ['mark_select_order', (string) $this->mark_select_order],
             ['mark_select_count',(string)  $this->mark_select_count],
+            ['mark_force_zero', (string)  $this->mark_force_zero],
             ['status_calculate', (string) $this->status_calculate],
             ['status_compare', (string) $this->status_compare],
             ['status_compare_value', (string) $this->status_compare_value],
@@ -146,7 +153,21 @@ class ilExCalculate
 
         $prepared = $ilDB->prepareManip($query, array('text', 'text'));
         $ilDB->executeMultiple($prepared, $params);
+
+        // trigger status re-calculation
+        if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC) {
+            $this->exercise->updateAllUsersStatus();
+        }
     }
+
+    /**
+     * TODO: Generate a description text for the Calculation settings
+     */
+    public function getDescriptionText()
+    {
+        return '';
+    }
+
 
     /**
      * Init the list of assignments for calculation
@@ -155,7 +176,6 @@ class ilExCalculate
     protected function initAssignments()
     {
         if (!isset($this->assignments)) {
-            /** @var ilExAssignment $assignment */
             foreach(ilExAssignment::getInstancesByExercise($this->exercise->getId()) as $assignment) {
                 $this->assignments[$assignment->getId()] = $assignment;
             }
@@ -163,24 +183,49 @@ class ilExCalculate
     }
 
     /**
-     * Calculate the overall results and store them in the learning progress
-     * @param 	array $a_usr_ids list of user ids  (empty for all users)
+     * Get the available member status instances
+     * @param array $a_usr_ids
+     * @return ilExAssignmentMemberStatus[][] indexed by usr_id and ass_ids
      */
-    public function calculateResults($a_usr_ids = [])
+    protected function getMemberStatusInstances($a_usr_ids = [])
     {
         // get the list of assignments
         $this->initAssignments();
         $ass_ids = array_keys($this->assignments);
-        
+
+        // load the saved states
+        $states = [];
+        foreach (ilExAssignmentMemberStatus::getMultiple($a_usr_ids, $ass_ids) as $status) {
+
+            // treat status as not yet marked if result time is not reached
+            if ((int) $this->assignments[$status->getAssignmentId()]->getResultTime() > time()) {
+                $status->setMark(null);
+                $status->setStatus(self::STATUS_NOTGRADED);
+                $status->setPlagFlag(ilExAssignmentMemberStatus::PLAG_NONE);
+            }
+
+            $states[$status->getUserId()][$status->getAssignmentId()] = $status;
+        }
+
+        return $states;
+    }
+
+
+    /**
+     * Calculate the overall results and store them in the learning progress
+     * @param int[]  $a_usr_ids list of user ids  (empty for all users)
+     */
+    public function calculateResults($a_usr_ids = [])
+    {
         // get the list of users
         $usr_ids = (count($a_usr_ids) ? $a_usr_ids : ilExerciseMembers::_getMembers($this->exercise->getId()));
 
         // get the status objects
-        $results = ilExAssignmentMemberStatus::getMultiple($usr_ids, $ass_ids);
+        $states = $this->getMemberStatusInstances($usr_ids);
         
         // calculate and write the overall mark and status
         foreach ($usr_ids as $usr_id) {
-            $mark = $this->calculateMarkOfUser($results[$usr_id]);
+            $mark = $this->calculateMarkOfUser((array) $states[$usr_id]);
 
             $marks_obj = new ilLPMarks($this->exercise->getId(), $usr_id);
             $marks_obj->setMark($mark);
@@ -198,60 +243,54 @@ class ilExCalculate
         }
     }
 
-    /**
-     * TODO: Generate a description text for the Calculation settings
-     */
-    public function getDescriptionText()
-    {
-        return '';
-    }
-    
+
     /**
      * calculate the mark depending on assignment results
      *
-     * @param 	ilExAssignmentMemberStatus[]  $a_results  indexed by assignment id
+     * @param 	ilExAssignmentMemberStatus[]  $a_states  indexed by assignment id
      * @return	int		calculated mark (or null if mark couldn't be calculated)
      */
-    protected function calculateMarkOfUser(array $a_results)
+    protected function calculateMarkOfUser(array $a_states)
     {
         // lists of marks
         $selected = [];
         $candidates = [];
         
         // pre-selection of results
-        foreach ($a_results as $ass_id => $result) {
-            $mandatory = $this->assignments[$ass_id]->getMandatory();
+        foreach ($this->assignments as $ass_id => $assignment) {
 
-            $mark = $result->getEffectiveMark();
+            $mark = null;
+            if (isset($a_states[$ass_id])) {
+                $mark = $a_states[$ass_id]->getEffectiveMark(true);
+            }
+
+            // treat not marked results
             if (!isset($mark)) {
-                if ($mandatory) {
+                if ($this->mark_force_zero) {
+                    $mark = 0;
+                }
+                elseif ($assignment->getMandatory()) {
                     // mandatory mark not available
                     return null;
                 }
-            }
-            else {
-                $mark = str_replace(',', '.', $mark);
-                
-                if (!is_numeric($mark)) {
-                    if ($mandatory) {
-                        // mandatory mark not available
-                        return null;
-                    }
-                    else {
-                        // mark can't be used for calculation
-                        continue;
-                    }
-
-                } elseif ($mandatory) {
-                    $selected[] = $mark;
-
-                } elseif ($this->mark_select == self::SELECT_MARKED) {
-                    $selected[] = $mark;
-
-                } elseif ($this->mark_select == self::SELECT_NUMBER) {
-                    $candidates[] = $mark;
+                else {
+                    // mark can't be used for calculation
+                    continue;
                 }
             }
+
+            if ($assignment->getMandatory()) {
+                // always take the mandatory assignments
+                // this includes the case SELECT_MANDATORY
+                $selected[] = $mark;
+
+            } elseif ($this->mark_select == self::SELECT_MARKED) {
+                $selected[] = $mark;
+
+            } elseif ($this->mark_select == self::SELECT_NUMBER) {
+                $candidates[] = $mark;
+            }
+
         }
 
         // selection of candidates
