@@ -399,9 +399,11 @@ class ilUserUtil
             $all[self::START_PD_SUBSCRIPTION] = 'my_courses_groups';
         }
 
-        if (ilMyStaffAccess::getInstance()->hasCurrentUserAccessToMyStaff()) {
-            $all[self::START_PD_MYSTAFF] = 'my_staff';
-        }
+// fau: fixOrguAccess - don't get instance to prevent queries like DROP TABLE IF EXISTS `tmp_obj_spec_perm_access_enrolments_crs
+//        if (ilMyStaffAccess::getInstance()->hasCurrentUserAccessToMyStaff()) {
+//            $all[self::START_PD_MYSTAFF] = 'my_staff';
+//        }
+// fau.
 
         if ($a_force_all || !$ilSetting->get("disable_personal_workspace")) {
             $all[self::START_PD_WORKSPACE] = 'personal_workspace';
