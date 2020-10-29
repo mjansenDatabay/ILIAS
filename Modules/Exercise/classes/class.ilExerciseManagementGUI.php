@@ -553,11 +553,15 @@ class ilExerciseManagementGUI
             foreach ($_POST["lcomment"] as $k => $v) {
                 $marks_obj = new ilLPMarks($this->exercise->getId(), (int) $k);
                 $marks_obj->setComment(ilUtil::stripSlashes($v));
-                $marks_obj->setMark(ilUtil::stripSlashes($_POST["mark"][$k]));
+                // fau: exCalc - don't save grade in PASS_MODE_CALC
+                if ($this->exercise->getPassMode() != ilObjExercise::PASS_MODE_CALC) {
+                    $marks_obj->setMark(ilUtil::stripSlashes($_POST["mark"][$k]));
+                }
+                // fau.
                 $marks_obj->update();
 
                 // fau: exCalc - save the status in manual mode
-                if ($this->exercise->getPassMode() == "man") {
+                if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL) {
                     ilExerciseMembers::_writeStatus($this->exercise->getId(), $k, $_POST["status"][$k]);
                 }
                 // fau.

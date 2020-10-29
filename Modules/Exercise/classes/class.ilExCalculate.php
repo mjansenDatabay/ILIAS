@@ -23,6 +23,9 @@ class ilExCalculate
     const COMPARE_LOWER_EQUAL= 'lower_equal';
     const COMPARE_HIGHER_EQUAL = 'higher_equal';
 
+    const BASE_PERCENT = 'percent';
+    const BASE_ABSOLUTE = 'absolute';
+
     const STATUS_NOTGRADED = 'notgraded';
     const STATUS_PASSED = 'passed';
     const STATUS_FAILED = 'failed';
@@ -51,6 +54,9 @@ class ilExCalculate
 
     /** @var float  */
     public $status_compare_value = 0;
+
+    /** @var string  */
+    public $status_compare_base = self::BASE_ABSOLUTE;
 
     /** @var string  */
     public $status_default = self::STATUS_NOTGRADED;
@@ -116,6 +122,9 @@ class ilExCalculate
                 case 'status_compare_value':
                     $this->status_compare_value = (float) $row['option_value'];
                     break;
+                case 'status_compare_base':
+                    $this->status_compare_base = (string) $row['option_value'];
+                    break;
                 case 'status_default':
                     $this->status_default = (string) $row['option_value'];
                     break;
@@ -145,6 +154,7 @@ class ilExCalculate
             ['status_calculate', (string) $this->status_calculate],
             ['status_compare', (string) $this->status_compare],
             ['status_compare_value', (string) $this->status_compare_value],
+            ['status_compare_base', (string) $this->status_compare_base],
             ['status_default', (string) $this->status_default],
         ];
 
@@ -225,7 +235,7 @@ class ilExCalculate
         
         // calculate and write the overall mark and status
         foreach ($usr_ids as $usr_id) {
-            $mark = $this->calculateMarkOfUser((array) $states[$usr_id]);
+            $mark = $this->calculateMarkOfUser((array)  $states[$usr_id]);
 
             $marks_obj = new ilLPMarks($this->exercise->getId(), $usr_id);
             $marks_obj->setMark($mark);
@@ -342,7 +352,18 @@ class ilExCalculate
         }
         
         $mark = (float) $a_mark;
-        $value = (float) $this->status_compare_value;
+
+        if ($this->status_compare_base == self::BASE_ABSOLUTE) {
+            $value = (float) $this->status_compare_value;
+        }
+        else {
+            $max = 0;
+            foreach ($this->assignments as $ass) {
+                $max += (int) $ass->getMaxPoints();
+            }
+            $value = (float) $max * $this->status_compare_value;
+        }
+
         switch ($this->status_compare) {
             case self::COMPARE_HIGHER:
                 return $mark > $value ? self::STATUS_PASSED : self::STATUS_FAILED;

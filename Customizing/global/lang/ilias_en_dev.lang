@@ -582,7 +582,7 @@ exc#:#exc_calc_mark_select_count#:#Count
 exc#:#exc_calc_mark_select_count_info#:#You have to involve at least the obligatory exercise units. Their values always count.
 exc#:#exc_calc_mark_select_count_message#:#Please choose at least the obligatory exercise units (%s).
 exc#:#exc_calc_mark_select_highest#:#The highest value
-exc#:#exc_calc_mark_select_info#:#At least the obligatory units have to be evaluated.<br /> Thereby only the Grades/credits will be recognized, not if it is passed. Are not enough results available, the overall result will be empty.
+exc#:#exc_calc_mark_select_info#:#At least the obligatory units have to be evaluated.<br /> Thereby only the grades/points will be recognized, not if it is passed. Are not enough results available, the overall result will be empty.
 exc#:#exc_calc_mark_select_lowest#:#The lowest value
 exc#:#exc_calc_mark_select_mandatory#:#All affirmative exercise units
 exc#:#exc_calc_mark_select_marked#:#All exercise units with grades/credits
@@ -599,14 +599,21 @@ exc#:#exc_calc_status_compare_lower#:#smaller that the threshold
 exc#:#exc_calc_status_compare_lower_equal#:#smaller than or equal to the threshold
 exc#:#exc_calc_status_compare_value#:#threshold
 exc#:#exc_calc_status_default#:#Default value
-exc#:#exc_calc_status_default_info#:#Is because of lack of single results the overall result empty, the status will become this value
-exc#:#exc_calc_status_info#:#The "passed"-status will be calculated by the ascertained grades/credits.
-exc#:#exc_calculate_overall_results#:#calculate overall results
+exc#:#exc_calc_status_default_info#:#Is because of lack of single results the overall result empty, the status will get this value.
+exc#:#exc_calc_status_info#:#The passed status will be determined by the calculated grades/points.
+exc#:#exc_calc_status_compare_base#:#Comparing Base
+exc#:#exc_calc_status_compare_absolute#:#Fixed Value
+exc#:#exc_calc_status_compare_absolute_info#:#The calculated grades/points will directly be compared with the threshold.
+exc#:#exc_calc_status_compare_percent#:#Percent of All
+exc#:#exc_calc_status_compare_percent_info#:#The calculated grades/points are compared with the total achievable points of all assignments. This will only work correctly if all assignments have maximum points defined and the the sum of the reached points is calculated.
+exc#:#exc_calculate_overall_results#:#Calculate Overall Results
 exc#:#exc_calc_confirm_all#:#Calculate the overall result of all participants?
 exc#:#exc_calculate#:#Calculate
 exc#:#exc_grade_time#:#Grading Time
-exc#:#exc_grade_time_info#:#If set, then feedback and grading will be possible after the given Date
+exc#:#exc_grade_time_info#:#In an exercise with restricted tutor rights (see exercise settings), course tutors can only give feedbacks and grades for this assignment after the given date.
 exc#:#exc_grade_start#:#Grading Start
+exc#:#exc_grade_overview_legend_mandatory#:#Mandatory assignments are marked by an asteristk.
+exc#:#exc_grade_overview_legend_restime#:#Assignments before the publish date of their results are put in parentheses.
 exc#:#exc_no_assignments_for_grading#:#No assignments available for grading.
 exc#:#exc_not_available_for_grading#:#The selected assignment is not available for grading!
 exc#:#exc_mark#:#Grade/Credits

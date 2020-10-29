@@ -531,7 +531,7 @@ dcl#:#dcl_max_import_done#:#Die Datei enthält %s Datensätze, aber es wurden nu
 exc#:#exc_calc_all_calculated#:#Alle Gesamtergebnisse wurden neu berechnet.
 exc#:#exc_calc_calculate#:#Berechnen
 exc#:#exc_calc_settings#:#Einstellungen zur Berechnung des Gesamtergebnisses
-exc#:#exc_calc_settings_update_status#:#Beim Speichern der Einstellungen wird das Gesamtergebnis alle Übungsteilnehmer/innen neu berechnet.
+exc#:#exc_calc_settings_update_status#:#Beim Speichern der Einstellungen wird das Gesamtergebnis aller Übungsteilnehmer/innen neu berechnet.
 exc#:#exc_calc_mark_function#:#Noten/Punkte-Berechnung
 exc#:#exc_calc_mark_function_average#:#Durchschnitt
 exc#:#exc_calc_mark_function_average_info#:#Es wird eine Durchschnittsnote der ausgewählten Übungseinheiten gebildet.
@@ -559,13 +559,20 @@ exc#:#exc_calc_status_compare_lower#:#kleiner als der Schwellwert
 exc#:#exc_calc_status_compare_lower_equal#:#kleiner oder gleich dem Schwellwert
 exc#:#exc_calc_status_compare_value#:#Schwellwert
 exc#:#exc_calc_status_default#:#Standardwert
-exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamtergebnis leer, wird der Status auf diesen Wert
+exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamtergebnis leer, wird der Status auf diesen Wert gesetzt.
 exc#:#exc_calc_status_info#:#Der "Bestanden"-Status wird anhand der ermittelten Noten/Punkte berechnet.
+exc#:#exc_calc_status_compare_base#:#Vergleichsbasis
+exc#:#exc_calc_status_compare_absolute#:#Absolutwert
+exc#:#exc_calc_status_compare_absolute_info#:#Die berechneten Noten/Punkte werden direkt mit dem Schwellwert verglichen.
+exc#:#exc_calc_status_compare_percent#:#Prozentual
+exc#:#exc_calc_status_compare_percent_info#:#Die berechneten Noten/Punkte werden prozentual mit den gesamt erreichbaren Punkten aller Übungseinheiten verglichen. Das funktioniert nur, wenn alle Übungseinheiten eine maximale Punktzahl vorgegeben haben und bei der Punkteberechnung die Summe gebildet wird.
 exc#:#exc_calculate_overall_results#:#Gesamtergebnisse berechnen
 exc#:#exc_calc_confirm_all#:#Möchten Sie die Gesamtergebnisse aller Übungsteilnehmer neu berechnen?
 exc#:#exc_grade_time#:#Korrekturzeit
-exc#:#exc_grade_time_info#:#Wenn gesetzt, sind Feedback und Bewertung für die Tutoren erst ab einem bestimmten Datum möglich.
+exc#:#exc_grade_time_info#:#In einer Übung mit beschränkten Tutor-Rechten (siehe Einstellungen der Übung), können Kurstutoren die Abgaben und Noten dieser Übungseinheit erst ab dem eingestellten Datum verwenden.
 exc#:#exc_grade_start#:#Korrektur-Start
+exc#:#exc_grade_overview_legend_mandatory#:#Verpflichtende Übungseinheiten sind mit * gekennzeichnet.
+exc#:#exc_grade_overview_legend_restime#:#Übungseinheiten vor dem Veröffentlichungstermin ihrer Ergebnisse sind in Klammern gesetzt.
 exc#:#exc_no_assignments_for_grading#:#Keine Übungseinheiten zur Bewertung verfügbar.
 exc#:#exc_not_available_for_grading#:#Die ausgewählte Übungseinheit ist nicht zur Bewertung verfügbar!
 exc#:#exc_mark#:#Note/Punkte

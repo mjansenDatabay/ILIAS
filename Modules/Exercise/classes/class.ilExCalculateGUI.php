@@ -149,12 +149,12 @@ class ilExCalculateGUI
     {
         global $DIC;
 
-        if ($this->canCalculate()) {
-            $button = ilLinkButton::getInstance();
-            $button->setCaption('exc_calculate_overall_results');
-            $button->setUrl($this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui', 'ilexcalculategui'], 'confirmCalculateAll'));
-            $DIC->toolbar()->addButtonInstance($button);
-        }
+//        if ($this->canCalculate()) {
+//            $button = ilLinkButton::getInstance();
+//            $button->setCaption('exc_calculate_overall_results');
+//            $button->setUrl($this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui', 'ilexcalculategui'], 'confirmCalculateAll'));
+//            $DIC->toolbar()->addButtonInstance($button);
+//        }
 
         if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC) {
             ilUtil::sendInfo($this->lng->txt('exc_calc_settings_update_status'));
@@ -261,12 +261,33 @@ class ilExCalculateGUI
         ));
         $item->addSubItem($subitem);
 
+        // base
+        $base = new ilRadioGroupInputGUI($this->lng->txt('exc_calc_status_compare_base'), 'status_compare_base');
+        $base->setRequired(true);
+        $item->addSubItem($base);
+
         // number
-        $subitem = new ilNumberInputGUI($this->lng->txt('exc_calc_status_compare_value'), 'status_compare_value');
-        $subitem->setInfo($this->lng->txt('exc_calc_status_compare_info'));
-        $subitem->setSize(5);
-        $subitem->setRequired(true);
-        $item->addSubItem($subitem);
+        $base_abs = new ilRadioOption($this->lng->txt('exc_calc_status_compare_absolute'), ilExCalculate::BASE_ABSOLUTE);
+        $base_abs->setInfo($this->lng->txt('exc_calc_status_compare_absolute_info'));
+        $number = new ilNumberInputGUI($this->lng->txt('exc_calc_status_compare_value'), 'status_compare_value_absolute');
+        $number->setInfo($this->lng->txt('exc_calc_status_compare_info'));
+        $number->setSize(5);
+        $number->setRequired(true);
+        $base_abs->addSubItem($number);
+        $base->addOption($base_abs);
+
+        // percent
+        $base_perc = new ilRadioOption($this->lng->txt('exc_calc_status_compare_percent'), ilExCalculate::BASE_PERCENT);
+        $base_perc->setInfo($this->lng->txt('exc_calc_status_compare_percent_info'));
+        $percent = new ilNumberInputGUI($this->lng->txt('exc_calc_status_compare_value'), 'status_compare_value_percent');
+        $percent->setInfo($this->lng->txt('exc_calc_status_compare_info'));
+        $percent->setSize(5);
+        $percent->setMinValue(0);
+        $percent->setMaxValue(100);
+        $percent->setSuffix('%');
+        $percent->setRequired(true);
+        $base_perc->addSubItem($percent);
+        $base->addOption($base_perc);
 
         // default value
         $subitem = new ilSelectInputGUI($this->lng->txt('exc_calc_status_default'), 'status_default');
@@ -325,7 +346,13 @@ class ilExCalculateGUI
         $values['mark_force_zero'] = $this->calculator->mark_force_zero;
         $values['status_calculate'] = $this->calculator->status_calculate;
         $values['status_compare'] = $this->calculator->status_compare;
-        $values['status_compare_value'] = $this->calculator->status_compare_value;
+        $values['status_compare_base'] = $this->calculator->status_compare_base;
+        if ($this->calculator->status_compare_base == ilExCalculate::BASE_ABSOLUTE) {
+            $values['status_compare_value_absolute'] = $this->calculator->status_compare_value;
+        }
+        else {
+            $values['status_compare_value_percent'] = $this->calculator->status_compare_value * 100;
+        }
         $values['status_default'] = $this->calculator->status_default;
         $form->setValuesByArray($values);
     }
@@ -343,7 +370,13 @@ class ilExCalculateGUI
         $this->calculator->mark_force_zero = (bool) $form->getInput('mark_force_zero');
         $this->calculator->status_calculate = (bool) $form->getInput('status_calculate');
         $this->calculator->status_compare = (string) $form->getInput('status_compare');
-        $this->calculator->status_compare_value = (float) $form->getInput('status_compare_value');
+        $this->calculator->status_compare_base = (string) $form->getInput('status_compare_base');
+        if ($this->calculator->status_compare_base == ilExCalculate::BASE_ABSOLUTE) {
+            $this->calculator->status_compare_value = (float) $form->getInput('status_compare_value_absolute');
+        }
+        else {
+            $this->calculator->status_compare_value = (float) $form->getInput('status_compare_value_percent') / 100;
+        }
         $this->calculator->status_default = (string) $form->getInput('status_default');
         $this->calculator->writeOptions();
     }
