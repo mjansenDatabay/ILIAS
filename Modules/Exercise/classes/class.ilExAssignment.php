@@ -176,7 +176,14 @@ class ilExAssignment
             $this->read();
         }
     }
-            
+
+    // fau: exCalc - add type hint
+    /**
+     * Get the assignments of the exercise
+     * @param $a_exc_id
+     * @return self[]
+     */
+    // fau.
     public static function getInstancesByExercise($a_exc_id)
     {
         global $DIC;
@@ -541,17 +548,22 @@ class ilExAssignment
     }
 
     // fau: exMaxPoints - new function getTitleWithInfo()
+    // fau: exResTime - add parameter for result time
     /**
      * Get the title with basic info in parenthesis
+     * @param $a_with_result_time
      * @return string
      */
-    public function getTitleWithInfo() {
+    public function getTitleWithInfo($a_with_result_time = false) {
         $title_infos = [];
         if ($this->getMandatory()) {
             $title_infos[] = $this->lng->txt("exc_mandatory");
         }
         if ($this->getMaxPoints()) {
             $title_infos[] = sprintf($this->lng->txt('exc_max_x_points'), $this->getMaxPoints());
+        }
+        if ($this->getResultTime() && $a_with_result_time) {
+            $title_infos[] = $this->lng->txt('exc_result_time') . ' ' . ilDatePresentation::formatDate(new ilDateTime($this->getResultTime(), IL_CAL_UNIX));
         }
         $suffix = empty($title_infos) ? '' : ' (' . implode(', ', $title_infos) . ')';
 
@@ -1094,6 +1106,15 @@ class ilExAssignment
     }
 
     /**
+     * Get if the mark/points are numeric
+     * @return bool
+     */
+    public function hasNumericPoints()
+    {
+        return isset($this->max_points);
+    }
+
+    /**
      * Check if a mark is allowed
      * @param $a_mark
      * @return bool
@@ -1102,7 +1123,7 @@ class ilExAssignment
         if (empty($a_mark)) {
             return true;
         }
-        if (isset($this->max_points)) {
+        if ($this->hasNumericPoints()) {
             if (!is_numeric($a_mark)) {
                 return false;
             }

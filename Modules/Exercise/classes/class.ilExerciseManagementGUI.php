@@ -130,11 +130,13 @@ class ilExerciseManagementGUI
         // fau.
 
         switch ($class) {
-            // fau: exManCalc - call calculation GUI
+            // fau: exCalc - call calculation GUI
             case "ilexcalculategui":
-                include_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
-                $calc_gui = new ilExCalculateGUI($this->exercise);
-                $ilTabs->activateTab("grades");
+                require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+                $calc_gui = new ilExCalculateGUI($this->exercise, ilExCalculateGUI::PARENT_GRADING);
+                $this->addSubTabs($calc_gui->getDisplayType() == ilExCalculateGUI::DISPLAY_PARENT ?
+                    'grades' : 'result_calculation');
+                $this->tabs_gui->activateTab("grades");
                 $this->ctrl->setReturn($this, 'showGradesOverview');
                 $this->ctrl->forwardCommand($calc_gui);
                 break;
@@ -324,6 +326,19 @@ class ilExerciseManagementGUI
             $lng->txt("exc_grades_overview"),
             $ilCtrl->getLinkTarget($this, "showGradesOverview")
         );
+
+        // fau: exCalc - add sub tab for calculation
+        require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+        $calcGui = new ilExCalculateGUI($this->exercise,ilExCalculateGUI::PARENT_GRADING);
+        if ($calcGui->canEditSettings()) {
+            $this->tabs_gui->addSubTab(
+                "result_calculation",
+                $this->lng->txt("exc_pass_result_calculation"),
+                $this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui','ilexcalculategui'])
+            );
+        }
+        // fau.
+
         $ilTabs->activateSubTab($a_activate);
         
         $ilCtrl->setParameter($this, "ass_id", $ass_id);
@@ -538,11 +553,15 @@ class ilExerciseManagementGUI
             foreach ($_POST["lcomment"] as $k => $v) {
                 $marks_obj = new ilLPMarks($this->exercise->getId(), (int) $k);
                 $marks_obj->setComment(ilUtil::stripSlashes($v));
-                $marks_obj->setMark(ilUtil::stripSlashes($_POST["mark"][$k]));
+                // fau: exCalc - don't save grade in PASS_MODE_CALC
+                if ($this->exercise->getPassMode() != ilObjExercise::PASS_MODE_CALC) {
+                    $marks_obj->setMark(ilUtil::stripSlashes($_POST["mark"][$k]));
+                }
+                // fau.
                 $marks_obj->update();
 
-                // fau: exManCalc - save the status in manual mode
-                if ($this->exercise->getPassMode() == "man") {
+                // fau: exCalc - save the status in manual mode
+                if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_MANUAL) {
                     ilExerciseMembers::_writeStatus($this->exercise->getId(), $k, $_POST["status"][$k]);
                 }
                 // fau.
@@ -1068,16 +1087,18 @@ class ilExerciseManagementGUI
                 $lng->txt("exc_export_excel"),
                 $ilCtrl->getLinkTarget($this, "exportExcel")
             );
-
-            // fau: exManCalc - add button to calculate the grades
-            if ($this->exercise->getPassMode() == "man") {
-                $ilToolbar->addButton(
-                    $lng->txt("exc_calculate_overall_results"),
-                    $ilCtrl->getLinkTargetByClass("ilExCalculateGUI")
-                );
-            }
-            // fau.
         }
+
+        // fau: exCalc - add button to calculate the results
+        require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+        $calcGUI = new ilExCalculateGUI($this->exercise, ilExCalculateGUI::PARENT_GRADING);
+        if ($calcGUI->canCalculate()) {
+            $button = ilLinkButton::getInstance();
+            $button->setCaption('exc_calculate_overall_results');
+            $button->setUrl($this->ctrl->getLinkTargetByClass(['ilexercisemanagementgui', 'ilexcalculategui'], 'callCalculateAll'));
+            $this->toolbar->addButtonInstance($button);
+        }
+        // fau.
         
         $this->ctrl->setParameter($this, "vw", self::VIEW_GRADES);
 

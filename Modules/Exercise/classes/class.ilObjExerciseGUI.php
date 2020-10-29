@@ -198,7 +198,20 @@ class ilObjExerciseGUI extends ilObjectGUI
                 $crit_gui = new ilExcCriteriaCatalogueGUI($this->object);
                 $this->ctrl->forwardCommand($crit_gui);
                 break;
-                
+
+            //  fau: exCalc - delegate command to calculation gui
+            case "ilexcalculategui":
+                $this->checkPermission("write");
+                require_once("./Modules/Exercise/classes/class.ilExCalculateGUI.php");
+                $ilTabs->activateTab("settings");
+                $this->setSettingsSubTabs();
+                $ilTabs->activateSubTab("result_calculation");
+                $gui = new ilExCalculateGUI($this->object, ilExCalculateGUI::PARENT_SETTINGS);
+                $this->ctrl->setReturn($this, 'edit');
+                $this->ctrl->forwardCommand($gui);
+                break;
+            // fau.
+
             default:
                 if (!$cmd) {
                     $cmd = "infoScreen";
@@ -269,30 +282,34 @@ class ilObjExerciseGUI extends ilObjectGUI
 
         // pass mode
         $radg = new ilRadioGroupInputGUI($this->lng->txt("exc_pass_mode"), "pass_mode");
-    
+
+        // fau: exCalc - use constants and add new pass modes
         $op1 = new ilRadioOption(
             $this->lng->txt("exc_pass_all"),
-            "all",
+            ilObjExercise::PASS_MODE_ALL,
             $this->lng->txt("exc_pass_all_info")
         );
         $radg->addOption($op1);
         $op2 = new ilRadioOption(
             $this->lng->txt("exc_pass_minimum_nr"),
-            "nr",
+            ilObjExercise::PASS_MODE_NR,
             $this->lng->txt("exc_pass_minimum_nr_info")
         );
         $radg->addOption($op2);
 
-        // fau: exManCalc - new pass mode "man"
         $op3 = new ilRadioOption(
+            $this->lng->txt("exc_pass_calc"),
+            ilObjExercise::PASS_MODE_CALC,
+            $this->lng->txt("exc_pass_calc_info")
+        );
+        $radg->addOption($op3);
+
+        $op4 = new ilRadioOption(
             $this->lng->txt("exc_pass_manual"),
-            "man",
+            ilObjExercise::PASS_MODE_MANUAL,
             $this->lng->txt("exc_pass_manual_info")
         );
-        $instruction = new ilTextAreaInputGUI($this->lng->txt("description"), "instruction");
-        $instruction->setInfo($this->lng->txt("exc_pass_manual_description"));
-        $op3->addSubItem($instruction);
-        $radg->addOption($op3);
+        $radg->addOption($op4);
         // fau.
 
         // minimum number of assignments to pass
@@ -308,6 +325,14 @@ class ilObjExerciseGUI extends ilObjectGUI
         $op2->addSubItem($ni);
 
         $a_form->addItem($radg);
+
+
+        // fau: exCalc - add instruction for calculation
+        $instruction = new ilTextAreaInputGUI($this->lng->txt("description"), "instruction");
+        $instruction->setInfo($this->lng->txt("exc_pass_description"));
+        $a_form->addItem($instruction);
+        // fau.
+
 
         // completion by submission
         $subcompl = new ilRadioGroupInputGUI($this->lng->txt("exc_passed_status_determination"), "completion_by_submission");
@@ -415,10 +440,8 @@ class ilObjExerciseGUI extends ilObjectGUI
         if ($a_values["pass_mode"] == "nr") {
             $a_values["pass_nr"] = $this->object->getPassNr();
         }
-        // fau: exManCalc - get value of instruction
-        elseif ($this->object->getPassMode() == "man") {
-            $a_values["instruction"] = $this->object->getInstruction();
-        }
+        // fau: exCalc - get value of instruction
+        $a_values["instruction"] = $this->object->getInstruction();
         // fau.
 
         include_once "./Services/Notification/classes/class.ilNotification.php";
@@ -461,10 +484,8 @@ class ilObjExerciseGUI extends ilObjectGUI
         if ($this->object->getPassMode() == "nr") {
             $this->object->setPassNr($a_form->getInput("pass_nr"));
         }
-        // fau: exManCalc - set the instruction for namual mode
-        elseif ($this->object->getPassMode() == "man") {
-            $this->object->setInstruction($a_form->getInput("instruction"));
-        }
+        // fau: exCalc - set the instruction for pass calculation
+        $this->object->setInstruction($a_form->getInput("instruction"));
         // fau.
 
         $this->object->setCompletionBySubmission($a_form->getInput('completion_by_submission') == 1 ? true : false);
@@ -692,24 +713,12 @@ class ilObjExerciseGUI extends ilObjectGUI
         }
         $info->addProperty($lng->txt("exc_assignments"), $cnt);
         $info->addProperty($lng->txt("exc_mandatory"), $mcnt);
-        // fau: exManCalc - add instruction for manual status
-        if ($this->object->getPassMode() == "man") {
-            $info->addProperty(
-                $lng->txt("exc_pass_mode"),
-                $this->object->getInstruction()
-            );
-        } elseif ($this->object->getPassMode() != "nr") {
-            // fau.
-            $info->addProperty(
-                $lng->txt("exc_pass_mode"),
-                $lng->txt("exc_msg_all_mandatory_ass")
-            );
-        } else {
-            $info->addProperty(
-                $lng->txt("exc_pass_mode"),
-                sprintf($lng->txt("exc_msg_min_number_ass"), $this->object->getPassNr())
-            );
+        // fau: exCalc - get the instruction text from the object
+        $instruction_text = $this->object->getInstructionDisplayText();
+        if (!empty($instruction_text)) {
+            $info->addProperty($lng->txt("exc_pass_mode"), $instruction_text);
         }
+        // fau.
 
         // feedback from tutor
         include_once("Services/Tracking/classes/class.ilLPMarks.php");
@@ -777,13 +786,26 @@ class ilObjExerciseGUI extends ilObjectGUI
             $this->lng->txt("general_settings"),
             $this->ctrl->getLinkTarget($this, "edit")
         );
-        
+
         $this->tabs_gui->addSubTab(
             "crit",
             $this->lng->txt("exc_criteria_catalogues"),
             $this->ctrl->getLinkTargetByClass("ilexccriteriacataloguegui", "")
         );
-        
+
+
+        // fau: exCalc - add tab for calculation settings
+        /** @var ilObjExercise $object */
+        $object = $this->object;
+        if (isset($object) && ($object->getPassMode() == ilObjExercise::PASS_MODE_CALC || $object->getPassMode() == ilObjExercise::PASS_MODE_MANUAL)) {
+            $this->tabs_gui->addSubTab(
+                "result_calculation",
+                $this->lng->txt("exc_pass_result_calculation"),
+                $this->ctrl->getLinkTargetByClass(['ilobjexercisegui','ilexcalculategui'])
+            );
+        }
+        // fau.
+
         include_once "Services/Certificate/classes/class.ilCertificate.php";
         if (ilCertificate::isActive()) {
             $this->tabs_gui->addSubTab(
@@ -966,6 +988,14 @@ class ilObjExerciseGUI extends ilObjectGUI
 
         $mtpl = new ilTemplate("tpl.exc_ass_overview.html", true, true, "Modules/Exercise");
         $mtpl->setVariable("CONTENT", $acc->getHTML());
+
+        // fau: exCalc - add instruction text to the assignments overview
+        $instruction_text = $this->object->getInstructionDisplayText();
+        if (!empty($instruction_text)) {
+            $mtpl->setVariable("TXT_INSTRUCTION", $instruction_text);
+        }
+        // fau.
+
 
         $tpl->setContent($mtpl->get());
     }

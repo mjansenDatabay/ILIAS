@@ -46,6 +46,13 @@ class ilObjExercise extends ilObject
     const TUTOR_FEEDBACK_MAIL = 1;
     const TUTOR_FEEDBACK_TEXT = 2;
     const TUTOR_FEEDBACK_FILE = 4;
+
+    // fau: exCalc - constants for pass mode
+    const PASS_MODE_ALL = 'all';
+    const PASS_MODE_NR = 'nr';
+    const PASS_MODE_CALC = 'calc';
+    const PASS_MODE_MANUAL = 'man';
+    // fau.
     
     /**
      *
@@ -110,7 +117,37 @@ class ilObjExercise extends ilObject
     {
         return $this->instruction;
     }
-    
+
+    // fau: exCalc - new function getInstructionDisplayText()
+    /**
+     * Get the text displayed for instructions
+     * Either the configured itext is taken or a generated text
+     */
+    public function getInstructionDisplayText()
+    {
+        if (!empty($this->getInstruction())) {
+            return $this->getInstruction();
+        }
+        switch ($this->getPassMode()) {
+            case self::PASS_MODE_ALL:
+                return $this->lng->txt("exc_msg_all_mandatory_ass");
+
+            case self::PASS_MODE_NR:
+                return sprintf($this->lng->txt("exc_msg_min_number_ass"), $this->getPassNr());
+
+            case self::PASS_MODE_MANUAL:
+            case self::PASS_MODE_CALC:
+                include_once "./Modules/Exercise/classes/class.ilExCalculate.php";
+                $exCalc = new ilExCalculate($this);
+                $text = $exCalc->getDescriptionText();
+                if (!empty($text)) {
+                    return $text;
+                }
+                return ($this->lng->txt($this->getPassMode() == self::PASS_MODE_MANUAL ? 'exc_pass_manual_info' : 'exc_pass_calc_info'));
+        }
+    }
+    // fau.
+
     /**
      * Set pass mode (all | nr)
      *
@@ -505,6 +542,13 @@ class ilObjExercise extends ilObject
             // fau: exPlag - use effective status
             $stat = $a->getMemberStatus($a_user_id)->getEffectiveStatus();
             // fau.
+
+            // fau: exResTime - force "notgraded" status if result time is not reached
+            if ((int) $a->getResultTime() > time()) {
+                $stat = "notgraded";
+            }
+            // fau.
+
             if ($a->getMandatory() && ($stat == "failed" || $stat == "notgraded")) {
                 $passed_all_mandatory = false;
             }
@@ -523,11 +567,20 @@ class ilObjExercise extends ilObject
             $passed_all_mandatory = false;
         }
 
-        // fau: exManCalc - respect take existing status in "manual" mode
-        if ($this->getPassMode() == "man") {
+        // fau: exCalc - add status determination for calc and manual modes, use constants
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            // trigger a calculation
+            include_once("./Modules/Exercise/classes/class.ilExCalculate.php");
+            $calculator = new ilExCalculate($this);
+            $calculator->calculateResults([$a_user_id]);
+            // lookup the calculation result
             $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
-        } elseif ($this->getPassMode() != "nr") {
-            // fau.
+        }
+        elseif ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+            // lookup the existing status (manually set or previously calculated)
+            $overall_stat = ilExerciseMembers::_lookupStatus($this->getId(), $a_user_id);
+        } elseif ($this->getPassMode() != self::PASS_MODE_NR) {
+        // fau.
             //echo "5";
             $overall_stat = "notgraded";
             if ($failed_a_mandatory) {
@@ -564,11 +617,28 @@ class ilObjExercise extends ilObject
      */
     public function updateUserStatus($a_user_id = 0)
     {
+        // fau: exCalc - prevent an update in PASS_MODE_MANUAL
+        // in PASS_MODE_MANUAL the status is manually set in ilExerciseManagementGUI::saveGradesObject
+        if ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+            return;
+        }
+        // fau.
+
         $ilUser = $this->user;
         
         if ($a_user_id == 0) {
             $a_user_id = $ilUser->getId();
         }
+
+        // fau: exCalc - call calculation directly in PASS_MODE_CALC
+        // in PASS_MODE_CALC the status is written by ilExCalculate
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            include_once("./Modules/Exercise/classes/class.ilExCalculate.php");
+            $calculator = new ilExCalculate($this);
+            $calculator->calculateResults([$a_user_id]);
+            return;
+        }
+        // fau.
 
         $st = $this->determinStatusOfUser($a_user_id);
 
@@ -585,11 +655,29 @@ class ilObjExercise extends ilObject
      */
     public function updateAllUsersStatus()
     {
+        // fau: exCalc - prevent an update in PASS_MODE_MANUAL
+        // in PASS_MODE_MANUAL the status is manually set in ilExerciseManagementGUI::saveGradesObject
+        if ($this->getPassMode() == self::PASS_MODE_MANUAL) {
+            return;
+        }
+        // fau.
+
         if (!is_object($this->members_obj)) {
             $this->members_obj = new ilExerciseMembers($this);
         }
         
         $mems = $this->members_obj->getMembers();
+
+        // fau: exCalc - call calculation directly in PASS_MODE_CALC
+        // in PASS_MODE_CALC the status is written by ilExCalculate
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            include_once("./Modules/Exercise/classes/class.ilExCalculate.php");
+            $calculator = new ilExCalculate($this);
+            $calculator->calculateResults($mems);
+            return;
+        }
+        // fau.
+
         foreach ($mems as $mem) {
             $this->updateUserStatus($mem);
         }
@@ -730,7 +818,7 @@ class ilObjExercise extends ilObject
             reset($ass_data);
             foreach ($ass_data as $ass) {
                 // fau: exPlag - export the effective mark
-                $excel->setCell($row, $col++, $ass->getMemberStatus($user_id)->getEffectiveMark());
+                $excel->setCell($row, $col++, $ass->getMemberStatus($user_id)->getEffectiveMark($ass->hasNumericPoints()));
                 // fau.
             }
             

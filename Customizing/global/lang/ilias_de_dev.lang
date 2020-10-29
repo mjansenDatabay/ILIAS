@@ -530,6 +530,8 @@ dcl#:#dcl_max_import_simulate#:#Die Datei enthält %s Datensätze, aber es könn
 dcl#:#dcl_max_import_done#:#Die Datei enthält %s Datensätze, aber es wurden nur die ersten %s importiert. Wenn Sie mehr Datensätze importieren möchten, teilen Sie Ihre Datei bitte auf.###fau: dcImportLimit
 exc#:#exc_calc_all_calculated#:#Alle Gesamtergebnisse wurden neu berechnet.
 exc#:#exc_calc_calculate#:#Berechnen
+exc#:#exc_calc_settings#:#Einstellungen zur Berechnung des Gesamtergebnisses
+exc#:#exc_calc_settings_update_status#:#Beim Speichern der Einstellungen wird das Gesamtergebnis aller Übungsteilnehmer/innen neu berechnet.
 exc#:#exc_calc_mark_function#:#Noten/Punkte-Berechnung
 exc#:#exc_calc_mark_function_average#:#Durchschnitt
 exc#:#exc_calc_mark_function_average_info#:#Es wird eine Durchschnittsnote der ausgewählten Übungseinheiten gebildet.
@@ -546,6 +548,8 @@ exc#:#exc_calc_mark_select_mandatory#:#Alle verpflichtenden Übungseinheiten
 exc#:#exc_calc_mark_select_marked#:#Alle Übungseinheiten mit Note/Punkten
 exc#:#exc_calc_mark_select_number#:#Festgelegte Anzahl
 exc#:#exc_calc_mark_select_order#:#Auswahl
+exc#:#exc_calc_mark_force_zero#:#Fehlende Werte auf 0 setzen
+exc#:#exc_calc_mark_force_zero_info#:#Nicht bewertete Abgaben oder Übungseinheiten vor dem Ergebnistermin sollen mit 0 Punkten in die Berechnung einfließen.
 exc#:#exc_calc_status#:#Status-Berechnung
 exc#:#exc_calc_status_compare#:#Bestanden, wenn
 exc#:#exc_calc_status_compare_higher#:#größer als der Schwellwert
@@ -555,12 +559,20 @@ exc#:#exc_calc_status_compare_lower#:#kleiner als der Schwellwert
 exc#:#exc_calc_status_compare_lower_equal#:#kleiner oder gleich dem Schwellwert
 exc#:#exc_calc_status_compare_value#:#Schwellwert
 exc#:#exc_calc_status_default#:#Standardwert
-exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamtergebnis leer, wird der Status auf diesen Wert
+exc#:#exc_calc_status_default_info#:#Ist mangels Einzelergebnissen das Gesamtergebnis leer, wird der Status auf diesen Wert gesetzt.
 exc#:#exc_calc_status_info#:#Der "Bestanden"-Status wird anhand der ermittelten Noten/Punkte berechnet.
+exc#:#exc_calc_status_compare_base#:#Vergleichsbasis
+exc#:#exc_calc_status_compare_absolute#:#Absolutwert
+exc#:#exc_calc_status_compare_absolute_info#:#Die berechneten Noten/Punkte werden direkt mit dem Schwellwert verglichen.
+exc#:#exc_calc_status_compare_percent#:#Prozentual
+exc#:#exc_calc_status_compare_percent_info#:#Die berechneten Noten/Punkte werden prozentual mit den gesamt erreichbaren Punkten aller Übungseinheiten verglichen. Das funktioniert nur, wenn alle Übungseinheiten eine maximale Punktzahl vorgegeben haben und bei der Punkteberechnung die Summe gebildet wird.
 exc#:#exc_calculate_overall_results#:#Gesamtergebnisse berechnen
+exc#:#exc_calc_confirm_all#:#Möchten Sie die Gesamtergebnisse aller Übungsteilnehmer neu berechnen?
 exc#:#exc_grade_time#:#Korrekturzeit
-exc#:#exc_grade_time_info#:#Wenn gesetzt, sind Feedback und Bewertung für die Tutoren erst ab einem bestimmten Datum möglich.
+exc#:#exc_grade_time_info#:#In einer Übung mit beschränkten Tutor-Rechten (siehe Einstellungen der Übung), können Kurstutoren die Abgaben und Noten dieser Übungseinheit erst ab dem eingestellten Datum verwenden.
 exc#:#exc_grade_start#:#Korrektur-Start
+exc#:#exc_grade_overview_legend_mandatory#:#Verpflichtende Übungseinheiten sind mit * gekennzeichnet.
+exc#:#exc_grade_overview_legend_restime#:#Übungseinheiten vor dem Veröffentlichungstermin ihrer Ergebnisse sind in Klammern gesetzt.
 exc#:#exc_no_assignments_for_grading#:#Keine Übungseinheiten zur Bewertung verfügbar.
 exc#:#exc_not_available_for_grading#:#Die ausgewählte Übungseinheit ist nicht zur Bewertung verfügbar!
 exc#:#exc_mark#:#Note/Punkte
@@ -572,9 +584,14 @@ exc#:#exc_mark_percent#:#%s (%s %%)
 exc#:#exc_mark_adjusted#:#Die Punkte der folgenden Nutzer wurden an den gültigen Wertebereich angepasst:
 exc#:#exc_multi_feedback_by_submissions_hint#:#Wenn Sie Ihr Feedback direkt als Kommentare in den abgegebenen Dateien (z.B. bei PDFs) geben, können Sie auch mit dem unter "Alle Abgaben herunterladen" Archiv arbeiten.
 exc#:#exc_multi_feedback_by_submissions_warning#:#Sie haben wahrscheinlich das unter "Alle Abgaben herunterladen" bereitgestellte Archiv hochgeladen. Enthalten die Dateien darin ihr Feedback, z.B. als Kommentare? Dann können sie sie als Feedback speichern.
+exc#:#exc_pass_calc#:#Berechnet
+exc#:#exc_pass_calc_info#:#Das Bestehen der Übung und die Gesamtnote werden auf Basis der Teilpunkte automatisch berechnet.
+exc#:#exc_pass_calc_info_tip#:#Die Einstellungen dazu nehmen Sie nach dem Speichern dieser Option auf dem Unter-Reiter "Ergebnisberechnung" vor.
 exc#:#exc_pass_manual#:#Manuell
-exc#:#exc_pass_manual_description#:#Beschreibung der Anforderung auf der Info-Seite
-exc#:#exc_pass_manual_info#:#Das Bestehen der Übung wird durch die Tutoren bestimmt. In der Notenübersicht kann eine automatische Berechnung der Gesamtergebnisse auf Basis der Teilnoten/Punkte erfolgen.
+exc#:#exc_pass_manual_info#:#Das Bestehen der Übung und die Gesamtnote werden durch die Tutoren auf Basis der Teilpunkte bestimmt.
+exc#:#exc_pass_manual_info_tip#:#In der Notenübersicht kann eine automatische Berechnung der Gesamtergebnisse auf Basis der Teilnpunkte erfolgen.
+exc#:#exc_pass_description#:#Beschreibung der Anforderung auf der Info-Seite und der Übersicht der Übungseinheiten. Sie ersetzt eine automatisch generierte Beschreibung.
+exc#:#exc_pass_result_calculation#:#Ergebnisberechnung
 exc#:#exc_result_time#:#Ergebnistermin
 exc#:#exc_result_time_info#:#Wenn gesetzt, können die Bewertung und das Feedback des Tutors erst ab diesem Termin eingesehen werden. Vorher erfolgt auch keine automatische Benachrichtigung.
 exc#:#exc_result_time_should_be_after_end_date#:#Der Ergebnistermin muss nach dem Abgabetermin sein.

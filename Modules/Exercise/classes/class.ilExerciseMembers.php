@@ -312,9 +312,9 @@ class ilExerciseMembers
         return false;
     }
 
-    // fau: exManCalc - new function lookupStatusTime
+    // fau: exCalc - new function lookupStatusTime
     /**
-     * Get time when exercise has been set to solved.
+     * Get the time from the last status update
      */
     public static function _lookupStatusTime($exc_id, $member_id)
     {
@@ -352,9 +352,9 @@ class ilExerciseMembers
         $ilDB->manipulate(
             "UPDATE exc_members SET " .
             " status = " . $ilDB->quote($a_status, "text") .
-            // fim: update the status time
+            // fau: exCalc - update the status time
             ", status_time = " . $ilDB->quote(ilUtil::now(), "timestamp") .
-            // fim.
+            // fau.
             " WHERE obj_id = " . $ilDB->quote($a_obj_id, "integer") .
             " AND usr_id = " . $ilDB->quote($a_user_id, "integer")
         );

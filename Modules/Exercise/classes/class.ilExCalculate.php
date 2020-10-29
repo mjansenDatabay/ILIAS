@@ -1,66 +1,133 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
- * fau: exManCalc - new class for result calculation.
+ * fau: exCalc - new class for result calculation.
  *
- * @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
- * @version $Id$
- *
+ * @author Fred Neumann <fred.neumann@fau.de>
  * @ingroup ModulesExercise
 */
 class ilExCalculate
 {
+    const FUNCTION_AVERAGE = 'average';
+    const FUNCTION_SUM = 'sum';
+
+    const SELECT_MARKED = 'marked';
+    const SELECT_MANDATORY = 'mandatory';
+    const SELECT_NUMBER = 'number';
+
+    const ORDER_HIGHEST = 'highest';
+    const ORDER_LOWEST = 'lowest';
+
+    const COMPARE_LOWER = 'lower';
+    const COMPARE_HIGHER = 'higher';
+    const COMPARE_LOWER_EQUAL= 'lower_equal';
+    const COMPARE_HIGHER_EQUAL = 'higher_equal';
+
+    const BASE_PERCENT = 'percent';
+    const BASE_ABSOLUTE = 'absolute';
+
+    const STATUS_NOTGRADED = 'notgraded';
+    const STATUS_PASSED = 'passed';
+    const STATUS_FAILED = 'failed';
+
+
+    /** @var string  */
+    public $mark_function = self::FUNCTION_AVERAGE;
+
+    /** @var string  */
+    public $mark_select = self::SELECT_MARKED;
+
+    /** @var string  */
+    public $mark_select_order = self::ORDER_HIGHEST;
+
+    /** @var integer */
+    public $mark_select_count = 0;
+
+    /** @var bool  */
+    public $mark_force_zero = false;
+
+    /** @var bool */
+    public $status_calculate = false;
+
+    /** @var string  */
+    public $status_compare = self::COMPARE_HIGHER_EQUAL;
+
+    /** @var float  */
+    public $status_compare_value = 0;
+
+    /** @var string  */
+    public $status_compare_base = self::BASE_ABSOLUTE;
+
+    /** @var string  */
+    public $status_default = self::STATUS_NOTGRADED;
+
     /** @var ilObjExercise */
-    private $object = null;
-    private $options = array();
-    private $assignments = array();
-    private $count_mandatory = 0;
+    protected $exercise;
+
+    /**
+     * @var ilExAssignment[]   indexed by assignment id
+     * @see initAssignments
+     */
+    protected $assignments;
+
     
     /**
-     * constructor
+     * Constructor
      *
-     * @param object	related test object
+     * @param ilObjExercise	$exercise
      */
-    public function __construct($a_object)
+    public function __construct(ilObjExercise $exercise)
     {
-        $this->object = $a_object;
+        $this->exercise = $exercise;
         $this->readOptions();
-        $this->readAssignments();
     }
+
     
     /**
-     * init the options
-     */
-    public function initOptions()
-    {
-        $this->options = array();
-        $this->options['mark_function'] = 'average';		// average | sum
-        $this->options['mark_select'] = 'all';				// all | mandatory | number
-        $this->options['mark_select_count'] = '';			//
-        $this->options['mark_select_order'] = '';			// highest | lowest
-        $this->options['status_calculate'] = '';			// 0 | 1
-        $this->options['status_compare'] = '';				// higher_equal | lower_equal
-        $this->options['status_compare_value'] = '';
-    }
-    
-    
-    /**
-     * read the mycampus options for this test from the database
+     * Read the options for this exercise from the database
      */
     public function readOptions()
     {
         global $DIC;
         $ilDB = $DIC->database();
-        
-        $this->initOptions();
-        
+
         $query = 'SELECT * FROM exc_calc_options WHERE obj_id='
-            . $ilDB->quote($this->object->getId(), 'integer');
+            . $ilDB->quote($this->exercise->getId(), 'integer');
         $result = $ilDB->query($query);
         
         while ($row = $ilDB->fetchAssoc($result)) {
-            $this->options[$row['option_key']] = $row['option_value'];
+            switch($row['option_key']) {
+                case 'mark_function':
+                    $this->mark_function = (string) $row['option_value'];
+                    break;
+                case 'mark_select':
+                    $this->mark_select = (string) $row['option_value'];
+                    break;
+                case 'mark_select_order':
+                    $this->mark_select_order = (string) $row['option_value'];
+                    break;
+                case 'mark_select_count':
+                    $this->mark_select_count = (int) $row['option_value'];
+                    break;
+                case 'mark_force_zero':
+                    $this->mark_force_zero = (bool) $row['option_value'];
+                    break;
+                case 'status_calculate':
+                    $this->status_calculate = (bool) $row['option_value'];
+                    break;
+                case 'status_compare':
+                    $this->status_compare = (string) $row['option_value'];
+                    break;
+                case 'status_compare_value':
+                    $this->status_compare_value = (float) $row['option_value'];
+                    break;
+                case 'status_compare_base':
+                    $this->status_compare_base = (string) $row['option_value'];
+                    break;
+                case 'status_default':
+                    $this->status_default = (string) $row['option_value'];
+                    break;
+            }
         }
     }
     
@@ -74,157 +141,178 @@ class ilExCalculate
         $ilDB = $DIC->database();
         
         $query = 'DELETE FROM exc_calc_options WHERE obj_id='
-            . $ilDB->quote($this->object->getId(), 'integer');
-        
+            . $ilDB->quote($this->exercise->getId(), 'integer');
         $ilDB->manipulate($query);
-        
-        if (count($this->options)) {
-            $insert = array();
-            foreach ($this->options as $key => $value) {
-                $insert[] = array($key, $value);
+
+        $params = [
+            ['mark_function', (string) $this->mark_function],
+            ['mark_select', (string) $this->mark_select],
+            ['mark_select_order', (string) $this->mark_select_order],
+            ['mark_select_count',(string)  $this->mark_select_count],
+            ['mark_force_zero', (string)  $this->mark_force_zero],
+            ['status_calculate', (string) $this->status_calculate],
+            ['status_compare', (string) $this->status_compare],
+            ['status_compare_value', (string) $this->status_compare_value],
+            ['status_compare_base', (string) $this->status_compare_base],
+            ['status_default', (string) $this->status_default],
+        ];
+
+        $query = 'INSERT INTO exc_calc_options(obj_id, option_key, option_value) VALUES ('
+            . $ilDB->quote($this->exercise->getId(), 'integer') . ', ?, ?)';
+
+        $prepared = $ilDB->prepareManip($query, array('text', 'text'));
+        $ilDB->executeMultiple($prepared, $params);
+
+        // trigger status re-calculation
+        if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC) {
+            $this->exercise->updateAllUsersStatus();
+        }
+    }
+
+    /**
+     * TODO: Generate a description text for the Calculation settings
+     */
+    public function getDescriptionText()
+    {
+        return '';
+    }
+
+
+    /**
+     * Init the list of assignments for calculation
+     * Prevent a read in the constructor
+     */
+    protected function initAssignments()
+    {
+        if (!isset($this->assignments)) {
+            $this->assignments = [];
+            foreach(ilExAssignment::getInstancesByExercise($this->exercise->getId()) as $assignment) {
+                $this->assignments[$assignment->getId()] = $assignment;
             }
-            
-            $query = 'INSERT INTO exc_calc_options(obj_id, option_key, option_value) VALUES ('
-                . $ilDB->quote($this->object->getId(), 'integer') . ', ?, ?)';
-    
-            $query = $ilDB->prepareManip($query, array('text', 'text'));
-            $ilDB->executeMultiple($query, $insert);
         }
     }
-    
-    
-    /**
-     * get an option value
-     *
-     * @param 	string	key
-     * @return 	string	value
-     */
-    public function getOption($a_key)
-    {
-        return $this->options[$a_key];
-    }
-    
-    
-    /**
-     * set an option value
-     *
-     * @param 	string	key
-     * @param 	string	value
-     */
-    public function setOption($a_key, $a_value)
-    {
-        $this->options[$a_key] = $a_value;
-    }
 
-    
     /**
-     * calculate the overall results and store them in the learning progress
-     *
-     * @param 	array	list of user ids  (empty for all users)
+     * Get the available member status instances
+     * @param array $a_usr_ids
+     * @return ilExAssignmentMemberStatus[][] indexed by usr_id and ass_ids
      */
-    public function calculateResults($a_usr_ids = array())
+    protected function getMemberStatusInstances($a_usr_ids = [])
     {
-        global $DIC;
-        $ilDB = $DIC->database();
         // get the list of assignments
+        $this->initAssignments();
         $ass_ids = array_keys($this->assignments);
-        
-        // get the list of users
-        if (count($a_usr_ids)) {
-            $usr_ids = $a_usr_ids;
-        } else {
-            $usr_ids = ilExerciseMembers::_getMembers($this->object->getId());
-        }
-        
-        // get the results data for all assignments and selected users
-        $q = "SELECT * FROM exc_mem_ass_status WHERE "
-            . $ilDB->in('ass_id', $ass_ids, false, 'integer') . " AND "
-            . $ilDB->in('usr_id', $usr_ids, false, 'integer');
-        $set = $ilDB->query($q);
 
-        $results = [];
-        while ($rec = $ilDB->fetchAssoc($set)) {
-            $results[$rec['usr_id']][$rec['ass_id']] = $rec;
+        // load the saved states
+        $states = [];
+        foreach (ilExAssignmentMemberStatus::getMultiple($a_usr_ids, $ass_ids) as $status) {
+
+            // treat status as not yet marked if result time is not reached
+            if ((int) $this->assignments[$status->getAssignmentId()]->getResultTime() > time()) {
+                $status->setMark(null);
+                $status->setStatus(self::STATUS_NOTGRADED);
+                $status->setPlagFlag(ilExAssignmentMemberStatus::PLAG_NONE);
+            }
+
+            $states[$status->getUserId()][$status->getAssignmentId()] = $status;
         }
+
+
+        return $states;
+    }
+
+
+    /**
+     * Calculate the overall results and store them in the learning progress
+     * @param int[]  $a_usr_ids list of user ids  (empty for all users)
+     */
+    public function calculateResults($a_usr_ids = [])
+    {
+        // get the list of users
+        $usr_ids = (count($a_usr_ids) ? $a_usr_ids : ilExerciseMembers::_getMembers($this->exercise->getId()));
+
+        // get the status objects
+        $states = $this->getMemberStatusInstances($usr_ids);
         
         // calculate and write the overall mark and status
         foreach ($usr_ids as $usr_id) {
-            $mark = $this->calculateMarkOfUser($results[$usr_id]);
+            $mark = $this->calculateMarkOfUser((array)  $states[$usr_id]);
 
-            $marks_obj = new ilLPMarks($this->object->getId(), $usr_id);
+            $marks_obj = new ilLPMarks($this->exercise->getId(), $usr_id);
             $marks_obj->setMark($mark);
             $marks_obj->update();
             
-            if ($this->options['status_calculate']) {
+            if ($this->status_calculate) {
                 $status = $this->calculateStatusByMark($mark);
             }
             else {
-                $status = ilExerciseMembers::_lookupStatus($this->object->getId(), $usr_id);
+                $status = ilExerciseMembers::_lookupStatus($this->exercise->getId(), $usr_id);
             }
 
             // always save the status to set the current status time
-            ilExerciseMembers::_writeStatus($this->object->getId(), $usr_id, $status);
+            ilExerciseMembers::_writeStatus($this->exercise->getId(), $usr_id, $status);
         }
     }
 
-    
+
     /**
      * calculate the mark depending on assignment results
      *
-     * @param 	array	assignment data of a user ($assignment id -> result array)
+     * @param 	ilExAssignmentMemberStatus[]  $a_states  indexed by assignment id
      * @return	int		calculated mark (or null if mark couldn't be calculated)
      */
-    private function calculateMarkOfUser($a_results)
+    protected function calculateMarkOfUser(array $a_states)
     {
         // lists of marks
-        $selected = array();
-        $candidates = array();
+        $selected = [];
+        $candidates = [];
         
         // pre-selection of results
-        foreach ($a_results as $result) {
-            $mandatory = $this->assignments[$result['ass_id']]['mandatory'];
-            
-            if (!isset($result['mark'])) {
-                if ($mandatory) {
+        foreach ($this->assignments as $ass_id => $assignment) {
+
+            $mark = null;
+            if (isset($a_states[$ass_id])) {
+                $mark = $a_states[$ass_id]->getEffectiveMark(true);
+            }
+
+            // treat not marked results
+            if (!isset($mark)) {
+                if ($this->mark_force_zero) {
+                    $mark = 0;
+                }
+                elseif ($assignment->getMandatory()) {
                     // mandatory mark not available
                     return null;
                 }
-            }
-            else {
-                $mark = str_replace(',', '.', $result['mark']);
-                
-                if (!is_numeric($mark)) {
-                    if ($mandatory) {
-                        // mandatory mark not available
-                        return null;
-                    }
-                    else {
-                        // mark can't be used for calculation
-                        continue;
-                    }
-
-                } elseif ($mandatory) {
-                    $selected[] = $mark;
-
-                } elseif ($this->options['mark_select'] == 'marked') {
-                    $selected[] = $mark;
-
-                } elseif ($this->options['mark_select'] == 'number') {
-                    $candidates[] = $mark;
-
+                else {
+                    // mark can't be used for calculation
+                    continue;
                 }
             }
+
+            if ($assignment->getMandatory()) {
+                // always take the mandatory assignments
+                // this includes the case SELECT_MANDATORY
+                $selected[] = $mark;
+
+            } elseif ($this->mark_select == self::SELECT_MARKED) {
+                $selected[] = $mark;
+
+            } elseif ($this->mark_select == self::SELECT_NUMBER) {
+                $candidates[] = $mark;
+            }
+
         }
 
         // selection of candidates
-        if ($this->options['mark_select'] == 'number') {
-            $needed = $this->options['mark_select_count'];
+        if ($this->mark_select == self::SELECT_NUMBER) {
+            $needed = $this->mark_select_count;
             if (count($selected) + count($candidates) < $needed) {
                 // not enough marks available
                 return null;
             } elseif (count($selected) < $needed) {
                 sort($candidates, SORT_NUMERIC);
-                if ($this->options['mark_select_order'] = 'highest') {
+                if ($this->mark_select_order == self::ORDER_HIGHEST) {
                     $candidates = array_reverse($candidates);
                 }
                 
@@ -239,18 +327,15 @@ class ilExCalculate
         foreach ($selected as $mark) {
             $sum += $mark;
         }
-        switch ($this->options['mark_function']) {
-            case 'sum':
+        switch ($this->mark_function) {
+            case self::FUNCTION_SUM:
                 return $sum;
-                break;
-                
-            case 'average':
+
+            case self::FUNCTION_AVERAGE:
                 return round($sum / count($selected), 2);
-                break;
 
             default:
                 return null;
-                break;
         }
     }
     
@@ -258,53 +343,42 @@ class ilExCalculate
     /**
      * calculate the status depending on the mark
      *
-     * @param 	int 	mark
+     * @param 	float 	$a_mark
      * @return	string	learning progress status
      */
-    private function calculateStatusByMark($a_mark = null)
+    protected function calculateStatusByMark($a_mark = null)
     {
         if (!isset($a_mark)) {
-            return $this->options['status_default'];
+            return $this->status_default;
         }
         
         $mark = (float) $a_mark;
-        $value = (float) $this->options['status_compare_value'];
-        switch ($this->options['status_compare']) {
-            case 'higher':
-                return $mark > $value ? 'passed' : 'failed';
-                break;
-            
-            case 'lower':
-                return $mark < $value ? 'passed' : 'failed';
-                break;
-            
-            case 'higher_equal':
-                return $mark >= $value ? 'passed' : 'failed';
-                break;
 
-            case 'lower_equal':
-                return $mark <= $value ? 'passed' : 'failed';
-                break;
+        if ($this->status_compare_base == self::BASE_ABSOLUTE) {
+            $value = (float) $this->status_compare_value;
         }
-
-        return 'notgraded';
-    }
-    
-    
-    /**
-     * read the assignments data into an indexed array
-     */
-    private function readAssignments()
-    {
-        $ass_data = ilExAssignment::getAssignmentDataOfExercise($this->object->getId());
-        
-        $this->count_mandatory = 0;
-        $this->assignments = array();
-        foreach ($ass_data as $data) {
-            $this->assignments[$data['id']] = $data;
-            if ($data['mandatory']) {
-                $this->count_mandatory++;
+        else {
+            $max = 0;
+            foreach ($this->assignments as $ass) {
+                $max += (int) $ass->getMaxPoints();
             }
+            $value = (float) $max * $this->status_compare_value;
         }
+
+        switch ($this->status_compare) {
+            case self::COMPARE_HIGHER:
+                return $mark > $value ? self::STATUS_PASSED : self::STATUS_FAILED;
+
+            case self::COMPARE_LOWER:
+                return $mark < $value ? self::STATUS_PASSED : self::STATUS_FAILED;
+
+            case self::COMPARE_HIGHER_EQUAL:
+                return $mark >= $value ? self::STATUS_PASSED : self::STATUS_FAILED;
+
+            case self::COMPARE_LOWER_EQUAL:
+                return $mark <= $value ? self::STATUS_PASSED : self::STATUS_FAILED;
+        }
+
+        return self::STATUS_NOTGRADED;
     }
 }
