@@ -61,7 +61,6 @@ class ilExCalculate
     /** @var string  */
     public $status_default = self::STATUS_NOTGRADED;
 
-
     /** @var ilObjExercise */
     protected $exercise;
 
@@ -186,6 +185,7 @@ class ilExCalculate
     protected function initAssignments()
     {
         if (!isset($this->assignments)) {
+            $this->assignments = [];
             foreach(ilExAssignment::getInstancesByExercise($this->exercise->getId()) as $assignment) {
                 $this->assignments[$assignment->getId()] = $assignment;
             }
@@ -216,6 +216,7 @@ class ilExCalculate
 
             $states[$status->getUserId()][$status->getAssignmentId()] = $status;
         }
+
 
         return $states;
     }

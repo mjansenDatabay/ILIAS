@@ -147,8 +147,8 @@ class ilExCalculateGUI
      */
     protected function editSettings()
     {
-        global $DIC;
-
+//        global $DIC;
+//
 //        if ($this->canCalculate()) {
 //            $button = ilLinkButton::getInstance();
 //            $button->setCaption('exc_calculate_overall_results');
@@ -272,6 +272,7 @@ class ilExCalculateGUI
         $number = new ilNumberInputGUI($this->lng->txt('exc_calc_status_compare_value'), 'status_compare_value_absolute');
         $number->setInfo($this->lng->txt('exc_calc_status_compare_info'));
         $number->setSize(5);
+        $number->setDecimals(2);
         $number->setRequired(true);
         $base_abs->addSubItem($number);
         $base->addOption($base_abs);
@@ -284,6 +285,7 @@ class ilExCalculateGUI
         $percent->setSize(5);
         $percent->setMinValue(0);
         $percent->setMaxValue(100);
+        $percent->setDecimals(2);
         $percent->setSuffix('%');
         $percent->setRequired(true);
         $base_perc->addSubItem($percent);

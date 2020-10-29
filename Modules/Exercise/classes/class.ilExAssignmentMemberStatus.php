@@ -415,7 +415,7 @@ class ilExAssignmentMemberStatus
         while ($row = $ilDB->fetchAssoc($result)) {
             $status = new self($row['ass_id'], $row['usr_id']);
             $status->setPropertiesByRow($row);
-            $return[] = $status;
+            $instances[] = $status;
         }
         return $instances;
     }
