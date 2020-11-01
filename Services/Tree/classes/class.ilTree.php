@@ -538,7 +538,13 @@ class ilTree
         // set order_clause if sort order parameter is given
         if (!empty($a_order)) {
             $order_clause = "ORDER BY " . $a_order . " " . $a_direction;
-        } else {
+        }
+        // fau: treeOrderSkip - skip order lft for materialized path trees
+        elseif ($this->getTreeImplementation() instanceof \ilMaterializedPathTree) {
+            $order_clause = '';
+        }
+        // fau.
+        else {
             $order_clause = "ORDER BY " . $this->table_tree . ".lft";
         }
 
@@ -646,17 +652,26 @@ class ilTree
                 $ilDB->quote($a_type, 'text')
             );
         } else {
+            // fau: treeOrderSkip - skip order lft for materialized path trees
+            if ($this->getTreeImplementation() instanceof \ilMaterializedPathTree) {
+               $order_clause = '';
+            }
+            else {
+                $order_clause = "ORDER BY " . $this->table_tree . ".lft";
+            }
+
             $query = sprintf(
                 "SELECT * FROM " . $this->table_tree . " " .
                 $this->buildJoin() .
                 "WHERE parent = %s " .
                 "AND " . $this->table_tree . "." . $this->tree_pk . " = %s " .
                 "AND " . $this->table_obj_data . ".type = %s " .
-                "ORDER BY " . $this->table_tree . ".lft",
+                $order_clause,
                 $ilDB->quote($a_node_id, 'integer'),
                 $ilDB->quote($this->tree_id, 'integer'),
                 $ilDB->quote($a_type, 'text')
             );
+            // fau.
         }
         $res = $ilDB->query($query);
         
@@ -698,7 +713,13 @@ class ilTree
         // set order_clause if sort order parameter is given
         if (!empty($a_order)) {
             $order_clause = "ORDER BY " . $a_order . " " . $a_direction;
-        } else {
+        }
+        // fau: treeOrderSkip - skip order lft for materialized path trees
+        elseif ($this->getTreeImplementation() instanceof \ilMaterializedPathTree) {
+            $order_clause = '';
+        }
+        // fau.
+        else {
             $order_clause = "ORDER BY " . $this->table_tree . ".lft";
         }
         
