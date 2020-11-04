@@ -69,7 +69,7 @@ class ilExSubmissionTestResultGUI extends ilExSubmissionBaseGUI
             $button->setCaption("exc_ass_type_test_open");
             $button->setTarget('_blank');
             $button->setUrl($DIC->ctrl()->getLinkTargetByClass(['ilexsubmissiongui','ilexsubmissiontestresultgui'], 'callTest'));
-            $a_info->addProperty($lng->txt("exc_ass_type_test_select"), $button->render());
+            $a_info->addProperty($lng->txt("exc_ass_type_test_object"), $button->render());
         }
     }
 
