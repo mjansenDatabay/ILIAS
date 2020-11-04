@@ -569,7 +569,7 @@ crs#:#export_lp_comments#:#Comment
 dcl#:#dcl_max_import_simulate#:#The file has %s records, but only %s can be imported in one upload. Please split your file if you need to import more records.###fau: dcImportLimit
 dcl#:#dcl_max_import_done#:#The file has %s records, but only the first %s were imported. Please split your file if you need to import more records.###fau: dcImportLimit
 exc#:#exc_ass_type_test_open#:#Open Test
-exc#:#exc_ass_type_test_open_info#:Your test result will automatically be taken as result sfor this assignment.
+exc#:#exc_ass_type_test_open_info#:#Your test result will automatically be taken as result sfor this assignment.
 exc#:#exc_ass_type_test_object#:#Test Object
 exc#:#exc_ass_type_test_object_info#:#Test object whose status and points are automatically taken over as the evaluation of this assignment. The evaluation is updated with each test run within the submission deadline. Depending on the test settings, the best or last run is evaluated. Please make sure that the test settings match the schedule of this assignment.
 exc#:#exc_calc_all_calculated#:#All overall results have been recalculated.
