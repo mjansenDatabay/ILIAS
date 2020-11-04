@@ -15,6 +15,10 @@ class ilExSubmission
     const TYPE_TEXT = "Text";
     const TYPE_REPO_OBJECT = "RepoObject";	// Wikis
 
+    // fau: exAssTest - add test result submission type
+    const TYPE_TEST_RESULT = "TestResult";
+    // fau.
+
     // fau: exAssHook - add inactive submission type
     const TYPE_INACTIVE = "Inactive";
     // fau.

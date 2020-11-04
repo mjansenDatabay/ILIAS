@@ -57,13 +57,15 @@ class ilExAssignmentTypes
     public function getAllIds()
     {
         // fau: exAssHook - add dummy plugin ids to the type ids
+        // fau: exAssTest - add type for test results
         $ids = [
             ilExAssignment::TYPE_UPLOAD,
             ilExAssignment::TYPE_UPLOAD_TEAM,
             ilExAssignment::TYPE_TEXT,
             ilExAssignment::TYPE_BLOG,
             ilExAssignment::TYPE_PORTFOLIO,
-            ilExAssignment::TYPE_WIKI_TEAM
+            ilExAssignment::TYPE_WIKI_TEAM,
+            ilExAssignment::TYPE_TEST_RESULT
         ];
 
         foreach ($this->getActivePlugins() as $plugin) {
@@ -165,6 +167,13 @@ class ilExAssignmentTypes
                 include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeWikiTeam.php");
                 return new ilExAssTypeWikiTeam();
                 break;
+
+            // fau: exAssTest - get assignment type instance
+            case ilExAssignment::TYPE_TEST_RESULT:
+                include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeTestResult.php");
+                return new ilExAssTypeTestResult();
+                break;
+            // fau.
 
                 // fau: exAssHook - return the type of a plugin for the id
             default:

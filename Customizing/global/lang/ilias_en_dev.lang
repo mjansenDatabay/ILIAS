@@ -568,6 +568,10 @@ crs#:#export_lp_status#:#Status
 crs#:#export_lp_comments#:#Comment
 dcl#:#dcl_max_import_simulate#:#The file has %s records, but only %s can be imported in one upload. Please split your file if you need to import more records.###fau: dcImportLimit
 dcl#:#dcl_max_import_done#:#The file has %s records, but only the first %s were imported. Please split your file if you need to import more records.###fau: dcImportLimit
+exc#:#exc_ass_type_test_open#:#Open Test
+exc#:#exc_ass_type_test_open_info#:Your test result will automatically be taken as result sfor this assignment.
+exc#:#exc_ass_type_test_object#:#Test Object
+exc#:#exc_ass_type_test_object_info#:#Test object whose status and points are automatically taken over as the evaluation of this assignment. The evaluation is updated with each test run within the submission deadline. Depending on the test settings, the best or last run is evaluated. Please make sure that the test settings match the schedule of this assignment.
 exc#:#exc_calc_all_calculated#:#All overall results have been recalculated.
 exc#:#exc_calc_calculate#:#Calculate
 exc#:#exc_calc_settings#:#Settings for Calculation of Overall Results
@@ -691,6 +695,7 @@ exc#:#exc_feedback_notification#:#Notification at Feedback###fau: exNotify
 exc#:#exc_feedback_notification_info#:#Participants get an email notification when a new feedback is available. This setting is used for all participants.###fau: exNotify
 exc#:#exc_settings_feedback_file_info#:#Tutors upload a file. The participant can access the file at the assignment overview.###fau: exNotify
 exc#:#exc_settings_feedback_text_info#:#Tutors type their evaluation in a text field. The participant can view the text is at the assignment overview.###fau: exNotify
+exc#:#exc_type_test_result#:#Test Result
 exercise#:#exc_mark#:#Grade/Points
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.

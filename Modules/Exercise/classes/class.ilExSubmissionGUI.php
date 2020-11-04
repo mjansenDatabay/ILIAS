@@ -6,12 +6,13 @@ include_once "Modules/Exercise/classes/class.ilExSubmission.php";
 
 /**
 * Class ilExSubmissionGUI
-*
 * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
-*
 * @ilCtrl_Calls ilExSubmissionGUI: ilExSubmissionTeamGUI, ilExSubmissionFileGUI
 * @ilCtrl_Calls ilExSubmissionGUI: ilExSubmissionTextGUI, ilExSubmissionObjectGUI
 * @ilCtrl_Calls ilExSubmissionGUI: ilExPeerReviewGUI
+ * fau: exAssTest - add GUI to control structure
+ * @ilCtrl_Calls ilExSubmissionGUI: ilExSubmissionTestResultGUI
+ * fau.
 * @ingroup ModulesExercise
 */
 class ilExSubmissionGUI
@@ -162,7 +163,15 @@ class ilExSubmissionGUI
                 $peer_gui = new ilExPeerReviewGUI($this->assignment, $this->submission);
                 $this->ctrl->forwardCommand($peer_gui);
                 break;
-                
+
+            // fau: exAssTest - forward to submiision gui
+            case "ilexsubmissiontestresultgui":
+                include_once "Modules/Exercise/classes/class.ilExSubmissionTestResultGUI.php";
+                $gui = new ilExSubmissionTestResultGUI($this->exercise, $this->submission);
+                $ilCtrl->forwardCommand($gui);
+                break;
+            // fau.
+
             default:
 
 

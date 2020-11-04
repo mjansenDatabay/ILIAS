@@ -1309,3 +1309,37 @@ if (!$ilDB->tableColumnExists('exc_data', 'feedback_notification')) {
     );
 }
 ?>
+<#80>
+<?php
+/**
+ * fau: exNotify - add column for feedback notification
+ */
+$fields = array(
+    'id' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '4',
+    ),
+    'exercise_id' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '4',
+    ),
+    'test_ref_id' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '4',
+    ),
+);
+if (! $ilDB->tableExists('exc_ass_test_result')) {
+    $ilDB->createTable('exc_ass_test_result', $fields);
+    $ilDB->addPrimaryKey('exc_ass_test_result', array( 'id' ));
+}
+?>
+<#81>
+<?php
+/**
+ * fau: exAssTest - reload control structure
+ */
+$ilCtrlStructureReader->getStructure();
+?>

@@ -59,6 +59,10 @@ class ilExAssignment
     const TYPE_INACTIVE = -1;
     // fau.
 
+    // fau: exAssTest - type for test results
+    const TYPE_TEST_RESULT = 11;
+    // fau.
+
 
     const FEEDBACK_DATE_DEADLINE = 1;
     const FEEDBACK_DATE_SUBMISSION = 2;
@@ -211,6 +215,7 @@ class ilExAssignment
     }
 
     // fau: exGradeTime - new function getInstancesForGrading()
+    // fau: exAssTest - new function getInstancesForGrading()
     /**
      * Get the assignments that are allowed for grading
      * @param int $a_exc_id
@@ -221,7 +226,13 @@ class ilExAssignment
         $assignments = self::getInstancesByExercise($a_exc_id);
         $allowed = [];
         foreach ($assignments as $ass) {
-            if ($ass->checkInGradeTime() || ilObjExerciseAccess::checkExtendedGradingAccess($a_exc_id, false)) {
+            if (ilObjExerciseAccess::checkExtendedGradingAccess($a_exc_id, false)) {
+                $allowed[] = $ass;
+            }
+            elseif($ass->getAssignmentType() instanceof ilExAssTypeTestResult) {
+                continue;
+            }
+            elseif ($ass->checkInGradeTime()) {
                 $allowed[] = $ass;
             }
         }
