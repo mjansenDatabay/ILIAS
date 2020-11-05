@@ -11,7 +11,7 @@ include_once "Modules/Exercise/classes/class.ilExSubmission.php";
 * @ilCtrl_Calls ilExSubmissionGUI: ilExSubmissionTextGUI, ilExSubmissionObjectGUI
 * @ilCtrl_Calls ilExSubmissionGUI: ilExPeerReviewGUI
  * fau: exAssTest - add GUI to control structure
- * @ilCtrl_Calls ilExSubmissionGUI: ilExSubmissionTestResultGUI
+ * @ilCtrl_Calls ilExSubmissionGUI: ilExSubmissionTestResultGUI, ilExSubmissionTestResultTeamGUI
  * fau.
 * @ingroup ModulesExercise
 */
@@ -121,7 +121,11 @@ class ilExSubmissionGUI
                 );
 
                 // forward to type gui
-                if ($this->submission->getSubmissionType() != ilExSubmission::TYPE_REPO_OBJECT) {
+                // fau: exAssTest - don't shw submission tab for test results
+                if ($this->submission->getSubmissionType() != ilExSubmission::TYPE_REPO_OBJECT
+                    && $this->submission->getSubmissionType() != ilExSubmission::TYPE_TEST_RESULT
+                    && $this->submission->getSubmissionType() != ilExSubmission::TYPE_TEST_RESULT_TEAM) {
+                    // fau.
                     $this->tabs_gui->addTab(
                         "submission",
                         $this->lng->txt("exc_submission"),
@@ -164,10 +168,16 @@ class ilExSubmissionGUI
                 $this->ctrl->forwardCommand($peer_gui);
                 break;
 
-            // fau: exAssTest - forward to submiision gui
+            // fau: exAssTest - forward to submission gui
             case "ilexsubmissiontestresultgui":
                 include_once "Modules/Exercise/classes/class.ilExSubmissionTestResultGUI.php";
                 $gui = new ilExSubmissionTestResultGUI($this->exercise, $this->submission);
+                $ilCtrl->forwardCommand($gui);
+                break;
+
+            case "ilexsubmissiontestresultteamgui":
+                include_once "Modules/Exercise/classes/class.ilExSubmissionTestResultTeamGUI.php";
+                $gui = new ilExSubmissionTestResultTeamGUI($this->exercise, $this->submission);
                 $ilCtrl->forwardCommand($gui);
                 break;
             // fau.

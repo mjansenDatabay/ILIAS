@@ -38,8 +38,9 @@ class ilExAssignmentTypesGUI
         ilExAssignment::TYPE_UPLOAD_TEAM => "ilExAssTypeUploadTeamGUI",
         ilExAssignment::TYPE_TEXT => "ilExAssTypeTextGUI",
         ilExAssignment::TYPE_WIKI_TEAM => "ilExAssTypeWikiTeamGUI",
-        // fau: exAssTest - add tst result type gui
-        ilExAssignment::TYPE_TEST_RESULT => "ilExAssTypeTestResultGUI"
+        // fau: exAssTest - add test result type gui
+        ilExAssignment::TYPE_TEST_RESULT => "ilExAssTypeTestResultGUI",
+        ilExAssignment::TYPE_TEST_RESULT_TEAM => "ilExAssTypeTestResultTeamGUI"
         // fau.
     );
 
@@ -114,7 +115,13 @@ class ilExAssignmentTypesGUI
                 include_once("./Modules/Exercise/AssignmentTypes/GUI/classes/class.ilExAssTypeTestResultGUI.php");
                 return new ilExAssTypeTestResultGUI();
                 break;
-             // fau.
+
+            case ilExAssignment::TYPE_TEST_RESULT_TEAM:
+                include_once("./Modules/Exercise/AssignmentTypes/GUI/classes/class.ilExAssTypeTestResultTeamGUI.php");
+                return new ilExAssTypeTestResultTeamGUI();
+                break;
+
+            // fau.
 
             // fau: exAssHook - return the type of a plugin for the id
             default:

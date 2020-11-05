@@ -46,6 +46,13 @@ class ilExcAssMemberState
      */
     protected $assignment;
 
+    // fau: exAssTest - class variable for team
+    /**
+     * @var ilExAssignmentTeam|null
+     */
+    protected $team;
+    // fau.
+
     /**
      * @var int either user id or team id, if this is a team assignment and the user is member of a team, in this case is_team is true
      */
@@ -78,7 +85,9 @@ class ilExcAssMemberState
 
         // check team status
         $this->is_team = false;
-        if ($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM) {
+        // fau: exAssTest - newer check for teams, set team property
+        if ($this->assignment->getAssignmentType()->usesTeams() && isset($a_team)) {
+            $this->team = $a_team;
             if ($a_team->getId()) {
                 $this->member_id = $a_team->getId();
                 $this->team_id = $a_team->getId();
@@ -111,7 +120,9 @@ class ilExcAssMemberState
         $member_id = $user->getId();
         $is_team = false;
         $team = null;
-        if ($ass->getType() == ilExAssignment::TYPE_UPLOAD_TEAM) {		// better move this to ilExcIndividualDeadline
+        // fau: exAssTest - newer check for teams
+        if ($ass->getAssignmentType()->usesTeams()) {		// better move this to ilExcIndividualDeadline
+        // fau.
             include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
             $team = ilExAssignmentTeam::getInstanceByUserId($a_ass_id, $user->getId());
             if ($team->getId()) {
@@ -146,7 +157,26 @@ class ilExcAssMemberState
     {
         return $this->idl;
     }
-    
+
+    // fau: exAssTest - new function to tet the team from the member state
+    /**
+     * Check if user is in team
+     * @return bool
+     */
+    public function isInTeam()
+    {
+        return !empty($this->team_id);
+    }
+
+    /**
+     * Get the team object
+     * @return ilExAssignmentTeam | null
+     */
+    public function getTeamObject()
+    {
+        return $this->team;
+    }
+    // fau.
     
     /**
      * Get general start

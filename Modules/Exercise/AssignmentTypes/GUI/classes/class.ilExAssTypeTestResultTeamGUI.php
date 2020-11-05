@@ -1,12 +1,12 @@
 <?php
-// fau: exAssTest - new class ilExAssTypeTestResultGUI.
+// fau: exAssTest - new class ilExAssTypeTestResultTeamGUI.
 
 require_once(__DIR__ . "/class.ilExAssTypeTestResultBaseGUI.php");
 
 /**
- * Test Result assignment type gui implementation
+ * Test Result assignment type base gui implementation
  */
-class ilExAssTypeTestResultGUI extends ilExAssTypeTestResultBaseGUI implements ilExAssignmentTypeGUIInterface
+class ilExAssTypeTestResultTeamGUI extends ilExAssTypeTestResultBaseGUI implements ilExAssignmentTypeGUIInterface
 {
     /**
      * Constructor

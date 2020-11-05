@@ -1,15 +1,15 @@
 <?php
-// fau: exAssTest - new class ilExSubmissionTestResultGUI.
+// fau: exAssTest - new class ilExSubmissionTestResultTeamGUI.
 
 require_once(__DIR__ . "/class.ilExSubmissionTestResultBaseGUI.php");
 
 /**
- * Test result based submissions for single users (copies status and mark from the test)
+ * Test result based submissions for teams (copies status and mark from the test)
  *
- * @ilCtrl_Calls ilExSubmissionTestResultGUI:
+ * @ilCtrl_Calls ilExSubmissionTestResultTeamGUI:
  * @ingroup ModulesExercise
  */
-class ilExSubmissionTestResultGUI extends ilExSubmissionTestResultBaseGUI
+class ilExSubmissionTestResultTeamGUI extends ilExSubmissionTestResultBaseGUI
 {
     /**
      * @var ilObjUser

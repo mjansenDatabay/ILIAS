@@ -2,11 +2,10 @@
 // fau: exAssTest - new assignment type for test results
 
 include_once("./Modules/Exercise/AssignmentTypes/classes/interface.ilExAssignmentTypeInterface.php");
-
 /**
  * ILIAS test result as assignment type type
  */
-class ilExAssTypeTestResult implements ilExAssignmentTypeInterface
+class ilExAssTypeTestResultTeam implements ilExAssignmentTypeInterface
 {
     /**
      * @var ilLanguage
@@ -40,7 +39,7 @@ class ilExAssTypeTestResult implements ilExAssignmentTypeInterface
      */
     public function usesTeams()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -58,7 +57,7 @@ class ilExAssTypeTestResult implements ilExAssignmentTypeInterface
     {
         $lng = $this->lng;
 
-        return $lng->txt("exc_type_test_result");
+        return $lng->txt("exc_type_test_result_team");
     }
 
     /**
@@ -66,7 +65,7 @@ class ilExAssTypeTestResult implements ilExAssignmentTypeInterface
      */
     public function getSubmissionType()
     {
-        return ilExSubmission::TYPE_TEST_RESULT;
+        return ilExSubmission::TYPE_TEST_RESULT_TEAM;
     }
 
     /**

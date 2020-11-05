@@ -134,17 +134,25 @@ class ilExAssTypeTestResultAssignment extends ActiveRecord
 
         if ($state->isSubmissionAllowed()) {
 
-
-            $status = new ilExAssignmentMemberStatus($this->getId(), $user_id);
-            $status->setStatus($passed ? 'passed' : 'failed');
-            $status->setReturned(1);
-            $status->setMark($points);
-            $status->setComment($mark_official);
-            $status->setNotice($mark_official);
-            if ($status->getFeedback() == null) {
-                $status->setFeedback(0);
+            if ($state->isInTeam()) {
+                $user_ids = $state->getTeamObject()->getMembers();
             }
-            $status->update();
+            else {
+                $user_ids = [$user_id];
+            }
+
+            foreach ($user_ids as $user_id) {
+                $status = new ilExAssignmentMemberStatus($this->getId(), $user_id);
+                $status->setStatus($passed ? 'passed' : 'failed');
+                $status->setReturned(1);
+                $status->setMark($points);
+                $status->setComment($mark_official);
+                $status->setNotice($mark_official);
+                if ($status->getFeedback() == null) {
+                    $status->setFeedback(0);
+                }
+                $status->update();
+            }
         }
     }
 }

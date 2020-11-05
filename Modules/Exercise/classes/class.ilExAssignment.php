@@ -61,6 +61,7 @@ class ilExAssignment
 
     // fau: exAssTest - type for test results
     const TYPE_TEST_RESULT = 11;
+    const TYPE_TEST_RESULT_TEAM = 12;
     // fau.
 
 
@@ -229,7 +230,8 @@ class ilExAssignment
             if (ilObjExerciseAccess::checkExtendedGradingAccess($a_exc_id, false)) {
                 $allowed[] = $ass;
             }
-            elseif($ass->getAssignmentType() instanceof ilExAssTypeTestResult) {
+            elseif ($ass->getAssignmentType() instanceof ilExAssTypeTestResult ||
+                    $ass->getAssignmentType() instanceof ilExAssTypeTestResultTeam) {
                 continue;
             }
             elseif ($ass->checkInGradeTime()) {

@@ -65,7 +65,8 @@ class ilExAssignmentTypes
             ilExAssignment::TYPE_BLOG,
             ilExAssignment::TYPE_PORTFOLIO,
             ilExAssignment::TYPE_WIKI_TEAM,
-            ilExAssignment::TYPE_TEST_RESULT
+            ilExAssignment::TYPE_TEST_RESULT,
+            ilExAssignment::TYPE_TEST_RESULT_TEAM
         ];
 
         foreach ($this->getActivePlugins() as $plugin) {
@@ -172,6 +173,11 @@ class ilExAssignmentTypes
             case ilExAssignment::TYPE_TEST_RESULT:
                 include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeTestResult.php");
                 return new ilExAssTypeTestResult();
+                break;
+
+            case ilExAssignment::TYPE_TEST_RESULT_TEAM:
+                include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeTestResultTeam.php");
+                return new ilExAssTypeTestResultTeam();
                 break;
             // fau.
 

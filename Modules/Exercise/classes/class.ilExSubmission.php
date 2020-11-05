@@ -17,6 +17,7 @@ class ilExSubmission
 
     // fau: exAssTest - add test result submission type
     const TYPE_TEST_RESULT = "TestResult";
+    const TYPE_TEST_RESULT_TEAM = "TestResultTeam";
     // fau.
 
     // fau: exAssHook - add inactive submission type
