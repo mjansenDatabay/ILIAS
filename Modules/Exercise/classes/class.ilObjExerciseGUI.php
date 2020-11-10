@@ -723,11 +723,13 @@ class ilObjExerciseGUI extends ilObjectGUI
         // feedback from tutor
         include_once("Services/Tracking/classes/class.ilLPMarks.php");
         if ($this->checkPermissionBool("read")) {
-            $lpcomment = ilLPMarks::_lookupComment($ilUser->getId(), $this->object->getId());
-            $mark = ilLPMarks::_lookupMark($ilUser->getId(), $this->object->getId());
+            // fau: exCalc - determine status of user before mark is looked up
             //$status = ilExerciseMembers::_lookupStatus($this->object->getId(), $ilUser->getId());
             $st = $this->object->determinStatusOfUser($ilUser->getId());
             $status = $st["overall_status"];
+            $lpcomment = ilLPMarks::_lookupComment($ilUser->getId(), $this->object->getId());
+            $mark = ilLPMarks::_lookupMark($ilUser->getId(), $this->object->getId());
+            // fau.
             if ($lpcomment != "" || $mark != "" || $status != "notgraded") {
                 $info->addSection($this->lng->txt("exc_feedback_from_tutor"));
                 if ($lpcomment != "") {
