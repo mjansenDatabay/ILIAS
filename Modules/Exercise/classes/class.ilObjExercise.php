@@ -528,26 +528,26 @@ class ilObjExercise extends ilObject
         if ($a_user_id == 0) {
             $a_user_id = $ilUser->getId();
         }
-        
+
         include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
         $ass = ilExAssignment::getInstancesByExercise($this->getId());
-        
+
         $passed_all_mandatory = true;
         $failed_a_mandatory = false;
         $cnt_passed = 0;
         $cnt_notgraded = 0;
         $passed_at_least_one = false;
-        
-        foreach ($ass as $a) {
-            // fau: exPlag - use effective status
-            $stat = $a->getMemberStatus($a_user_id)->getEffectiveStatus();
-            // fau.
 
-            // fau: exResTime - force "notgraded" status if result time is not reached
+        // fau: exResTime - force "notgraded" status if result time is not reached
+        // fau: exPlag - use effective status
+        $result_time_open = false;
+        foreach ($ass as $a) {
+            $stat = $a->getMemberStatus($a_user_id)->getEffectiveStatus();
+
             if ((int) $a->getResultTime() > time()) {
                 $stat = "notgraded";
+                $result_time_open = true;
             }
-            // fau.
 
             if ($a->getMandatory() && ($stat == "failed" || $stat == "notgraded")) {
                 $passed_all_mandatory = false;
@@ -562,7 +562,8 @@ class ilObjExercise extends ilObject
                 $cnt_notgraded++;
             }
         }
-        
+        // fau.
+
         if (count($ass) == 0) {
             $passed_all_mandatory = false;
         }
@@ -603,13 +604,24 @@ class ilObjExercise extends ilObject
                 $overall_stat = "passed";
             }
         }
-        
+
+        // fau: exResTime - provide info about open result time and preliminary status
+        $preliminary_stat = $overall_stat;
+        if ($this->getPassMode() == self::PASS_MODE_CALC) {
+            $preliminary_stat = $calculator->calculatePreliminaryStatus($a_user_id);
+        }
+        if ($result_time_open) {
+            $overall_stat = "notgraded";
+        }
         $ret = array(
+            "result_time_open" => $result_time_open,
+            "preliminary_status" => $preliminary_stat,
             "overall_status" => $overall_stat,
             "failed_a_mandatory" => $failed_a_mandatory);
         //echo "<br>p:".$cnt_passed.":ng:".$cnt_notgraded;
         //var_dump($ret);
         return $ret;
+        // fau.
     }
     
     /**

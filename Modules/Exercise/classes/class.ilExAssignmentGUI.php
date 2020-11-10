@@ -159,19 +159,24 @@ class ilExAssignmentGUI
 
         // status icon
         // fau: exResTime - don't show the result status before the result time is reached
-        $stat = "not_attempted";
-        $pic = "scorm/not_attempted.svg";
+        // fau: exPlag - use effective status and icon
+        // fau: exAssTest - check a status that is set without submission
         if ((int) $a_ass->getResultTime() <= time()) {
-            // fau: exPlag - use effective status and icon
+            // after result time: show real status
             $stat = $a_ass->getMemberStatus()->getEffectiveStatus();
-            // fau.
             $pic = $a_ass->getMemberStatus()->getStatusIcon();
         }
-        if ($stat != "passed" and $stat != "failed") {
+        else {
+            // before result time: show real status
             $submission = new ilExSubmission($a_ass, $this->user->getId());
-            if ($submission->hasSubmitted()) {
+            if ($submission->hasSubmitted()
+                || $a_ass->getMemberStatus()->getEffectiveStatus() != "notgraded") {
                 $stat = "notgraded";
                 $pic = "scorm/running.svg";
+            }
+            else {
+                $stat = "not_attempted";
+                $pic = "scorm/not_attempted.svg";
             }
         }
         // fau.

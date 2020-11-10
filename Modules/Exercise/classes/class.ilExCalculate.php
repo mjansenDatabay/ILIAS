@@ -242,7 +242,10 @@ class ilExCalculate
             $marks_obj->setMark($mark);
             $marks_obj->update();
             
-            if ($this->status_calculate) {
+            if ($this->hasOpenResultTime()) {
+                $status = self::STATUS_NOTGRADED;
+            }
+            elseif ($this->status_calculate) {
                 $status = $this->calculateStatusByMark($mark);
             }
             else {
@@ -252,6 +255,38 @@ class ilExCalculate
             // always save the status to set the current status time
             ilExerciseMembers::_writeStatus($this->exercise->getId(), $usr_id, $status);
         }
+    }
+
+    /**
+     * Calculate the the preliminary status of a user (this is not saved)
+     * @param int  $a_usr_id
+     * @return string  $status
+     */
+    public function calculatePreliminaryStatus($a_usr_id)
+    {
+        if ($this->status_calculate) {
+            $states = $this->getMemberStatusInstances([$a_usr_id]);
+            $mark = $this->calculateMarkOfUser((array)  $states[$a_usr_id]);
+            return $this->calculateStatusByMark($mark);
+        }
+        else {
+            return ilExerciseMembers::_lookupStatus($this->exercise->getId(), $a_usr_id);
+        }
+    }
+
+    /**
+     * Check if at least one assignment has a not yet reached result time
+     * @return bool
+     */
+    protected function hasOpenResultTime()
+    {
+        $this->initAssignments();
+        foreach ($this->assignments as $ass) {
+            if ((int) $ass->getResultTime() > time()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

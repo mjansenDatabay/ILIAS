@@ -658,6 +658,11 @@ exc#:#exc_settings_feedback_text_info#:#Tutoren geben ihre Rückmeldungen in ein
 exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Dem jeweiligen Teilnehmer wird die Datei in der Übungseinheiten-Übersicht angezeigt.###fau: exNotify
 exc#:#exc_type_test_result#:#Testergebnis (Einzelnutzer)
 exc#:#exc_type_test_result_team#:#Testergebnis (als Team)
+exc#:#exc_result_time_open_info#:#Bei mindestens einer Übungseinheit ist der Termin zur Bekanntgabe des Ergebnisses noch nicht erreicht. Der effektive Lernfortschritt dieser Übung ist daher "In Bearbeitung".
+exc#:#exc_preliminary_info#:#Sie sehen hier eine vorläufige Bewertung aus den bereits bekannt gegebenen Übungseinheiten.
+exc#:#exc_preliminary_mark#:#Vorläufige Note/Nunkte
+exc#:#exc_preliminary_status#:#Vorläufiger Status
+exc#:#exc_notgraded#:#Nicht bewertet
 exercise#:#exc_mark#:#Note/Punkte
 grp#:#crs_grp_info_reg#:#Sie können nur Mitglied in einem der folgenden Kurse werden:
 grp#:#group_req_direct_studycond#:#Direkter Beitritt (sonst Aufnahmeantrag) für folgende Studierende:<p class="small">%s</p>
