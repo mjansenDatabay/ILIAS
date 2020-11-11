@@ -356,6 +356,10 @@ class ilExCalculate
                 }
             }
         }
+
+        if (count($selected) == 0) {
+            return null;
+        }
         
         // calculation of the mark
         $sum = 0;
