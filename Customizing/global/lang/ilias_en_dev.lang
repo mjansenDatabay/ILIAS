@@ -699,11 +699,12 @@ exc#:#exc_settings_feedback_file_info#:#Tutors upload a file. The participant ca
 exc#:#exc_settings_feedback_text_info#:#Tutors type their evaluation in a text field. The participant can view the text is at the assignment overview.###fau: exNotify
 exc#:#exc_type_test_result#:#Test Result (Single User)
 exc#:#exc_type_test_result_team#:#Test Result (as Team)
-exc#:#exc_result_time_open_info#:#At least one exercise unit has not yet reached the date for announcing the result. The effective learning progress of this exercise is therefore "In progress".
+exc#:#exc_result_time_open_info#:#At least one exercise unit has not yet reached the date for announcing the result. The effective status of this exercise is therefore "In progress".
 exc#:#exc_result_time_open_info#:#Here you see a preliminary result from the already announced exercise units.
 exc#:#exc_preliminary_mark#:#Preliminary Grade/Points
 exc#:#exc_preliminary_status#:#Preliminary Status
 exc#:#exc_notgraded#:#Not Graded
+exc#:#exc_incomplete#:#In Progress
 exercise#:#exc_mark#:#Grade/Points
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.
