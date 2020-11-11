@@ -376,6 +376,7 @@ class ilObjGroupAccess extends ilObjectAccess
         }
 
         // fim: [meminf] get info about membership limitations and subscription status
+        // fau: fairSub - always query for the free places - info is also used on subscription plage
         global $ilAccess;
         include_once './Modules/Group/classes/class.ilGroupParticipant.php';
         include_once './Modules/Group/classes/class.ilGroupWaitingList.php';
@@ -393,15 +394,13 @@ class ilObjGroupAccess extends ilObjectAccess
             $show_hidden_notice = false;
         }
 
+        $max_members = $info['reg_info_max_members'];
+        $members = $partObj->getNumberOfMembers();
+        $free_places = max($max_members - $members, 0);
+        $info['reg_info_free_places'] = $free_places;
+        $waiting = ilGroupWaitingList::lookupListSize($a_obj_id);
 
         if ($show_mem_limit) {
-            $max_members = $info['reg_info_max_members'];
-            $members = $partObj->getNumberOfMembers();
-            $free_places = max($max_members - $members, 0);
-            $info['reg_info_free_places'] = $free_places;
-
-            $waiting = ilGroupWaitingList::lookupListSize($a_obj_id);
-
             $limits = array();
             if ($show_hidden_notice) {
                 $limits[] = $lng->txt("mem_max_users_hidden");
@@ -435,6 +434,7 @@ class ilObjGroupAccess extends ilObjectAccess
             $info['reg_info_list_prop_status']['value'] = $status;
         }
         // fim.
+        // fau.
 
         return $info;
     }
