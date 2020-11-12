@@ -425,13 +425,15 @@ class ilExAssignmentMemberStatus
     {
         return array(
             "notice" => array("text", $this->getNotice())
-            ,"returned" => array("integer", $this->getReturned())
+            // fau: fixExStatusUpdate - prevent null for saving returned and fedback flags
+            ,"returned" => array("integer", (int) $this->getReturned())
             ,"solved" => array("integer", $this->getSolved())
             ,"status_time" => array("timestamp", $this->getStatusTime())
             ,"sent" => array("integer", $this->getSent())
             ,"sent_time" => array("timestamp", $this->getSentTime())
             ,"feedback_time" => array("timestamp", $this->getFeedbackTime())
-            ,"feedback" => array("integer", $this->getFeedback())
+            ,"feedback" => array("integer", (int) $this->getFeedback())
+            // fau.
             ,"status" => array("text", $this->getStatus())
             ,"mark" => array("text", $this->getMark())
             ,"u_comment" => array("text", $this->getComment())
