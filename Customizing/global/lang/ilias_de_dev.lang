@@ -534,6 +534,10 @@ exc#:#exc_ass_type_test_open_label#:#Abgabe
 exc#:#exc_ass_type_test_open_no_team#:#Sie müssen erst ein Team bilden oder in ein Team aufgenommen werden, um den Test dieser Übungseinheit durchzuführen.
 exc#:#exc_ass_type_test_object#:#Test-Objekt
 exc#:#exc_ass_type_test_object_info#:#Test-Objekt, dessen Status und Punkte automatisch als Bewertung dieser Einheit übernommen werden. Die Bewertung wird mit jedem Testdurchlauf innerhalb der Abgabefrist aktualisiert. Dabei wird je nach Testeinstellung der beste oder letzte Durchlauf gewertet. Bitte stellen Sie sicher, dass die Testeinstellungen zum Terminplan dieser Einhalt passen.
+exc#:#exc_ass_type_test_sync_label#:#Für Administratoren
+exc#:#exc_ass_type_test_sync#:#Testergebnisse synchronisieren
+exc#:#exc_ass_type_test_sync_info#:#Die vorhandenen Testergebnisse aller Teilnehmer werden neu übertragen. Bei Teams wird das späteste Testergebnis für alle Mitglieder verwendet.
+exc#:#exc_ass_type_test_synced#:#Die Testergebnisse wurden synchronisiert.
 exc#:#exc_calc_all_calculated#:#Alle Gesamtergebnisse wurden neu berechnet.
 exc#:#exc_calc_calculate#:#Berechnen
 exc#:#exc_calc_settings#:#Einstellungen zur Berechnung des Gesamtergebnisses

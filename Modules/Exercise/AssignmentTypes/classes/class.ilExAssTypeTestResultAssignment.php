@@ -127,15 +127,20 @@ class ilExAssTypeTestResultAssignment extends ActiveRecord
      * @param string $mark_short
      * @param string $mark_official
      * @param int $tstamp
+     * @return array    affected user ids
      */
     public function submitResult($user_id, $passed, $points, $mark_short, $mark_official, $tstamp)
     {
         $state = ilExcAssMemberState::getInstanceByIds($this->getId(), $user_id);
 
+        $user_ids = [];
         if ($state->isSubmissionAllowed()) {
 
             if ($state->isInTeam()) {
                 $user_ids = $state->getTeamObject()->getMembers();
+            }
+            elseif (!empty($state->getTeamObject())) {
+                $user_ids = [];
             }
             else {
                 $user_ids = [$user_id];
@@ -154,5 +159,7 @@ class ilExAssTypeTestResultAssignment extends ActiveRecord
                 $status->update();
             }
         }
+
+        return $user_ids;
     }
 }

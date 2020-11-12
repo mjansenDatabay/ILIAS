@@ -64,18 +64,25 @@ abstract class ilExSubmissionTestResultBaseGUI extends ilExSubmissionBaseGUI
         // no team yet
         if ($a_submission->getSubmissionType() == ilExSubmission::TYPE_TEST_RESULT_TEAM && $a_submission->hasNoTeamYet()) {
             $a_info->addProperty($lng->txt("exc_ass_type_test_open_label"), $lng->txt("exc_ass_type_test_open_no_team"));
-            return;
+        }
+        else {
+            $assTest =  $assTest = ilExAssTypeTestResultAssignment::findOrGetInstance($a_submission->getAssignment()->getId());
+
+            if ($a_submission->canSubmit() && !empty($assTest->getTestRefId())) {
+                $button = ilLinkButton::getInstance();
+                $button->setPrimary(true);
+                $button->setCaption("exc_ass_type_test_open");
+                $button->setTarget('_blank');
+                $button->setUrl($DIC->ctrl()->getLinkTargetByClass(['ilexsubmissiongui',strtolower(get_called_class())], 'callTest'));
+                $a_info->addProperty($lng->txt("exc_ass_type_test_open_label"), '<p>' .$lng->txt("exc_ass_type_test_open_info"). '</p>'. $button->render());
+            }
         }
 
-        $assTest =  $assTest = ilExAssTypeTestResultAssignment::findOrGetInstance($a_submission->getAssignment()->getId());
-
-        if ($a_submission->canSubmit() && !empty($assTest->getTestRefId())) {
+        if (ilObjExerciseAccess::checkExtendedGradingAccess($a_submission->getAssignment()->getExerciseId(), false)) {
             $button = ilLinkButton::getInstance();
-            $button->setPrimary(true);
-            $button->setCaption("exc_ass_type_test_open");
-            $button->setTarget('_blank');
-            $button->setUrl($DIC->ctrl()->getLinkTargetByClass(['ilexsubmissiongui',strtolower(get_called_class())], 'callTest'));
-            $a_info->addProperty($lng->txt("exc_ass_type_test_open_label"), '<p>' .$lng->txt("exc_ass_type_test_open_info"). '</p>'. $button->render());
+            $button->setCaption("exc_ass_type_test_sync");
+            $button->setUrl($DIC->ctrl()->getLinkTargetByClass(['ilexsubmissiongui',strtolower(get_called_class())], 'syncTestResults'));
+            $a_info->addProperty($lng->txt("exc_ass_type_test_sync_label"),  $button->render() .'<p class="info">' .$lng->txt("exc_ass_type_test_sync_info"). '</p>');
         }
     }
 
@@ -100,5 +107,48 @@ abstract class ilExSubmissionTestResultBaseGUI extends ilExSubmissionBaseGUI
             }
             $this->ctrl->redirectToURL(ilLink::_getLink($assTest->getTestRefId(), 'tst'));
         }
+    }
+
+    /**
+     * Synchronize the test results of all participants
+     */
+    public function syncTestResults() {
+        if (!ilObjExerciseAccess::checkExtendedGradingAccess($this->assignment->getExerciseId(), false)) {
+            ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+            $this->returnToParentObject();
+        }
+
+        $assTest =  $assTest = ilExAssTypeTestResultAssignment::findOrGetInstance($this->assignment->getId());
+        $testObj = new ilObjTest($assTest->getTestRefId());
+        $partList = $testObj->getActiveParticipantList();
+        $members = new ilExerciseMembers($this->exercise);
+
+        $users = array_intersect($partList->getAllUserIds(), $members->getMembers());
+
+        $synced = [];
+        foreach ($users as $user_id) {
+            $results = $testObj->getResultsForActiveId($partList->getParticipantByUsrId($user_id)->getActiveId());
+
+            // check if user is already synced by a team member, keep a newer result time
+            if (isset($synced[$user_id]) && $synced[$user_id] > $results['tstamp']) {
+                continue;
+            }
+
+            $affected = $assTest->submitResult($user_id,
+                $results['passed'],
+                $results['reached_points'],
+                $results['mark_short'],
+                $results['mark_official'],
+                $results['tstamp']
+            );
+
+            // store the result time for check with other team members
+            foreach ($affected as $affected_id) {
+                $synced[$affected_id] = $results['tstamp'];
+            }
+        }
+
+        ilUtil::sendSuccess($this->lng->txt('exc_ass_type_test_synced'), true);
+        $this->returnToParentObject();
     }
 }

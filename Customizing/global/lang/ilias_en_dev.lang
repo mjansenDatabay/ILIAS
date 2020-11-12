@@ -574,6 +574,10 @@ exc#:#exc_ass_type_test_open_label#:#Abgabe
 exc#:#exc_ass_type_test_open_no_team#:#You must form a team or be added to a team in order to run the test of this assignment.
 exc#:#exc_ass_type_test_object#:#Test Object
 exc#:#exc_ass_type_test_object_info#:#Test object whose status and points are automatically taken over as the evaluation of this assignment. The evaluation is updated with each test run within the submission deadline. Depending on the test settings, the best or last run is evaluated. Please make sure that the test settings match the schedule of this assignment.
+exc#:#exc_ass_type_test_sync_label#:#For Administrators
+exc#:#exc_ass_type_test_sync#:#Synchronize Test Results
+exc#:#exc_ass_type_test_sync_info#:#The existing test results of all partipipants will be transmitted to the exercise. In teams the latest test result of all team members will be used.
+exc#:#exc_ass_type_test_synced#:#The test results are transmitted.
 exc#:#exc_calc_all_calculated#:#All overall results have been recalculated.
 exc#:#exc_calc_calculate#:#Calculate
 exc#:#exc_calc_settings#:#Settings for Calculation of Overall Results

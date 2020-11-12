@@ -83,7 +83,7 @@ class ilTestPassFinishTasks
     /**
      * Update exercise submissions assigned to this test
      */
-    protected function updateExerciseSubmissionsAfterPassFinishedIsWritten()
+    public function updateExerciseSubmissionsAfterPassFinishedIsWritten()
     {
         global $DIC;
         $db = $DIC->database();
