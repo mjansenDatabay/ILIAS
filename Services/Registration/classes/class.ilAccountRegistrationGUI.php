@@ -756,7 +756,7 @@ class ilAccountRegistrationGUI
                 break;
 
             case ilRegistrationSettings::LOGIN_GEN_FIRST_LASTNAME:
-                $base_login = ilUtil::getASCIIFilename(strtolower($this->form->getInput('usr_firstname')))
+                $base_login = ilUtil::getASCIIFilename(strtolower($this->form->getInput('usr_firstname'))) . '.'
                     . ilUtil::getASCIIFilename(strtolower($this->form->getInput('usr_lastname')));
                 break;
 
