@@ -548,16 +548,24 @@ class ilTree
             $order_clause = "ORDER BY " . $this->table_tree . ".lft";
         }
 
-             
+        // fau: treeQuery53 - don't use tree_id for repository tree
+        // this has bad performance on our MariaDB 10.1
+        // deleted subtrees may have negative tree_id, but the given childs are already primary keys
+        if ($this->__isMainTree() && $this->tree_id == 1) {
+            $treeClause = '';
+        } else {
+            $treeClause = 'AND ' . $this->table_tree . '.' . $this->tree_pk . ' = ' . $this->ilDB->quote($this->tree_id, 'integer') . ' ';
+        }
+
         $query = sprintf(
             'SELECT * FROM ' . $this->table_tree . ' ' .
                 $this->buildJoin() .
                 "WHERE parent = %s " .
-                "AND " . $this->table_tree . "." . $this->tree_pk . " = %s " .
+                $treeClause .
                 $order_clause,
-            $ilDB->quote($a_node_id, 'integer'),
-            $ilDB->quote($this->tree_id, 'integer')
+            $ilDB->quote($a_node_id, 'integer')
         );
+        // fau.
 
         $res = $ilDB->query($query);
         
@@ -565,12 +573,21 @@ class ilTree
             return array();
         }
 
+        // fau: treeQuery53 - filter by tree id outside query
         // get rows and object ids
         $rows = array();
         while ($r = $ilDB->fetchAssoc($res)) {
+            if ($this->__isMainTree() && $r[$this->getTreePk()] != $this->getTreeId()) {
+                continue;
+            }
             $rows[] = $r;
             $obj_ids[] = $r["obj_id"];
         }
+        // count again
+        if (!$count = count($rows)) {
+            return array();
+        }
+        // fau.
 
         // preload object translation information
         if ($this->__isMainTree() && $this->isCacheUsed() && is_object($ilObjDataCache) &&
