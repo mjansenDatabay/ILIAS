@@ -65,13 +65,13 @@ class ilPatchUtils
 		// output the result and remember success
 		if ($error != "")
 		{
-			echo $error . " Failed.\n";
+			echo $error . "\nFailed.";
 		}
 		else
 		{
-			echo "Done.\n";
+			echo "\nDone";
 		}
 
-		echo "Time (s): " .(time() - $start) . "\n\n";
+		echo "\nTime (s): " .(time() - $start) . "\n\n";
 	}
 } 

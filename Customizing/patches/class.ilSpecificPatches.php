@@ -68,13 +68,13 @@ class ilSpecificPatches
             return;
         }
 
-        // run this on the slave
+        // run this on the slave (or on the development platform)
         // export the result as inserts
         // insert the ids to help table _page_ids
-        // $query = "SELECT page_id, parent_type FROM page_object WHERE content LIKE '%H5PPageComponent%'";
+        // $query = "SELECT page_id, parent_type FROM page_object WHERE content LIKE '%H5PPageComponent%' ORDER BY page_id ASC";
 
         // run this on the master
-        $query = "SELECT page_id, parent_type FROM _page_ids";
+        $query = "SELECT page_id, parent_type FROM _page_ids  ORDER BY page_id ASC";
 
         $found_content_ids = [];
         $result = $this->db->query($query);
@@ -118,7 +118,10 @@ class ilSpecificPatches
                     $h5pPlugin->onClone($properties, $plugin_version);
 
                     // a non-existing id is kept in onClone
-                    if ($properties['content_id'] != $content_id) {
+                    if ($properties['content_id'] == $content_id) {
+                        echo "\nPage " . $row['page_id'] . ": h5p id " .$content_id . " could not be cloned";
+                    }
+                    else {
                         foreach ($node->childNodes as $child) {
                             $node->removeChild($child);
                         }
