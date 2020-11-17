@@ -4,6 +4,14 @@
  */
 class ilSpecificPatches
 {
+    /** @var ilDBInterface  */
+    protected $db;
+
+    public function __construct() {
+        global $DIC;
+        $this->db = $DIC->database();
+    }
+
 	/**
 	 * Add an imported online help module to the repository
 	 */
@@ -43,6 +51,97 @@ class ilSpecificPatches
 
             echo $query2. "\n\n";
             $ilDB->manipulate($query2);
+        }
+    }
+
+    /**
+     * Create separate H5P objects for H5P contents in ILIAS pages
+     * Copied or imported pages may have vreated double usages of the same content id
+     */
+    public function splitH5PPageContents()
+    {
+        require_once "Customizing/global/plugins/Services/COPage/PageComponent/H5PPageComponent/classes/class.ilH5PPageComponentPlugin.php";
+        $h5pPlugin = new ilH5PPageComponentPlugin();
+
+        if (!$h5pPlugin->isActive()) {
+            echo "\plugin not active!";
+            return;
+        }
+
+        // run this on the slave
+        // export the result as inserts
+        // insert the ids to help table _page_ids
+        // $query = "SELECT page_id, parent_type FROM page_object WHERE content LIKE '%H5PPageComponent%'";
+
+        // run this on the master
+        $query = "SELECT page_id, parent_type FROM _page_ids";
+
+        $found_content_ids = [];
+        $result = $this->db->query($query);
+        while ($row = $this->db->fetchAssoc($result)) {
+
+            /** @var ilPageObject $pageObject */
+            $pageObject = ilPageObjectFactory::getInstance($row['parent_type'], $row['page_id']);
+            $xml =  $pageObject->getXmlContent();
+            $dom = domxml_open_mem(
+                '<?xml version="1.0" encoding="UTF-8"?>' . $xml,
+                DOMXML_LOAD_PARSING,
+                $error
+            );
+            $xpath = new DOMXPath($dom->myDOMDocument);
+
+            $modified = false;
+            /** @var DOMElement $node */
+            $nodes = $xpath->query("//Plugged");
+            foreach ($nodes as $node) {
+                $plugin_name = $node->getAttribute('PluginName');
+                $plugin_version = $node->getAttribute('PluginVersion');
+
+                if ($plugin_name == 'H5PPageComponent') {
+                    $properties = [];
+                    /** @var DOMElement $child */
+                    foreach ($node->childNodes as $child) {
+                        $properties[$child->getAttribute('Name')] = $child->nodeValue;
+                    }
+
+                    // first found content id kan be kept, remember it
+                    $content_id = $properties['content_id'];
+                    if (!in_array($content_id, $found_content_ids)) {
+                        echo "\nPage " . $row['page_id'] . ": found and kept h5p id " . $content_id;
+                        $found_content_ids[] = $content_id;
+                        continue;
+                    }
+
+                    // let the plugin copy additional content
+                    // and allow it to modify the saved parameters
+                    $h5pPlugin->setPageObj($pageObject);
+                    $h5pPlugin->onClone($properties, $plugin_version);
+
+                    // a non-existing id is kept in onClone
+                    if ($properties['content_id'] != $content_id) {
+                        foreach ($node->childNodes as $child) {
+                            $node->removeChild($child);
+                        }
+                        foreach ($properties as $name => $value) {
+                            $child = new DOMElement('PluggedProperty', $value);
+                            $node->appendChild($child);
+                            $child->setAttribute('Name', $name);
+                        }
+                        $modified = true;
+
+                        echo "\nPage " . $row['page_id'] . ": replaced h5p id " .$content_id . " by " .  $properties['content_id'];
+                    }
+                }
+            }
+
+            if ($modified) {
+                $xml = $dom->dump_mem(0, $pageObject->encoding);
+                $xml = preg_replace('/<\?xml[^>]*>/i', "", $xml);
+                $xml = preg_replace('/<!DOCTYPE[^>]*>/i', "", $xml);
+
+                $pageObject->setXMLContent($xml);
+                $pageObject->update();
+            }
         }
     }
 
