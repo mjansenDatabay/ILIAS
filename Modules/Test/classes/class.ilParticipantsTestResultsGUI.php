@@ -209,7 +209,7 @@ class ilParticipantsTestResultsGUI
         $DIC->ui()->mainTemplate()->setContent($tableGUI->getHTML());
     }
 
-    // fau: provideRecalc - new functions to recalculate all test results
+    // fau: provideRecalc - new functions to recalculate test results
     /**
      * @param ilToolbarGUI $toolbar
      */
@@ -248,6 +248,60 @@ class ilParticipantsTestResultsGUI
         $scorer = new ilTestScoring($this->getTestObj());
         $scorer->setPreserveManualScores(true);
         $scorer->recalculateSolutions();
+
+        ilUtil::sendSuccess($DIC->language()->txt('tst_recalculated_solutions'), true);
+        $DIC->ctrl()->redirect($this, self::CMD_SHOW_PARTICIPANTS);
+    }
+
+    /**
+     * Recalculate the scoring of selected participants
+     */
+    public function recalcSelectedTestResultsCmd()
+    {
+        global $DIC; /* @var ILIAS\DI\Container $DIC */
+
+
+        if (!is_array($_POST["chbUser"]) || count($_POST["chbUser"]) == 0) {
+            ilUtil::sendInfo($DIC->language()->txt("select_one_user"), true);
+            $DIC->ctrl()->redirect($this);
+        }
+
+        $cgui = new ilConfirmationGUI();
+        $cgui->setFormAction($DIC->ctrl()->getFormAction($this));
+        $cgui->setHeaderText($DIC->language()->txt('tst_recalculate_selected_solutions_confirm'));
+        $cgui->setConfirm($DIC->language()->txt('tst_recalculate_solutions'), 'confirmedRecalcSelectedTestResults');
+        $cgui->setCancel($DIC->language()->txt('cancel'), self::CMD_SHOW_PARTICIPANTS);
+
+        $accessFilter = ilTestParticipantAccessFilter::getManageParticipantsUserFilter($this->getTestObj()->getRefId());
+        $participantData = new ilTestParticipantData($DIC->database(), $DIC->language());
+        $participantData->setParticipantAccessFilter($accessFilter);
+        $participantData->setActiveIdsFilter((array) $_POST["chbUser"]);
+        $participantData->load($this->getTestObj()->getTestId());
+
+        foreach ($participantData->getActiveIds() as $activeId) {
+            $cgui->addItem(
+                "chbUser[]",
+                $activeId,
+                $participantData->getFormatedFullnameByActiveId($activeId),
+                ilUtil::getImagePath("icon_usr.svg"),
+                $DIC->language()->txt("usr")
+            );
+        }
+
+        $DIC->ui()->mainTemplate()->setContent($cgui->getHTML());
+    }
+
+
+    /**
+     * Recalculate the scoring of all participants
+     */
+    public function confirmedRecalcSelectedTestResultsCmd()
+    {
+        global $DIC; /* @var ILIAS\DI\Container $DIC */
+
+        $scorer = new ilTestScoring($this->getTestObj());
+        $scorer->setPreserveManualScores(true);
+        $scorer->recalculateSolutions($_POST["chbUser"]);
 
         ilUtil::sendSuccess($DIC->language()->txt('tst_recalculated_solutions'), true);
         $DIC->ctrl()->redirect($this, self::CMD_SHOW_PARTICIPANTS);

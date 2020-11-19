@@ -151,6 +151,9 @@ class ilParticipantsTestResultsTableGUI extends ilTable2GUI
             // fau: sendSimpleResults - add command to send simple results to participants
             $this->addMultiCommand('sendSimpleResultsToParticipants', $this->lng->txt('send_simple_results_to_participants'));
             // fau.
+            // fau: provideRecalc - add recalc command
+            $this->addMultiCommand('recalcSelectedTestResults', $this->lng->txt('tst_recalculate_solutions'));
+            // fau.
             $this->addMultiCommand('deleteSingleUserResults', $this->lng->txt('delete_user_data'));
         }
     }

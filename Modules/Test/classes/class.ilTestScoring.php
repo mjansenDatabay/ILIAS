@@ -74,13 +74,18 @@ class ilTestScoring
     {
         $this->questionId = $questionId;
     }
-    
-    public function recalculateSolutions()
+
+    // fau: provideRecalc - add parameter for selected users, also update the learning progress
+    public function recalculateSolutions($a_active_ids = null)
     {
         $participants = $this->test->getCompleteEvaluationData(false)->getParticipants();
         if (is_array($participants)) {
             require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
             foreach ($participants as $active_id => $userdata) {
+                if (isset($a_active_ids) && !in_array($active_id, $a_active_ids)) {
+                    continue;
+                }
+
                 if (is_object($userdata) && is_array($userdata->getPasses())) {
                     $this->recalculatePasses($userdata, $active_id);
                 }
@@ -90,10 +95,10 @@ class ilTestScoring
                 /** @var  ilTestEvaluationUserData $userdata */
                 include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
                 ilLPStatusWrapper::_updateStatus($this->test->getId(), $userdata->getUserID());
-                // fau.
             }
         }
     }
+    // fau.
 
     /**
      * @param $userdata
