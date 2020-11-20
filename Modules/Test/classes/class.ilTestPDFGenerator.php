@@ -23,15 +23,18 @@ class ilTestPDFGenerator
 
 	private static function buildHtmlDocument($contentHtml, $styleHtml)
 	{
+	    // fau: fixTestPdfImages - add base tag for relative image paths
 		return "
 			<html>
 				<head>
 					<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
+					<base href=\"". ILIAS_HTTP_PATH ."/index.html\">
  					$styleHtml
  				</head>
 				<body>$contentHtml</body>
 			</html>
 		";
+		// fau.
 	}
 
 	/**
