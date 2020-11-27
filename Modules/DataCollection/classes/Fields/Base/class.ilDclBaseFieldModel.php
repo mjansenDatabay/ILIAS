@@ -732,13 +732,15 @@ class ilDclBaseFieldModel
     public function setLocked($locked)
     {
         // fau: dclFieldLock - ensure correct value when set
-        switch ($locked) {
-            case self::LOCKED_ON:
-            case self::LOCKED_OFF:
-            case self::LOCKED_HIDE:
-                $this->locked = $locked;
-                break;
-         }
+        if (isset($locked)) {
+            switch ($locked) {
+                case self::LOCKED_ON:
+                case self::LOCKED_OFF:
+                case self::LOCKED_HIDE:
+                    $this->locked = $locked;
+                    break;
+            }
+        }
          // fau.
     }
 
@@ -749,15 +751,16 @@ class ilDclBaseFieldModel
     public function getLocked()
     {
         // fau: dclFieldLock - ensure correct value when get
-        switch ($this->locked) {
-            case self::LOCKED_ON:
-            case self::LOCKED_OFF:
-            case self::LOCKED_HIDE:
-                return $this->locked;
-            default:
-                return self::LOCKED_OFF;
+        if (isset($this->locked)) {
+            switch ($this->locked) {
+                case self::LOCKED_ON:
+                case self::LOCKED_OFF:
+                case self::LOCKED_HIDE:
+                    return $this->locked;
+            }
         }
         // fau.
+        return self::LOCKED_OFF;
     }
 
 
