@@ -134,7 +134,7 @@ class ilExAssTypeTestResultAssignment extends ActiveRecord
         $state = ilExcAssMemberState::getInstanceByIds($this->getId(), $user_id);
 
         $user_ids = [];
-        if ($state->isSubmissionAllowed()) {
+//        if ($state->isSubmissionAllowed()) {
 
             if ($state->isInTeam()) {
                 $user_ids = $state->getTeamObject()->getMembers();
@@ -158,7 +158,7 @@ class ilExAssTypeTestResultAssignment extends ActiveRecord
                 }
                 $status->update();
             }
-        }
+//        }
 
         return $user_ids;
     }

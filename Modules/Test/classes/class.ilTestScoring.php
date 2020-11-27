@@ -76,11 +76,21 @@ class ilTestScoring
     }
 
     // fau: provideRecalc - add parameter for selected users, also update the learning progress
+    // fau: exAssTest - update the result of connected exercise assignments
     public function recalculateSolutions($a_active_ids = null)
     {
+        global $DIC;
+        $db = $DIC->database();
+
         $participants = $this->test->getCompleteEvaluationData(false)->getParticipants();
         if (is_array($participants)) {
-            require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
+
+            $ref_ids = ilObject::_getAllReferences($this->test->getId());
+
+            require_once ('./Modules/Exercise/AssignmentTypes/classes/class.ilExAssTypeTestResultAssignment.php');
+            /** @var  ilExAssTypeTestResultAssignment[] $assTests */
+            $assTests = ilExAssTypeTestResultAssignment::where($db->in('test_ref_id', $ref_ids, false, 'integer'))->get();
+
             foreach ($participants as $active_id => $userdata) {
                 if (isset($a_active_ids) && !in_array($active_id, $a_active_ids)) {
                     continue;
@@ -91,10 +101,22 @@ class ilTestScoring
                 }
                 assQuestion::_updateTestResultCache($active_id);
 
-                // fau: provideRecalc - also update the learning progress
                 /** @var  ilTestEvaluationUserData $userdata */
                 include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
                 ilLPStatusWrapper::_updateStatus($this->test->getId(), $userdata->getUserID());
+
+                if (!empty($assTests)) {
+                    $results = $this->test->getResultsForActiveId($active_id);
+                    foreach ($assTests as $assTest) {
+                        $assTest->submitResult($userdata->getUserID(),
+                            $results['passed'],
+                            $results['reached_points'],
+                            $results['mark_short'],
+                            $results['mark_official'],
+                            $results['tstamp']
+                        );
+                    }
+                }
             }
         }
     }
