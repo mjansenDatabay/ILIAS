@@ -142,7 +142,20 @@ class ilDclFieldListGUI
         }
 
         foreach ($fields as $field) {
-            $field->setLocked($_POST['locked'][$field->getId()] == "on");
+            // fau: dclFieldLock - set the locked status by posted radio value
+            switch($_POST['locked'][$field->getId()]) {
+                case 'on':
+                    $field->setLocked(ilDclBaseFieldModel::LOCKED_ON);
+                    break;
+                case 'hide':
+                    $field->setLocked(ilDclBaseFieldModel::LOCKED_HIDE);
+                    break;
+                case 'off':
+                default:
+                    $field->setLocked(ilDclBaseFieldModel::LOCKED_OFF);
+                    break;
+            }
+            // fau.
             $field->setExportable($_POST['exportable'][$field->getId()] == "on");
             $field->setOrder($order[$field->getId()]);
             $field->doUpdate();

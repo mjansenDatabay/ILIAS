@@ -97,6 +97,12 @@ class ilDclTextRecordRepresentation extends ilDclBaseRecordRepresentation
     public function fillFormInput($form)
     {
         $input_field = $form->getItemByPostVar('field_' . $this->getField()->getId());
+        // fau: dclFieldLock - fault tolerance when hidden locked field has no form item
+        if (!$input_field) {
+            return;
+        }
+        // fau.
+
         $raw_input = $this->getFormInput();
 
         $value = is_array($raw_input) ? $raw_input['link'] : $raw_input;

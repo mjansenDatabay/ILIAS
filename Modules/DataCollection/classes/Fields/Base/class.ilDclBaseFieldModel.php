@@ -14,6 +14,11 @@
  */
 class ilDclBaseFieldModel
 {
+    // fau: dclFieldLock - constants with third oprion for hidingfields
+    const LOCKED_OFF = 0;
+    const LOCKED_ON = 1;
+    const LOCKED_HIDE = 2;
+    // fau.
 
     /**
      * @var mixed int for custom fields string for standard fields
@@ -460,7 +465,9 @@ class ilDclBaseFieldModel
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
-        $this->getLocked() == null ? $this->setLocked(false) : true;
+        // fau: dclFieldLock - don't set bool valie, valid values are ensured by getLocked()
+        //$this->getLocked() == null ? $this->setLocked(false) : true;
+        // fau.
 
         if (!ilDclTable::_tableExists($this->getTableId())) {
             throw new ilException("The field does not have a related table!");
@@ -472,7 +479,9 @@ class ilDclBaseFieldModel
             . ", is_locked" . " ) VALUES (" . $ilDB->quote($this->getId(), "integer") . "," . $ilDB->quote($this->getTableId(), "integer") . ","
             . $ilDB->quote($this->getDatatypeId(), "integer") . "," . $ilDB->quote($this->getTitle(), "text") . ","
             . $ilDB->quote($this->getDescription(), "text") . "," . $ilDB->quote($this->getRequired(), "integer") . ","
-            . $ilDB->quote($this->isUnique(), "integer") . "," . $ilDB->quote($this->getLocked() ? 1 : 0, "integer") . ")";
+            // fau: dclFieldLock - don't force 0 or 1, valid values are ensured by getLocked()
+            . $ilDB->quote($this->isUnique(), "integer") . "," . $ilDB->quote($this->getLocked(), "integer") . ")";
+            // fau.
         $ilDB->manipulate($query);
 
         $this->updateTableFieldSetting();
@@ -529,7 +538,9 @@ class ilDclBaseFieldModel
             ),
             "is_locked" => array(
                 "integer",
-                $this->getLocked() ? 1 : 0,
+                // fau: dclFieldLock - don't force 0 or 1 - valid values are ensured by getLocked
+                $this->getLocked(),
+                // fau.
             ),
         ),
             array(
@@ -720,7 +731,15 @@ class ilDclBaseFieldModel
      */
     public function setLocked($locked)
     {
-        $this->locked = $locked;
+        // fau: dclFieldLock - ensure correct value when set
+        switch ($locked) {
+            case self::LOCKED_ON:
+            case self::LOCKED_OFF:
+            case self::LOCKED_HIDE:
+                $this->locked = $locked;
+                break;
+         }
+         // fau.
     }
 
 
@@ -729,7 +748,16 @@ class ilDclBaseFieldModel
      */
     public function getLocked()
     {
-        return $this->locked;
+        // fau: dclFieldLock - ensure correct value when get
+        switch ($this->locked) {
+            case self::LOCKED_ON:
+            case self::LOCKED_OFF:
+            case self::LOCKED_HIDE:
+                return $this->locked;
+            default:
+                return self::LOCKED_OFF;
+        }
+        // fau.
     }
 
 

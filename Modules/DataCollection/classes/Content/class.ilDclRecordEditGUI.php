@@ -284,14 +284,23 @@ class ilDclRecordEditGUI
         $inline_css = '';
         foreach ($allFields as $field) {
             $item = ilDclCache::getFieldRepresentation($field)->getInputField($this->form, $this->record_id);
+
+            // fau: dclFieldLock - omit field item if field is hidden (existing values are kept)
+            if (!ilObjDataCollectionAccess::hasWriteAccess($this->parent_obj->ref_id)) {
+                switch ($field->getLocked()) {
+                    case ilDclBaseFieldModel::LOCKED_ON:
+                        $item->setDisabled(true);
+                        break;
+                    case ilDclBaseFieldModel::LOCKED_HIDE:
+                        $item = null;
+                        break;
+                }
+            }
             if ($item === null) {
                 continue; // Fields calculating values at runtime, e.g. ilDclFormulaFieldModel do not have input
             }
-
-            if (!ilObjDataCollectionAccess::hasWriteAccess($this->parent_obj->ref_id) && $field->getLocked()) {
-                $item->setDisabled(true);
-            }
-            $this->form->addItem($item);
+           $this->form->addItem($item);
+            // fau.
         }
 
         $this->tpl->addInlineCss($inline_css);

@@ -19,7 +19,11 @@
 
     <!-- BEGIN locked -->
     <td class="dcl_locked">
-        <input type="checkbox" name="{CHECKBOX_NAME_LOCKED}" {CHECKBOX_CHECKED_LOCKED}>
+        <!-- fau: dclFieldLock - radio buttons -->
+        <label class="text-nowrap"><input type = "radio" name="{RADIO_NAME_LOCKED}" value="off" {RADIO_CHECKD_LOCKED_OFF}> {RADIO_LABEL_LOCKED_OFF}</label><br />
+        <label class="text-nowrap"><input type = "radio" name="{RADIO_NAME_LOCKED}" value="on" {RADIO_CHECKD_LOCKED_ON}> {RADIO_LABEL_LOCKED_ON}</label><br />
+        <label class="text-nowrap"><input type = "radio" name="{RADIO_NAME_LOCKED}" value="hide" {RADIO_CHECKD_LOCKED_HIDE}> {RADIO_LABEL_LOCKED_HIDE}</label>
+        <!-- fau. -->
     </td>
     <!-- END locked -->
     <!-- BEGIN not_locked -->

@@ -42,7 +42,9 @@ class ilDclFieldListTableGUI extends ilTable2GUI
         $this->addColumn('', '', '1', true);
         $this->addColumn($lng->txt('dcl_order'), null, '30px');
         $this->addColumn($lng->txt('dcl_fieldtitle'), null, 'auto');
-        $this->addColumn($lng->txt('dcl_locked'), null, '30px', false, "", $lng->txt('dcl_locked_tooltip'));
+        // fau: dclFieldLock - adjust column width for radio buttons
+        $this->addColumn($lng->txt('dcl_locked'), null, 'auto', false, "", $lng->txt('dcl_locked_tooltip'));
+        // fau.
         $this->addColumn($lng->txt('dcl_in_export'), null, '30px');
         $this->addColumn($lng->txt('dcl_description'), null, 'auto');
         $this->addColumn($lng->txt('dcl_field_datatype'), null, 'auto');
@@ -117,10 +119,25 @@ class ilDclFieldListTableGUI extends ilTable2GUI
         }
 
         if (!$a_set->isStandardField()) {
-            $this->tpl->setVariable('CHECKBOX_NAME_LOCKED', 'locked[' . $a_set->getId() . ']');
-            if ($a_set->getLocked()) {
-                $this->tpl->setVariable('CHECKBOX_CHECKED_LOCKED', 'checked');
+
+            // fau: dclFieldLock - show radio buttons instead of checkbox
+            $this->tpl->setVariable('RADIO_NAME_LOCKED', 'locked[' . $a_set->getId() . ']');
+            $this->tpl->setVariable('RADIO_LABEL_LOCKED_OFF', $this->lng->txt('dcl_locked_off'));
+            $this->tpl->setVariable('RADIO_LABEL_LOCKED_ON', $this->lng->txt('dcl_locked_on'));
+            $this->tpl->setVariable('RADIO_LABEL_LOCKED_HIDE', $this->lng->txt('dcl_locked_hide'));
+            switch ((int) $a_set->getLocked()) {
+                case ilDclBaseFieldModel::LOCKED_ON:
+                    $this->tpl->setVariable('RADIO_CHECKD_LOCKED_ON', 'checked');
+                    break;
+                case ilDclBaseFieldModel::LOCKED_HIDE:
+                    $this->tpl->setVariable('RADIO_CHECKD_LOCKED_HIDE', 'checked');
+                    break;
+                case ilDclBaseFieldModel::LOCKED_OFF:
+                default:
+                    $this->tpl->setVariable('RADIO_CHECKD_LOCKED_OFF', 'checked');
+                    break;
             }
+            // fau.
         } else {
             $this->tpl->setVariable('NOT_LOCKED', '');
         }

@@ -567,6 +567,9 @@ crs#:#export_lp_info#:#The determination of the status can be determined in the 
 crs#:#export_lp_marks#:#Grades/Credits
 crs#:#export_lp_status#:#Status
 crs#:#export_lp_comments#:#Comment
+dcl#:#dcl_locked_on#:#locked###fau: dclFieldLock
+dcl#:#dcl_locked_off#:#editable###fau: dclFieldLock
+dcl#:#dcl_locked_hide#:#hidden###fau: dclFieldLock
 dcl#:#dcl_max_import_simulate#:#The file has %s records, but only %s can be imported in one upload. Please split your file if you need to import more records.###fau: dcImportLimit
 dcl#:#dcl_max_import_done#:#The file has %s records, but only the first %s were imported. Please split your file if you need to import more records.###fau: dcImportLimit
 exc#:#exc_ass_type_test_open#:#Open Test

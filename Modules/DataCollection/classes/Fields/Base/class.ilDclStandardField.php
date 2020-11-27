@@ -60,7 +60,9 @@ class ilDclStandardField extends ilDclBaseFieldModel
      */
     public function getLocked()
     {
-        return true;
+        // fau: dclFieldLock - provide correct value for standard fields
+        return self::LOCKED_ON;
+        // fau.
     }
 
 
