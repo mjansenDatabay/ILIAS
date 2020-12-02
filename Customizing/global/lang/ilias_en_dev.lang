@@ -713,6 +713,10 @@ exc#:#exc_preliminary_mark#:#Preliminary Grade/Points
 exc#:#exc_preliminary_status#:#Preliminary Status
 exc#:#exc_notgraded#:#Not Graded
 exc#:#exc_incomplete#:#In Progress
+exc#:#exc_create_single_teams#:#Create Single Teams
+exc#:#exc_create_single_teams_confirmation#:#Would you like to form individual teams for the following users? This makes them rateable, but they are no longer available for others to form teams.
+exc#:#exc_create_single_teams_empty#:#No participants without team were found.
+exc#:#exc_create_single_teams_finished#:#The individual teams were formed.
 exercise#:#exc_mark#:#Grade/Points
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.

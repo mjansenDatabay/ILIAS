@@ -443,7 +443,10 @@ class ilExerciseManagementGUI
 
             $ilCtrl->setParameter($this, "ass_id", $this->assignment->getId());
 
-            if ($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM) {
+            // fau: exTeamRemove - allow adopting teams from groups ony with extended access
+            if (ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId()) &&
+                $this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM) {
+                // fau.
                 include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
                 if (ilExAssignmentTeam::getAdoptableGroups($this->exercise->getRefId())) {
                     $ilToolbar->addButton(
@@ -454,6 +457,18 @@ class ilExerciseManagementGUI
                     $ilToolbar->addSeparator();
                 }
             }
+
+            // fau: exTeamSingles - button to create single user teams
+            if (ilObjExerciseAccess::checkExtendedGradingAccess($this->exercise->getRefId())
+                && $this->assignment->getAssignmentType()->usesTeams()) {
+                $ilToolbar->addButton(
+                    $this->lng->txt("exc_create_single_teams"),
+                    $this->ctrl->getLinkTarget($this, "confirmCreateSingleTeams")
+                );
+                $ilToolbar->addSeparator();
+            }
+            // fau.
+
             // fau: exMultiFeedbackStucture - allow multi feedback for teams
             if ($this->exercise->hasTutorFeedbackFile()) {
                 // if (!$this->assignment->getAssignmentType()->usesTeams()) {
@@ -1848,8 +1863,86 @@ class ilExerciseManagementGUI
         $form->setValuesByPost();
         $this->adoptTeamsFromGroupObject($form);
     }
-    
-    
+
+    // fau: exTeamSingles - new functions
+    /**
+     * Show confirmation to create single user teams for all users without a team
+     */
+    public function confirmCreateSingleTeamsObject()
+    {
+        if (!$this->exercise->isMemberDeleteAllowed()) {
+            ilUtil::sendFailure($this->lng->txt("exc_mem_delete_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+
+        // get the members without a team
+        $all_members  = ilExerciseMembers::_getMembers($this->exercise->getId());
+        $team_members = array_keys(ilExAssignmentTeam::getAssignmentTeamMap($this->assignment->getId()));
+        $members = array_diff($all_members, $team_members);
+
+        if (empty($members)) {
+            ilUtil::sendFailure($this->lng->txt("exc_create_single_teams_empty"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+
+        include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
+        $cgui = new ilConfirmationGUI();
+        $cgui->setFormAction($this->ctrl->getFormAction($this));
+        $cgui->setHeaderText( $this->lng->txt("exc_create_single_teams_confirmation"));
+        $cgui->setCancel( $this->lng->txt("cancel"), "members");
+        $cgui->setConfirm( $this->lng->txt("create"), "createSingleTeams");
+
+        include_once("./Services/User/classes/class.ilUserUtil.php");
+        foreach ($members as $usr_id) {
+            $cgui->addItem(
+                "member[]",
+                $usr_id,
+                ilUserUtil::getNamePresentation((int) $usr_id, false, false, "", true)
+            );
+        }
+
+        $this->tpl->setContent($cgui->getHTML());
+    }
+
+    /**
+     * Create single user teams for all users without a team
+     */
+    public function createSingleTeamsObject()
+    {
+        if (!$this->exercise->isMemberDeleteAllowed()) {
+            ilUtil::sendFailure($this->lng->txt("exc_mem_delete_perm_failure"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+
+        // ensure now new teams have been created
+        $selected_members = (array) $_POST['member'];
+        $team_members = array_keys(ilExAssignmentTeam::getAssignmentTeamMap($this->assignment->getId()));
+        $members = array_diff($selected_members, $team_members);
+
+        if (empty($members)) {
+            ilUtil::sendFailure($this->lng->txt("exc_create_single_teams_empty"), true);
+            $this->ctrl->redirect($this, "members");
+        }
+
+        foreach ($members as $user_id) {
+            $team = ilExAssignmentTeam::getInstanceByUserId($this->assignment->getId(), (int) $user_id, true);
+
+            // re-evaluate the user submission
+            $submission = new ilExSubmission($this->assignment,  (int) $user_id);
+            $this->exercise->processExerciseStatus(
+                $this->assignment,
+                $team->getMembers(),
+                $submission->hasSubmitted(),
+                $submission->validatePeerReviews()
+            );
+        }
+
+        ilUtil::sendSuccess($this->lng->txt("exc_create_single_teams_finished"), true);
+        $this->ctrl->redirect($this, "members");
+    }
+    // fau.
+
+
     ////
     //// Multi Feedback
     ////
