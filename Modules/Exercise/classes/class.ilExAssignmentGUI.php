@@ -556,12 +556,11 @@ class ilExAssignmentGUI
                 if ($cnt_files > 0) {
                     $files = $storage->getFeedbackFiles($a_feedback_id);
                     // fau: exMultiFeedbackStructure - better listing of nested files
-                    $member_data = $a_ass->getMemberListData();
                     $i = 1;
                     foreach ($files as $file) {
                         $a_info->addProperty(
                             $lng->txt("file") . ' ' . $i++,
-                            $this->getFeedbackFileDisplay($file, $member_data),
+                            $this->getFeedbackFileDisplay($file),
                             $this->getSubmissionLink("downloadFeedbackFile", array("file" => urlencode($file)))
                         );
                     }
@@ -586,11 +585,10 @@ class ilExAssignmentGUI
     /**
      * Get the display title of a feedback file (extracting the member from the sub folder name)
      * @param string $file
-     * @param array $member_data
      * @return string
      * @see ilExAssignment::getMemberListData()
      */
-    public function getFeedbackFileDisplay($file, $member_data) {
+    public function getFeedbackFileDisplay($file) {
         //  $mem_dir = $name["lastname"] . "_" . $name["firstname"] . "_" . $name["login"] . "_" . $name["user_id"];
 
         $pi = pathinfo($file);
@@ -598,11 +596,14 @@ class ilExAssignmentGUI
         $basename = $pi['basename'];
         $parts = explode('_', $dirname);
 
-        $user_id = $parts[3];
-        $login = $parts[2];
 
-        if (isset($member_data[$user_id])) {
-            return $basename . ' (' .$member_data[$user_id]['firstname'] . ' ' . $member_data[$user_id]['lastname'] . ')';
+        if (count($parts) == 4) {
+            $lastname = $parts[0];
+            $firstname = $parts[1];
+            $user_id = $parts[3];
+            $login = $parts[2];
+
+            return $basename . ' (' . $firstname . ' ' . $lastname . ')';
         }
         else {
             return $file;
