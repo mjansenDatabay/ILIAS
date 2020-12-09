@@ -31,6 +31,24 @@
  */
 class ilExcAssMemberState
 {
+    // fau: exMemStateCache - cache variables
+    /**
+     * @var array  ass_id => user_id => ilExcAssMemberState
+     */
+    protected static $state_cache = [];
+
+    /**
+     * @var array  ass_id => user_id => ilExAssignment
+     */
+    protected static $ass_cache = [];
+
+    /**
+     * @var array  user_id => ilObjUser
+     */
+    protected static $user_cache = [];
+    // fau.
+
+
     /**
      * @var int
      */
@@ -98,24 +116,48 @@ class ilExcAssMemberState
         $this->idl = $a_idl;
     }
 
+    // fau: exMemStateCache - use cache by default
     /**
      * Get instance by IDs (recommended for consumer code)
      *
      * @param int $a_ass_id assignment id
      * @param int $a_user_id user id
+     * @param bool $use_cache use the cache
      * @return ilExcAssMemberState
      */
-    public static function getInstanceByIds($a_ass_id, $a_user_id = 0)
+    public static function getInstanceByIds($a_ass_id, $a_user_id = 0, $use_cache = true)
     {
         global $DIC;
 
-        $lng = $DIC->language();
-        $user = ($a_user_id > 0)
-            ? new ilObjUser($a_user_id)
-            : $DIC->user();
+        if ($use_cache && isset(self::$state_cache[$a_ass_id][$a_user_id])) {
+            return self::$state_cache[$a_ass_id][$a_user_id];
+        }
 
-        include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-        $ass = new ilExAssignment($a_ass_id);
+        $lng = $DIC->language();
+
+        if ($use_cache && isset(self::$user_cache[$a_user_id])) {
+            $user = self::$user_cache[$a_user_id];
+        }
+        else {
+            $user = ($a_user_id > 0)
+                ? new ilObjUser($a_user_id)
+                : $DIC->user();
+
+            if ($use_cache) {
+               self::$user_cache[$a_user_id] = $user;
+            }
+        }
+
+        if ($use_cache && isset(self::$ass_cache[$a_ass_id])) {
+            $ass = self::$ass_cache[$a_ass_id];
+        }
+        else {
+            $ass = new ilExAssignment($a_ass_id);
+
+            if ($use_cache) {
+                self::$ass_cache[$a_ass_id] = $ass;
+            }
+        }
 
         $member_id = $user->getId();
         $is_team = false;
@@ -135,8 +177,14 @@ class ilExcAssMemberState
         include_once("./Modules/Exercise/classes/class.ilExcIndividualDeadline.php");
         $idl = ilExcIndividualDeadline::getInstance($a_ass_id, $member_id, $is_team);
 
-        return self::getInstance($ass, $user, $idl, time(), $lng, $team);
+        $instance = self::getInstance($ass, $user, $idl, time(), $lng, $team);
+
+        if ($use_cache) {
+            self::$state_cache[$a_ass_id][$a_user_id] = $instance;
+        }
+        return $instance;
     }
+    // fau.
 
     /**
      * Get instance by dependencies.
