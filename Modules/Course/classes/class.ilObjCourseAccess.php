@@ -481,8 +481,10 @@ class ilObjCourseAccess extends ilObjectAccess implements ilConditionHandling
             $registration_possible = true;
         } else {
             $registration_possible = false;
-            $info['reg_info_list_prop']['property'] = $lng->txt('crs_list_reg');
-            $info['reg_info_list_prop']['value'] = $lng->txt('crs_list_reg_noreg');
+// fim: [meminf] hide registration info if registration is not possible (exam platforms)
+//            $info['reg_info_list_prop']['property'] = $lng->txt('crs_list_reg');
+//            $info['reg_info_list_prop']['value'] = $lng->txt('crs_list_reg_noreg');
+// fim.
         }
 
         // fim: [meminf] get info about membership limitations and subscription status
