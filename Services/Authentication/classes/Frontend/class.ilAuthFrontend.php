@@ -238,9 +238,7 @@ class ilAuthFrontend
             $this->getLogger()->info('Authentication failed for inactive user with id and too may login attempts: ' . $this->getStatus()->getAuthenticatedUserId());
             $this->getStatus()->setStatus(ilAuthStatus::STATUS_AUTHENTICATION_FAILED);
             $this->getStatus()->setAuthenticatedUserId(0);
-            // fau: loginFailed - use same message for exceeded login attempts as with wrong password (security)
             $this->getStatus()->setReason('auth_err_login_attempts_deactivation');
-            // fau.
             return false;
         }
 

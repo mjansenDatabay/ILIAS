@@ -176,8 +176,9 @@ il.Accordion = {
 		var a = il.Accordion.data[id];
 
 		if (a.active_head_class && a.active_head_class != "" && acc_el) {
-			$(acc_el.parentNode).children("div:first").children("div:first").
-				addClass(a.active_head_class);
+			const b = $(acc_el.parentNode).children(":first").children(":first");
+			b.addClass(a.active_head_class);
+			b.attr("aria-expanded", true);
 		}
 	},
 
@@ -185,8 +186,9 @@ il.Accordion = {
 		var a = il.Accordion.data[id];
 
 		if (a.active_head_class && a.active_head_class != "" && acc_el) {
-			$(acc_el.parentNode).children("div:first").children("div:first").
-				removeClass(a.active_head_class);
+			const b = $(acc_el.parentNode).children(":first").children(":first");
+			b.removeClass(a.active_head_class);
+			b.attr("aria-expanded", false);
 		}
 	},
 
@@ -204,10 +206,7 @@ il.Accordion = {
 				t = $(this);
 				if (t.hasClass("ilAccHideContent")) {
 
-					if (a.active_head_class) {
-						$(this.parentNode).children("div:first").children("div:first").
-							addClass(a.active_head_class);
-					}
+					il.Accordion.addActiveHeadClass(id, this);
 
 					// fade in the accordion (currentAccordion)
 					options = il.Accordion.prepareShow(a, t);
@@ -243,10 +242,7 @@ il.Accordion = {
 				t = $(this);
 				if (t.hasClass("ilAccHideContent")) {
 
-					if (a.active_head_class) {
-						$(this.parentNode).children("div:first").children("div:first").
-							addClass(a.active_head_class);
-					}
+					il.Accordion.addActiveHeadClass(id, this);
 
 					// fade in the accordion (currentAccordion)
 					options = il.Accordion.prepareShow(a, t);
@@ -418,11 +414,9 @@ il.Accordion = {
 		// add active class to opened accordion
 		if (a.active_head_class && a.active_head_class != '') {
 			if (a.last_opened_acc && !a.multi) {
-				$(a.last_opened_acc.parentNode).children("div:first").children("div:first").
-					removeClass(a.active_head_class);
+				il.Accordion.removeActiveHeadClass(id, a.last_opened_acc);
 			}
-			$(a.clicked_acc.parentNode).children("div:first").children("div:first").
-				addClass(a.active_head_class);
+			il.Accordion.addActiveHeadClass(id, a.clicked_acc);
 		}
 
 		// fade in the new accordion (currentAccordion)

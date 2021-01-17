@@ -1273,9 +1273,12 @@ class ilQTIParser extends ilSaxParser
                 }
                 
                 require_once 'Services/QTI/classes/class.ilQtiMatImageSecurity.php';
-                $matImageSecurity = new ilQtiMatImageSecurity($this->matimage);
-                $matImageSecurity->sanitizeLabel();
-                
+                try {
+                    $matImageSecurity = new ilQtiMatImageSecurity($this->matimage);
+                    $matImageSecurity->sanitizeLabel();
+                } catch (Exception $e) {
+                    break;
+                }
                 if (!$matImageSecurity->validate()) {
                     break;
                 }

@@ -1054,7 +1054,7 @@ abstract class assQuestion
                     break;
             }
         }
-        return join($output, "<br />");
+        return join("<br />", $output);
     }
 
     /**
@@ -1309,7 +1309,7 @@ abstract class assQuestion
      */
     final public function persistWorkingState($active_id, $pass = null, $obligationsEnabled = false, $authorized = true)
     {
-        if (!$this->validateSolutionSubmit()) {
+        if (!$this->validateSolutionSubmit() && !$this->savePartial()) {
             return false;
         }
 
@@ -5494,4 +5494,9 @@ abstract class assQuestion
     }
     // hey.
 // fau.
+
+    public function savePartial()
+    {
+        return false;
+    }
 }

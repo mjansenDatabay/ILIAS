@@ -655,7 +655,7 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
             }
         }
 
-        if ($this->saveResult == false) {
+        if ($this->saveResult == false || (!$questionOBJ->validateSolutionSubmit() && $questionOBJ->savePartial()) ) {
             // fau: fixQuestionValidateSubmit - use common function to handle a save error
             $this->handleSaveQuestionSolutionError($questionOBJ);
             // fau.

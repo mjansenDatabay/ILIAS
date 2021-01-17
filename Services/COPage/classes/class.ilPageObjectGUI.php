@@ -1837,6 +1837,7 @@ class ilPageObjectGUI
         
         // check cache (same parameters, non-edit mode and rendered time
         // > last change
+        $is_error = false;
         if (($this->getOutputMode() == "preview" || $this->getOutputMode() == "presentation") &&
             !$this->getCompareMode() &&
             !$this->getAbstractOnly() &&
@@ -1850,45 +1851,52 @@ class ilPageObjectGUI
             $xsl = file_get_contents("./Services/COPage/xsl/page.xsl");
 
             $this->log->debug("Calling XSLT, content: " . substr($content, 0, 100));
-            $args = array( '/_xml' => $content, '/_xsl' => $xsl );
-            $xh = xslt_create();
-            // fau: fixPageXslErrorMessage - show a speaking error message when an xsl error occurs
             try {
+                $args = array( '/_xml' => $content, '/_xsl' => $xsl );
+                $xh = xslt_create();
                 $output = xslt_process($xh, "arg:/_xml", "arg:/_xsl", null, $args, $params);
-                if (($this->getOutputMode() == "presentation" || $this->getOutputMode() == "preview")
-                    && !$this->getAbstractOnly()
-                    && $this->obj->old_nr == 0) {
-                    $this->obj->writeRenderedContent($output, $md5);
-                }
             } catch (Exception $e) {
+                $output = "";
+                if ($this->getOutputMode() == "edit") {
+                    $output = "<pre>".$e->getMessage()."<br>".htmlentities($content)."</pre>";
+                    $is_error = true;
+                }
+                // fau: fixPageXslErrorMessage - show a speaking error message when an xsl error occurs
                 ilUtil::sendFailure($this->lng->txt('page_xsl_error'), false);
+                // fau.
             }
-            // fau.
+            if (($this->getOutputMode() == "presentation" || $this->getOutputMode() == "preview")
+                && !$this->getAbstractOnly()
+                && $this->obj->old_nr == 0) {
+                $this->obj->writeRenderedContent($output, $md5);
+            }
             xslt_free($xh);
         }
 
-        // unmask user html
-        if (($this->getOutputMode() != "edit" ||
-                $this->user->getPref("ilPageEditor_HTMLMode") != "disable")
-            && !$this->getPageConfig()->getPreventHTMLUnmasking()) {
-            $output = str_replace("&lt;", "<", $output);
-            $output = str_replace("&gt;", ">", $output);
-        }
-        $output = str_replace("&amp;", "&", $output);
-        
-        include_once './Services/MathJax/classes/class.ilMathJax.php';
-        $output = ilMathJax::getInstance()->insertLatexImages($output);
+        if (!$is_error) {
+            // unmask user html
+            if (($this->getOutputMode() != "edit" ||
+                    $this->user->getPref("ilPageEditor_HTMLMode") != "disable")
+                && !$this->getPageConfig()->getPreventHTMLUnmasking()) {
+                $output = str_replace("&lt;", "<", $output);
+                $output = str_replace("&gt;", ">", $output);
+            }
 
-        // insert page snippets
-        //$output = $this->insertContentIncludes($output);
+            $output = str_replace("&amp;", "&", $output);
 
-        // insert resource blocks
-        $output = $this->insertResources($output);
+            include_once './Services/MathJax/classes/class.ilMathJax.php';
+            $output = ilMathJax::getInstance()->insertLatexImages($output);
 
-        // insert page toc
-        if ($this->getPageConfig()->getEnablePageToc()) {
-            $output = $this->insertPageToc($output);
-        }
+            // insert page snippets
+            //$output = $this->insertContentIncludes($output);
+
+            // insert resource blocks
+            $output = $this->insertResources($output);
+
+            // insert page toc
+            if ($this->getPageConfig()->getEnablePageToc()) {
+                $output = $this->insertPageToc($output);
+            }
 
         // fau: shortRssLink - don't add special elements to abstract
         if ($this->getAbstractOnly()) {
@@ -1899,55 +1907,56 @@ class ilPageObjectGUI
         }
         // fau.
 
-        // workaround for preventing template engine
-        // from hiding paragraph text that is enclosed
-        // in curly brackets (e.g. "{a}", see ilLMEditorGUI::executeCommand())
-        $output = $this->replaceCurlyBrackets($output);
+            // workaround for preventing template engine
+            // from hiding paragraph text that is enclosed
+            // in curly brackets (e.g. "{a}", see ilLMEditorGUI::executeCommand())
+            $output = $this->replaceCurlyBrackets($output);
 
-        // remove all newlines (important for code / pre output)
-        $output = str_replace("\n", "", $output);
+            // remove all newlines (important for code / pre output)
+            $output = str_replace("\n", "", $output);
 
-        //echo htmlentities($output);
-        $output = $this->postOutputProcessing($output);
-        //echo htmlentities($output);
-        if ($this->getOutputMode() == "edit" &&
-            !$this->getPageObject()->getActive($this->getPageConfig()->getEnableScheduledActivation())) {
-            $output = '<div class="il_editarea_disabled"><div class="ilCopgDisabledText">' . $this->getDisabledText() . '</div>' . $output . '</div>';
+            //echo htmlentities($output);
+            $output = $this->postOutputProcessing($output);
+            //echo htmlentities($output);
+            if ($this->getOutputMode() == "edit" &&
+                !$this->getPageObject()->getActive($this->getPageConfig()->getEnableScheduledActivation())) {
+                $output = '<div class="il_editarea_disabled"><div class="ilCopgDisabledText">' . $this->getDisabledText() . '</div>' . $output . '</div>';
+            }
+
+            // for all page components...
+            include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
+            $defs = ilCOPagePCDef::getPCDefinitions();
+            foreach ($defs as $def) {
+                ilCOPagePCDef::requirePCClassByName($def["name"]);
+                $pc_class = $def["pc_class"];
+                $pc_obj = new $pc_class($this->getPageObject());
+                $pc_obj->setSourcecodeDownloadScript($this->determineSourcecodeDownloadScript());
+                $pc_obj->setFileDownloadLink($this->determineFileDownloadLink());
+                $pc_obj->setFullscreenLink($this->determineFullscreenLink());
+
+                // post xsl page content modification by pc elements
+                $output = $pc_obj->modifyPageContentPostXsl($output, $this->getOutputMode());
+
+                // javascript files
+                $js_files = $pc_obj->getJavascriptFiles($this->getOutputMode());
+                foreach ($js_files as $js) {
+                    $GLOBALS["tpl"]->addJavascript($js);
+                }
+
+                // css files
+                $css_files = $pc_obj->getCssFiles($this->getOutputMode());
+                foreach ($css_files as $css) {
+                    $GLOBALS["tpl"]->addCss($css);
+                }
+
+                // onload code
+                $onload_code = $pc_obj->getOnloadCode($this->getOutputMode());
+                foreach ($onload_code as $code) {
+                    $GLOBALS["tpl"]->addOnloadCode($code);
+                }
+            }
         }
-        
-        // for all page components...
-        include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
-        $defs = ilCOPagePCDef::getPCDefinitions();
-        foreach ($defs as $def) {
-            ilCOPagePCDef::requirePCClassByName($def["name"]);
-            $pc_class = $def["pc_class"];
-            $pc_obj = new $pc_class($this->getPageObject());
-            $pc_obj->setSourcecodeDownloadScript($this->determineSourcecodeDownloadScript());
-            $pc_obj->setFileDownloadLink($this->determineFileDownloadLink());
-            $pc_obj->setFullscreenLink($this->determineFullscreenLink());
 
-            // post xsl page content modification by pc elements
-            $output = $pc_obj->modifyPageContentPostXsl($output, $this->getOutputMode());
-            
-            // javascript files
-            $js_files = $pc_obj->getJavascriptFiles($this->getOutputMode());
-            foreach ($js_files as $js) {
-                $GLOBALS["tpl"]->addJavascript($js);
-            }
-
-            // css files
-            $css_files = $pc_obj->getCssFiles($this->getOutputMode());
-            foreach ($css_files as $css) {
-                $GLOBALS["tpl"]->addCss($css);
-            }
-
-            // onload code
-            $onload_code = $pc_obj->getOnloadCode($this->getOutputMode());
-            foreach ($onload_code as $code) {
-                $GLOBALS["tpl"]->addOnloadCode($code);
-            }
-        }
-        
         //		$output = $this->selfAssessmentRendering($output);
 
         // output
@@ -2964,7 +2973,7 @@ class ilPageObjectGUI
         return $a_output;
     }
     // fau.
-    
+
     /**
      * Finalizing output processing. Maybe overwritten in derived
      * classes, e.g. in wiki module.

@@ -2501,7 +2501,6 @@ class ilObjContentObject extends ilObject
                     "target" => $a_target_dir . '/js/ilExtLink.js',
                     "type" => "js");
             }
-            // fau: fixLinkifyExport - add the correct js files
             if (is_int(strpos($p, "linkify.min.js"))) {
                 $scripts[] = array("source" => $p,
                     "target" => $a_target_dir . '/js/linkify.min.js',
@@ -2512,7 +2511,6 @@ class ilObjContentObject extends ilObject
                                    "target" => $a_target_dir . '/js/linkify-jquery.min.js',
                                    "type" => "js");
             }
-            // fau.
         }
 
         return $scripts;

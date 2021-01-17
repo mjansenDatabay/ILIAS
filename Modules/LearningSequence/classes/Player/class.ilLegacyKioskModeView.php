@@ -74,6 +74,7 @@ class ilLegacyKioskModeView implements ILIAS\KioskMode\View
         $label = $this->lng->txt('lso_start_item') . ' ' . $this->getTitleByType($this->getType());
 
         $ref_id = $this->object->getRefId();
+        $obj_id = (int) $this->object->getId();
         $type = $this->object->getType();
 
         $url = \ilLink::_getStaticLink(
@@ -84,7 +85,6 @@ class ilLegacyKioskModeView implements ILIAS\KioskMode\View
         );
 
         if (in_array($type, self::GET_VIEW_CMD_FROM_LIST_GUI_FOR)) {
-            $obj_id = $this->object->getId();
             $item_list_gui = \ilObjectListGUIFactory::_getListGUIByType($type);
             $item_list_gui->initItem($ref_id, $obj_id);
             $view_link = $item_list_gui->getCommandLink('view');
@@ -97,7 +97,7 @@ class ilLegacyKioskModeView implements ILIAS\KioskMode\View
         $this->lng->loadLanguageModule('trac');
         $builder->refresh($this->lng->txt('trac_refresh'));
         // fau.
-        $builder->start($label, $url, 0);
+        $builder->start($label, $url, $obj_id);
         //return $this->debugBuildAllControls($builder);
         return $builder;
     }

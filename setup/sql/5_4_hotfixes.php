@@ -1331,8 +1331,8 @@ if (!$idx) {
 <#90>
 <?php
 
-$query = 'update object_data set offline = 1 where type = '.
-    $ilDB->quote('crs',\ilDBConstants::T_TEXT) . '  and offline IS NULL';
+$query = 'update object_data set offline = 1 where type = ' .
+    $ilDB->quote('crs', \ilDBConstants::T_TEXT) . '  and offline IS NULL';
 $ilDB->manipulate($query);
 
 ?>
@@ -1341,8 +1341,8 @@ $ilDB->manipulate($query);
 <?php
 
 $ilDB->modifyTableColumn(
-        'ldap_role_assignments',
-        'rule_id',
+    'ldap_role_assignments',
+    'rule_id',
     [
             'type' => \ilDBConstants::T_INTEGER,
             'length' => 4,
@@ -1357,11 +1357,69 @@ $ilCtrlStructureReader->getStructure();
 <#93>
 <?php
     // remove magpie cache dir
-    $mcdir = CLIENT_WEB_DIR."/magpie_cache";
+    $mcdir = CLIENT_WEB_DIR . "/magpie_cache";
     ilUtil::delDir($mcdir);
 ?>
 <#94>
 <?php
 $setting = new ilSetting();
 $setting->set('ilfrmtreemigr', 1);
+?>
+
+
+<#95>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+// workaround to avoid error when using addAdminNode. Bug?
+class EventHandler
+{
+    public function raise($a_component, $a_event, $a_parameter = "")
+    {
+        // nothing to do...
+    }
+}
+$GLOBALS['ilAppEventHandler'] = new EventHandler();
+ilDBUpdateNewObjectType::addAdminNode('lsos', 'LearningSequenceAdmin');
+?>
+
+<#96>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+
+<#97>
+<?php
+if (!$ilDB->indexExistsByFields('booking_object', array('pool_id'))) {
+    $ilDB->addIndex('booking_object', array('pool_id'), 'i1');
+}
+?>
+<#98>
+<?php
+if (!$ilDB->indexExistsByFields('il_object_subobj', array('subobj'))) {
+    $ilDB->addIndex('il_object_subobj', array('subobj'), 'i1');
+}
+?>
+<#99>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#100>
+<?php
+if (!$ilDB->indexExistsByFields('tax_tree', ['child'])) {
+    $ilDB->addIndex('tax_tree', ['child'], 'i1');
+}
+?>
+<#101>
+<?php
+// deleted
+?>
+<#102>
+<?php
+global $DIC;
+$DIC->database()->modifyTableColumn("usr_data", "login", [
+    "type" => \ilDBConstants::T_TEXT,
+    "length" => 190,
+    "notnull" => false,
+    "fixed" => false
+]);
 ?>

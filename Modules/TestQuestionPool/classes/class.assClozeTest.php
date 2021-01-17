@@ -1279,7 +1279,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
     
     public function validateSolutionSubmit()
     {
-        foreach ($this->getSolutionSubmit() as $gapIndex => $value) {
+        foreach ($this->getSolutionSubmitValidation() as $gapIndex => $value) {
             $gap = $this->getGap($gapIndex);
             
             if ($gap->getType() != CLOZE_NUMERIC) {
@@ -1308,7 +1308,9 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
                     $gap = $this->getGap($matches[1]);
                     if (is_object($gap)) {
                         if (!(($gap->getType() == CLOZE_SELECT) && ($value == -1))) {
-                            if ($gap->getType() == CLOZE_NUMERIC) {
+                            if ($gap->getType() == CLOZE_NUMERIC && !is_numeric(str_replace(",", ".", $value))) {
+                                $value = null;
+                            } else if ($gap->getType() == CLOZE_NUMERIC) {
                                 $value = str_replace(",", ".", $value);
                             }
                             $solutionSubmit[trim($matches[1])] = $value;
@@ -1320,7 +1322,32 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
         
         return $solutionSubmit;
     }
-    
+
+    public function getSolutionSubmitValidation()
+    {
+        $submit = $_POST;
+        $solutionSubmit = array();
+
+        foreach ($submit as $key => $value) {
+            if (preg_match("/^gap_(\d+)/", $key, $matches)) {
+                $value = ilUtil::stripSlashes($value, false);
+                if (strlen($value)) {
+                    $gap = $this->getGap($matches[1]);
+                    if (is_object($gap)) {
+                        if (!(($gap->getType() == CLOZE_SELECT) && ($value == -1))) {
+                            if ($gap->getType() == CLOZE_NUMERIC) {
+                                $value = str_replace(",", ".", $value);
+                            }
+                            $solutionSubmit[trim($matches[1])] = $value;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $solutionSubmit;
+    }
+
     public function getSolutionSubmit()
     {
         return $this->fetchSolutionSubmit($_POST);
@@ -1989,5 +2016,10 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
         $item->setOrder($gap->getItemCount());
         
         $gap->addItem($item);
+    }
+
+    public function savePartial()
+    {
+        return true;
     }
 }
