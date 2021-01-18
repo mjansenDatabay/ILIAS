@@ -659,6 +659,8 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
             // fau: fixQuestionValidateSubmit - use common function to handle a save error
             $this->handleSaveQuestionSolutionError($questionOBJ);
             // fau.
+            $this->ctrl->setParameter($this, "save_error", "1");
+            $_SESSION["previouspost"] = $_POST;
         }
 
         return $this->saveResult;

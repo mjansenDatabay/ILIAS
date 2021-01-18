@@ -219,9 +219,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 
         ilUtil::sendFailure($message, true);
 
-        $this->ctrl->setParameter($this, "save_error", "1");
         $this->setAnswerChangedParameter();
-        $_SESSION["previouspost"] = $_POST;
     }
     // fau.
 

@@ -810,6 +810,8 @@ class ilTestPlayerDynamicQuestionSetGUI extends ilTestPlayerAbstractGUI
             }
             $this->handleSaveQuestionSolutionError($questionOBJ);
             // fau.
+            $this->ctrl->setParameter($this, "save_error", "1");
+            $_SESSION["previouspost"] = $_POST;
         }
         
         return $this->saveResult;
