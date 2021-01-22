@@ -1053,7 +1053,9 @@ function numericInputCheck() {
 
 		// Append ilcqinput_NumericInputInvalid class for visually distinguishable numeric input fields.
 		// -> Onload.
-		let value = $( numericInput ).val().toString().replace( ',', '.' );
+		// fau: fixIos9 - use var instead of let
+		var value = $( numericInput ).val().toString().replace( ',', '.' );
+		// fau.
 		if ( value && !$.isNumeric( value ) ) {
 			$( numericInput ).addClass( 'ilcqinput_NumericInputInvalid' );
 		} else {
@@ -1061,7 +1063,9 @@ function numericInputCheck() {
 		}
 		// -> OnChange.
 		$( numericInput ).on( 'change', function() {
-			let value = $( this ).val().toString().replace( ',', '.' );
+			// fau: fixIos9 - use var instead of let
+			var value = $( this ).val().toString().replace( ',', '.' );
+			// fau.
 			if ( value && !$.isNumeric( value ) ) {
 				$( this ).addClass( 'ilcqinput_NumericInputInvalid' );
 			} else {
