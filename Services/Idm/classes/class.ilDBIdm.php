@@ -21,38 +21,31 @@ class ilDBIdm extends ilDBPdoMySQLInnoDB
      */
     public static function getInstance()
     {
-        try {
-            if (!ilCust::get('idm_host')) {
+        global $DIC;
+
+        // read the client settings if available
+        if (isset($DIC) && $DIC->offsetExists('ilClientIniFile'))
+        {
+            /** @var ilIniFile $ilClientIniFile */
+            $ilClientIniFile = $DIC['ilClientIniFile'];
+            $settings = $ilClientIniFile->readGroup('db_idm');
+        }
+
+        if (!isset(self::$instance))
+        {
+            $instance = new self;
+            $instance->setDBHost($settings['host']);
+            $instance->setDBPort($settings['port']);
+            $instance->setDBUser($settings['user']);
+            $instance->setDBPassword($settings['pass']);
+            $instance->setDBName($settings['name']);
+            if (!$instance->connect(true))
+            {
                 return null;
             }
-
-            if (!isset(self::$instance)) {
-                $instance = new ilDBIdm;
-
-                $instance->setDBHost(ilCust::get('idm_host'));
-                $instance->setDBPort(ilCust::get('idm_port'));
-                $instance->setDBUser(ilCust::get('idm_user'));
-                $instance->setDBPassword(ilCust::get('idm_pass'));
-                $instance->setDBName(ilCust::get('idm_name'));
-                if (!$instance->connect(true)) {
-                    return null;
-                }
-                self::$instance = $instance;
-            }
-
-            return self::$instance;
-        } catch (Exception $e) {
-            return null;
+            self::$instance = $instance;
         }
-    }
 
-    /**
-     * Connect
-     * set the parameter 'new_link' (allowed by patch in PEAR:MDB2)
-     * don't set the parameter 'use transactions'
-     */
-    public function doConnect()
-    {
-        $this->db = MDB2::factory($this->getDSN(), array("new_link" => true));
+        return self::$instance;
     }
 }

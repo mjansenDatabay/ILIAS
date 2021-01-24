@@ -1355,5 +1355,17 @@ $ilDB->manipulate("UPDATE usr_data SET passwd_enc_type = 'idmcrypt' WHERE passwd
 ?>
 <#83>
 <?php
+/**
+ * fau: idmPass - drop unnecessary ext_passwd
+ */
 $ilDB->dropTableColumn('usr_data', 'ext_passwd');
+?>
+<#84>
+<?php
+$ilDB->modifyTableColumn("usr_data", "passwd", [
+    "type" => \ilDBConstants::T_TEXT,
+    "length" => 250,
+    "notnull" => false,
+    "fixed" => false
+]);
 ?>

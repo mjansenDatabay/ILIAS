@@ -46,12 +46,10 @@ class ilIdmData
      */
     public $coded_password = '';
 
-
     /**
      * @var string  matriculation number
      */
     public $matriculation = '';
-
 
     /**
      * @var array   affiliations ('employee', 'member', 'student', 'affiliate')
@@ -63,18 +61,15 @@ class ilIdmData
      */
     public $fau_employee = null;
 
-
     /**
      * @var string  null | 'auto'   or a specific string
      */
     public $fau_student = null;
 
-
     /**
      * @var string  null | 'auto'   or a specific string
      */
     public $fau_guest = null;
-
 
     /**
      * @var ilStudyCourseData[]   study data
@@ -102,10 +97,9 @@ class ilIdmData
         ilStudyAccess::_requireData();
     }
 
-
     /**
      * Read the identity data from the idm database
-     * @param   string      $identity
+     * @param string $identity
      * @return  boolean
      */
     public function read($identity = null)
@@ -265,9 +259,8 @@ class ilIdmData
 
     /**
      * Set the properties from an array of raw data
-     *
-     * @param   array           raw data (assoc, names like columns of idm.identities)
-     * @param   boolean         format is coming from shibboleth authentication
+     * @param array           raw data (assoc, names like columns of idm.identities)
+     * @param boolean         format is coming from shibboleth authentication
      */
     public function setRawData($raw, $fromShibboleth = false)
     {
@@ -279,11 +272,11 @@ class ilIdmData
         switch ($raw['schac_gender']) {
             // genders are differently coded in provisions by sso and database
             case '1':
-                $this->gender = $fromShibboleth ? 'm' :'f';
+                $this->gender = $fromShibboleth ? 'm' : 'f';
                 break;
             case '2':
-                $this->gender = $fromShibboleth ? 'f': 'm';
-               break;
+                $this->gender = $fromShibboleth ? 'f' : 'm';
+                break;
             default:
                 $this->gender = 'n';
                 break;
@@ -377,9 +370,8 @@ class ilIdmData
     /**
      * Apply the basic IDM data to a user account
      * Note: the id must exist
-     *
      * @param ilObjUser $userObj
-     * @param string $mode 'create' or 'update'
+     * @param string    $mode 'create' or 'update'
      * @throws ilDateTimeException
      */
     public function applyToUser(ilObjUser $userObj, $mode = 'update')
@@ -405,8 +397,7 @@ class ilIdmData
                 $userObj->setPasswd($this->coded_password, IL_PASSWD_CRYPTED);
                 if (substr($this->coded_password, 0, 6) == '{SSHA}') {
                     $userObj->setPasswordEncodingType('idmssha');
-                }
-                elseif (substr($this->coded_password, 0, 7) == '{CRYPT}') {
+                } elseif (substr($this->coded_password, 0, 7) == '{CRYPT}') {
                     $userObj->setPasswordEncodingType('idmcrypt');
                 }
             }
@@ -472,5 +463,34 @@ class ilIdmData
         // update role assignments
         require_once('Services/AuthShibboleth/classes/class.ilShibbolethRoleAssignmentRules.php');
         ilShibbolethRoleAssignmentRules::updateAssignments($userObj->getId(), (array) $this);
+    }
+
+    /**
+     * Get a dummy user for password verification
+     * @return ilObjUser
+     */
+    public function getDummyUser()
+    {
+        $userObj = new ilObjUser();
+        $userObj->setFirstname($this->firstname);
+        $userObj->setLastname($this->lastname);
+        $userObj->setGender($this->gender);
+        $userObj->setEmail($this->email);
+        $userObj->setMatriculation($this->matriculation);
+        $userObj->setFullname();
+        $userObj->setTitle($userObj->getFullname());
+        $userObj->setDescription($userObj->getEmail());
+
+        $userObj->setPasswd($this->coded_password, IL_PASSWD_CRYPTED);
+        if (substr($this->coded_password, 0, 6) == '{SSHA}') {
+            $userObj->setPasswordEncodingType('idmssha');
+        } elseif (substr($this->coded_password, 0, 7) == '{CRYPT}') {
+            $userObj->setPasswordEncodingType('idmcrypt');
+        }
+
+        $userObj->setExternalAccount($this->identity);
+        $userObj->setActive(1, 6);
+
+        return $userObj;
     }
 }
