@@ -3,9 +3,7 @@
 
 define("IL_PASSWD_PLAIN", "plain");
 define("IL_PASSWD_CRYPTED", "crypted");
-// fau: idmPass - support for ssha passwords - an SSHA encoded password is stored in passwd column with prefix "{SSHA}"
-define("IL_PASSWD_SSHA", "ssha");          // SSHA generated password
-// fau.
+
 
 require_once "./Services/Object/classes/class.ilObject.php";
 require_once './Services/User/exceptions/class.ilUserException.php';
@@ -57,12 +55,6 @@ class ilObjUser extends ilObject
     // in the methods that perform SQL statements. All other
     // methods work exclusively with the $passwd and $passwd_type
     // variables.
-
-
-    // fau: idmPass - add field for external password (always SSHA encrypted)
-    public $ext_passwd;
-    // fau.
-
 
     /**
      * The encoding algorithm of the user's password stored in the database
@@ -255,13 +247,7 @@ class ilObjUser extends ilObject
         if ($data = $ilDB->fetchAssoc($r)) {
             // convert password storage layout used by table usr_data into
             // storage layout used by class ilObjUser
-            // fau: idmPass - recognize password type ssha
-            if (ilUserPasswordManager::_isSSHAPassword($data["passwd"])) {
-                $data["passwd_type"] = IL_PASSWD_SSHA;
-            } else {
-                $data["passwd_type"] = IL_PASSWD_CRYPTED;
-            }
-            // fau.
+            $data["passwd_type"] = IL_PASSWD_CRYPTED;
 
             // this assign must not be set via $this->assignData($data)
             // because this method will be called on profile updates and
@@ -368,10 +354,6 @@ class ilObjUser extends ilObject
             $this->setPasswd($a_data["passwd"], $a_data["passwd_type"]);
         }
 
-        // fau: idmPass - assign external passwd
-        $this->setExternalPasswd($a_data["ext_passwd"]);
-        // fau.
-
         $this->setGender($a_data["gender"]);
         $this->setUTitle($a_data["title"]);
         $this->setFirstname($a_data["firstname"]);
@@ -474,12 +456,6 @@ class ilObjUser extends ilObject
                 $pw_value = $this->passwd;
                 break;
 
-// fau: idmPass - sql insert for passwd type ssha
-            case IL_PASSWD_SSHA:
-                $pw_value = $this->passwd;
-                break;
-// fau.
-
             default:
                  $ilErr->raiseError("<b>Error: passwd_type missing in function saveAsNew. " .
                                     $this->id . "!</b><br />class: " . get_class($this) . "<br />Script: " . __FILE__ .
@@ -540,9 +516,6 @@ class ilObjUser extends ilObject
             "loc_zoom" => array("integer", (int) $this->loc_zoom),
             "last_password_change" => array("integer", (int) $this->last_password_change_ts),
             'inactivation_date' => array('timestamp', $this->inactivation_date),
-// fau: idmPass - add external password
-            "ext_passwd" => array("text", $this->getExternalPasswd()),
-// fau.
             'is_self_registered' => array('integer', (int) $this->is_self_registered),
             );
         $ilDB->insert("usr_data", $insert_array);
@@ -637,10 +610,7 @@ class ilObjUser extends ilObject
             "loc_zoom" => array("integer", (int) $this->loc_zoom),
             "last_password_change" => array("integer", $this->last_password_change_ts),
             "last_update" => array("timestamp", ilUtil::now()),
-            'inactivation_date' => array('timestamp', $this->inactivation_date),
-// fau: idmPass - add external password
-            "ext_passwd" => array("text", $this->getExternalPasswd())
-// fau.
+            'inactivation_date' => array('timestamp', $this->inactivation_date)
             );
             
         // fau: samlAuth - allow null as agree date
@@ -662,12 +632,6 @@ class ilObjUser extends ilObject
             case IL_PASSWD_CRYPTED:
                 $update_array["passwd"] = array("text", (string) $this->passwd);
                 break;
-
-// fau: idmPass - sql update for new passwd type ssha
-            case IL_PASSWD_SSHA:
-                $update_array["passwd"] = array("text", (string) $this->passwd);
-                break;
-// fau.
 
             default:
                 $ilErr->raiseError("<b>Error: passwd_type missing in function update()" . $this->id . "!</b><br />class: " .
@@ -3900,29 +3864,6 @@ class ilObjUser extends ilObject
     {
         return $this->ext_account;
     }
-
-    // fau: idmPass - set/get external password
-    /**
-    * set external password
-    * @access	public
-    * @param	string	passwd
-    */
-    public function setExternalPasswd($a_str)
-    {
-        $this->ext_passwd = $a_str;
-    }
-
-    /**
-    * get external password
-    * @return 	password
-    * @access	public
-    */
-    public function getExternalPasswd()
-    {
-        return $this->ext_passwd;
-    }
-    // fau.
-
 
     /**
      * Get list of external account by authentication method

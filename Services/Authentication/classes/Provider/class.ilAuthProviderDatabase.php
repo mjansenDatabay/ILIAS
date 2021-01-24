@@ -60,7 +60,7 @@ class ilAuthProviderDatabase extends ilAuthProvider implements ilAuthProviderInt
 
                 $this->getLogger()->debug('Trying to authenticate user: ' . $login);
                 if ($user instanceof ilObjUser) {
-                    if (ilUserPasswordManager::getInstance()->verifyExternalPassword($user, $this->getCredentials()->getPassword())) {
+                    if (ilUserPasswordManager::getInstance()->verifyPassword($user, $this->getCredentials()->getPassword())) {
                         $this->getLogger()->debug('Successfully authenticated user: ' . $user->getLogin());
                         $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
                         $status->setAuthenticatedUserId($user->getId());

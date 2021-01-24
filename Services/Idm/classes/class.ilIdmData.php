@@ -402,7 +402,13 @@ class ilIdmData
                 $userObj->setEmail($this->email);
             }
             if (!empty($this->coded_password)) {
-                $userObj->setPasswd($this->coded_password, IL_PASSWD_SSHA);
+                $userObj->setPasswd($this->coded_password, IL_PASSWD_CRYPTED);
+                if (substr($this->coded_password, 0, 6) == '{SSHA}') {
+                    $userObj->setPasswordEncodingType('idmssha');
+                }
+                elseif (substr($this->coded_password, 0, 7) == '{CRYPT}') {
+                    $userObj->setPasswordEncodingType('idmcrypt');
+                }
             }
 
             // dependent system data
@@ -413,7 +419,6 @@ class ilIdmData
 
         // always update external account and password
         $userObj->setExternalAccount($this->identity);
-        $userObj->setExternalPasswd($this->coded_password);
 
         // time limit and activation
         if ($mode == 'create') {

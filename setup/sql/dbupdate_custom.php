@@ -1,5 +1,8 @@
 <#1>
 <?php
+    /** @var ilDBInterface $ilDB */
+    /** @var ilCtrlStructureReader $ilCtrlStructureReader */
+
     /**
     * fau: studyData - Create the tables for study data.
     */
@@ -622,6 +625,7 @@
     }
 
     $query = "SELECT * FROM tst_rnd_quest_set_qpls WHERE origin_tax_fi IS NOT NULL OR mapped_tax_fi IS NOT NULL";
+    /** @var PDOStatement $result */
     $result = $ilDB->query($query);
     while ($row = $ilDB->fetchObject($result)) {
         if (!empty($row->origin_tax_fi)) {
@@ -640,7 +644,7 @@
             . " origin_tax_fi = NULL, origin_node_fi = NULL, mapped_tax_fi = NULL, mapped_node_fi = NULL, "
             . " origin_tax_filter = " . $ilDB->quote($origin_tax_filter, 'text') . ", "
             . " mapped_tax_filter = " . $ilDB->quote($mapped_tax_filter, 'text')
-            . " WHERE def_id = " . $ilDB->quote($row->def_id);
+            . " WHERE def_id = " . $ilDB->quote($row->def_id,  'integer');
 
         $ilDB->manipulate($update);
     }
@@ -675,8 +679,6 @@
 <?php
     /**
      * fau: relativeLink - create the link table
-     *
-     * @var ilDB $ilDB
      */
     if (!$ilDB->tableExists('il_relative_link')) {
         $fields = array(
@@ -1342,4 +1344,16 @@ if (! $ilDB->tableExists('exc_ass_test_result')) {
  * fau: exAssTest - reload control structure
  */
 $ilCtrlStructureReader->getStructure();
+?>
+<#82>
+<?php
+/**
+ * fau: idmPass - add encoding types for idm passwords
+ */
+$ilDB->manipulate("UPDATE usr_data SET passwd_enc_type = 'idmssha' WHERE passwd LIKE '{SSHA}%'");
+$ilDB->manipulate("UPDATE usr_data SET passwd_enc_type = 'idmcrypt' WHERE passwd LIKE '{CRYPT}%'");
+?>
+<#83>
+<?php
+$ilDB->dropTableColumn('usr_data', 'ext_passwd');
 ?>
