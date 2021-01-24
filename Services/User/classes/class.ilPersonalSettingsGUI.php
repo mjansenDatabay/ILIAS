@@ -246,6 +246,13 @@ class ilPersonalSettingsGUI
             //if (
             //	($ilUser->getAuthMode(true) != AUTH_SHIBBOLETH || !$ilSetting->get("shib_auth_allow_local"))
             //)
+
+            // fau: pwChangeForm - show username
+            $login = new ilNonEditableValueGUI($lng->txt('login'), 'login');
+            $login->setValue($ilUser->getLogin());
+            $this->form->addItem($login);
+            // fau.
+
             if ($ilUser->getAuthMode(true) == AUTH_LOCAL) {
                 // current password
                 $cpass = new ilPasswordInputGUI($lng->txt("current_password"), "current_password");
