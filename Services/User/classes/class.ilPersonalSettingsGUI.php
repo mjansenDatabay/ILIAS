@@ -247,11 +247,10 @@ class ilPersonalSettingsGUI
             //	($ilUser->getAuthMode(true) != AUTH_SHIBBOLETH || !$ilSetting->get("shib_auth_allow_local"))
             //)
 
-            // fau: pwChangeForm - show username
+            // fau: pwChangeForm - show username, add button and info for "password assistancen
             $login = new ilNonEditableValueGUI($lng->txt('login'), 'login');
             $login->setValue($ilUser->getLogin());
             $this->form->addItem($login);
-            // fau.
 
             if ($ilUser->getAuthMode(true) == AUTH_LOCAL) {
                 // current password
@@ -261,9 +260,16 @@ class ilPersonalSettingsGUI
                 // only if a password exists.
                 if ($ilUser->getPasswd()) {
                     $cpass->setRequired(true);
+                    $cpass->setInfo($lng->txt('current_password_info'));
                 }
                 $this->form->addItem($cpass);
+
+                $button = ilLinkButton::getInstance();
+                $button->setCaption('forgot_password', true);
+                $button->setUrl($this->ctrl->getLinkTarget($this, 'confirmPasswordAssistance'));
+                $DIC->toolbar()->addButtonInstance($button);
             }
+            // fau.
             
             // new password
             $ipass = new ilPasswordInputGUI($lng->txt("desired_password"), "new_password");
@@ -294,6 +300,61 @@ class ilPersonalSettingsGUI
             $this->form->setFormAction($this->ctrl->getFormAction($this));
         }
     }
+
+    // fau: pwChangeForm - new function confirmPasswordAssistance()
+    /**
+     * Confirm the sending of a password assistance mail
+     */
+    protected function confirmPasswordAssistance()
+    {
+        global $DIC;
+
+        // normally we should not end up here
+        if (!$this->allowPasswordChange()) {
+            $this->ctrl->redirect($this, "showPersonalData");
+            return;
+        }
+
+        $this->__initSubTabs("showPersonalData");
+        $DIC->tabs()->activateTab("password");
+        $this->setHeader();
+
+        $gui = new ilConfirmationGUI();
+        $gui->setFormAction($DIC->ctrl()->getFormAction($this));
+        $gui->setHeaderText(sprintf($this->lng->txt('confirm_password_assistance'), $DIC->user()->getEmail()));
+        $gui->addHiddenItem('username', $DIC->user()->getLogin());
+        $gui->addHiddenItem('email', $DIC->user()->getEmail());
+
+        $gui->setConfirm($this->lng->txt('ok'), 'sendPasswordAssistanceMail');
+        $gui->setCancel($this->lng->txt('cancel'), 'showPassword');
+
+
+        $this->tpl->setContent($gui->getHTML());
+        $this->tpl->show();
+    }
+    // fau.
+
+    // fau: pwChangeForm - new function sendPasswordAssistanceMail()
+    /**
+     * Send a mail for password assistance
+     */
+    protected function sendPasswordAssistanceMail()
+    {
+        global $DIC;
+        // normally we should not end up here
+        if (!$this->allowPasswordChange()) {
+            $this->ctrl->redirect($this, "showPersonalData");
+            return;
+        }
+
+        $this->lng->loadLanguageModule('pwassist');
+        $gui = new ilPasswordAssistanceGUI();
+        $gui->sendPasswordAssistanceMail($DIC->user());
+
+        ilUtil::sendSuccess(sprintf($this->lng->txt('pwassist_mail_sent'), $DIC->user()->getEmail()));
+        $this->ctrl->redirect($this, 'showPassword');
+    }
+    // fau.
     
     /**
     * Check, whether password change is allowed for user
