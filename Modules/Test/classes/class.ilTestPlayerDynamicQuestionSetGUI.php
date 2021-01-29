@@ -174,7 +174,11 @@ class ilTestPlayerDynamicQuestionSetGUI extends ilTestPlayerAbstractGUI
         if ($this->object->checkMaximumAllowedUsers() == false) {
             return $this->showMaximumAllowedUsersReachedMessage();
         }
-        
+
+        // fau: testStatement - call check when dynamic test is resumed
+        $this->checkAuthorshipStatement();
+        // fau.
+
         $this->handleUserSettings();
         
         if ($this->dynamicQuestionSetConfig->isAnyQuestionFilterEnabled()) {

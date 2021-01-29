@@ -476,6 +476,10 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
      */
     protected function startPlayerCmd()
     {
+        // fau: testStatement - call check when test is started
+        $this->checkAuthorshipStatement();
+        // fau.
+
         $testStartLock = $this->getLockParameter();
         $isFirstTestStartRequest = false;
 
@@ -550,6 +554,33 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
     {
         $this->ctrl->redirect($this, ilTestPlayerCommands::START_TEST);
     }
+
+    // fau: testStatement - new function checkAuthorshipStatement()
+    /**
+     * Check if a needed authorship statement is checked
+     */
+    public function checkAuthorshipStatement()
+    {
+        if (empty($_POST["chb_authorship_statement"])) {
+            if ($this->testSession->hasAuthorshipStatement()) {
+                $this->testSession->setAuthorshipStatement(false);
+                $this->testSession->saveToDb();
+            }
+
+            if ($this->object->isAuthorshipStatementRequired())
+            {
+                ilUtil::sendFailure($this->lng->txt('tst_msg_authorship_statement_required'), true);
+                $this->ctrl->redirectByClass('ilobjtestgui', 'infoScreen');
+            }
+        }
+        else {
+            if (!$this->testSession->hasAuthorshipStatement()) {
+                $this->testSession->setAuthorshipStatement(true);
+                $this->testSession->saveToDb();
+            }
+        }
+    }
+    // fau.
 
     /**
      * Handles some form parameters on starting and resuming a test

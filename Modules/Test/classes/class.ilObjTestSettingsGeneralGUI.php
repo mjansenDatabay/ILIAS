@@ -783,6 +783,15 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $showinfo->setChecked($this->testOBJ->getShowInfo());
         $showinfo->setInfo($this->lng->txt("showinfo_desc"));
         $form->addItem($showinfo);
+
+        // fau: testStatement - add chceckbox
+        $statement = new ilCheckboxInputGUI($this->lng->txt("tst_require_authorship_statement"), "require_authorship_statement");
+        $statement->setValue(1);
+        $statement->setChecked($this->testOBJ->isAuthorshipStatementRequired());
+        $statement->setInfo($this->lng->txt("tst_require_authorship_statement_desc"));
+        $form->addItem($statement);
+        // fau.
+
     }
 
     /**
@@ -803,6 +812,12 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         if ($form->getItemByPostVar('showinfo') instanceof ilFormPropertyGUI) {
             $this->testOBJ->setShowInfo($form->getItemByPostVar('showinfo')->getChecked());
         }
+
+        // fau: testStatement - save form setting
+        if ($form->getItemByPostVar('require_authorship_statement') instanceof ilFormPropertyGUI) {
+            $this->testOBJ->requireAuthorshipStatement($form->getItemByPostVar('require_authorship_statement')->getChecked());
+        }
+        // fau.
     }
 
     /**

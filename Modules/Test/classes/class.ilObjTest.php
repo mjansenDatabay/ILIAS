@@ -144,6 +144,14 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     public $mark_tst_failed;
     // fau.
 
+    //fau: testStatement - class variable
+    /**
+     * @var bool
+     */
+    public $require_authorship_statement = false;
+    // fau.
+
+
     /**
     * Defines the mark schema
     *
@@ -685,6 +693,9 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         // fau: testGradingMessage - init messages
         $this->mark_tst_passed = "";
         $this->mark_tst_failed = "";
+        // fau.
+        // fau: testStatement - init statement
+        $this->require_authorship_statement = false;
         // fau.
         $this->ects_grades = array(
             'A' => 90,
@@ -1272,10 +1283,13 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                 'intro_enabled' => array('integer', (int) $this->isIntroductionEnabled()),
                 'introduction' => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getIntroduction(), 0)),
                 'finalstatement' => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getFinalStatement(), 0)),
-// fau: testGradingMessage - save mark messages to db
+                // fau: testGradingMessage - save mark messages to db
                 'mark_tst_passed' => array('text', $this->getMarkTstPassed()),
                 'mark_tst_failed' => array('text', $this->getMarkTstFailed()),
-// fau.
+                // fau.
+                // fau: testStatement - save the requirement in db
+                'require_authorship_statement' => array('integer', $this->isAuthorshipStatementRequired()),
+                // fau.
                 'showinfo' => array('integer', $this->getShowInfo()),
                 'forcejs' => array('integer', $this->getForceJS()),
                 'customstyle' => array('text', $this->getCustomStyle()),
@@ -1396,10 +1410,13 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                         'intro_enabled' => array('integer', (int) $this->isIntroductionEnabled()),
                         'introduction' => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getIntroduction(), 0)),
                         'finalstatement' => array('text', ilRTE::_replaceMediaObjectImageSrc($this->getFinalStatement(), 0)),
-// fau: testGradingMessage - save mark messages to db
+                        // fau: testGradingMessage - update mark messages in db
                         'mark_tst_passed' => array('text', $this->getMarkTstPassed()),
                         'mark_tst_failed' => array('text', $this->getMarkTstFailed()),
-// fau.
+                        // fau.
+                        // fau: testStatement - update requirement in db
+                        'require_authorship_statement' => array('integer', $this->isAuthorshipStatementRequired()),
+                        // fau.
                         'showinfo' => array('integer', $this->getShowInfo()),
                         'forcejs' => array('integer', $this->getForceJS()),
                         'customstyle' => array('text', $this->getCustomStyle()),
@@ -1892,6 +1909,9 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $this->setMarkTstPassed($data->mark_tst_passed);
             $this->setMarkTstFailed($data->mark_tst_failed);
             // fau.
+            // fau: testStatement - set requirement from DB
+            $this->requireAuthorshipStatement($data->require_authorship_statement);
+            // fau.
             $this->setForceJS($data->forcejs);
             $this->setCustomStyle($data->customstyle);
             $this->setShowFinalStatement($data->showfinalstatement);
@@ -2110,7 +2130,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $this->_finalstatement = $a_statement;
     }
 
-    // fau: testGradingMessage - new functions setMarkTstPassed(), setMarkTstFailed
+    // fau: testGradingMessage - new functions setMarkTstPassed(), setMarkTstFailed()
     /**
     * Set the mark message for passed tests
     *
@@ -2121,7 +2141,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     {
         $this->mark_tst_passed = $a_mark;
     }
-    // fim.
 
     /**
     * Set the mark message for failed tests
@@ -2135,6 +2154,16 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     }
     // fau.
 
+
+    // fau: testStatement - new function requireAuthorshipStatement()
+    /**
+     * Set requirement of an authorship statement
+     * @param bool $require
+     */
+    public function requireAuthorshipStatement($require) {
+        $this->require_authorship_statement = (bool) $require;
+    }
+    // fau.
 
     /**
     * Set whether the complete information page is shown or the required data only
@@ -2279,6 +2308,16 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     public function getMarkTstFailed()
     {
         return (strlen($this->mark_tst_failed)) ? $this->mark_tst_failed : null;
+    }
+    // fau.
+
+    // fau: testStatement - new function isAuthorshipStatementRequired()
+    /**
+     * Get requirement of an authorship statement
+     * @return bool
+     */
+    public function isAuthorshipStatementRequired() {
+        return (bool) $this->require_authorship_statement;
     }
     // fau.
 
@@ -6056,14 +6095,19 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                         $this->setEndingTimeEnabled(true);
                     }
                     break;
-// fau: testGradingMessage - get mark messages from XML
+                // fau: testGradingMessage - get mark messages from XML
                 case "mark_tst_passed":
                     $this->setMarkTstPassed($metadata["entry"]);
                     break;
                 case "mark_tst_failed":
                     $this->setMarkTstFailed($metadata["entry"]);
                     break;
-// fau.
+                // fau.
+                // fau: testStatement - set requirement from XML
+                case "require_authorship_statement":
+                    $this->requireAuthorshipStatement($metadata["entry"]);
+                    break;
+                // fau.
                 case "enable_examview":
                     $this->setEnableExamview($metadata["entry"]);
                     break;
@@ -6688,6 +6732,13 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $a_xml_writer->xmlEndTag("qtimetadatafield");
         // fau.
 
+        // fau: testStatement - write requirement to XML
+        $a_xml_writer->xmlStartTag("qtimetadatafield");
+        $a_xml_writer->xmlElement("fieldlabel", null, "require_authorship_statement");
+        $a_xml_writer->xmlElement("fieldentry", null, (int) $this->isAuthorshipStatementRequired());
+        $a_xml_writer->xmlEndTag("qtimetadatafield");
+        // fau.
+
         // add qti objectives
         $a_xml_writer->xmlStartTag("objectives");
         $this->addQTIMaterial($a_xml_writer, $this->getIntroduction());
@@ -7256,6 +7307,9 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         // fau: testGradingMessage - clone mark messages
         $newObj->setMarkTstPassed($this->getMarkTstPassed());
         $newObj->setMarkTstFailed($this->getMarkTstFailed());
+        // fau.
+        // fau: testStatement - set requirement
+        $newObj->requireAuthorshipStatement($this->isAuthorshipStatementRequired());
         // fau.
         $newObj->setShowInfo($this->getShowInfo());
         $newObj->setForceJS($this->getForceJS());

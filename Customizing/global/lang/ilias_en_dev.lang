@@ -88,6 +88,11 @@ assessment#:#validate_submit_error#:#Your input is rejected!
 assessment#:#validate_submit_error_in_test_hint#:#You need to fix it to leave the question. Alteratively you can revert the edit.
 assessment#:#err_cloze_not_numeric#:#You entered text in a gap that requires numeric input!
 assessment#:#tst_password_enter_info#:#IMPORTANT: Do not change the password during a running exam! The participants have to enter it when they move to the next question. Previous autosaves fail!
+assessment#:#tst_require_authorship_statement#:#Statement of Authorship
+assessment#:#tst_require_authorship_statement_desc#:#Requires a statement of authorship to start the test
+assessment#:#tst_info_section_requirements#:#Requirements
+assessment#:#tst_authorship_statement#:#Statement of Authorship
+assessment#:#tst_msg_authorship_statement_required#:#Please read and confirm the statement of authorship!
 auth#:#shib_continue#:#Continue to StudOn
 auth#:#shib_continue_local#:#Continue to StudOn
 auth#:#shib_convert_accept#:# I agree to the changes.

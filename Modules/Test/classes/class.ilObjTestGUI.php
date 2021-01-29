@@ -2810,7 +2810,22 @@ class ilObjTestGUI extends ilObjectGUI
         if ($this->object->getShowInfo()) {
             $info->enablePrivateNotes();
         }
-        
+
+        // fau: testStatement - add checkbox
+        if ($this->object->isAuthorshipStatementRequired()) {
+            $info->addSection($this->lng->txt("tst_info_section_requirements"));
+            if ($this->user->getLanguage() == 'de') {
+                $tpl_stat = new ilTemplate('tpl.tst_authorship_statement_de.html', false, false, 'Modules/Test');
+            }
+            else {
+                $tpl_stat = new ilTemplate('tpl.tst_authorship_statement_en.html', false, false, 'Modules/Test');
+            }
+            $info->addPropertyCheckbox($this->lng->txt("tst_authorship_statement"), "chb_authorship_statement", 1,
+                $tpl_stat->get(), $toolbar->getTestSession()->hasAuthorshipStatement());
+        }
+        // fau.
+
+
         if (strlen($this->object->getIntroduction())) {
             $info->addSection($this->lng->txt("tst_introduction"));
             $info->addProperty("", $this->object->prepareTextareaOutput($this->object->getIntroduction(), true) .

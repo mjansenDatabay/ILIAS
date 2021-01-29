@@ -1369,3 +1369,23 @@ $ilDB->modifyTableColumn("usr_data", "passwd", [
     "fixed" => false
 ]);
 ?>
+<#85>
+<?php
+/**
+ * fau: testStatement - database changes
+ */
+if (!$ilDB->tableColumnExists('tst_tests', 'require_authorship_statement')) {
+    $ilDB->addTableColumn(
+        'tst_tests',
+        'require_authorship_statement',
+        array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0)
+    );
+}
+if (!$ilDB->tableColumnExists('tst_active', 'time_authorship_statement')) {
+    $ilDB->addTableColumn(
+        'tst_active',
+        'time_authorship_statement',
+        array('type' => 'timestamp', 'notnull' => false, 'default' => null)
+    );
+}
+?>

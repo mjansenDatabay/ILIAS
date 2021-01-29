@@ -784,6 +784,9 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
      */
     protected function resumePlayerCmd()
     {
+        // fau: testStatement - call check when normal test is resumed
+        $this->checkAuthorshipStatement();
+        // fau.
         $this->handleUserSettings();
 
         $active_id = $this->testSession->getActiveId();
