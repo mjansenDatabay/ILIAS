@@ -298,6 +298,14 @@ class ilObjExercise extends ilObject
 
         $new_obj->saveCertificateVisibility($this->getCertificateVisibility());
 
+        // fau: exCalc - clone calculation settings
+        include_once "./Modules/Exercise/classes/class.ilExCalculate.php";
+        $exCalc = new ilExCalculate($this);
+        /** @var ilObjExercise $new_obj */
+        $exCalc->setExercise($new_obj);
+        $exCalc->writeOptions();
+        // fau.
+
         // Copy criteria catalogues
         $crit_cat_map = array();
         include_once("./Modules/Exercise/classes/class.ilExcCriteriaCatalogue.php");
@@ -354,6 +362,12 @@ class ilObjExercise extends ilObject
 
         include_once "Modules/Exercise/classes/class.ilExcCriteriaCatalogue.php";
         ilExcCriteriaCatalogue::deleteByParent($this->getId());
+
+        // fau: exCalc - delete calculation settings
+        include_once "./Modules/Exercise/classes/class.ilExCalculate.php";
+        $exCalc = new ilExCalculate($this);
+        $exCalc->deleteOptions();
+        // fau.
 
         // remove all notifications
         include_once "./Services/Notification/classes/class.ilNotification.php";

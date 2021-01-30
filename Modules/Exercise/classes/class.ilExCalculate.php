@@ -82,6 +82,16 @@ class ilExCalculate
         $this->readOptions();
     }
 
+    /**
+     * Set the exercise (needed for cloning exercises)
+     * (options will nor be read)
+     * @param ilObjExercise	$exercise
+     */
+
+    public function setExercise(ilObjExercise $exercise)
+    {
+        $this->exercise = $exercise;
+    }
     
     /**
      * Read the options for this exercise from the database
@@ -167,6 +177,19 @@ class ilExCalculate
         if ($this->exercise->getPassMode() == ilObjExercise::PASS_MODE_CALC) {
             $this->exercise->updateAllUsersStatus();
         }
+    }
+
+    /**
+     * Delete the options
+     */
+    public function deleteOptions()
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        $query = 'DELETE FROM exc_calc_options WHERE obj_id='
+            . $ilDB->quote($this->exercise->getId(), 'integer');
+        $ilDB->manipulate($query);
     }
 
     /**
