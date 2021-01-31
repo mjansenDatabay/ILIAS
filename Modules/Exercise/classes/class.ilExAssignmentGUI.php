@@ -449,9 +449,26 @@ class ilExAssignmentGUI
         else {
             $tpl_stat = new ilTemplate('tpl.exc_authorship_statement_en.html', false, false, 'Modules/Exercise');
         }
-        $a_info->addPropertyCheckbox($this->lng->txt("exc_authorship_statement"), "chb_authorship_statement", 1,
-            $tpl_stat->get(), false);
 
+        if (!$a_ass->getMemberStatus()->hasAuthorshipStatement()) {
+            $button = ilLinkButton::getInstance();
+            $button->setPrimary(true);
+            $button->setCaption($this->lng->txt('exc_accept_authorship_statement'), false);
+            $button->setUrl($this->ctrl->getLinkTargetByClass('ilobjexercisegui', 'acceptAuthorshipStatement'));
+            $html = $button->render();
+        }
+        else {
+            $date = new ilDateTime($a_ass->getMemberStatus()->getAuthorshipStatementTime(), IL_CAL_DATETIME);
+            $html = '<p>' . sprintf($this->lng->txt('exc_authorship_statement_accepted_at'), ilDatePresentation::formatDate($date)) .'</p>';
+
+//            $button = ilLinkButton::getInstance();
+//            $button->setPrimary(false);
+//            $button->setCaption($this->lng->txt('exc_revoke_authorship_statement'), false);
+//            $button->setUrl($this->ctrl->getLinkTargetByClass('ilobjexercisegui', 'revokeAuthorshipStatement'));
+//            $html .= $button->render();
+        }
+
+        $a_info->addProperty($this->lng->txt("exc_authorship_statement"), $tpl_stat->get() . $html);
     }
     // fau.
 

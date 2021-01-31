@@ -800,7 +800,7 @@ class ilObjExerciseGUI extends ilObjectGUI
         // forward the command
         $this->ctrl->forwardCommand($info);
     }
-    
+
     public function editObject()
     {
         $this->setSettingsSubTabs();
@@ -1028,7 +1028,34 @@ class ilObjExerciseGUI extends ilObjectGUI
 
         $tpl->setContent($mtpl->get());
     }
-    
+
+    // fau: exStatement - new function acceptAuthorshipStatementObject()
+    public function acceptAuthorshipStatementObject()
+    {
+        if (isset($this->ass)) {
+            $state = $this->ass->getMemberStatus();
+            $state->setAuthorshipStatement(true);
+            $state->update();
+            $this->ctrl->setParameter($this, 'ass_id_goto', $this->ass->getId());
+        }
+        $this->ctrl->redirect($this, 'showOverview');
+    }
+    // fau.
+
+    // fau: exStatement - new function revokeAuthorshipStatementObject()
+    public function revokeAuthorshipStatementObject()
+    {
+        if (isset($this->ass)) {
+            $state = $this->ass->getMemberStatus();
+            $state->setAuthorshipStatement(false);
+            $state->update();
+            $this->ctrl->setParameter($this, 'ass_id_goto', $this->ass->getId());
+        }
+        $this->ctrl->redirect($this, 'showOverview');
+    }
+    // fau.
+
+
     public function certificateObject()
     {
         $this->setSettingsSubTabs();

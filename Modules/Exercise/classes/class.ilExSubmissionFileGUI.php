@@ -81,8 +81,14 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
             $files_str = $lng->txt("message_no_delivered_files");
         }
 
+        // fau: exStatement - suppress submission button
+        if($a_submission->getAssignment()->isAuthorshipStatementRequired()
+            && !$a_submission->getAssignment()->getMemberStatus()->hasAuthorshipStatement()) {
+            $files_str .= "<br><br>" . '<b>' .$lng->txt('exc_msg_authorship_statement_required') . '</b>';
+        }
+        // fau.
         // no team == no submission
-        if (!$a_submission->hasNoTeamYet()) {
+        elseif (!$a_submission->hasNoTeamYet()) {
             if ($a_submission->canSubmit()) {
                 $title = (count($titles) == 0
                     ? $lng->txt("exc_hand_in")

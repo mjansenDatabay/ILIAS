@@ -728,6 +728,9 @@ exc#:#exc_info_section_requirements#:#Requirements
 exc#:#exc_authorship_statement#:#Statement of Authorship
 exc#:#exc_msg_authorship_statement_required#:#Please read and confirm the statement of authorship!
 exc#:#exc_require_authorship_statement_default#:#An authorship statement is required by default for new exercise assignments
+exc#:#exc_accept_authorship_statement#:#Accept Statement
+exc#:#exc_revoke_authorship_statement#:#Revoke Statement
+exc#:#exc_authorship_statement_accepted_at#:#Statement accepted: %s
 exercise#:#exc_mark#:#Grade/Points
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.
