@@ -722,6 +722,12 @@ exc#:#exc_create_single_teams#:#Create Single Teams
 exc#:#exc_create_single_teams_confirmation#:#Would you like to form individual teams for the following users? This makes them rateable, but they are no longer available for others to form teams.
 exc#:#exc_create_single_teams_empty#:#No participants without team were found.
 exc#:#exc_create_single_teams_finished#:#The individual teams were formed.
+exc#:#exc_require_authorship_statement#:#Statement of Authorship
+exc#:#exc_require_authorship_statement_desc#:#Requires a statement of authorship to submit the exercise
+exc#:#exc_info_section_requirements#:#Requirements
+exc#:#exc_authorship_statement#:#Statement of Authorship
+exc#:#exc_msg_authorship_statement_required#:#Please read and confirm the statement of authorship!
+exc#:#exc_require_authorship_statement_default#:#An authorship statement is required by default for new exercise assignments
 exercise#:#exc_mark#:#Grade/Points
 grp#:#crs_grp_info_reg#:#You can only become a member of the following courses:
 grp#:#crs_grp_info_reg_lot#:#You can only become a member of the following courses, but register for any. So the first assigned membership becomes valid.

@@ -238,6 +238,9 @@ class ilExerciseDataSet extends ilDataSet
                         // fau: exMaxPoints - add max points to export structure
                         ,"MaxPoints" => "float"
                         // fau.
+                        // fau: exStatement - add  requirement to export structure
+                        ,"RequireAuthorshipStatement" => "integer"
+                        // fau.
                         // fau: exFileSuffixes - add suffix fields to export structure
                         ,"FileSuffixes" => "text"
                         ,"FileSuffixesCase" => "integer"
@@ -401,6 +404,9 @@ class ilExerciseDataSet extends ilDataSet
                         // fau.
                         // fau: exMaxPoints - query for max points at export
                         ",max_points" .
+                        // fau.
+                        // fau: exStatement - query for require at export
+                        ",require_authorship_statement" .
                         // fau.
                         // fau: exFileSuffixes - query for file suffixes at export
                         ",file_suffixes" .
@@ -694,6 +700,10 @@ class ilExerciseDataSet extends ilDataSet
 
                     // fau: exMaxPoints - import data
                     $ass->setMaxPoints($a_rec["MaxPoints"]);
+                    // fau.
+
+                    // fau: exStatement - import data
+                    $ass->requireAuthorshipStatement($a_rec["RequireAuthorshipStatement"]);
                     // fau.
 
                     // fau: exFileSuffixes - import data

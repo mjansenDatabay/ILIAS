@@ -423,6 +423,19 @@ class ilExAssignmentEditorGUI
         $max_points_tgl->addSubItem($max_points);
         // fau.
 
+        // fau: exStatement - add form element
+        if (!$ass_type->usesTeams()) {
+            $statement = new ilCheckboxInputGUI($this->lng->txt("exc_require_authorship_statement"), "require_authorship_statement");
+            $statement->setValue(1);
+            $statement->setInfo($this->lng->txt("exc_require_authorship_statement_desc"));
+            if ($a_mode == 'create') {
+                $exc_set = new ilSetting("excs");
+                $statement->setChecked($exc_set->get("require_authorship_statement", false));
+            }
+            $form->addItem($statement);
+        }
+        // fau.
+
         // Work Instructions
         $sub_header = new ilFormSectionHeaderGUI();
         $sub_header->setTitle($lng->txt("exc_work_instructions"), "work_instructions");
@@ -873,6 +886,9 @@ class ilExAssignmentEditorGUI
                         ? $a_form->getInput("max_points")
                         : null
                     // fau.
+                    // fau: exStatement - add  requirement to form result
+                    ,"require_authorship_statement" => (bool) $a_form->getInput("require_authorship_statement")
+                    // fau.
                     // dates
                     ,"start" => $time_start
                     ,"deadline" => $time_deadline
@@ -998,8 +1014,12 @@ class ilExAssignmentEditorGUI
         $a_ass->setInstruction($a_input["instruction"]);
         $a_ass->setMandatory($a_input["mandatory"]);
 
-        // fau: exMaxPoints - set th points from the form
+        // fau: exMaxPoints - set the points from the form
         $a_ass->setMaxPoints($a_input["max_points"]);
+        // fau.
+
+        // fau: exStatement - set the requirement from the form
+        $a_ass->requireAuthorshipStatement($a_input["require_authorship_statement"]);
         // fau.
 
         $a_ass->setStartTime($a_input["start"]);
@@ -1192,6 +1212,10 @@ class ilExAssignmentEditorGUI
             $values["max_points_tgl"] = true;
             $values["max_points"] = $this->assignment->getMaxPoints();
         }
+        // fau.
+
+        // fau: exStatement - set the form values for requirement
+        $values["require_authorship_statement"] = $this->assignment->isAuthorshipStatementRequired();
         // fau.
 
         //$values['template_id'] = $this->assignment->getPortfolioTemplateId();

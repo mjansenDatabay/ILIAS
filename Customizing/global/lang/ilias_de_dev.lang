@@ -681,6 +681,12 @@ exc#:#exc_create_single_teams#:#Einzelteams bilden
 exc#:#exc_create_single_teams_confirmation#:#Möchten Sie für die folgenden Nutzer Einzelteams bilden? Damit werden sie bewertbar, sind aber nicht mehr für andere zur Teambildung verfügbar.
 exc#:#exc_create_single_teams_empty#:#Es wurden keine Teilnehmer ohne Team gefunden.
 exc#:#exc_create_single_teams_finished#:#Die Einzelteams wurden gebildet.
+exc#:#exc_require_authorship_statement#:#Selbstständigkeitserklärung
+exc#:#exc_require_authorship_statement_desc#:#Erfordert zur Abgabe die Bestätigung einer Selbstständigkeitserklärung
+exc#:#exc_info_section_requirements#:#Voraussetzung zur Abgabe
+exc#:#exc_authorship_statement#:#Selbstständigkeitserklärung
+exc#:#exc_msg_authorship_statement_required#:#Bitte lesen und bestätigen Sie die Selbständigkeitserklärung!
+exc#:#exc_require_authorship_statement_default#:#Bei neuen Übungseinheiten ist die Anforderung einer Selbständigkeitserklärung voreingstellt.
 exercise#:#exc_mark#:#Note/Punkte
 grp#:#crs_grp_info_reg#:#Sie können nur Mitglied in einem der folgenden Kurse werden:
 grp#:#group_req_direct_studycond#:#Direkter Beitritt (sonst Aufnahmeantrag) für folgende Studierende:<p class="small">%s</p>

@@ -7308,7 +7308,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $newObj->setMarkTstPassed($this->getMarkTstPassed());
         $newObj->setMarkTstFailed($this->getMarkTstFailed());
         // fau.
-        // fau: testStatement - set requirement
+        // fau: testStatement - clone requirement
         $newObj->requireAuthorshipStatement($this->isAuthorshipStatementRequired());
         // fau.
         $newObj->setShowInfo($this->getShowInfo());

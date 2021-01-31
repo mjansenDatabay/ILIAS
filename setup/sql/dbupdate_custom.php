@@ -1389,3 +1389,23 @@ if (!$ilDB->tableColumnExists('tst_active', 'time_authorship_statement')) {
     );
 }
 ?>
+<#86>
+<?php
+/**
+ * fau: testStatement - database changes
+ */
+if (!$ilDB->tableColumnExists('exc_assignment', 'require_authorship_statement')) {
+    $ilDB->addTableColumn(
+        'exc_assignment',
+        'require_authorship_statement',
+        array('type' => 'integer', 'length' => 4, 'notnull' => true, 'default' => 0)
+    );
+}
+if (!$ilDB->tableColumnExists('exc_mem_ass_status', 'time_authorship_statement')) {
+    $ilDB->addTableColumn(
+        'exc_mem_ass_status',
+        'time_authorship_statement',
+        array('type' => 'timestamp', 'notnull' => false, 'default' => null)
+    );
+}
+?>

@@ -128,6 +128,10 @@ class ilExAssignment
     protected $max_points;
     // fau.
 
+    // fau: exStatement - class variable
+    public $require_authorship_statement = false;
+    // fau.
+
     // fau: exMultiFeedbackStructure - variable that indicates that a submission download is uploaded for multi feedback
     protected $multi_feedback_by_submissions_download = false;
     // fau.
@@ -1174,6 +1178,29 @@ class ilExAssignment
     }
     // fau.
 
+
+    // fau: exStatement - new function requireAuthorshipStatement()
+    /**
+     * Set requirement of an authorship statement
+     * @param bool $require
+     */
+    public function requireAuthorshipStatement($require) {
+        $this->require_authorship_statement = (bool) $require;
+    }
+    // fau.
+
+    // fau: exStatement - new function isAuthorshipStatementRequired()
+    /**
+     * Get requirement of an authorship statement
+     * @return bool
+     */
+    public function isAuthorshipStatementRequired() {
+        return (bool) $this->require_authorship_statement;
+    }
+    // fau.
+
+
+
     // fau: exFileSuffixes - getters and setters and check
 
     /**
@@ -1350,6 +1377,9 @@ class ilExAssignment
         // fau: exMaxPoints - read the max points
         $this->setMaxPoints($a_set["max_points"]);
         // fau.
+        // fau: exStatement - set requirement from DB
+        $this->requireAuthorshipStatement($a_set["require_authorship_statement"]);
+        // fau.
         $this->setType($a_set["type"]);
         $this->setPeerReview($a_set["peer"]);
         $this->setPeerReviewMin($a_set["peer_min"]);
@@ -1416,6 +1446,9 @@ class ilExAssignment
             // fau: exMaxPoints - save the max points
             "max_points" => array("float", $this->getMaxPoints()),
             // fau.
+            // fau: exStatement - save the requirement in db
+            'require_authorship_statement' => array('integer', $this->isAuthorshipStatementRequired()),
+            // fau.
             "type" => array("integer", $this->getType()),
             "peer" => array("integer", $this->getPeerReview()),
             "peer_min" => array("integer", $this->getPeerReviewMin()),
@@ -1481,6 +1514,9 @@ class ilExAssignment
             "mandatory" => array("integer", $this->getMandatory()),
             // fau: exMaxPoints - update the max points in the database
             "max_points" => array("float", $this->getMaxPoints()),
+            // fau.
+            // fau: exStatement - update requirement in db
+            'require_authorship_statement' => array('integer', $this->isAuthorshipStatementRequired()),
             // fau.
             "type" => array("integer", $this->getType()),
             "peer" => array("integer", $this->getPeerReview()),
@@ -1612,6 +1648,9 @@ class ilExAssignment
             $new_ass->setTitle($d->getTitle());
             // fau: exMaxPoints - clone max points
             $new_ass->setMaxPoints($d->getMaxPoints());
+            // fau.
+            // fau: exStatement - clone requirement
+            $new_ass->requireAuthorshipStatement($d->isAuthorshipStatementRequired());
             // fau.
             $new_ass->setDeadline($d->getDeadline());
             $new_ass->setExtendedDeadline($d->getExtendedDeadline());
@@ -1979,6 +2018,9 @@ class ilExAssignment
                 $mem[$rec["usr_id"]]["mark"] = $rec["mark"];
                 // fau: exMaxPoints - add max_points to the member list data
                 $mem[$rec["usr_id"]]["max_points"] = $this->getMaxPoints();
+                // fau.
+                // fau: exStatement - add statement time to the member list data
+                $mem[$rec["usr_id"]]["time_authorship_statement"] = $rec["time_authorship_statement"];
                 // fau.
                 // fau: exPlag - add plagiarism info to member list data
                 $mem[$rec["usr_id"]]["plag_flag"] = $rec["plag_flag"];
