@@ -214,7 +214,13 @@ class ilExAssignmentGUI
         }
 
         $this->addSchedule($info, $a_ass);
-        
+
+        // fau: exStatement - add Statement section
+        if ($state->hasSubmissionStarted()) {
+            $this->addRequirements($info, $a_ass);
+        }
+        // fau.
+
         if ($state->hasSubmissionStarted()) {
             $this->addSubmission($info, $a_ass);
         }
@@ -430,6 +436,24 @@ class ilExAssignmentGUI
             }
         }
     }
+
+    // fau: exStatement - new function addRequirements
+    protected function addRequirements(ilInfoScreenGUI $a_info, ilExAssignment $a_ass)
+    {
+        include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+        $state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $this->user->getId());
+        $a_info->addSection($this->lng->txt("exc_info_section_requirements"));
+        if ($this->user->getLanguage() == 'de') {
+            $tpl_stat = new ilTemplate('tpl.exc_authorship_statement_de.html', false, false, 'Modules/Exercise');
+        }
+        else {
+            $tpl_stat = new ilTemplate('tpl.exc_authorship_statement_en.html', false, false, 'Modules/Exercise');
+        }
+        $a_info->addPropertyCheckbox($this->lng->txt("exc_authorship_statement"), "chb_authorship_statement", 1,
+            $tpl_stat->get(), false);
+
+    }
+    // fau.
 
     protected function addSubmission(ilInfoScreenGUI $a_info, ilExAssignment $a_ass)
     {

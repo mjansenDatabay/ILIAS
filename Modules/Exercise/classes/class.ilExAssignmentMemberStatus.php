@@ -40,7 +40,12 @@ class ilExAssignmentMemberStatus
     // fau: exPlag - class variables
     protected $plag_flag; // [int]
     protected $plag_comment; // [string]
-    // fau,
+    // fau.
+
+    // fau: exStatement - class variable
+    protected $time_authorship_statement; // [string]
+    // fau.
+
 
 
     public function __construct($a_ass_id, $a_user_id)
@@ -355,6 +360,51 @@ class ilExAssignmentMemberStatus
     }
     // fau.
 
+    // fau: exStatement  - setters and getters
+    /**
+     * User has checked the authorship statement
+     */
+    public function hasAuthorshipStatement()
+    {
+        return !empty($this->time_authorship_statement);
+    }
+
+    /**
+     * Set if the user has checked the authorship statement
+     * @param bool $stated
+     */
+    public function setAuthorshipStatement($stated)
+    {
+        if ($stated && empty($this->time_authorship_statement)) {
+            $this->time_authorship_statement = strftime("%Y-%m-%d %H:%M:%S");
+        }
+
+        if (!$stated) {
+            $this->time_authorship_statement = null;
+        }
+    }
+
+    /**
+     * Get the time of an authorship statement
+     * @return string
+     */
+    public function getAuthorshipStatementTime()
+    {
+        return $this->time_authorship_statement;
+    }
+
+
+    /**
+     * Set the time of an authorship statement
+     * @param string $time
+     */
+    public function setAuthorshipStatementTime($time)
+    {
+        $this->time_authorship_statement = $time;
+    }
+    // fau.
+
+
     // fau: exCalc - support getting multiple instances
     /**
      * Read the properties
@@ -391,6 +441,9 @@ class ilExAssignmentMemberStatus
         // fau: exPlag - read values
         $this->plag_flag = $row["plag_flag"];
         $this->plag_comment = $row["plag_comment"];
+        // fau.
+        // fau: exStatement - read the authorship statement time from db
+        $this->time_authorship_statement = $row['time_authorship_statement'];
         // fau.
         $this->db_exists = true;
     }
@@ -440,6 +493,9 @@ class ilExAssignmentMemberStatus
             // fau: exPlag - get the plag fields
             ,"plag_flag" => array("text", $this->getPlagFlag())
             ,"plag_comment" => array("text", $this->getPlagComment())
+            // fau.
+            // fau: testStatement: update authorship statement time in db
+            ,'time_authorship_statement' => array('text', $this->getAuthorshipStatementTime()),
             // fau.
         );
     }
