@@ -216,7 +216,7 @@ class ilExAssignmentGUI
         $this->addSchedule($info, $a_ass);
 
         // fau: exStatement - add Statement section
-        if ($state->hasSubmissionStarted()) {
+        if ($a_ass->isAuthorshipStatementRequired() && $state->hasSubmissionStarted()) {
             $this->addRequirements($info, $a_ass);
         }
         // fau.
