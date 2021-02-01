@@ -1033,6 +1033,11 @@ class ilObjExerciseGUI extends ilObjectGUI
     public function acceptAuthorshipStatementObject()
     {
         if (isset($this->ass)) {
+            $members = new ilExerciseMembers($this->object);
+            if (!$members->isAssigned($this->user->getId())) {
+                $members->assignMember($this->user->getId());
+            }
+
             $state = $this->ass->getMemberStatus();
             $state->setAuthorshipStatement(true);
             $state->update();
@@ -1046,6 +1051,11 @@ class ilObjExerciseGUI extends ilObjectGUI
     public function revokeAuthorshipStatementObject()
     {
         if (isset($this->ass)) {
+            $members = new ilExerciseMembers($this->object);
+            if (!$members->isAssigned($this->user->getId())) {
+                $members->assignMember($this->user->getId());
+            }
+
             $state = $this->ass->getMemberStatus();
             $state->setAuthorshipStatement(false);
             $state->update();

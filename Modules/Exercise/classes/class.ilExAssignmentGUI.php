@@ -450,7 +450,10 @@ class ilExAssignmentGUI
             $tpl_stat = new ilTemplate('tpl.exc_authorship_statement_en.html', false, false, 'Modules/Exercise');
         }
 
+        $this->ctrl->setParameterByClass('ilobjexercisegui', 'ass_id', $a_ass->getId());
+
         if (!$a_ass->getMemberStatus()->hasAuthorshipStatement()) {
+
             $button = ilLinkButton::getInstance();
             $button->setPrimary(true);
             $button->setCaption($this->lng->txt('exc_accept_authorship_statement'), false);
