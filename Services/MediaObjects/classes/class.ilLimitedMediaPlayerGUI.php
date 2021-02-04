@@ -156,7 +156,7 @@ class ilLimitedMediaPlayerGUI
         
         $tpl = new ilTemplate("tpl.limited_media_player_limit_reached.html", true, true, "Services/MediaObjects");
         $tpl->setVariable("MESSAGE", $lng->txt("cont_limit_starts_limit_reached_text"));
-        $tpl->show();
+        echo $tpl->get();
         
         //echo "<pre>"; var_dump($this); echo "</pre>";
     }
