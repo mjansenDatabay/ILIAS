@@ -35,56 +35,56 @@
 // fau: requestLog - add logging functions
 function log_request()
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeRequestLog();
 }
 
 function log_soap()
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeSoapLog();
 }
 
 function log_server()
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeServerLog();
 }
 
 function log_session()
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeSessionLog();
 }
 
 function log_var(&$a_var, $a_name = '')
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeVarDump($a_var, $a_name);
 }
 
 function log_backtrace()
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeBacktrace();
 }
 
 function log_line($a_line)
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->writeline($a_line);
 }
 
 function show_log()
 {
-    include_once("include/inc.log_request.php");
+    include_once(__DIR__ . "/inc.log_request.php");
     $RequestLog = RequestLog::getInstance();
     $RequestLog->showLog();
 }
