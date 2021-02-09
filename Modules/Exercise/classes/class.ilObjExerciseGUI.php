@@ -1032,6 +1032,8 @@ class ilObjExerciseGUI extends ilObjectGUI
     // fau: exStatement - new function acceptAuthorshipStatementObject()
     public function acceptAuthorshipStatementObject()
     {
+        $this->checkPermission("read");
+
         if (isset($this->ass)) {
             $members = new ilExerciseMembers($this->object);
             if (!$members->isAssigned($this->user->getId())) {
@@ -1050,6 +1052,8 @@ class ilObjExerciseGUI extends ilObjectGUI
     // fau: exStatement - new function revokeAuthorshipStatementObject()
     public function revokeAuthorshipStatementObject()
     {
+        $this->checkPermission("read");
+
         if (isset($this->ass)) {
             $members = new ilExerciseMembers($this->object);
             if (!$members->isAssigned($this->user->getId())) {
