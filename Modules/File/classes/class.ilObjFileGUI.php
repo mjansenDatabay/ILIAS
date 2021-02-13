@@ -1129,6 +1129,10 @@ class ilObjFileGUI extends ilObject2GUI
             }
 
             try {
+                // fau: fixUnzipEncoding - enable fix
+                ilUtil::enableUnzipEncodingFix();
+                // fau.
+
                 // 	processZipFile (
                 //		Dir to unzip,
                 //		Path to uploaded file,

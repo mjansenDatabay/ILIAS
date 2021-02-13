@@ -383,6 +383,9 @@ class ilExSubmission
         $success = true;
         
         try {
+            // fau: fixUnzipEncoding - enable fix
+            ilUtil::enableUnzipEncodingFix();
+            // fau.
             ilFileUtils::processZipFile($newDir, $fileTmp, false);
             ilFileUtils::recursive_dirscan($newDir, $filearray);
 
