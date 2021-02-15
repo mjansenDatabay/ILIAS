@@ -392,6 +392,8 @@ class ilObjectCustomUserFieldsGUI
         // description
         $de = new ilTextAreaInputGUI($this->lng->txt('ps_cdf_desc'), 'de');
         $de->setInfo($this->lng->txt('ps_cdf_desc_info'));
+        $de->setUseRte(true);
+        $de->setRteTagSet('mini');
         $this->form->addItem($de);
         // fau.
         
