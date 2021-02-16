@@ -438,6 +438,16 @@ class ilTestScoringGUI extends ilTestServiceGUI
             $cust->setHtml($questionSolution);
             $form->addItem($cust);
 
+            // fau: testShowAutoSave - show on manual scoring screen
+            if ($questionGUI->supportsIntermediateSolutionOutput() && $questionGUI->hasIntermediateSolution($activeId, $pass)) {
+                $questionGUI->setUseIntermediateSolution(true);
+                $intermediateSolution = $questionSolution = $questionGUI->getSolutionOutput($activeId, $pass, false, false, true, false, false, true);
+                $cust = new ilCustomInputGUI($lng->txt('tst_intermediate_solution'));
+                $cust->setHtml($intermediateSolution);
+                $form->addItem($cust);
+            }
+            // fau.
+
             $text = new ilTextInputGUI($lng->txt('tst_change_points_for_question'), "question__{$questionId}__points");
             if ($initValues) {
                 $text->setValue(assQuestion::_getReachedPoints($activeId, $questionId, $pass));

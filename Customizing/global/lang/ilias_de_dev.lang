@@ -92,6 +92,7 @@ assessment#:#tst_require_authorship_statement_desc#:#Erfordert zum Teststart die
 assessment#:#tst_info_section_requirements#:#Voraussetzung zum Teststart
 assessment#:#tst_authorship_statement#:#Selbstständigkeitserklärung
 assessment#:#tst_msg_authorship_statement_required#:#Bitte lesen und bestätigen Sie die Selbständigkeitserklärung!
+assessment#:#tst_intermediate_solution#:#Letzte automatische Speicherung###fau: testShowAutoSave
 auth#:#shib_continue#:#Weiter zu StudOn
 auth#:#shib_continue_local#:#Weiter zu StudOn
 auth#:#shib_convert_accept#:#Ich bin mit den Änderungen einverstanden.

@@ -105,6 +105,14 @@ abstract class assQuestionGUI
      */
     protected $editForm;
 
+    // fau: testShowAutoSave - class variable
+    /**
+     * Prefer the intermediate solution for solution output
+     * @var bool
+     */
+    protected $use_intermediate_solution = false;
+    // fau.
+
     /**
     * assQuestionGUI constructor
     */
@@ -2119,6 +2127,48 @@ abstract class assQuestionGUI
         $show_manual_scoring = false,
         $show_question_text = true
     );
+
+    // fau: testShowAutoSave - aditional functions
+    /**
+     * Question type specific support of intermediate solution output
+     * The function getSolutionOutput respects getUseIntermediateSolution()
+     * @return bool
+     */
+    public function supportsIntermediateSolutionOutput()
+    {
+        return false;
+    }
+
+    /**
+     * Check if the question has an intermediate solution
+     * @param int $activeId
+     * @param int $passIndex
+     * @return bool
+     */
+    public function hasIntermediateSolution($activeId, $passIndex)
+    {
+        $result = $this->object->lookupForExistingSolutions($activeId, $passIndex);
+        return ($result['intermediate']);
+    }
+
+    /**
+     * Set to use the intermediate solution for solution output
+     * @var bool $use
+     */
+    public function setUseIntermediateSolution($use)
+    {
+        $this->use_intermediate_solution = (bool) $use;
+    }
+
+    /**
+     * Get if intermediate solution should be used for solution output
+     * @return bool
+     */
+    public function getUseIntermediateSolution()
+    {
+        return (bool) $this->use_intermediate_solution;
+    }
+    // fau.
     
     protected function hasCorrectSolution($activeId, $passIndex)
     {

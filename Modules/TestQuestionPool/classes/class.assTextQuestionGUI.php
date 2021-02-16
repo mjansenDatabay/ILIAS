@@ -259,6 +259,18 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         return $solutionoutput;
     }
 
+    // fau: testShowAutoSave - enable support
+    /**
+     * Question type specific support of intermediate solution output
+     * The function getSolutionOutput respects getUseIntermediateSolution()
+     * @return bool
+     */
+    public function supportsIntermediateSolutionOutput()
+    {
+        return true;
+    }
+    // fau.
+
     private function getBestAnswer($asHtml)
     {
         $answers = $this->object->getAnswers();
@@ -308,7 +320,9 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
     private function getUserAnswer($active_id, $pass)
     {
         $user_solution = "";
-        $solutions = $this->object->getSolutionValues($active_id, $pass);
+        // fau: testShowAutoSave - use intermediate sulution,
+        $solutions = $this->object->getSolutionValues($active_id, $pass, !$this->getUseIntermediateSolution());
+        // fau.
         foreach ($solutions as $idx => $solution_value) {
             $user_solution = $solution_value["value1"];
         }

@@ -93,6 +93,7 @@ assessment#:#tst_require_authorship_statement_desc#:#Requires a statement of aut
 assessment#:#tst_info_section_requirements#:#Requirements
 assessment#:#tst_authorship_statement#:#Statement of Authorship
 assessment#:#tst_msg_authorship_statement_required#:#Please read and confirm the statement of authorship!
+assessment#:#tst_intermediate_solution#:#Last Auto Save###fau: testShowAutoSave
 auth#:#shib_continue#:#Continue to StudOn
 auth#:#shib_continue_local#:#Continue to StudOn
 auth#:#shib_convert_accept#:# I agree to the changes.
