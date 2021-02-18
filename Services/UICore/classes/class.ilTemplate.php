@@ -941,7 +941,9 @@ class ilTemplate extends HTML_Template_ITX
             return;
         }
 
-        $users_online = ilSession::_getUsersOnline(600) . ' (10min) ⸱ ' . ilSession::_getUsersOnline(3600). ' (1h)';
+        // fau: countUsersOnline - call the counter
+        $users_online = ilSession::_getUsersOnline(600, true) . ' (10min) ⸱ ' . ilSession::_getUsersOnline(3600). ' (1h)';
+        // fau.
 
         $lng->loadLanguageModule("common");
         $ftpl->setVariable("FAU_LOGO", ilUtil::getImagePath("studon/fau-white.svg"));

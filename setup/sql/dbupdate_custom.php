@@ -1409,3 +1409,67 @@ if (!$ilDB->tableColumnExists('exc_mem_ass_status', 'time_authorship_statement')
     );
 }
 ?>
+<#87>
+<?php
+/**
+ * fau: countUsersOnline - log table
+ */
+$fields = array(
+    'check_time' => array(
+        'notnull' => '1',
+        'type' => 'timestamp'
+    ),
+    'check_year' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '2',
+    ),
+    'check_month' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '1',
+    ),
+    'check_day' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '1',
+    ),
+    'check_hour' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '1',
+    ),
+    'check_minute' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '1',
+    ),
+    'window_seconds' => array(
+        'notnull' => '1',
+        'type' => 'integer',
+        'length' => '2',
+    ),
+    'users_online' => array(
+    'notnull' => '1',
+    'type' => 'integer',
+    'length' => '2',
+    )
+);
+
+if (!$ilDB->tableExists('ut_count_online')) {
+    $ilDB->createTable('ut_count_online', $fields);
+    $ilDB->addPrimaryKey('ut_count_online', array( 'check_time' ));
+}
+?>
+<#88>
+<?php
+/**
+ * fau: countUsersOnline - indexes
+ */
+if (!$ilDB->indexExistsByFields('ut_count_online', ['check_year', 'check_month', 'check_day'])) {
+    $ilDB->addIndex('ut_count_online', ['check_year', 'check_month', 'check_day'], 'i1');
+}
+if (!$ilDB->indexExistsByFields('ut_count_online', ['check_hour', 'check_minute'])) {
+    $ilDB->addIndex('ut_count_online', ['check_hour', 'check_minute'], 'i2');
+}
+?>

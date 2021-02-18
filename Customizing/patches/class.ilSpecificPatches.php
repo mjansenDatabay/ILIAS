@@ -500,5 +500,63 @@ class ilSpecificPatches
         echo "\nMax: " . $max;
 	    echo "\nAverage: " . $sum / $count;
     }
+
+    /**
+     * Import a log of nagios regarding the users online
+     * @param string[] $params
+     * @throws ilDateTimeException
+     */
+    function importUsersOnline($params = array('inputfile' => 'online.log'))
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        // file loop
+        $fd = fopen($params['inputfile'], "r");
+
+        $users = null;
+        $time = null;
+        while (!feof($fd)) {
+
+            // get a line
+            $line = fgets($fd, 4096);
+            while (!feof($fd) and substr($line, -1) != "\n") {
+                $line .= fgets($fd, 4096);
+            }
+
+            $pos = strpos($line, 'returned');
+            if ($pos > 0) {
+                $users = (int) substr($line, $pos + 9);
+            } else {
+                $line = str_replace('##### ', '', $line);
+                $time = strtotime($line);
+                $users = null;
+            }
+
+            if (isset($users) && isset($time)) {
+
+                $parts = getdate($time);
+                $datetime = new ilDateTime($parts[0], IL_CAL_UNIX);
+
+                echo $datetime->get(IL_CAL_DATETIME) . ' [' . $users . ']' . "\n";
+
+                $ilDB->replace('ut_count_online',
+                    ['check_time' => ['text', $datetime->get(IL_CAL_DATETIME)]],
+                    [
+                        'check_year'=> ['integer', $parts['year']],
+                        'check_month' => ['integer', $parts['mon']],
+                        'check_day' => ['integer', $parts['mday']],
+                        'check_hour' => ['integer', $parts['hours']],
+                        'check_minute' => ['integer', $parts['minutes']],
+                        'window_seconds' => ['integer', 600],
+                        'users_online' => ['integer', $users]
+                    ]
+                );
+
+                $users = null;
+                $time = null;
+            }
+        }
+    }
 }
 
