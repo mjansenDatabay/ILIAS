@@ -455,18 +455,20 @@ class ilSession
             $parts = getdate();
             $datetime = new ilDateTime($parts[0], IL_CAL_UNIX);
 
-            $ilDB->replace('ut_count_online',
-                ['check_time' => ['text', $datetime->get(IL_CAL_DATETIME)]],
-                [
-                    'check_year'=> ['integer', $parts['year']],
-                    'check_month' => ['integer', $parts['mon']],
-                    'check_day' => ['integer', $parts['mday']],
-                    'check_hour' => ['integer', $parts['hours']],
-                    'check_minute' => ['integer', $parts['minutes']],
-                    'window_seconds' => ['integer', $seconds],
-                    'users_online' => ['integer', $users]
-                ]
-            );
+            if ($ilDB->tableExists('ut_count_online')) {
+                $ilDB->replace('ut_count_online',
+                    ['check_time' => ['text', $datetime->get(IL_CAL_DATETIME)]],
+                    [
+                        'check_year'=> ['integer', $parts['year']],
+                        'check_month' => ['integer', $parts['mon']],
+                        'check_day' => ['integer', $parts['mday']],
+                        'check_hour' => ['integer', $parts['hours']],
+                        'check_minute' => ['integer', $parts['minutes']],
+                        'window_seconds' => ['integer', $seconds],
+                        'users_online' => ['integer', $users]
+                    ]
+                );
+            }
 
             // next store after 5 minutes
             $ilSetting->set('session_count_users_online_store_'. $seconds, time() + 300);
