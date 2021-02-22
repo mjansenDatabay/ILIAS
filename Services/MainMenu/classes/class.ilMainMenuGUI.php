@@ -725,7 +725,10 @@ class ilMainMenuGUI
      */
     private function getHeaderURL() : string
     {
-        $url = ilUserUtil::getStartingPointAsUrl();
+        // fau: rootAsLogin - don't use personal starting point for logo link
+        //$url = ilUserUtil::getStartingPointAsUrl();
+        $url = '';
+        // fau.
 
         if (!$url) {
             $url = "./goto.php?target=root_1";
