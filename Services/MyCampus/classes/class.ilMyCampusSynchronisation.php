@@ -122,10 +122,13 @@ class ilMyCampusSynchronisation
         require_once('Services/UnivIS/classes/class.ilUnivis.php');
 
         $semester = ilUnivis::_getRunningSemester();
-        $this->message("Semester " . $semester);
-        $objects = ilUnivis::_getUntrashedObjectsForSemester($semester);
-        $this->syncObjects($objects);
-        
+
+        if ($semester >= '2021s') {
+            $this->message("Semester " . $semester);
+            $objects = ilUnivis::_getUntrashedObjectsForSemester($semester);
+            $this->syncObjects($objects);
+        }
+
         $semester = ilUnivis::_getNextSemester();
         $this->message("Semester " . $semester);
         $objects = ilUnivis::_getUntrashedObjectsForSemester($semester);
