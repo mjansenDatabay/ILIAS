@@ -39,7 +39,7 @@ class ilCronManager implements \ilCronManagerInterface
         $job = self::getJobInstanceById($job_id);
         if ($job) {
             $this->logger->info("CRON - run " . $job_id);
-            self::runJob($job);
+            self::runJob($job, null, true);
             $this->logger->info("CRON - end  " . $job_id);
         }
         else {
