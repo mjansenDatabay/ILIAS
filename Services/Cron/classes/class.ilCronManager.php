@@ -30,6 +30,24 @@ class ilCronManager implements \ilCronManagerInterface
         $this->logger = $logger;
     }
 
+    // fau: singleCronJob - new  function runSingleJob()
+    /**
+     * @inheritdoc
+     */
+    public function runSingleJob($job_id) {
+
+        $job = self::getJobInstanceById($job_id);
+        if ($job) {
+            $this->logger->info("CRON - run " . $job_id);
+            self::runJob($job);
+            $this->logger->info("CRON - end  " . $job_id);
+        }
+        else {
+            $this->logger->error("CRON - undefined job " . $job_id);
+        }
+    }
+    // fau.
+
     /**
      * @inheritdoc
      */
