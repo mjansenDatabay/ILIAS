@@ -2416,9 +2416,26 @@ class ilObjContentObject extends ilObject
             array("source" => ilYuiUtil::getLocalPath('animation/animation-min.js'),
                 "target" => $a_target_dir . '/js/yahoo/animation-min.js',
                 "type" => "js"),
+            // fau: fixLmOfflineOverlay - add needed javascript for overlays
+            // @see: \ilCOPageHTMLExport::exportSupportScripts
+            array("source" => ilYuiUtil::getLocalPath('container/container-min.js'),
+                  "target" => $a_target_dir . '/js/yahoo/container-min.js',
+                  "type" => "js"),
+            array("source" => ilYuiUtil::getLocalPath('container/assets/skins/sam/container.css'),
+                  "target" => $a_target_dir . '/css/container.js',
+                  "type" => "css"),
+            array("source" => ilYuiUtil::getLocalPath('container/assets/skins/sam/container.css'),
+                  "target" => $a_target_dir . '/css/yahoo/container.css',
+                  "type" => "css"),
+           // fau.
             array("source" => './Services/JavaScript/js/Basic.js',
                 "target" => $a_target_dir . '/js/Basic.js',
                 "type" => "js"),
+            // fau: fixLmOfflineOverlay - add needed javascript for overlays
+            array("source" => './Services/UIComponent/Overlay/js/ilOverlay.js',
+                  "target" => $a_target_dir . '/js/ilOverlay.js',
+                  "type" => "js"),
+            // fau.
             array("source" => './Services/Accordion/js/accordion.js',
                 "target" => $a_target_dir . '/js/accordion.js',
                 "type" => "js"),
@@ -2428,11 +2445,11 @@ class ilObjContentObject extends ilObject
             array("source" => iljQueryUtil::getLocaljQueryPath(),
                 "target" => $a_target_dir . '/js/jquery.js',
                 "type" => "js"),
-// fau: fixLmQuestionOfflineScripts - add needed javascript for imagemap question
+            // fau: fixLmQuestionOfflineScripts - add needed javascript for imagemap question
             array("source" => './libs/bower/bower_components/jquery-migrate/jquery-migrate.min.js',
                 "target" => $a_target_dir . '/js/jquery-migrate.min.js',
                 "type" => "js"),
-// fau.
+            // fau.
             array("source" => iljQueryUtil::getLocalMaphilightPath(),
                 "target" => $a_target_dir . '/js/maphilight.js',
                 "type" => "js"),
@@ -2448,11 +2465,11 @@ class ilObjContentObject extends ilObject
             array("source" => './Modules/Scorm2004/scripts/questions/question_handling.js',
                 "target" => $a_target_dir . '/js/question_handling.js',
                 "type" => "js"),
-// fau: fixLmQuestionOfflineScripts - add javascript for MC question
+            // fau: fixLmQuestionOfflineScripts - add javascript for MC question
             array("source" => './Modules/TestQuestionPool/js/ilAssMultipleChoice.js',
                 "target" => $a_target_dir . '/js/ilAssMultipleChoice.js',
                 "type" => "js"),
-// fau.
+            // fau.
             array("source" => './Modules/TestQuestionPool/js/ilMatchingQuestion.js',
                 "target" => $a_target_dir . '/js/ilMatchingQuestion.js',
                 "type" => "js"),
