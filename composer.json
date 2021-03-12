@@ -84,8 +84,12 @@
 		],
 		"exclude-from-classmap": [
 			"./Services/Migration",
-			"./*/*/lib", "./*/*/test",
+			"./*/*/test",
 			"./Services/CAS/phpcas",
+			"./Services/CAS/lib",
+			"./Modules/LTIConsumer/lib",
+			"./Services/SOAPAuth/include",
+			"./webservice/soap/lib/nusoap.php",
 			"./Customizing/**/vendor"
 		]
 	},
