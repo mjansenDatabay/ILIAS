@@ -123,7 +123,8 @@ class ilChatroomViewGUI extends ilChatroomGUIHandler
         $initial->userinfo = array(
             'moderator' => ilChatroom::checkUserPermissions('moderate', (int) $_GET['ref_id'], false),
             'id' => $chat_user->getUserId(),
-            'login' => $chat_user->getUsername()
+            'login' => $chat_user->getUsername(),
+            'broadcast_typing' => $chat_user->enabledBroadcastTyping(),
         );
 
         $smileys = array();
