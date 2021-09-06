@@ -102,6 +102,8 @@ class ilObjForum extends ilObject
 
         $this->createSettings();
 
+        $this->setOfflineStatus(true);
+        $this->update();
         $this->saveData();
 
         return $id;

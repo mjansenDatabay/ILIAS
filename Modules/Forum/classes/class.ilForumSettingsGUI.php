@@ -62,6 +62,16 @@ class ilForumSettingsGUI
                 break;
         }
     }
+    private function addAvailabilitySection(ilPropertyFormGUI $form) : void
+    {
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->lng->txt('rep_activation_availability'));
+        $form->addItem($section);
+
+        $online = new ilCheckboxInputGUI($this->lng->txt('rep_activation_online'), 'activation_online');
+        $online->setInfo($this->lng->txt('frm_activation_online_info'));
+        $form->addItem($online);
+    }
 
     /**
      * @param ilPropertyFormGUI $a_form
@@ -71,6 +81,8 @@ class ilForumSettingsGUI
         $this->settingsTabs();
         $this->tabs->activateSubTab("basic_settings");
         $a_form->setTitle($this->lng->txt('frm_settings_form_header'));
+
+        $this->addAvailabilitySection($a_form);
 
         $presentationHeader = new ilFormSectionHeaderGUI();
         $presentationHeader->setTitle($this->lng->txt('frm_settings_presentation_header'));
@@ -232,6 +244,7 @@ class ilForumSettingsGUI
         
         $a_values['default_view'] = $default_view;
         $a_values['file_upload_allowed'] = (bool) $this->parent_obj->objProperties->getFileUploadAllowed();
+        $a_values['activation_online'] = !($object->getOfflineStatus() === null) && !$object->getOfflineStatus();
     }
 
     /**
@@ -271,6 +284,10 @@ class ilForumSettingsGUI
         }
         $this->parent_obj->objProperties->update();
         $this->obj_service->commonSettings()->legacyForm($a_form, $this->parent_obj->object)->saveTileImage();
+
+        $object = $this->parent_obj->object;
+        $object->setOfflineStatus(!(bool) $a_form->getInput('activation_online'));
+        $object->update();
     }
 
     public function showMembers()

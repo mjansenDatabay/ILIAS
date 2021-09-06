@@ -65,13 +65,22 @@ class ilObjForumListGUI extends ilObjectListGUI
      */
     public function getProperties()
     {
-        if (!$this->access->checkAccess('read', '', $this->ref_id)) {
-            return array();
+        $props = [];
+
+        $maySee = $this->rbacsystem->checkAccess('visible', $this->ref_id);
+        $mayRead = $this->rbacsystem->checkAccess('read', $this->ref_id);
+
+        if (!$maySee && !$mayRead) {
+            return $props;
+        }
+
+        $props = parent::getProperties();
+
+        if (!$mayRead || ilObject::lookupOfflineStatus($this->obj_id)) {
+            return $props;
         }
 
         $this->lng->loadLanguageModule('forum');
-
-        $props = array();
 
         $properties = ilObjForumAccess::getStatisticsByRefId($this->ref_id);
         $num_posts_total = $properties['num_posts'];
