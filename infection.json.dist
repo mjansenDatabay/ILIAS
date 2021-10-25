@@ -1,0 +1,48 @@
+{
+    "source": {
+        "directories": [
+            "."
+        ],
+        "excludes": [
+            "tests",
+            "docs",
+            "data",
+            "extern",
+            "lang",
+            "CI",
+            "dicto",
+            "xml",
+            "templates",
+            "Customizing",
+            "libs/composer",
+            "libs/bower",
+            "include",
+            "Services/Migration",
+            "Services/CAS/phpcas",
+            "Services/CAS/lib",
+            "Modules/LTIConsumer/lib",
+            "./*/*/test",
+            "setup",
+            "test",
+            "gs_content.php",
+            "src/Refinery/examples",
+            "webservice",
+            "Services/SOAPAuth/include",
+            "Services/Feeds/classes/class.ilPDExternalFeedBlockGUI.php"
+        ]
+    },
+    "logs": {
+        "text": "infection.log",
+        "summary": "summary.log",
+        "json": "infection-log.json",
+        "perMutator": "per-mutator.md"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "bootstrap": "./libs/composer/vendor/autoload.php",
+    "testFramework": "phpunit",
+    "phpUnit": {
+        "configDir": "Services/Mail"
+    }
+}
