@@ -525,7 +525,13 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling, ilFo
         }
 
         // suppress for topic level
-        if ($cmd != 'viewThreadObject' && $cmd != 'showUserObject') {
+        if (
+            $cmd != 'viewThreadObject' && $cmd != 'showUserObject' && !in_array(
+                strtolower($next_class),
+                array_map('strtolower', [ilForumPageGUI::class]),
+                true
+            )
+        ) {
             $this->addHeaderAction();
         }
     }
@@ -746,7 +752,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling, ilFo
             $this->toolbar->addComponent(
                 $this->uiFactory->button()->standard(
                     $this->lng->txt('cntr_text_media_editor'),
-                    $this->ctrl->getLinkTargetByClass(ilForumPageGUI::class, 'preview')
+                    $this->ctrl->getLinkTargetByClass(ilForumPageGUI::class, 'edit')
                 )
             );
         }

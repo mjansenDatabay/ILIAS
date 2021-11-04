@@ -44,6 +44,11 @@ class ilForumPageGUI extends ilPageObjectGUI implements ilForumObjectConstants
         return parent::getProfileBackUrl();
     }
 
+    public function finishEditing() : void
+    {
+        $this->ctrl->redirectByClass(ilObjForumGUI::class, 'showThreads');
+    }
+
     public function setDefaultLinkXml() : void
     {
         parent::setDefaultLinkXml();
