@@ -625,6 +625,14 @@ class ilObjContentPageGUI extends ilObject2GUI implements ilContentPageObjectCon
      */
     protected function initEditCustomForm(ilPropertyFormGUI $a_form)
     {
+        $this->addAvailabilitySection($a_form);
+
+        $presentationHeader = new ilFormSectionHeaderGUI();
+        $presentationHeader->setTitle($this->lng->txt('settings_presentation_header'));
+        $a_form->addItem($presentationHeader);
+
+        $this->obj_service->commonSettings()->legacyForm($a_form, $this->object)->addTileImage();
+
         $sh = new ilFormSectionHeaderGUI();
         $sh->setTitle($this->lng->txt('obj_features'));
         $a_form->addItem($sh);
@@ -636,14 +644,6 @@ class ilObjContentPageGUI extends ilObject2GUI implements ilContentPageObjectCon
                 ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY
             ]
         );
-
-        $this->addAvailabilitySection($a_form);
-
-        $presentationHeader = new ilFormSectionHeaderGUI();
-        $presentationHeader->setTitle($this->lng->txt('settings_presentation_header'));
-        $a_form->addItem($presentationHeader);
-
-        $this->obj_service->commonSettings()->legacyForm($a_form, $this->object)->addTileImage();
     }
     private function addAvailabilitySection(ilPropertyFormGUI $form) : void
     {

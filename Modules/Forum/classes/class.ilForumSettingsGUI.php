@@ -244,7 +244,7 @@ class ilForumSettingsGUI
         
         $a_values['default_view'] = $default_view;
         $a_values['file_upload_allowed'] = (bool) $this->parent_obj->objProperties->getFileUploadAllowed();
-        $a_values['activation_online'] = !($object->getOfflineStatus() === null) && !$object->getOfflineStatus();
+        $a_values['activation_online'] = !($this->parent_obj->object->getOfflineStatus() === null) && !$this->parent_obj->object->getOfflineStatus();
     }
 
     /**
