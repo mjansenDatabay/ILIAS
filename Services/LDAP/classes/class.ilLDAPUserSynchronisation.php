@@ -22,25 +22,14 @@
 class ilLDAPUserSynchronisation
 {
     private string $authmode;
-
     private ilLDAPServer $server;
-
     private string $extaccount = '';
     private string $intaccount = '';
-
     private array $user_data = array();
-    
     private bool $force_creation = false;
     private bool $force_read_ldap_data = false;
-
     private ilLogger $logger;
 
-
-    /**
-     * Constructor
-     *
-     * @param string $a_auth_mode
-     */
     public function __construct(string $a_authmode, int $a_server_id)
     {
         global $DIC;
@@ -109,7 +98,7 @@ class ilLDAPUserSynchronisation
      */
     public function isCreationForced() : bool
     {
-        return (bool) $this->force_creation;
+        return $this->force_creation;
     }
 
     /**
@@ -118,7 +107,7 @@ class ilLDAPUserSynchronisation
      */
     public function getUserData() : array
     {
-        return (array) $this->user_data;
+        return $this->user_data;
     }
 
     /**
