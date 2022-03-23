@@ -1065,7 +1065,7 @@ class ilLDAPServer
         if (!$this->server_id) {
             return;
         }
-        $query = "SELECT * FROM ldap_server_settings WHERE server_id = " . $this->db->quote($this->server_id) . "";
+        $query = "SELECT * FROM ldap_server_settings WHERE server_id = " . $this->db->quote($this->server_id);
         
         $res = $this->db->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {

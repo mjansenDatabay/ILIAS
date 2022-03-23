@@ -58,7 +58,7 @@ class ilLDAPResult
      * Total count of resulted rows
      * @return int
      */
-    public function numRows()
+    public function numRows() : int
     {
         return is_array($this->rows) ? count($this->rows) : 0;
     }
@@ -85,7 +85,7 @@ class ilLDAPResult
      * Returns last result
      * @return array
      */
-    public function get()
+    public function get() : array
     {
         return is_array($this->last_row) ? $this->last_row : array();
     }
@@ -94,7 +94,7 @@ class ilLDAPResult
      * Returns complete results
      * @return array
      */
-    public function getRows()
+    public function getRows() : array
     {
         return is_array($this->rows) ? $this->rows : array();
     }
@@ -103,7 +103,7 @@ class ilLDAPResult
      * Starts ldap_get_entries() and transforms results
      * @return self $this
      */
-    public function run()
+    public function run() : self
     {
         $entries = @ldap_get_entries($this->handle, $this->result);
         $this->addEntriesToRows($entries);

@@ -458,7 +458,7 @@ class ilLDAPSettingsGUI
                 $res = $object_search->performSearch();
                 
                 $entries = $res->getEntries();
-                if (count($entries) == 1) {
+                if (count($entries) === 1) {
                     $role = current($entries);
                     $this->rule->setRoleId($role['obj_id']);
                 } elseif (count($entries) > 1) {

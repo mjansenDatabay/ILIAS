@@ -126,7 +126,7 @@ class ilLDAPCronSynchronization extends ilCronJob
             $status = ilCronJobResult::STATUS_OK;
         }
         $result = new ilCronJobResult();
-        if (sizeof($messages)) {
+        if (count($messages)) {
             $result->setMessage(implode("\n", $messages));
         }
         $result->setStatus($status);
@@ -136,7 +136,7 @@ class ilLDAPCronSynchronization extends ilCronJob
     /**
      * Deactivate users that are disabled in LDAP
      */
-    private function deactivateUsers(ilLDAPServer $server, $a_ldap_users)
+    private function deactivateUsers(ilLDAPServer $server, array $a_ldap_users) : void
     {
         $inactive = [];
 

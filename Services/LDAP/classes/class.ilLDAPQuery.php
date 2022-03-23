@@ -61,7 +61,7 @@ class ilLDAPQuery
 
         $this->settings = $a_server;
         
-        if (strlen($a_url)) {
+        if ($a_url !== '') {
             $this->ldap_server_url = $a_url;
         } else {
             $this->ldap_server_url = $this->settings->getUrl();
@@ -108,7 +108,7 @@ class ilLDAPQuery
         // First of all check if a group restriction is enabled
         // YES: => fetch all group members
         // No:  => fetch all users
-        if (strlen($this->settings->getGroupName())) {
+        if ($this->settings->getGroupName() != '') {
             $this->logger->debug('Searching for group members.');
 
             $groups = $this->settings->getGroupNames();
@@ -120,7 +120,7 @@ class ilLDAPQuery
                 }
             }
         }
-        if (!strlen($this->settings->getGroupName()) or $this->settings->isMembershipOptional()) {
+        if ($this->settings->getGroupName() == '' or $this->settings->isMembershipOptional()) {
             $this->logger->info('Start reading all users...');
             $this->readAllUsers();
             #throw new ilLDAPQueryException('LDAP: Called import of users without specifying group restrictions. NOT IMPLEMENTED YET!');
@@ -181,7 +181,7 @@ class ilLDAPQuery
     private function readAllUsers()
     {
         // Build search base
-        if (($dn = $this->settings->getSearchBase()) && substr($dn, -1) != ',') {
+        if (($dn = $this->settings->getSearchBase()) && substr($dn, -1) !== ',') {
             $dn .= ',';
         }
         $dn .= $this->settings->getBaseDN();
@@ -317,14 +317,14 @@ class ilLDAPQuery
         $group_names = $this->getServer()->getGroupNames();
         
         if (!count($group_names)) {
-            $this->logger()->debug('No LDAP group restrictions found');
+            $this->logger->debug('No LDAP group restrictions found');
             return true;
         }
         
         $group_dn = $this->getServer()->getGroupDN();
         if (
             $group_dn &&
-            (substr($group_dn, -1) != ',')
+            (substr($group_dn, -1) !== ',')
         ) {
             $group_dn .= ',';
         }
@@ -388,9 +388,9 @@ class ilLDAPQuery
     /**
      * Fetch group member ids
      */
-    private function fetchGroupMembers($a_name = '') : bool
+    private function fetchGroupMembers(string $a_name = '') : bool
     {
-        $group_name = strlen($a_name) ? $a_name : $this->settings->getGroupName();
+        $group_name = $a_name !== '' ? $a_name : $this->settings->getGroupName();
         
         // Build filter
         $filter = sprintf(
@@ -402,7 +402,7 @@ class ilLDAPQuery
         
         
         // Build search base
-        if (($gdn = $this->settings->getGroupDN()) && substr($gdn, -1) != ',') {
+        if (($gdn = $this->settings->getGroupDN()) && substr($gdn, -1) !== ',') {
             $gdn .= ',';
         }
         $gdn .= $this->settings->getBaseDN();
@@ -440,6 +440,7 @@ class ilLDAPQuery
             }
         }
         unset($tmp_result);
+
         return true;
     }
     
@@ -472,7 +473,7 @@ class ilLDAPQuery
             );
 
             // Build search base
-            if (($dn = $this->settings->getSearchBase()) && substr($dn, -1) != ',') {
+            if (($dn = $this->settings->getSearchBase()) && substr($dn, -1) !== ',') {
                 $dn .= ',';
             }
             $dn .= $this->settings->getBaseDN();
@@ -612,7 +613,7 @@ class ilLDAPQuery
                 // Now bind anonymously or as user
                 if (
                 ilLDAPServer::LDAP_BIND_USER == $this->settings->getBindingType() &&
-                    strlen($this->settings->getBindUser())
+                $this->settings->getBindUser() != ''
                 ) {
                     $user = $this->settings->getBindUser();
                     $pass = $this->settings->getBindPassword();
@@ -630,7 +631,7 @@ class ilLDAPQuery
                 $user = $this->settings->getRoleBindDN();
                 $pass = $this->settings->getRoleBindPassword();
                 
-                if (!strlen($user) or !strlen($pass)) {
+                if ($user === '' or $pass === '') {
                     $user = $this->settings->getBindUser();
                     $pass = $this->settings->getBindPassword();
                 }
@@ -657,14 +658,7 @@ class ilLDAPQuery
         }
     }
     
-    /**
-     * fetch required fields of user profile data
-     *
-     * @access private
-     * @param
-     *
-     */
-    private function fetchUserProfileFields() : array
+    private function fetchUserProfileFields() : void
     {
         $this->user_fields = array_merge(
             array($this->settings->getUserAttribute()),

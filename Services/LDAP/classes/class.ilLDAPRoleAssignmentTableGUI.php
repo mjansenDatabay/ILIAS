@@ -49,14 +49,7 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
         $this->setDefaultOrderDirection("desc");
     }
     
-    /**
-     * Fill row
-     *
-     * @access public
-     * @param array row data
-     *
-     */
-    public function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set) : void
     {
         $this->tpl->setVariable('VAL_ID', $a_set['id']);
         $this->tpl->setVariable('VAL_TYPE', $a_set['type']);

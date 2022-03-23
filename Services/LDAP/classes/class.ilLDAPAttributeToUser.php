@@ -21,19 +21,16 @@
 */
 class ilLDAPAttributeToUser
 {
-    const MODE_INITIALIZE_ROLES = 1;
+    public const MODE_INITIALIZE_ROLES = 1;
 
     private array $modes = [];
-
-
     private ilLDAPServer $server_settings;
-    
     private array $user_data = [];
     private ilLDAPAttributeMapping $mapping;
-
     private string $new_user_auth_mode = 'ldap';
-    
     private ilLogger $logger;
+    private ilXmlWriter $writer;
+    private ilUserDefinedFields $udf;
     
     /**
      * Construct of ilLDAPAttribute2XML
@@ -122,8 +119,7 @@ class ilLDAPAttributeToUser
         $importParser->setRoleAssignment(ilLDAPRoleAssignmentRules::getAllPossibleRoles($this->getServer()->getServerId()));
         $importParser->setFolderId(7);
         $importParser->startParsing();
-        $importParser->getProtocol();
-        
+
         return true;
     }
 
@@ -335,7 +331,7 @@ class ilLDAPAttributeToUser
                     */
                     default:
                         // Handle user defined fields
-                        if (substr($field, 0, 4) != 'udf_') {
+                        if (strpos($field, 'udf_') !== 0) {
                             continue 2;
                         }
                         $id_data = explode('_', $field);
@@ -378,14 +374,11 @@ class ilLDAPAttributeToUser
     {
         if (is_array($a_value)) {
             return $a_value[0];
-        } else {
-            return $a_value;
         }
+
+        return $a_value;
     }
     
-    /**
-     * doMapping
-     */
     private function doMapping(array $user, array $rule) : string
     {
         $mapping = trim(strtolower($rule['value']));
@@ -403,11 +396,9 @@ class ilLDAPAttributeToUser
             }
             $value .= ($this->convertInput($user[trim($field)]));
         }
-        return $value ? $value : '';
+        return $value ?: '';
     }
-    
-    
-    
+
     private function initLDAPAttributeMapping() : void
     {
         $this->mapping = ilLDAPAttributeMapping::_getInstanceByServerId($this->server_settings->getServerId());

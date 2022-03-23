@@ -49,11 +49,7 @@ class ilLDAPRoleMappingTableGUI extends ilTable2GUI
         $this->getItems();
     }
     
-    /**
-     * fill row
-     * @param array $a_set
-     */
-    public function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set) : void
     {
         $title = $this->ilObjDataCache->lookupTitle($this->rbacreview->getObjectOfRole($a_set["role"]));
         $this->tpl->setVariable("VAL_ID", $a_set['mapping_id']);

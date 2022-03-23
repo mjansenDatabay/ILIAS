@@ -57,15 +57,9 @@ class ilLDAPRoleAssignmentRule
         $this->read();
     }
     
-    /**
-     * get instance by rule id
-     */
     public static function _getInstanceByRuleId(int $a_rule_id) : ilLDAPRoleAssignmentRule
     {
-        if (isset(self::$instances[$a_rule_id])) {
-            return self::$instances[$a_rule_id];
-        }
-        return self::$instances[$a_rule_id] = new ilLDAPRoleAssignmentRule($a_rule_id);
+        return self::$instances[$a_rule_id] ?? (self::$instances[$a_rule_id] = new ilLDAPRoleAssignmentRule($a_rule_id));
     }
     
     /**
@@ -82,6 +76,7 @@ class ilLDAPRoleAssignmentRule
             'OR remove_on_update = 1 ';
         $res = $ilDB->query($query);
         $row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
+
         return $row->num > 0;
     }
     
@@ -121,13 +116,15 @@ class ilLDAPRoleAssignmentRule
                 return $this->isGroupMember($a_user_data);
                 
         }
+
+        return false;
     }
     
     protected function wildcardCompare(string $a_str1, string $a_str2) : bool
     {
         $pattern = str_replace('*', '.*?', $a_str1);
         $this->logger->debug(': Replace pattern:' . $pattern . ' => ' . $a_str2);
-        return preg_match('/^' . $pattern . '$/i', $a_str2) == 1;
+        return preg_match('/^' . $pattern . '$/i', $a_str2) === 1;
     }
     
     /**
@@ -163,7 +160,7 @@ class ilLDAPRoleAssignmentRule
                 ilLDAPServer::LDAP_SCOPE_BASE,
                 array('dn')
             );
-            return $res->numRows() ? true : false;
+            return (bool) $res->numRows();
         } catch (ilLDAPQueryException $e) {
             $this->logger->warning(': Caught Exception: ' . $e->getMessage());
             return false;
@@ -190,6 +187,7 @@ class ilLDAPRoleAssignmentRule
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $rules[] = self::_getInstanceByRuleId($row->rule_id);
         }
+
         return $rules;
     }
     
@@ -333,7 +331,7 @@ class ilLDAPRoleAssignmentRule
         $this->add_on_update = $a_status;
     }
     
-    public function isAddOnUpdateEnabled()
+    public function isAddOnUpdateEnabled() : bool
     {
         return (bool) $this->add_on_update;
     }
@@ -360,13 +358,9 @@ class ilLDAPRoleAssignmentRule
     
     public function isPluginActive() : bool
     {
-        return (bool) $this->getType() == self::TYPE_PLUGIN;
+        return (bool) $this->getType() === self::TYPE_PLUGIN;
     }
-    
-    
-    /**
-     * condition to string
-     */
+
     public function conditionToString() : string
     {
         switch ($this->getType()) {
@@ -377,16 +371,14 @@ class ilLDAPRoleAssignmentRule
                 $dn_arr = explode(',', $this->getDN());
                 return $dn_arr[0];
                 
-            
             case self::TYPE_ATTRIBUTE:
                 return $this->getAttributeName() . '=' . $this->getAttributeValue();
+                
+            default:
+                throw new RuntimeException(sprintf('Unknown type: %s', var_export($this->getType(), true)));
         }
     }
-    
-    
-    /**
-     * create
-     */
+
     public function create() : bool
     {
         $next_id = $this->db->nextId('ldap_role_assignments');
@@ -413,9 +405,6 @@ class ilLDAPRoleAssignmentRule
         return true;
     }
 
-    /**
-     * update
-     */
     public function update() : bool
     {
         $query = "UPDATE ldap_role_assignments " .
@@ -432,12 +421,10 @@ class ilLDAPRoleAssignmentRule
             'plugin_id = ' . $this->db->quote($this->getPluginId(), 'integer') . ' ' .
             "WHERE rule_id = " . $this->db->quote($this->getRuleId(), 'integer') . " ";
         $this->db->manipulate($query);
+
         return true;
     }
-    
-    /**
-     * validate
-     */
+
     public function validate() : bool
     {
         $this->ilErr->setMessage('');
@@ -448,13 +435,13 @@ class ilLDAPRoleAssignmentRule
         }
         switch ($this->getType()) {
             case self::TYPE_GROUP:
-                if (!strlen($this->getDN()) or !strlen($this->getMemberAttribute())) {
+                if ($this->getDN() === '' || $this->getMemberAttribute() === '') {
                     $this->ilErr->setMessage('fill_out_all_required_fields');
                     return false;
                 }
                 break;
             case self::TYPE_ATTRIBUTE:
-                if (!strlen($this->getAttributeName()) or !strlen($this->getAttributeValue())) {
+                if ($this->getAttributeName() === '' || $this->getAttributeValue() === '') {
                     $this->ilErr->setMessage('fill_out_all_required_fields');
                     return false;
                 }
@@ -471,22 +458,19 @@ class ilLDAPRoleAssignmentRule
                 $this->ilErr->setMessage('ldap_no_type_given');
                 return false;
         }
+
         return true;
     }
         
-    /**
-     * delete rule
-     */
     public function delete() : bool
     {
         $query = "DELETE FROM ldap_role_assignments " .
             "WHERE rule_id = " . $this->db->quote($this->getRuleId(), 'integer') . " ";
         $this->db->manipulate($query);
+
         return true;
     }
-    /**
-     * load from db
-     */
+
     private function read() : void
     {
         $query = "SELECT * FROM ldap_role_assignments " .
@@ -494,14 +478,14 @@ class ilLDAPRoleAssignmentRule
         
         $res = $this->db->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $this->setServerId($row->server_id);
+            $this->setServerId((int) $row->server_id);
             $this->setType($row->type);
             $this->setDN($row->dn);
             $this->setMemberAttribute($row->attribute);
-            $this->setMemberIsDN($row->isdn);
+            $this->setMemberIsDN((bool) $row->isdn);
             $this->setAttributeName($row->att_name);
             $this->setAttributeValue($row->att_value);
-            $this->setRoleId($row->role_id);
+            $this->setRoleId((int) $row->role_id);
             $this->enableAddOnUpdate($row->add_on_update);
             $this->enableRemoveOnUpdate($row->remove_on_update);
             $this->setPluginId($row->plugin_id);

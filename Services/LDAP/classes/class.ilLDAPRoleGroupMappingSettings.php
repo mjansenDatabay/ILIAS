@@ -85,7 +85,7 @@ class ilLDAPRoleGroupMappingSettings
         return true;
     }
     
-    public static function _getAllActiveMappings()
+    public static function _getAllActiveMappings() : array
     {
         global $DIC;
 
@@ -115,7 +115,7 @@ class ilLDAPRoleGroupMappingSettings
         return $active;
     }
     
-    public function getServerId()
+    public function getServerId() : int
     {
         return $this->server_id;
     }
@@ -123,7 +123,7 @@ class ilLDAPRoleGroupMappingSettings
     /**
      * Get already configured mappings
      */
-    public function getMappings()
+    public function getMappings() : array
     {
         return $this->mappings;
     }
@@ -158,7 +158,7 @@ class ilLDAPRoleGroupMappingSettings
      * @access public
      *
      */
-    public function validate()
+    public function validate() : bool
     {
         $this->ilErr->setMessage('');
         $found_missing = false;
@@ -185,7 +185,7 @@ class ilLDAPRoleGroupMappingSettings
      * @param
      *
      */
-    public function save()
+    public function save() : void
     {
         foreach ($this->mappings as $mapping_id => $data) {
             if (!$mapping_id) {
@@ -228,7 +228,7 @@ class ilLDAPRoleGroupMappingSettings
      * @param int mapping_id
      *
      */
-    public function delete($a_mapping_id)
+    public function delete($a_mapping_id) : void
     {
         $query = "DELETE FROM ldap_rg_mapping " .
             "WHERE server_id = " . $this->db->quote($this->getServerId(), 'integer') . " " .
@@ -258,7 +258,7 @@ class ilLDAPRoleGroupMappingSettings
      * @access private
      *
      */
-    private function read()
+    private function read() : void
     {
         $this->mappings = array();
         $query = "SELECT * FROM ldap_rg_mapping LEFT JOIN object_data " .
