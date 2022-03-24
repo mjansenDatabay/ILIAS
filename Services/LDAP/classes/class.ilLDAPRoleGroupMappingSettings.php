@@ -28,9 +28,9 @@ class ilLDAPRoleGroupMappingSettings
 
     private int $server_id;
     private array $mappings = [];
-    
-    const MAPPING_INFO_ALL = 1;
-    const MAPPING_INFO_INFO_ONLY = 0;
+
+    public const MAPPING_INFO_ALL = 1;
+    public const MAPPING_INFO_INFO_ONLY = 0;
     
     /**
      * Private constructor (Singleton for each server_id)
@@ -137,7 +137,7 @@ class ilLDAPRoleGroupMappingSettings
         $this->mappings = [];
         foreach ($a_mappings as $mapping_id => $data) {
             if ($mapping_id == 0) {
-                if (!$data['dn'] and !$data['member'] and !$data['memberisdn'] and !$data['role']) {
+                if (!$data['dn'] && !$data['member'] && !$data['memberisdn'] && !$data['role']) {
                     continue;
                 }
             }

@@ -19,17 +19,17 @@
 class ilLDAPServer
 {
     private static $instances = array();
-    
-    const LDAP_BIND_ANONYMOUS = 0;
-    const LDAP_BIND_USER = 1;
 
-    const LDAP_SCOPE_SUB = 0;
-    const LDAP_SCOPE_ONE = 1;
-    const LDAP_SCOPE_BASE = 2;
+    public const LDAP_BIND_ANONYMOUS = 0;
+    public const LDAP_BIND_USER = 1;
 
-    const DEBUG = false;
-    const DEFAULT_VERSION = 3;
-    const DEFAULT_NETWORK_TIMEOUT = 5;
+    public const LDAP_SCOPE_SUB = 0;
+    public const LDAP_SCOPE_ONE = 1;
+    public const LDAP_SCOPE_BASE = 2;
+
+    private const DEBUG = false;
+    private const DEFAULT_VERSION = 3;
+    public const DEFAULT_NETWORK_TIMEOUT = 5;
     
     private string $role_bind_dn = '';
     private string $role_bind_pass = '';
@@ -182,7 +182,7 @@ class ilLDAPServer
      */
     public static function _getFirstActiveServer() : int
     {
-        $servers = ilLDAPServer::_getActiveServerList();
+        $servers = self::_getActiveServerList();
         if (count($servers)) {
             return $servers[0];
         }
@@ -259,7 +259,7 @@ class ilLDAPServer
      */
     public static function _getFirstServer() : int
     {
-        $servers = ilLDAPServer::_getServerList();
+        $servers = self::_getServerList();
         
         if (count($servers)) {
             return $servers[0];
@@ -571,10 +571,10 @@ class ilLDAPServer
     }
     public function setBindingType($a_type)
     {
-        if ($a_type == ilLDAPServer::LDAP_BIND_USER) {
-            $this->binding_type = ilLDAPServer::LDAP_BIND_USER;
+        if ($a_type == self::LDAP_BIND_USER) {
+            $this->binding_type = self::LDAP_BIND_USER;
         } else {
-            $this->binding_type = ilLDAPServer::LDAP_BIND_ANONYMOUS;
+            $this->binding_type = self::LDAP_BIND_ANONYMOUS;
         }
     }
     public function getBindUser()
@@ -817,7 +817,7 @@ class ilLDAPServer
             $this->ilErr->setMessage($this->lng->txt('fill_out_all_required_fields'));
         }
         
-        if ($this->getBindingType() == ilLDAPServer::LDAP_BIND_USER
+        if ($this->getBindingType() == self::LDAP_BIND_USER
             && ($this->getBindUser() == '' || $this->getBindPassword() == '')) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_bind_user'));
         }
@@ -969,7 +969,7 @@ class ilLDAPServer
             'version' => (int) $this->getVersion(),
             'referrals' => (bool) $this->isActiveReferrer());
         
-        if ($this->getBindingType() == ilLDAPServer::LDAP_BIND_USER) {
+        if ($this->getBindingType() == self::LDAP_BIND_USER) {
             $options['binddn'] = $this->getBindUser();
             $options['bindpw'] = $this->getBindPassword();
         }
@@ -977,7 +977,7 @@ class ilLDAPServer
         $options['start_tls'] = (bool) $this->isActiveTLS();
         $options['userdn'] = $this->getSearchBase();
         switch ($this->getUserScope()) {
-            case ilLDAPServer::LDAP_SCOPE_ONE:
+            case self::LDAP_SCOPE_ONE:
                 $options['userscope'] = 'one';
                 break;
             default:
@@ -994,10 +994,10 @@ class ilLDAPServer
         $options['enableLogging'] = true;
 
         switch ($this->getGroupScope()) {
-            case ilLDAPServer::LDAP_SCOPE_BASE:
+            case self::LDAP_SCOPE_BASE:
                 $options['groupscope'] = 'base';
                 break;
-            case ilLDAPServer::LDAP_SCOPE_ONE:
+            case self::LDAP_SCOPE_ONE:
                 $options['groupscope'] = 'one';
                 break;
             default:

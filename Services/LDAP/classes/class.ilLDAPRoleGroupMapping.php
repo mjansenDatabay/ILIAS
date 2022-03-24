@@ -48,7 +48,7 @@ class ilLDAPRoleGroupMapping
      * @access public
      *
      */
-    public static function _getInstance()
+    public static function _getInstance() : ?\ilLDAPRoleGroupMapping
     {
         if (is_object(self::$instance)) {
             return self::$instance;
@@ -65,20 +65,20 @@ class ilLDAPRoleGroupMapping
      * @param bool check info type
      *
      */
-    public function getInfoStrings($a_obj_id, $a_check_type = false)
+    public function getInfoStrings(int $a_obj_id, bool $a_check_type = false)
     {
         if (!$this->active_servers) {
             return false;
         }
+
         if ($a_check_type) {
-            if (isset($this->mapping_info_strict[$a_obj_id]) and is_array($this->mapping_info_strict[$a_obj_id])) {
+            if (isset($this->mapping_info_strict[$a_obj_id]) && is_array($this->mapping_info_strict[$a_obj_id])) {
                 return $this->mapping_info_strict[$a_obj_id];
             }
-        } else {
-            if (isset($this->mapping_info[$a_obj_id]) and is_array($this->mapping_info[$a_obj_id])) {
-                return $this->mapping_info[$a_obj_id];
-            }
+        } elseif (isset($this->mapping_info[$a_obj_id]) && is_array($this->mapping_info[$a_obj_id])) {
+            return $this->mapping_info[$a_obj_id];
         }
+
         return false;
     }
     
@@ -92,7 +92,7 @@ class ilLDAPRoleGroupMapping
      * @param
      *
      */
-    public function assign($a_role_id, $a_usr_id)
+    public function assign($a_role_id, $a_usr_id) : bool
     {
         // return if there nothing to do
         if (!$this->active_servers) {
@@ -121,7 +121,7 @@ class ilLDAPRoleGroupMapping
      * @param int role id
      *
      */
-    public function deleteRole($a_role_id)
+    public function deleteRole($a_role_id) : bool
     {
         global $DIC;
 
@@ -152,7 +152,7 @@ class ilLDAPRoleGroupMapping
      * @param
      *
      */
-    public function deassign($a_role_id, $a_usr_id)
+    public function deassign($a_role_id, $a_usr_id) : bool
     {
         // return if there notzing to do
         if (!$this->active_servers) {
@@ -176,7 +176,7 @@ class ilLDAPRoleGroupMapping
      * @access public
      * @param int user id
      */
-    public function deleteUser($a_usr_id)
+    public function deleteUser($a_usr_id) : bool
     {
         foreach ($this->mappings as $role_id) {
             $this->deassign($role_id, $a_usr_id);
@@ -192,12 +192,12 @@ class ilLDAPRoleGroupMapping
      * @param
      *
      */
-    private function initServers()
+    private function initServers() : void
     {
         $server_ids = ilLDAPServer::_getRoleSyncServerIds();
         
         if (!count($server_ids)) {
-            return false;
+            return;
         }
 
         // Init servers
@@ -211,7 +211,7 @@ class ilLDAPRoleGroupMapping
         $this->mapping_info_strict = array();
         foreach ($this->mappings as $mapping) {
             foreach ($mapping as $data) {
-                if (strlen($data['info']) and $data['object_id']) {
+                if (strlen($data['info']) && $data['object_id']) {
                     $this->mapping_info[$data['object_id']][] = $data['info'];
                 }
                 if (strlen($data['info']) && ($data['info_type'] == ilLDAPRoleGroupMappingSettings::MAPPING_INFO_ALL)) {
@@ -220,8 +220,6 @@ class ilLDAPRoleGroupMapping
             }
         }
         $this->users = ilObjUser::_getExternalAccountsByAuthMode('ldap', true);
-        
-        return true;
     }
     
     /**
@@ -229,10 +227,10 @@ class ilLDAPRoleGroupMapping
      *
      * @access private
      * @param int role_id
-     * @return int server id or 0 if mapping exists
+     * @return bool server id or 0 if mapping exists
      *
      */
-    private function isHandledRole($a_role_id)
+    private function isHandledRole($a_role_id) : bool
     {
         return array_key_exists($a_role_id, $this->mappings);
     }
@@ -242,7 +240,7 @@ class ilLDAPRoleGroupMapping
      *
      * @access private
      */
-    private function isHandledUser($a_usr_id)
+    private function isHandledUser($a_usr_id) : bool
     {
         return array_key_exists($a_usr_id, $this->users);
     }
@@ -255,7 +253,7 @@ class ilLDAPRoleGroupMapping
      * @param int role_id
      * @param int user_id
      */
-    private function assignToGroup($a_role_id, $a_usr_id)
+    private function assignToGroup($a_role_id, $a_usr_id) : void
     {
         foreach ($this->mappings[$a_role_id] as $data) {
             try {
@@ -293,7 +291,7 @@ class ilLDAPRoleGroupMapping
      * @param int user_id
      *
      */
-    private function deassignFromGroup($a_role_id, $a_usr_id)
+    private function deassignFromGroup($a_role_id, $a_usr_id) : void
     {
         foreach ($this->mappings[$a_role_id] as $data) {
             try {
@@ -341,12 +339,12 @@ class ilLDAPRoleGroupMapping
      * @access private
      * @throws ilLDAPQueryException
      */
-    private function isMember($a_uid, $data)
+    private function isMember($a_uid, $data) : bool
     {
-        if (!isset($this->mapping_members["$data[mapping_id]"])) {
+        if (!isset($this->mapping_members[(string) $data['mapping_id']])) {
             // Read members
             try {
-                $server = $this->servers["$data[server_id]"];
+                $server = $this->servers[(string) $data['server_id']];
                 $query_obj = $this->getLDAPQueryInstance($data['server_id'], $server->getUrl());
 
                 // query for members
@@ -366,7 +364,7 @@ class ilLDAPRoleGroupMapping
         #var_dump("<pre>",$a_uid,$this->mapping_members,"</pre>");
         
         // Now check for membership in stored result
-        if (in_array($a_uid, $this->mapping_members["$data[mapping_id]"])) {
+        if (in_array($a_uid, $this->mapping_members[(string) $data['mapping_id']])) {
             return true;
         }
         return false;
@@ -411,11 +409,11 @@ class ilLDAPRoleGroupMapping
      * @access private
      *
      */
-    private function storeMembers($a_mapping_id, $a_data)
+    private function storeMembers($a_mapping_id, $a_data) : void
     {
         $this->mapping_members[$a_mapping_id] = array();
         foreach ($a_data as $field => $value) {
-            if (strtolower($field) == 'dn') {
+            if (strtolower($field) === 'dn') {
                 continue;
             }
             
@@ -427,7 +425,6 @@ class ilLDAPRoleGroupMapping
                 $this->mapping_members[$a_mapping_id][] = $external_account;
             }
         }
-        return true;
     }
     
     /**
@@ -456,7 +453,7 @@ class ilLDAPRoleGroupMapping
             $search_base .= $server->getBaseDN();
             
             // try optional group user filter first
-            if ($server->isMembershipOptional() and $server->getGroupUserFilter()) {
+            if ($server->isMembershipOptional() && $server->getGroupUserFilter()) {
                 $userFilter = $server->getGroupUserFilter();
             } else {
                 $userFilter = $server->getFilter();
@@ -494,8 +491,8 @@ class ilLDAPRoleGroupMapping
      */
     private function getLDAPQueryInstance($a_server_id, $a_url)
     {
-        if (array_key_exists($a_server_id, $this->query) and
-            array_key_exists($a_url, $this->query[$a_server_id]) and
+        if (array_key_exists($a_server_id, $this->query) &&
+            array_key_exists($a_url, $this->query[$a_server_id]) &&
             is_object($this->query[$a_server_id][$a_url])) {
             return $this->query[$a_server_id][$a_url];
         }

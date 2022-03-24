@@ -76,7 +76,7 @@ class ilLDAPResult
      * Resource from ldap_search()
      * @param resource $result
      */
-    public function setResult($result)
+    public function setResult($result) : void
     {
         $this->result = $result;
     }
@@ -115,7 +115,7 @@ class ilLDAPResult
      * Adds Results from ldap_get_entries() to rows
      * @param array $entries
      */
-    private function addEntriesToRows($entries)
+    private function addEntriesToRows($entries) : void
     {
         if (!$entries) {
             return;
@@ -139,7 +139,7 @@ class ilLDAPResult
      * @param array $entry
      * @return array
      */
-    private function toSimpleArray($entry)
+    private function toSimpleArray($entry) : array
     {
         $data = array();
         foreach ($entry as $key => $value) {
@@ -148,7 +148,7 @@ class ilLDAPResult
             if (is_int($key)) {
                 continue;
             }
-            if ($key == 'dn') {
+            if ($key === 'dn') {
                 $data['dn'] = $value;
                 continue;
             }

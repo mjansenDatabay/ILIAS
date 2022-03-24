@@ -28,12 +28,9 @@ class ilLDAPQuery
     /**
      * @deprecated with PHP 7.3 (LDAP_CONTROL_PAGEDRESULTS)
      */
-    const IL_LDAP_CONTROL_PAGEDRESULTS = '1.2.840.113556.1.4.319';
-
-
-    const IL_LDAP_SUPPORTED_CONTROL = 'supportedControl';
-
-    const PAGINATION_SIZE = 100;
+    private const IL_LDAP_CONTROL_PAGEDRESULTS = '1.2.840.113556.1.4.319';
+    private const IL_LDAP_SUPPORTED_CONTROL = 'supportedControl';
+    private const PAGINATION_SIZE = 100;
 
     private string $ldap_server_url;
     private ilLDAPServer $settings;
@@ -92,9 +89,9 @@ class ilLDAPQuery
     {
         if (!$this->readUserData($a_name)) {
             return [];
-        } else {
-            return $this->users;
         }
+
+        return $this->users;
     }
     
     
@@ -120,7 +117,7 @@ class ilLDAPQuery
                 }
             }
         }
-        if ($this->settings->getGroupName() == '' or $this->settings->isMembershipOptional()) {
+        if ($this->settings->getGroupName() == '' || $this->settings->isMembershipOptional()) {
             $this->logger->info('Start reading all users...');
             $this->readAllUsers();
             #throw new ilLDAPQueryException('LDAP: Called import of users without specifying group restrictions. NOT IMPLEMENTED YET!');
@@ -144,6 +141,7 @@ class ilLDAPQuery
                     $a_scope
                 ));
         }
+
         return (new ilLDAPResult($this->lh, $res))->run();
     }
     
@@ -157,6 +155,7 @@ class ilLDAPQuery
         if (@ldap_mod_add($this->lh, $a_dn, $a_attribute)) {
             return true;
         }
+
         throw new ilLDAPQueryException(__METHOD__ . ' ' . ldap_error($this->lh));
     }
     
@@ -253,7 +252,7 @@ class ilLDAPQuery
                 $this->logger->warning('Result pagination failed with message: ' . $e->getMessage());
                 throw new ilLDAPPagingException($e->getMessage());
             }
-        } while ($cookie !== null && $cookie != '');
+        } while ($cookie !== null && $cookie !== '');
 
         // finally reset cookie
         ldap_control_paged_result($this->lh, 10000, false, $cookie);
@@ -601,11 +600,11 @@ class ilLDAPQuery
     public function bind(int $a_binding_type = ilLDAPQuery::LDAP_BIND_DEFAULT, string $a_user_dn = '', string $a_password = '') : void
     {
         switch ($a_binding_type) {
-            case ilLDAPQuery::LDAP_BIND_TEST:
+            case self::LDAP_BIND_TEST:
                 ldap_set_option($this->lh, LDAP_OPT_NETWORK_TIMEOUT, ilLDAPServer::DEFAULT_NETWORK_TIMEOUT);
                 // fall through
                 // no break
-            case ilLDAPQuery::LDAP_BIND_DEFAULT:
+            case self::LDAP_BIND_DEFAULT:
                 // Now bind anonymously or as user
                 if (
                 ilLDAPServer::LDAP_BIND_USER == $this->settings->getBindingType() &&
@@ -623,7 +622,7 @@ class ilLDAPQuery
                 }
                 break;
                 
-            case ilLDAPQuery::LDAP_BIND_ADMIN:
+            case self::LDAP_BIND_ADMIN:
                 $user = $this->settings->getRoleBindDN();
                 $pass = $this->settings->getRoleBindPassword();
                 
@@ -636,7 +635,7 @@ class ilLDAPQuery
                 define('IL_LDAP_REBIND_PASS', $pass);
                 break;
                 
-            case ilLDAPQuery::LDAP_BIND_AUTH:
+            case self::LDAP_BIND_AUTH:
                 $this->logger->debug('Trying to bind as: ' . $a_user_dn);
                 $user = $a_user_dn;
                 $pass = $a_password;
@@ -649,9 +648,9 @@ class ilLDAPQuery
         
         if (!@ldap_bind($this->lh, $user, $pass)) {
             throw new ilLDAPQueryException('LDAP: Cannot bind as ' . $user . ' with message: ' . ldap_err2str(ldap_errno($this->lh)) . ' Trying fallback...', ldap_errno($this->lh));
-        } else {
-            $this->logger->debug('Bind successful.');
         }
+
+        $this->logger->debug('Bind successful.');
     }
     
     private function fetchUserProfileFields() : void

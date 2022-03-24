@@ -84,7 +84,7 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
      * @param array array of LDAPRoleAssignmentRule
      *
      */
-    public function parse($rule_objs)
+    public function parse($rule_objs) : void
     {
         $records_arr = [];
         foreach ($rule_objs as $rule) {

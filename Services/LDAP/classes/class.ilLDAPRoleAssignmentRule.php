@@ -19,9 +19,9 @@
  */
 class ilLDAPRoleAssignmentRule
 {
-    const TYPE_GROUP = 1;
-    const TYPE_ATTRIBUTE = 2;
-    const TYPE_PLUGIN = 3;
+    public const TYPE_GROUP = 1;
+    public const TYPE_ATTRIBUTE = 2;
+    public const TYPE_PLUGIN = 3;
     
     private static array $instances = [];
     

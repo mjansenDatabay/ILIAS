@@ -78,8 +78,7 @@ class ilLDAPRoleAssignmentRules
             }
         }
 
-        $names = array_merge($names, self::getAdditionalPluginAttributes($a_server_id));
-        return $names;
+        return array_merge($names, self::getAdditionalPluginAttributes($a_server_id));
     }
 
     public static function getAssignmentsForUpdate(int $a_server_id, $a_usr_id, $a_usr_name, $a_usr_data) : array
