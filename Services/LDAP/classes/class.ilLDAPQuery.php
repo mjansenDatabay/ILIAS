@@ -178,7 +178,7 @@ class ilLDAPQuery
      * This function splits the query to filters like e.g (uid=a*) (uid=b*)...
      * This avoids AD page_size_limit
      */
-    private function readAllUsers()
+    private function readAllUsers() : void
     {
         // Build search base
         if (($dn = $this->settings->getSearchBase()) && substr($dn, -1) !== ',') {
@@ -211,8 +211,6 @@ class ilLDAPQuery
             }
         }
         unset($tmp_result);
-
-        return true;
     }
 
     /**
@@ -388,7 +386,7 @@ class ilLDAPQuery
     /**
      * Fetch group member ids
      */
-    private function fetchGroupMembers(string $a_name = '') : bool
+    private function fetchGroupMembers(string $a_name = '') : void
     {
         $group_name = $a_name !== '' ? $a_name : $this->settings->getGroupName();
         
@@ -423,9 +421,9 @@ class ilLDAPQuery
         
         if (!$tmp_result->numRows()) {
             $this->logger->info('No group found.');
-            return false;
+            return;
         }
-                
+
         $attribute_name = strtolower($this->settings->getGroupMember());
         
         // All groups
@@ -440,8 +438,6 @@ class ilLDAPQuery
             }
         }
         unset($tmp_result);
-
-        return true;
     }
     
     /**
@@ -529,7 +525,7 @@ class ilLDAPQuery
      */
     private function queryByScope(int $a_scope, string $a_base_dn, string $a_filter, array $a_attributes)
     {
-        $a_filter = $a_filter ? $a_filter : "(objectclass=*)";
+        $a_filter = $a_filter ?: "(objectclass=*)";
 
         switch ($a_scope) {
             case ilLDAPServer::LDAP_SCOPE_SUB:
@@ -602,7 +598,7 @@ class ilLDAPQuery
      * @throws ilLDAPQueryException on connection failure.
      *
      */
-    public function bind(int $a_binding_type = ilLDAPQuery::LDAP_BIND_DEFAULT, string $a_user_dn = '', string $a_password = '')
+    public function bind(int $a_binding_type = ilLDAPQuery::LDAP_BIND_DEFAULT, string $a_user_dn = '', string $a_password = '') : void
     {
         switch ($a_binding_type) {
             case ilLDAPQuery::LDAP_BIND_TEST:

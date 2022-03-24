@@ -162,20 +162,21 @@ class ilLDAPRoleGroupMappingSettings
     {
         $this->ilErr->setMessage('');
         $found_missing = false;
-        foreach (array_values($this->mappings) as $data) {
+        foreach ($this->mappings as $data) {
             // Check if all required fields are available
-            if (!strlen($data['dn']) || !strlen($data['member_attribute']) || !strlen($data['role_name'])) {
+            if ($data['dn'] == '' || $data['member_attribute'] == '' || $data['role_name'] == '') {
                 if (!$found_missing) {
                     $found_missing = true;
                     $this->ilErr->appendMessage($this->lng->txt('fill_out_all_required_fields'));
                 }
             }
             // Check role valid
-            if (strlen($data['role_name']) and !$this->rbacreview->roleExists($data['role_name'])) {
+            if ($data['role_name'] != '' && !$this->rbacreview->roleExists($data['role_name'])) {
                 $this->ilErr->appendMessage($this->lng->txt('ldap_role_not_exists') . ' ' . $data['role_name']);
             }
         }
-        return strlen($this->ilErr->getMessage()) ? false : true;
+
+        return $this->ilErr->getMessage() === '';
     }
     
     /**

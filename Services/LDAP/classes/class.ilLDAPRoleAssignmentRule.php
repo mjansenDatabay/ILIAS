@@ -358,7 +358,7 @@ class ilLDAPRoleAssignmentRule
     
     public function isPluginActive() : bool
     {
-        return (bool) $this->getType() === self::TYPE_PLUGIN;
+        return $this->getType() === self::TYPE_PLUGIN;
     }
 
     public function conditionToString() : string

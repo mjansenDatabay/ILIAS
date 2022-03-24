@@ -155,7 +155,7 @@ class ilLDAPSettingsGUI
         $this->setSubTabs();
         $this->tabs_gui->setTabActive('role_assignments');
 
-        $this->ctrl->saveParameter($this, 'rule_id', (int) $_GET['rule_id']);
+        $this->ctrl->saveParameter($this, 'rule_id');
         $this->initFormRoleAssignments(
             'edit',
             $this->role_mapping_rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId((int) $_GET['rule_id'])// TODO PHP8-REVIEW The method only supports 1 argument, but what about this assignment?
@@ -203,7 +203,7 @@ class ilLDAPSettingsGUI
         }
 
         $this->initFormRoleAssignments('edit');
-        if (!$this->form->checkInput() or ($err = $this->checkRoleAssignmentInput((int) $_REQUEST['rule_id']))) {
+        if (!$this->form->checkInput() || ($err = $this->checkRoleAssignmentInput((int) $_REQUEST['rule_id']))) {
             if ($err) {
                 $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt($err));
             }
@@ -290,7 +290,7 @@ class ilLDAPSettingsGUI
         }
 
         $this->initFormRoleAssignments('create');
-        if (!$this->form->checkInput() or ($err = $this->checkRoleAssignmentInput())) {
+        if (!$this->form->checkInput() || ($err = $this->checkRoleAssignmentInput())) {
             if ($err) {
                 $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt($err));
             }
@@ -528,7 +528,6 @@ class ilLDAPSettingsGUI
             $this->mapping->setRule($key, $value, false);
         }
         $this->userMapping();
-        return;
     }
     
     public function saveMapping() : void
@@ -558,7 +557,6 @@ class ilLDAPSettingsGUI
         
         $this->main_tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'));
         unset($_POST['mapping_template']);
-        return;
     }
     
     public function serverList() : void
@@ -801,7 +799,7 @@ class ilLDAPSettingsGUI
         $this->form_gui->addItem($ci_gui);
         
         $global_role = new ilSelectInputGUI($this->lng->txt('ldap_global_role_assignment'), 'global_role');
-        $global_role->setOptions($this->prepareGlobalRoleSelection(false));
+        $global_role->setOptions($this->prepareGlobalRoleSelection());
         $global_role->setInfo($this->lng->txt('ldap_global_role_info'));
         $this->form_gui->addItem($global_role);
         

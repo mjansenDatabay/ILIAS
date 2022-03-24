@@ -535,7 +535,7 @@ class ilLDAPServer
     }
     public function getVersion()
     {
-        return $this->version ? $this->version : self::DEFAULT_VERSION;
+        return $this->version ?: self::DEFAULT_VERSION;
     }
     public function setVersion($a_version)
     {
@@ -551,7 +551,7 @@ class ilLDAPServer
     }
     public function isActiveReferrer()
     {
-        return $this->referrals ? true : false;
+        return (bool) $this->referrals;
     }
     public function toggleReferrer($a_status)
     {
@@ -559,7 +559,7 @@ class ilLDAPServer
     }
     public function isActiveTLS()
     {
-        return $this->tls ? true : false;
+        return (bool) $this->tls;
     }
     public function toggleTLS($a_status)
     {
@@ -800,7 +800,7 @@ class ilLDAPServer
      */
     public function isAccountMigrationEnabled()
     {
-        return $this->account_migration ? true : false;
+        return (bool) $this->account_migration;
     }
     
     
@@ -810,26 +810,26 @@ class ilLDAPServer
     public function validate() : bool
     {
         $this->ilErr->setMessage('');
-        if (!strlen($this->getName()) ||
-            !strlen($this->getUrl()) ||
-            !strlen($this->getBaseDN()) ||
-            !strlen($this->getUserAttribute())) {
+        if ($this->getName() == '' ||
+            $this->getUrl() === '' ||
+            $this->getBaseDN() == '' ||
+            $this->getUserAttribute() == '') {
             $this->ilErr->setMessage($this->lng->txt('fill_out_all_required_fields'));
         }
         
         if ($this->getBindingType() == ilLDAPServer::LDAP_BIND_USER
-            && (!strlen($this->getBindUser()) || !strlen($this->getBindPassword()))) {
+            && ($this->getBindUser() == '' || $this->getBindPassword() == '')) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_bind_user'));
         }
         
-        if (($this->enabledSyncPerCron() or $this->enabledSyncOnLogin()) and !$this->global_role) {
+        if (($this->enabledSyncPerCron() || $this->enabledSyncOnLogin()) && !$this->global_role) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_role_assignment'));
         }
-        if ($this->getVersion() == 2 and $this->isActiveTLS()) {
+        if ($this->getVersion() == 2 && $this->isActiveTLS()) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_tls_conflict'));
         }
         
-        return strlen($this->ilErr->getMessage()) ? false : true;
+        return $this->ilErr->getMessage() === '';
     }
     
     public function create() : int
@@ -1023,14 +1023,14 @@ class ilLDAPServer
     {
         $filter = trim($a_filter);
         
-        if (!strlen($filter)) {
+        if ($filter === '') {
             return $filter;
         }
         
         if (strpos($filter, '(') !== 0) {
             $filter = ('(' . $filter);
         }
-        if (substr($filter, -1) != ')') {
+        if (substr($filter, -1) !== ')') {
             $filter = ($filter . ')');
         }
         return $filter;
@@ -1049,13 +1049,11 @@ class ilLDAPServer
                 array('dn'),
                 ilLDAPRoleAssignmentRules::getAttributeNames($this->getServerId())
             );
-        } else {
-            return array($this->getUserAttribute());
         }
+
+        return array($this->getUserAttribute());
     }
-    
-    
-    
+
     /**
      * Read server settings
      *

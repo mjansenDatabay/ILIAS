@@ -37,7 +37,7 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
         $this->ctrl = $ilCtrl;
         
         parent::__construct($a_parent_obj, $a_parent_cmd);
-        $this->addColumn('', '', 1);
+        $this->addColumn('', '', '1');
         $this->addColumn($this->lng->txt('ldap_rule_type'), 'type', "20%");
         $this->addColumn($this->lng->txt('ldap_ilias_role'), 'role', "30%");
         $this->addColumn($this->lng->txt('ldap_rule_condition'), 'condition', "20%");
@@ -86,6 +86,7 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
      */
     public function parse($rule_objs)
     {
+        $records_arr = [];
         foreach ($rule_objs as $rule) {
             $tmp_arr['id'] = $rule->getRuleId();
             
@@ -111,6 +112,6 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
             $records_arr[] = $tmp_arr;
         }
         
-        $this->setData($records_arr ? $records_arr : array());
+        $this->setData($records_arr);
     }
 }

@@ -115,7 +115,7 @@ class ilLDAPAttributeMapping
     public function getFieldsForUpdate() : array
     {
         $fields = [];
-        foreach (array_values($this->rules_for_update) as $rule) {
+        foreach ($this->rules_for_update as $rule) {
             if (!strlen($rule['value'])) {
                 continue;
             }
@@ -137,7 +137,7 @@ class ilLDAPAttributeMapping
     public function getFields() : array
     {
         $fields = [];
-        foreach (array_values($this->mapping_rules) as $rule) {
+        foreach ($this->mapping_rules as $rule) {
             if (!strlen($rule['value'])) {
                 continue;
             }

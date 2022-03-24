@@ -210,7 +210,7 @@ class ilLDAPRoleGroupMapping
         $this->mapping_info = array();
         $this->mapping_info_strict = array();
         foreach ($this->mappings as $mapping) {
-            foreach (array_values($mapping) as $data) {
+            foreach ($mapping as $data) {
                 if (strlen($data['info']) and $data['object_id']) {
                     $this->mapping_info[$data['object_id']][] = $data['info'];
                 }
