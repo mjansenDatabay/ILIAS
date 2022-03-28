@@ -14,7 +14,7 @@
  *
  *****************************************************************************/
 /**
- * Description of ilLDAPSyncronisationException
+ * Description of ilLDAPSynchronisationException
  *
  * @author Stefan Meyer <meyer@leifos.com>
  * @ingroup ServicesLDAP

@@ -203,7 +203,6 @@ class ilLDAPRoleGroupMappingSettings
                     $this->db->quote($data['info'], 'text') . ", " .
                     $this->db->quote($data['info_type'], 'integer') .
                     ")";
-                $this->db->manipulate($query);
             } else {
                 $query = "UPDATE ldap_rg_mapping " .
                     "SET server_id = " . $this->db->quote($this->getServerId(), 'integer') . ", " .
@@ -215,8 +214,8 @@ class ilLDAPRoleGroupMappingSettings
                     "mapping_info = " . $this->db->quote($data['info'], 'text') . ", " .
                     "mapping_info_type = " . $this->db->quote($data['info_type'], 'integer') . " " .
                     "WHERE mapping_id = " . $this->db->quote($mapping_id, 'integer');
-                $this->db->manipulate($query);
             }
+            $this->db->manipulate($query);
         }
         $this->read();
     }

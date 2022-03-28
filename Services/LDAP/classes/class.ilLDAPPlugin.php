@@ -22,12 +22,8 @@ abstract class ilLDAPPlugin extends ilPlugin
 {
     /**
      * Check if user data matches a keyword value combination
-     * @param array $a_user_data
-     * @param string $a_keyword
-     * @param scalar $a_value
-     * @return bool
      */
-    protected function checkValue(array $a_user_data, string $a_keyword, $a_value) : bool
+    protected function checkValue(array $a_user_data, string $a_keyword, string $a_value) : bool
     {
         if (!$a_user_data[$a_keyword]) {
             return false;
@@ -35,7 +31,7 @@ abstract class ilLDAPPlugin extends ilPlugin
 
         if (is_array($a_user_data[$a_keyword])) {
             foreach ($a_user_data[$a_keyword] as $values) {
-                if (strcasecmp(trim($values), (string) $a_value) === 0) {
+                if (strcasecmp(trim($values), $a_value) === 0) {
                     return true;
                 }
             }

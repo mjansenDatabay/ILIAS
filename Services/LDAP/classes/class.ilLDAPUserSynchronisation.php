@@ -17,7 +17,6 @@
  * Synchronization of user accounts used in auth container ldap, radius , cas,...
  *
  * @author Stefan Meyer <meyer@leifos.com>
- * @ingroup ServicesLDAP
  */
 class ilLDAPUserSynchronisation
 {
@@ -25,6 +24,7 @@ class ilLDAPUserSynchronisation
     private ilLDAPServer $server;
     private string $extaccount = '';
     private string $intaccount = '';
+
     private array $user_data = array();
     private bool $force_creation = false;
     private bool $force_read_ldap_data = false;
@@ -75,7 +75,7 @@ class ilLDAPUserSynchronisation
      * Get ILIAS unique internal account name
      * @return string internal account
      */
-    public function getInternalAccount() : string
+    public function getInternalAccount() : ?string
     {
         return $this->intaccount;
     }

@@ -18,7 +18,7 @@
  */
 class ilLDAPServer
 {
-    private static $instances = array();
+    private static array $instances = [];
 
     public const LDAP_BIND_ANONYMOUS = 0;
     public const LDAP_BIND_USER = 1;
@@ -45,7 +45,34 @@ class ilLDAPServer
     private bool $escape_dn = false;
     
     private bool $active = false;
-    
+
+    private string $name = '';
+    private int $version = self::DEFAULT_VERSION;
+    private string $base_dn = '';
+    private bool $referrals = false;
+    private bool $tls = false;
+    private int $binding_type = self::LDAP_BIND_ANONYMOUS;
+    private string $bind_user = '';
+    private string $bind_password = '';
+    private string $search_base = '';
+    private string $user_attribute = '';
+    private int $user_scope = self::LDAP_SCOPE_ONE;
+    private string $group_filter = '';
+    private string $filter = '';
+    private string $group_dn = '';
+    private string $group_member = '';
+    private int $group_scope = self::LDAP_SCOPE_ONE;
+    private string $group_name = '';
+    private bool $memberisdn = false;
+    private string $group_attribute = '';
+    private bool $group_optional = true;
+    private string $group_user_filter = '';
+    private bool $sync_on_login = false;
+    private bool $sync_per_cron = false;
+    private bool $account_migration = false;
+    private string $username_filter = '';
+    private int $global_role = 0;
+
     private ilDBInterface $db;
     private ilLanguage $lng;
     private ilErrorHandling $ilErr;
@@ -253,20 +280,6 @@ class ilLDAPServer
         }
         return $server;
     }
-    
-    /*
-     * Get first server id
-     */
-    public static function _getFirstServer() : int
-    {
-        $servers = self::_getServerList();
-        
-        if (count($servers)) {
-            return $servers[0];
-        }
-        return 0;
-    }
-
 
     public static function getAvailableDataSources(int $a_auth_mode) : array
     {
@@ -301,7 +314,7 @@ class ilLDAPServer
             "WHERE authentication_type = " . $ilDB->quote($a_auth_mode, 'integer') . " " .
             "AND authentication = " . $ilDB->quote(0, 'integer');
         $res = $ilDB->query($query);
-        while ($res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+        if ($res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             return true;
         }
         return false;
@@ -316,7 +329,7 @@ class ilLDAPServer
         $query = "SELECT server_id FROM ldap_server_settings " .
             "WHERE authentication_type = " . $ilDB->quote($a_auth_mode, 'integer') . " ";
         $res = $ilDB->query($query);
-        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+        if ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             return $row->server_id;
         }
         return 0;
@@ -476,7 +489,7 @@ class ilLDAPServer
     {
         return $this->url;
     }
-    public function setUrl($a_url) : void
+    public function setUrl(string $a_url) : void
     {
         $this->url_string = $a_url;
         
@@ -525,51 +538,51 @@ class ilLDAPServer
     }
     
     
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
-    public function setName($a_name)
+    public function setName(string $a_name)
     {
         $this->name = $a_name;
     }
-    public function getVersion()
+    public function getVersion() : int
     {
-        return $this->version ?: self::DEFAULT_VERSION;
+        return $this->version;
     }
-    public function setVersion($a_version)
+    public function setVersion(int $a_version) : void
     {
         $this->version = $a_version;
     }
-    public function getBaseDN()
+    public function getBaseDN() : string
     {
         return $this->base_dn;
     }
-    public function setBaseDN($a_base_dn)
+    public function setBaseDN(string $a_base_dn) : void
     {
         $this->base_dn = $a_base_dn;
     }
-    public function isActiveReferrer()
+    public function isActiveReferrer() : bool
     {
-        return (bool) $this->referrals;
+        return $this->referrals;
     }
-    public function toggleReferrer($a_status)
+    public function toggleReferrer(bool $a_status) : void
     {
         $this->referrals = $a_status;
     }
-    public function isActiveTLS()
+    public function isActiveTLS() : bool
     {
-        return (bool) $this->tls;
+        return $this->tls;
     }
-    public function toggleTLS($a_status)
+    public function toggleTLS(bool $a_status) : void
     {
         $this->tls = $a_status;
     }
-    public function getBindingType()
+    public function getBindingType() : int
     {
         return $this->binding_type;
     }
-    public function setBindingType($a_type)
+    public function setBindingType(int $a_type)
     {
         if ($a_type == self::LDAP_BIND_USER) {
             $this->binding_type = self::LDAP_BIND_USER;
@@ -577,75 +590,75 @@ class ilLDAPServer
             $this->binding_type = self::LDAP_BIND_ANONYMOUS;
         }
     }
-    public function getBindUser()
+    public function getBindUser() : string
     {
         return $this->bind_user;
     }
-    public function setBindUser($a_user)
+    public function setBindUser(string $a_user) : void
     {
         $this->bind_user = $a_user;
     }
-    public function getBindPassword()
+    public function getBindPassword() : string
     {
         return $this->bind_password;
     }
-    public function setBindPassword($a_password)
+    public function setBindPassword(string $a_password) : void
     {
         $this->bind_password = $a_password;
     }
-    public function getSearchBase()
+    public function getSearchBase() : string
     {
         return $this->search_base;
     }
-    public function setSearchBase($a_search_base)
+    public function setSearchBase(string $a_search_base) : void
     {
         $this->search_base = $a_search_base;
     }
-    public function getUserAttribute()
+    public function getUserAttribute() : string
     {
         return $this->user_attribute;
     }
-    public function setUserAttribute($a_user_attr)
+    public function setUserAttribute(string $a_user_attr) : void
     {
         $this->user_attribute = $a_user_attr;
     }
-    public function getFilter()
+    public function getFilter() : string
     {
         return $this->prepareFilter($this->filter);
     }
-    public function setFilter($a_filter)
+    public function setFilter(string $a_filter) : void
     {
         $this->filter = $a_filter;
     }
-    public function getGroupDN()
+    public function getGroupDN() : string
     {
         return $this->group_dn;
     }
-    public function setGroupDN($a_value)
+    public function setGroupDN(string $a_value) : void
     {
         $this->group_dn = $a_value;
     }
-    public function getGroupFilter()
+    public function getGroupFilter() : string
     {
         return $this->prepareFilter($this->group_filter);
     }
-    public function setGroupFilter($a_value)
+    public function setGroupFilter(string $a_value) : void
     {
         $this->group_filter = $a_value;
     }
-    public function getGroupMember()
+    public function getGroupMember() : string
     {
         return $this->group_member;
     }
-    public function setGroupMember($a_value)
+    public function setGroupMember(string $a_value) : void
     {
         $this->group_member = $a_value;
     }
-    public function getGroupName()
+    public function getGroupName() : string
     {
         return $this->group_name;
     }
-    public function setGroupName($a_value)
+    public function setGroupName(string $a_value) : void
     {
         $this->group_name = $a_value;
     }
@@ -654,123 +667,123 @@ class ilLDAPServer
      * Get group names as array
      * @return string[]
      */
-    public function getGroupNames()
+    public function getGroupNames() : array
     {
         $names = explode(',', $this->getGroupName());
 
         if (!is_array($names)) {
-            return array();
+            return [];
         }
 
         return array_filter(array_map('trim', $names));
     }
     
     
-    public function getGroupAttribute()
+    public function getGroupAttribute() : string
     {
         return $this->group_attribute;
     }
-    public function setGroupAttribute($a_value)
+    public function setGroupAttribute(string $a_value) : void
     {
         $this->group_attribute = $a_value;
     }
     
-    public function toggleMembershipOptional($a_status)
+    public function toggleMembershipOptional(bool $a_status) : void
     {
-        $this->group_optional = (bool) $a_status;
+        $this->group_optional = $a_status;
     }
-    public function isMembershipOptional()
+    public function isMembershipOptional() : bool
     {
-        return (bool) $this->group_optional;
+        return $this->group_optional;
     }
-    public function setGroupUserFilter($a_filter)
+    public function setGroupUserFilter(string $a_filter) : void
     {
         $this->group_user_filter = $a_filter;
     }
-    public function getGroupUserFilter()
+    public function getGroupUserFilter() : string
     {
         return $this->group_user_filter;
     }
 
-    public function enabledGroupMemberIsDN()
+    public function enabledGroupMemberIsDN() : bool
     {
-        return (bool) $this->memberisdn;
+        return $this->memberisdn;
     }
-    public function enableGroupMemberIsDN($a_value)
+    public function enableGroupMemberIsDN(bool $a_value) : void
     {
-        $this->memberisdn = (bool) $a_value;
+        $this->memberisdn = $a_value;
     }
-    public function setGroupScope($a_value)
+    public function setGroupScope(int $a_value) : void
     {
         $this->group_scope = $a_value;
     }
-    public function getGroupScope()
+    public function getGroupScope() : int
     {
         return $this->group_scope;
     }
-    public function setUserScope($a_value)
+    public function setUserScope(int $a_value) : void
     {
         $this->user_scope = $a_value;
     }
-    public function getUserScope()
+    public function getUserScope() : int
     {
         return $this->user_scope;
     }
-    public function enabledSyncOnLogin()
+    public function enabledSyncOnLogin() : bool
     {
         return $this->sync_on_login;
     }
-    public function enableSyncOnLogin($a_value)
+    public function enableSyncOnLogin(bool $a_value) : void
     {
-        $this->sync_on_login = (int) $a_value;
+        $this->sync_on_login = $a_value;
     }
-    public function enabledSyncPerCron()
+    public function enabledSyncPerCron() : bool
     {
         return $this->sync_per_cron;
     }
-    public function enableSyncPerCron($a_value)
+    public function enableSyncPerCron(bool $a_value) : void
     {
-        $this->sync_per_cron = (int) $a_value;
+        $this->sync_per_cron = $a_value;
     }
-    public function setGlobalRole($a_role)
+    public function setGlobalRole(int $a_role) : void
     {
         $this->global_role = $a_role;
     }
-    public function getRoleBindDN()
+    public function getRoleBindDN() : string
     {
         return $this->role_bind_dn;
     }
-    public function setRoleBindDN($a_value)
+    public function setRoleBindDN(string $a_value) : void
     {
         $this->role_bind_dn = $a_value;
     }
-    public function getRoleBindPassword()
+    public function getRoleBindPassword() : string
     {
         return $this->role_bind_pass;
     }
-    public function setRoleBindPassword($a_value)
+    public function setRoleBindPassword(string $a_value) : void
     {
         $this->role_bind_pass = $a_value;
     }
-    public function enabledRoleSynchronization()
+    public function enabledRoleSynchronization() : bool
     {
         return $this->role_sync_active;
     }
-    public function enableRoleSynchronization($a_value)
+    public function enableRoleSynchronization(bool $a_value) : void
     {
         $this->role_sync_active = $a_value;
     }
-    // start Patch Name Filter
-    public function getUsernameFilter()
+
+    public function getUsernameFilter() : string
     {
         return $this->username_filter;
     }
-    public function setUsernameFilter($a_value)
+    public function setUsernameFilter(string $a_value) : void
     {
         $this->username_filter = $a_value;
     }
 
-    public function enableEscapeDN(bool $a_value)
+    public function enableEscapeDN(bool $a_value) : void
     {
         $this->escape_dn = $a_value;
     }
@@ -782,25 +795,18 @@ class ilLDAPServer
 
     /**
      * Enable account migration
-     *
-     * @access public
-     * @param bool status
-     *
      */
-    public function enableAccountMigration($a_status)
+    public function enableAccountMigration(bool $a_status) : void
     {
         $this->account_migration = $a_status;
     }
     
     /**
      * enabled account migration
-     *
-     * @access public
-     *
      */
-    public function isAccountMigrationEnabled()
+    public function isAccountMigrationEnabled() : bool
     {
-        return (bool) $this->account_migration;
+        return $this->account_migration;
     }
     
     
@@ -922,7 +928,7 @@ class ilLDAPServer
             "role_bind_pass = " . $this->db->quote($this->getRoleBindPassword(), 'text') . ", " .
             "migration = " . $this->db->quote((int) $this->isAccountMigrationEnabled(), 'integer') . ", " .
             'authentication = ' . $this->db->quote((int) $this->isAuthenticationEnabled(), 'integer') . ', ' .
-            'authentication_type = ' . $this->db->quote((int) $this->getAuthenticationMapping(), 'integer') . ' ' .
+            'authentication_type = ' . $this->db->quote($this->getAuthenticationMapping(), 'integer') . ' ' .
             ", username_filter = " . $this->db->quote($this->getUsernameFilter(), "text") . " " .
             ", escape_dn = " . $this->db->quote($this->enabledEscapeDN() ? 1 : 0, 'integer') . " " .
             "WHERE server_id = " . $this->db->quote($this->getServerId(), 'integer');
@@ -966,15 +972,15 @@ class ilLDAPServer
     {
         $options = array(
             'url' => $this->getUrl(),
-            'version' => (int) $this->getVersion(),
-            'referrals' => (bool) $this->isActiveReferrer());
+            'version' => $this->getVersion(),
+            'referrals' => $this->isActiveReferrer());
         
         if ($this->getBindingType() == self::LDAP_BIND_USER) {
             $options['binddn'] = $this->getBindUser();
             $options['bindpw'] = $this->getBindPassword();
         }
         $options['basedn'] = $this->getBaseDN();
-        $options['start_tls'] = (bool) $this->isActiveTLS();
+        $options['start_tls'] = $this->isActiveTLS();
         $options['userdn'] = $this->getSearchBase();
         switch ($this->getUserScope()) {
             case self::LDAP_SCOPE_ONE:
@@ -1070,19 +1076,19 @@ class ilLDAPServer
             $this->toggleActive((bool) $row->active);
             $this->setName($row->name);
             $this->setUrl($row->url);
-            $this->setVersion($row->version);
+            $this->setVersion((int) $row->version);
             $this->setBaseDN($row->base_dn);
-            $this->toggleReferrer($row->referrals);
-            $this->toggleTLS($row->tls);
-            $this->setBindingType($row->bind_type);
+            $this->toggleReferrer((bool) $row->referrals);
+            $this->toggleTLS((bool) $row->tls);
+            $this->setBindingType((int) $row->bind_type);
             $this->setBindUser($row->bind_user);
             $this->setBindPassword($row->bind_pass);
             $this->setSearchBase($row->search_base);
-            $this->setUserScope($row->user_scope);
+            $this->setUserScope((int) $row->user_scope);
             $this->setUserAttribute($row->user_attribute);
             $this->setFilter($row->filter);
             $this->setGroupDN($row->group_dn);
-            $this->setGroupScope($row->group_scope);
+            $this->setGroupScope((int) $row->group_scope);
             $this->setGroupFilter($row->group_filter);
             $this->setGroupMember($row->group_member);
             $this->setGroupAttribute($row->group_attribute);
