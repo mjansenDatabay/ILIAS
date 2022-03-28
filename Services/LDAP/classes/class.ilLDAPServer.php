@@ -405,7 +405,7 @@ class ilLDAPServer
     public static function getAuthModeByKey(string $a_auth_key) : string
     {
         $auth_arr = explode('_', $a_auth_key);
-        if (count((array) $auth_arr) > 1) {
+        if (count($auth_arr) > 1) {
             return 'ldap_' . $auth_arr[1];
         }
         return 'ldap';
@@ -418,7 +418,7 @@ class ilLDAPServer
     public static function getKeyByAuthMode(string $a_auth_mode)// TODO PHP8-REVIEW A return type is missing here
     {
         $auth_arr = explode('_', $a_auth_mode);
-        if (count((array) $auth_arr) > 1) {
+        if (count($auth_arr) > 1) {
             return ilAuthUtils::AUTH_LDAP . '_' . $auth_arr[1];
         }
         return ilAuthUtils::AUTH_LDAP;
