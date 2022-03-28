@@ -62,7 +62,7 @@ class ilLDAPRoleGroupMapping
      * @param bool check info type
      *
      */
-    public function getInfoStrings(int $a_obj_id, bool $a_check_type = false)
+    public function getInfoStrings(int $a_obj_id, bool $a_check_type = false)// TODO PHP8-REVIEW A return type is missing here
     {
         if (!$this->active_servers) {
             return false;
@@ -330,7 +330,7 @@ class ilLDAPRoleGroupMapping
      * @return string role name
      *
      */
-    private function checkOtherMembership($a_usr_id, $a_role_id, $a_data)
+    private function checkOtherMembership($a_usr_id, $a_role_id, $a_data)// TODO PHP8-REVIEW A return type and type hints are missing here
     {
         global $DIC;
 

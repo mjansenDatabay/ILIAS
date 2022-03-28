@@ -100,7 +100,7 @@ class ilLDAPQuery
         // First of all check if a group restriction is enabled
         // YES: => fetch all group members
         // No:  => fetch all users
-        if ($this->settings->getGroupName() != '') {
+        if ($this->settings->getGroupName() !== '') {
             $this->logger->debug('Searching for group members.');
 
             $groups = $this->settings->getGroupNames();
@@ -112,7 +112,7 @@ class ilLDAPQuery
                 }
             }
         }
-        if ($this->settings->getGroupName() == '' || $this->settings->isMembershipOptional()) {
+        if ($this->settings->getGroupName() === '' || $this->settings->isMembershipOptional()) {
             $this->logger->info('Start reading all users...');
             $this->readAllUsers();
             #throw new ilLDAPQueryException('LDAP: Called import of users without specifying group restrictions. NOT IMPLEMENTED YET!');

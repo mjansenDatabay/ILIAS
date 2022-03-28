@@ -154,7 +154,7 @@ class ilLDAPAttributeMapping
         if (!$onlyApplicable) {
             return $this->mapping_rules;
         }
-        return array_filter($this->mapping_rules, function ($rule) {
+        return array_filter($this->mapping_rules, static function (array $rule) : bool {
             return $rule['value'] !== '';
         });
     }

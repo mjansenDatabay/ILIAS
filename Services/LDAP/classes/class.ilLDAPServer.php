@@ -415,7 +415,7 @@ class ilLDAPServer
      * Get auth id by auth mode
      * @return int|string auth_mode
      */
-    public static function getKeyByAuthMode(string $a_auth_mode)
+    public static function getKeyByAuthMode(string $a_auth_mode)// TODO PHP8-REVIEW A return type is missing here
     {
         $auth_arr = explode('_', $a_auth_mode);
         if (count((array) $auth_arr) > 1) {
@@ -579,7 +579,7 @@ class ilLDAPServer
     {
         return $this->binding_type;
     }
-    public function setBindingType(int $a_type)
+    public function setBindingType(int $a_type) : void
     {
         if ($a_type === self::LDAP_BIND_USER) {
             $this->binding_type = self::LDAP_BIND_USER;
@@ -812,15 +812,15 @@ class ilLDAPServer
     public function validate() : bool
     {
         $this->ilErr->setMessage('');
-        if ($this->getName() == '' ||
+        if ($this->getName() === '' ||
             $this->getUrl() === '' ||
-            $this->getBaseDN() == '' ||
-            $this->getUserAttribute() == '') {
+            $this->getBaseDN() === '' ||
+            $this->getUserAttribute() === '') {
             $this->ilErr->setMessage($this->lng->txt('fill_out_all_required_fields'));
         }
         
         if ($this->getBindingType() === self::LDAP_BIND_USER
-            && ($this->getBindUser() == '' || $this->getBindPassword() == '')) {
+            && ($this->getBindUser() === '' || $this->getBindPassword() === '')) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_bind_user'));
         }
         

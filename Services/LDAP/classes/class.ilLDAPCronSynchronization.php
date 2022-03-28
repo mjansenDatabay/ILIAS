@@ -154,7 +154,7 @@ class ilLDAPCronSynchronization extends ilCronJob
 
     public function addToExternalSettingsForm(int $a_form_id, array &$a_fields, bool $a_is_active) : void
     {
-        if ($a_form_id == ilAdministrationSettingsFormHandler::FORM_LDAP) {
+        if ($a_form_id === ilAdministrationSettingsFormHandler::FORM_LDAP) {
             $a_fields["ldap_user_sync_cron"] = [$a_is_active ?
                 $this->lng->txt("enabled") :
                 $this->lng->txt("disabled"),

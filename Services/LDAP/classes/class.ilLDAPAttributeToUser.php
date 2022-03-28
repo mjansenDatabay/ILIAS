@@ -339,7 +339,7 @@ class ilLDAPAttributeToUser
                             continue 2;
                         }
                         $this->initUserDefinedFields();
-                        $definition = $this->udf->getDefinition($id_data[1]);
+                        $definition = $this->udf->getDefinition((int) $id_data[1]);
                         $this->writer->xmlElement(
                             'UserDefinedField',
                             array('Id' => $definition['il_id'],

@@ -241,7 +241,7 @@ class ilLDAPRoleGroupMappingSettings
      *
      * @param int mapping_id
      */
-    public function getMappingInfoString($a_mapping_id)
+    public function getMappingInfoString($a_mapping_id)// TODO PHP8-REVIEW A return type and type hints are missing here
     {
         //$role = $this->mappings[$a_mapping_id]['role_name'];
         $dn_parts = explode(',', $this->mappings[$a_mapping_id]['dn']);
