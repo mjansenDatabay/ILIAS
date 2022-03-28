@@ -134,7 +134,7 @@ class ilLDAPRoleAssignmentRules
      * @param object $a_usr_data
      * @return array role data
      */
-    public static function getAssignmentsForCreation(int $a_server_id, $a_usr_name, $a_usr_data) : array
+    public static function getAssignmentsForCreation(int $a_server_id, $a_usr_name, $a_usr_data) : array// TODO PHP8-REVIEW Type hints are missing here
     {
         global $DIC;
 
@@ -145,13 +145,11 @@ class ilLDAPRoleAssignmentRules
             'WHERE server_id = ' . $ilDB->quote($a_server_id, 'integer');
         $res = $ilDB->query($query);
 
-        $num_matches = 0;
         $roles = [];
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId($row->rule_id);
 
             if ($rule->matches($a_usr_data)) {
-                $num_matches++;
                 $ilLog->info(': Assigned to role: ' . $a_usr_name . ' => ' . ilObject::_lookupTitle($rule->getRoleId()));
                 $roles[] = self::parseRole($rule->getRoleId(), self::ROLE_ACTION_ASSIGN);
             }

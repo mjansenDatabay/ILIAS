@@ -49,7 +49,7 @@ class ilLDAPResult
     {
         $this->handle = $a_ldap_handle;
 
-        if ($a_result != null) {
+        if ($a_result !== null) {
             $this->result = $a_result;
         }
     }
@@ -115,7 +115,7 @@ class ilLDAPResult
      * Adds Results from ldap_get_entries() to rows
      * @param array $entries
      */
-    private function addEntriesToRows($entries) : void
+    private function addEntriesToRows(array $entries) : void
     {
         if (!$entries) {
             return;

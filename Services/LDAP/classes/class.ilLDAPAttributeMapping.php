@@ -125,7 +125,7 @@ class ilLDAPAttributeMapping
             }
             $tmp_fields = explode(',', $rule['value']);
             foreach ($tmp_fields as $tmp_field) {
-                $fields[] = trim(strtolower($tmp_field));
+                $fields[] = strtolower(trim($tmp_field));
             }
         }
         return $fields;
@@ -147,7 +147,7 @@ class ilLDAPAttributeMapping
             }
             $tmp_fields = explode(',', $rule['value']);
             foreach ($tmp_fields as $tmp_field) {
-                $fields[] = trim(strtolower($tmp_field));
+                $fields[] = strtolower(trim($tmp_field));
             }
         }
         return $fields;

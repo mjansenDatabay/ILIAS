@@ -333,7 +333,7 @@ class ilLDAPRoleAssignmentRule
     
     public function isAddOnUpdateEnabled() : bool
     {
-        return (bool) $this->add_on_update;
+        return $this->add_on_update;
     }
     
     public function enableRemoveOnUpdate(bool $a_status) : void

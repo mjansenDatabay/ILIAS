@@ -26,7 +26,7 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
      * @param
      *
      */
-    public function __construct($a_parent_obj, $a_parent_cmd = '')
+    public function __construct($a_parent_obj, $a_parent_cmd = '')// TODO PHP8-Review Type hints are missing here
     {
         global $DIC;
 

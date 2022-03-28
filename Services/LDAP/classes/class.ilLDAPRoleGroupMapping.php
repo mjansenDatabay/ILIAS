@@ -207,7 +207,7 @@ class ilLDAPRoleGroupMapping
             $this->servers[$server_id] = new ilLDAPServer($server_id);
             $this->mappings = ilLDAPRoleGroupMappingSettings::_getAllActiveMappings();
         }
-        $this->mapping_info = array();
+        $this->mapping_info = array();// TODO PHP8-REVIEW The property is declared dynamically
         $this->mapping_info_strict = array();
         foreach ($this->mappings as $mapping) {
             foreach ($mapping as $data) {
@@ -219,7 +219,7 @@ class ilLDAPRoleGroupMapping
                 }
             }
         }
-        $this->users = ilObjUser::_getExternalAccountsByAuthMode('ldap', true);
+        $this->users = ilObjUser::_getExternalAccountsByAuthMode('ldap', true);// TODO PHP8-REVIEW The property is declared dynamically
     }
     
     /**
@@ -242,7 +242,7 @@ class ilLDAPRoleGroupMapping
      */
     private function isHandledUser($a_usr_id) : bool
     {
-        return array_key_exists($a_usr_id, $this->users);
+        return array_key_exists($a_usr_id, $this->users);// TODO PHP8-REVIEW The property is declared dynamically
     }
     
     
@@ -260,7 +260,7 @@ class ilLDAPRoleGroupMapping
                 if ($data['isdn']) {
                     $external_account = $this->readDN($a_usr_id, $data['server_id']);
                 } else {
-                    $external_account = $this->users[$a_usr_id];
+                    $external_account = $this->users[$a_usr_id];// TODO PHP8-REVIEW The property is declared dynamically
                 }
                 
                 // Forcing modAdd since Active directory is too slow and i cannot check if a user is member or not.
@@ -298,7 +298,7 @@ class ilLDAPRoleGroupMapping
                 if ($data['isdn']) {
                     $external_account = $this->readDN($a_usr_id, $data['server_id']);
                 } else {
-                    $external_account = $this->users[$a_usr_id];
+                    $external_account = $this->users[$a_usr_id];// TODO PHP8-REVIEW The property is declared dynamically
                 }
                 
                 // Check for other role membership
@@ -441,7 +441,7 @@ class ilLDAPRoleGroupMapping
             return $this->user_dns[$a_usr_id];
         }
         
-        $external_account = $this->users[$a_usr_id];
+        $external_account = $this->users[$a_usr_id];// TODO PHP8-REVIEW The property is declared dynamically
         
         try {
             $server = $this->servers[$a_server_id];
@@ -476,7 +476,7 @@ class ilLDAPRoleGroupMapping
             }
             
             $data = $res->get();
-            return $this->user_dns[$a_usr_id] = $data['dn'];
+            return $this->user_dns[$a_usr_id] = $data['dn'];// TODO PHP8-REVIEW The property is declared dynamically
         } catch (ilLDAPQueryException $exc) {
             throw $exc;
         }

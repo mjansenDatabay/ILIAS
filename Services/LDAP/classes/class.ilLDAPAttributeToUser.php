@@ -381,7 +381,7 @@ class ilLDAPAttributeToUser
     
     private function doMapping(array $user, array $rule) : string
     {
-        $mapping = trim(strtolower($rule['value']));
+        $mapping = strtolower(trim($rule['value']));
         
         if (strpos($mapping, ',') === false) {
             return $this->convertInput($user[$mapping]);

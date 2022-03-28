@@ -260,8 +260,8 @@ class ilLDAPQuery
     }
 
     /**
-     * read all users partial by alphabet
-     *
+     * Read all users partial by alphabet
+     * @param string $dn
      * @return ilLDAPResult
      */
     private function runReadAllUsersPartial(string $dn) : ilLDAPResult
@@ -447,10 +447,8 @@ class ilLDAPQuery
     private function readUserData(string $a_name, bool $a_check_dn = false, bool $a_try_group_user_filter = false) : bool
     {
         $filter = $this->settings->getFilter();
-        if ($a_try_group_user_filter) {
-            if ($this->settings->isMembershipOptional()) {
-                $filter = $this->settings->getGroupUserFilter();
-            }
+        if ($a_try_group_user_filter && $this->settings->isMembershipOptional()) {
+            $filter = $this->settings->getGroupUserFilter();
         }
         
         // Build filter
@@ -486,11 +484,9 @@ class ilLDAPQuery
         }
         
         if ($user_data = $tmp_result->get()) {
-            if (isset($user_data['useraccountcontrol'])) {
-                if (($user_data['useraccountcontrol'] & 0x02)) {
-                    $this->logger->notice('LDAP: ' . $a_name . ' account disabled.');
-                    return false;
-                }
+            if (isset($user_data['useraccountcontrol']) && ($user_data['useraccountcontrol'] & 0x02)) {
+                $this->logger->notice('LDAP: ' . $a_name . ' account disabled.');
+                return false;
             }
             
             $account = $user_data[strtolower($this->settings->getUserAttribute())];
@@ -522,7 +518,7 @@ class ilLDAPQuery
      * IL_SCOPE_SUB => ldap_search
      * IL_SCOPE_ONE => ldap_list
      */
-    private function queryByScope(int $a_scope, string $a_base_dn, string $a_filter, array $a_attributes)
+    private function queryByScope(int $a_scope, string $a_base_dn, string $a_filter, array $a_attributes) // TODO PHP8-REVIEW A return type is missing
     {
         $a_filter = $a_filter ?: "(objectclass=*)";
 
@@ -541,6 +537,7 @@ class ilLDAPQuery
                 break;
 
             default:
+                // TODO PHP8-REVIEW I strongly recocmend to throw an exeption here instead
                 $this->logger->warning("LDAP: LDAPQuery: Unknown search scope");
         }
         
@@ -582,10 +579,8 @@ class ilLDAPQuery
             $this->logger->debug('Switching referrals to false.');
         }
         // Start TLS
-        if ($this->settings->isActiveTLS()) {
-            if (!ldap_start_tls($this->lh)) {
-                throw new ilLDAPQueryException("LDAP: Cannot start LDAP TLS");
-            }
+        if ($this->settings->isActiveTLS() && !ldap_start_tls($this->lh)) {
+            throw new ilLDAPQueryException("LDAP: Cannot start LDAP TLS");
         }
     }
     
@@ -607,7 +602,7 @@ class ilLDAPQuery
             case self::LDAP_BIND_DEFAULT:
                 // Now bind anonymously or as user
                 if (
-                ilLDAPServer::LDAP_BIND_USER == $this->settings->getBindingType() &&
+                ilLDAPServer::LDAP_BIND_USER === $this->settings->getBindingType() &&
                 $this->settings->getBindUser() != ''
                 ) {
                     $user = $this->settings->getBindUser();
@@ -692,7 +687,7 @@ class ilLDAPQuery
      */
     public function checkPaginationEnabled() : bool
     {
-        if ($this->getServer()->getVersion() != 3) {
+        if ($this->getServer()->getVersion() !== 3) {
             $this->logger->info('Pagination control unavailable for ldap v' . $this->getServer()->getVersion());
             return false;
         }

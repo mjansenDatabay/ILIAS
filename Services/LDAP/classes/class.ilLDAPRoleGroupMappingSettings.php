@@ -136,10 +136,8 @@ class ilLDAPRoleGroupMappingSettings
         
         $this->mappings = [];
         foreach ($a_mappings as $mapping_id => $data) {
-            if ($mapping_id == 0) {
-                if (!$data['dn'] && !$data['member'] && !$data['memberisdn'] && !$data['role']) {
-                    continue;
-                }
+            if ($mapping_id == 0 && !$data['dn'] && !$data['member'] && !$data['memberisdn'] && !$data['role']) {
+                continue;
             }
             $this->mappings[$mapping_id]['dn'] = ilUtil::stripSlashes($data['dn']);
             $this->mappings[$mapping_id]['url'] = ilUtil::stripSlashes($data['url']);
@@ -203,7 +201,6 @@ class ilLDAPRoleGroupMappingSettings
                     $this->db->quote($data['info'], 'text') . ", " .
                     $this->db->quote($data['info_type'], 'integer') .
                     ")";
-                $this->db->manipulate($query);
             } else {
                 $query = "UPDATE ldap_rg_mapping " .
                     "SET server_id = " . $this->db->quote($this->getServerId(), 'integer') . ", " .
@@ -215,8 +212,8 @@ class ilLDAPRoleGroupMappingSettings
                     "mapping_info = " . $this->db->quote($data['info'], 'text') . ", " .
                     "mapping_info_type = " . $this->db->quote($data['info_type'], 'integer') . " " .
                     "WHERE mapping_id = " . $this->db->quote($mapping_id, 'integer');
-                $this->db->manipulate($query);
             }
+            $this->db->manipulate($query);
         }
         $this->read();
     }
@@ -277,7 +274,7 @@ class ilLDAPRoleGroupMappingSettings
             $this->mappings[$row->mapping_id]['role'] = $row->role;
             $this->mappings[$row->mapping_id]['info'] = $row->mapping_info;
             $this->mappings[$row->mapping_id]['info_type'] = $row->mapping_info_type;
-            if ($this->ilObjDataCache->lookupType((int) $row->role) == 'role') {
+            if ($this->ilObjDataCache->lookupType((int) $row->role) === 'role') {
                 $this->mappings[$row->mapping_id]['role_name'] = $this->ilObjDataCache->lookupTitle((int) $row->role);
             } else {
                 $this->mappings[$row->mapping_id]['role_name'] = $row->role;

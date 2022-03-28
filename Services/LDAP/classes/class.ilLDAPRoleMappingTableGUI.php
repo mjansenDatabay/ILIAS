@@ -21,9 +21,9 @@ class ilLDAPRoleMappingTableGUI extends ilTable2GUI
     private ilObjectDataCache $ilObjDataCache;
     private ilRbacReview $rbacreview;
 
-    public function __construct($a_parent_obj, $a_server_id, $a_parent_cmd = '')
+    public function __construct($a_parent_obj, $a_server_id, $a_parent_cmd = '')// TODO PHP8-REVIEW Tpye hints are missing here
     {
-        $this->server_id = $a_server_id;
+        $this->server_id = $a_server_id;// TODO PHP8-REVIEW The property is declared dynamically
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
         global $DIC;
