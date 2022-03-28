@@ -23,6 +23,15 @@ class ilLDAPRoleGroupMappingSetting
     private ilRbacReview $rbacreview;
 
     private int $mapping_id;
+    private int $server_id;
+
+    private ?string $url;
+    private ?string $dn;
+    private ?string $member_attribute;
+    private ?bool $mapping_info_type;
+    private ?bool $member_isdn;
+    private ?int $role;
+    private ?string $mapping_info;
 
     public function __construct(int $a_mapping_id)
     {
@@ -103,12 +112,20 @@ class ilLDAPRoleGroupMappingSetting
                     ")";
         $this->db->manipulate($query);
     }
-
+    
+    /**
+     * get mapping id
+     * @return int mapping id
+     */
     public function getMappingId() : int
     {
         return $this->mapping_id;
     }
-
+    
+    /**
+     * set mapping id
+     * @param int $a_value mapping id
+     */
     public function setMappingId(int $a_value) : void
     {
         $this->mapping_id = $a_value;
@@ -118,161 +135,148 @@ class ilLDAPRoleGroupMappingSetting
      * get server id
      * @return int server id id
      */
-    public function getServerId()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getServerId() : int
     {
-        return $this->server_id;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->server_id;
     }
     
     /**
      * set server id
      * @param int $a_value server id
      */
-    public function setServerId($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setServerId(int $a_value) : void
     {
-        $this->server_id = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->server_id = $a_value;
     }
     
     /**
      * get url
      * @return string url
      */
-    public function getURL()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getURL() : string
     {
-        return $this->url;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->url;
     }
     
     /**
      * set url
      * @param string $a_value url
      */
-    public function setURL($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setURL(string $a_value) : void
     {
-        $this->url = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->url = $a_value;
     }
     
     /**
      * get group dn
-     * @return string
      */
-    public function getDN()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getDN() : string
     {
-        return $this->dn;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->dn;
     }
     
     /**
      * set group dn
-     * @param string $a_value
      */
-    public function setDN($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setDN(string $a_value) : void
     {
-        $this->dn = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->dn = $a_value;
     }
     
     /**
      * get Group Member Attribute
-     * @return string
      */
-    public function getMemberAttribute()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getMemberAttribute() : string
     {
-        return $this->member_attribute;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->member_attribute;
     }
     
     /**
      * set Group Member Attribute
-     * @param string $a_value
      */
-    public function setMemberAttribute($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setMemberAttribute(string $a_value) : void
     {
-        $this->member_attribute = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->member_attribute = $a_value;
     }
     
     /**
      * get Member Attribute Value is DN
-     * @return bool
      */
-    public function getMemberISDN()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getMemberISDN() : bool
     {
-        return $this->member_isdn;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->member_isdn;
     }
     
     /**
      * set Member Attribute Value is DN
      * @param bool $a_value
      */
-    public function setMemberISDN($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setMemberISDN(bool $a_value) : void
     {
-        $this->member_isdn = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->member_isdn = $a_value;
     }
     
     /**
      * get ILIAS Role Name id
-     * @return int
      */
-    public function getRole()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getRole() : int
     {
-        return $this->role;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->role;
     }
     
     /**
      * set ILIAS Role Name id
-     * @param int $a_value
      */
-    public function setRole($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setRole(int $a_value) : void
     {
-        $this->role = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->role = $a_value;
     }
     
     /**
      * get ILIAS Role Name
-     * @return string
      */
-    public function getRoleName()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getRoleName() : string
     {
-        return $this->ilObjDataCache->lookupTitle($this->role);// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->ilObjDataCache->lookupTitle($this->role);
     }
     
     /**
      * set ILIAS Role Name
-     * @param string $a_value
      */
-    public function setRoleByName($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setRoleByName(string $a_value) : void
     {
-        $this->role = $this->rbacreview->roleExists(ilUtil::stripSlashes($a_value));// TODO PHP8-REVIEW The property is declared dynamically
+        $this->role = $this->rbacreview->roleExists(ilUtil::stripSlashes($a_value));
     }
     
     /**
      * get Information Text
-     * @return string
      */
-    public function getMappingInfo()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getMappingInfo() : string
     {
-        return $this->mapping_info;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->mapping_info;
     }
     
     /**
      * set Information Text
-     * @param string $a_value
      */
-    public function setMappingInfo($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setMappingInfo(string $a_value) : void
     {
-        $this->mapping_info = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->mapping_info = $a_value;
     }
     
     /**
      * get Show Information also in the Repository/Personal Desktop
-     * @return bool
      */
-    public function getMappingInfoType()// TODO PHP8-REVIEW Please add an explicit return type
+    public function getMappingInfoType() : bool
     {
-        return $this->mapping_info_type;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->mapping_info_type;
     }
     
     /**
      * set Show Information also in the Repository/Personal Desktop
-     * @param bool $a_value
      */
-    public function setMappingInfoType($a_value) : void// TODO PHP8-REVIEW A type hint is missing here
+    public function setMappingInfoType(bool $a_value) : void
     {
-        $this->mapping_info_type = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->mapping_info_type = $a_value;
     }
 }

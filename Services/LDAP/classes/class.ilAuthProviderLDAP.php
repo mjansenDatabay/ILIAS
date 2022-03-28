@@ -44,7 +44,7 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderAccount
         try {
             // bind
             $query = new ilLDAPQuery($this->getServer());
-            $query->bind(ilLDAPQuery::LDAP_BIND_DEFAULT);
+            $query->bind();
         } catch (ilLDAPQueryException $e) {
             $this->getLogger()->error('Cannot bind to LDAP server... ' . $e->getMessage());
             $this->handleAuthenticationFail($status, 'auth_err_ldap_exception');
@@ -99,6 +99,9 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderAccount
         return $this->updateAccount($status, $users[$this->changeKeyCase($this->getCredentials()->getUsername())]);
     }
 
+    /**
+     * Update Account
+     */
     protected function updateAccount(ilAuthStatus $status, array $user) : bool
     {
         $user = array_change_key_case($user, CASE_LOWER);
@@ -153,7 +156,7 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderAccount
 
         try {
             $query = new ilLDAPQuery($this->getServer());
-            $query->bind(ilLDAPQuery::LDAP_BIND_DEFAULT);
+            $query->bind();
         } catch (ilLDAPQueryException $e) {
             $this->getLogger()->error('Cannot bind to LDAP server... ' . $e->getMessage());
             $this->handleAuthenticationFail($status, 'auth_err_ldap_exception');
@@ -191,7 +194,7 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderAccount
 
         try {
             $query = new ilLDAPQuery($this->getServer());
-            $query->bind(ilLDAPQuery::LDAP_BIND_DEFAULT);
+            $query->bind();
         } catch (ilLDAPQueryException $e) {
             $this->getLogger()->error('Cannot bind to LDAP server... ' . $e->getMessage());
             $this->handleAuthenticationFail($status, 'auth_err_ldap_exception');
@@ -226,9 +229,6 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderAccount
         return $this->migration_account;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function setExternalAccountName(string $a_name) : void
     {
         $this->migration_account = $a_name;

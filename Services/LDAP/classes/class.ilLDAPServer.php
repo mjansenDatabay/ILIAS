@@ -18,7 +18,7 @@
  */
 class ilLDAPServer
 {
-    private static $instances = array();
+    private static array $instances = [];
 
     public const LDAP_BIND_ANONYMOUS = 0;
     public const LDAP_BIND_USER = 1;
@@ -45,7 +45,34 @@ class ilLDAPServer
     private bool $escape_dn = false;
     
     private bool $active = false;
-    
+
+    private string $name = '';
+    private int $version = self::DEFAULT_VERSION;
+    private string $base_dn = '';
+    private bool $referrals = false;
+    private bool $tls = false;
+    private int $binding_type = self::LDAP_BIND_ANONYMOUS;
+    private string $bind_user = '';
+    private string $bind_password = '';
+    private string $search_base = '';
+    private string $user_attribute = '';
+    private int $user_scope = self::LDAP_SCOPE_ONE;
+    private string $group_filter = '';
+    private string $filter = '';
+    private string $group_dn = '';
+    private string $group_member = '';
+    private int $group_scope = self::LDAP_SCOPE_ONE;
+    private string $group_name = '';
+    private bool $memberisdn = false;
+    private string $group_attribute = '';
+    private bool $group_optional = true;
+    private string $group_user_filter = '';
+    private bool $sync_on_login = false;
+    private bool $sync_per_cron = false;
+    private bool $account_migration = false;
+    private string $username_filter = '';
+    private int $global_role = 0;
+
     private ilDBInterface $db;
     private ilLanguage $lng;
     private ilErrorHandling $ilErr;
@@ -250,20 +277,6 @@ class ilLDAPServer
         }
         return $server;
     }
-    
-    /*
-     * Get first server id
-     */
-    public static function _getFirstServer() : int
-    {
-        $servers = self::_getServerList();
-        
-        if (count($servers)) {
-            return $servers[0];
-        }
-        return 0;
-    }
-
 
     public static function getAvailableDataSources(int $a_auth_mode) : array
     {
@@ -298,7 +311,7 @@ class ilLDAPServer
             "WHERE authentication_type = " . $ilDB->quote($a_auth_mode, 'integer') . " " .
             "AND authentication = " . $ilDB->quote(0, 'integer');
         $res = $ilDB->query($query);
-        while ($res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+        if ($res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             return true;
         }
         return false;
@@ -313,7 +326,7 @@ class ilLDAPServer
         $query = "SELECT server_id FROM ldap_server_settings " .
             "WHERE authentication_type = " . $ilDB->quote($a_auth_mode, 'integer') . " ";
         $res = $ilDB->query($query);
-        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+        if ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             return $row->server_id;
         }
         return 0;
@@ -473,7 +486,7 @@ class ilLDAPServer
     {
         return $this->url;
     }
-    public function setUrl($a_url) : void
+    public function setUrl(string $a_url) : void
     {
         $this->url_string = $a_url;
         
@@ -522,130 +535,129 @@ class ilLDAPServer
     }
     
     
-    public function getName() // TODO PHP8-REVIEW A return type is missing here
+    public function getName() : string
     {
-        return $this->name;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->name;
     }
-    public function setName($a_name) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setName(string $a_name) : void
     {
-        $this->name = $a_name;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->name = $a_name;
     }
     public function getVersion() : int
     {
-        return $this->version ?: self::DEFAULT_VERSION;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->version;
     }
-    public function setVersion($a_version) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setVersion(int $a_version) : void
     {
-        $this->version = $a_version;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->version = $a_version;
     }
-    public function getBaseDN() // TODO PHP8-REVIEW A return type is missing here
+    public function getBaseDN() : string
     {
-        return $this->base_dn;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->base_dn;
     }
-    public function setBaseDN($a_base_dn) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setBaseDN(string $a_base_dn) : void
     {
-        $this->base_dn = $a_base_dn;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->base_dn = $a_base_dn;
     }
     public function isActiveReferrer() : bool
     {
-        return (bool) $this->referrals;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->referrals;
     }
-    public function toggleReferrer($a_status) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function toggleReferrer(bool $a_status) : void
     {
-        $this->referrals = $a_status;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->referrals = $a_status;
     }
     public function isActiveTLS() : bool
     {
-        return (bool) $this->tls;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->tls;
     }
-    public function toggleTLS($a_status) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function toggleTLS(bool $a_status) : void
     {
-        $this->tls = $a_status;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->tls = $a_status;
     }
     public function getBindingType() : int
     {
-        return $this->binding_type;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->binding_type;
     }
-    public function setBindingType($a_type)// TODO PHP8-REVIEW A type hint is missing here
-    : void
+    public function setBindingType(int $a_type)
     {
-        if ($a_type == self::LDAP_BIND_USER) {
-            $this->binding_type = self::LDAP_BIND_USER;// TODO PHP8-REVIEW The property is declared dynamically
+        if ($a_type === self::LDAP_BIND_USER) {
+            $this->binding_type = self::LDAP_BIND_USER;
         } else {
-            $this->binding_type = self::LDAP_BIND_ANONYMOUS;// TODO PHP8-REVIEW The property is declared dynamically
+            $this->binding_type = self::LDAP_BIND_ANONYMOUS;
         }
     }
-    public function getBindUser() // TODO PHP8-REVIEW A return type is missing here
+    public function getBindUser() : string
     {
-        return $this->bind_user;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->bind_user;
     }
-    public function setBindUser($a_user) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setBindUser(string $a_user) : void
     {
-        $this->bind_user = $a_user;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->bind_user = $a_user;
     }
-    public function getBindPassword() // TODO PHP8-REVIEW A return type is missing here
+    public function getBindPassword() : string
     {
-        return $this->bind_password;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->bind_password;
     }
-    public function setBindPassword($a_password) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setBindPassword(string $a_password) : void
     {
-        $this->bind_password = $a_password;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->bind_password = $a_password;
     }
-    public function getSearchBase() // TODO PHP8-REVIEW A return type is missing here
+    public function getSearchBase() : string
     {
-        return $this->search_base;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->search_base;
     }
-    public function setSearchBase($a_search_base) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setSearchBase(string $a_search_base) : void
     {
-        $this->search_base = $a_search_base;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->search_base = $a_search_base;
     }
-    public function getUserAttribute() // TODO PHP8-REVIEW A return type is missing here
+    public function getUserAttribute() : string
     {
-        return $this->user_attribute;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->user_attribute;
     }
-    public function setUserAttribute($a_user_attr) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setUserAttribute(string $a_user_attr) : void
     {
-        $this->user_attribute = $a_user_attr;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->user_attribute = $a_user_attr;
     }
     public function getFilter() : string
     {
-        return $this->prepareFilter($this->filter);// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->prepareFilter($this->filter);
     }
-    public function setFilter($a_filter) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setFilter(string $a_filter) : void
     {
-        $this->filter = $a_filter;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->filter = $a_filter;
     }
-    public function getGroupDN() // TODO PHP8-REVIEW A return type is missing here
+    public function getGroupDN() : string
     {
-        return $this->group_dn;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_dn;
     }
-    public function setGroupDN($a_value) : void
+    public function setGroupDN(string $a_value) : void
     {
-        $this->group_dn = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_dn = $a_value;
     }
     public function getGroupFilter() : string
     {
-        return $this->prepareFilter($this->group_filter);// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->prepareFilter($this->group_filter);
     }
-    public function setGroupFilter($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGroupFilter(string $a_value) : void
     {
-        $this->group_filter = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_filter = $a_value;
     }
-    public function getGroupMember() // TODO PHP8-REVIEW A return type is missing here
+    public function getGroupMember() : string
     {
-        return $this->group_member;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_member;
     }
-    public function setGroupMember($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGroupMember(string $a_value) : void
     {
-        $this->group_member = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_member = $a_value;
     }
-    public function getGroupName() // TODO PHP8-REVIEW A return type is missing here
+    public function getGroupName() : string
     {
-        return $this->group_name;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_name;
     }
-    public function setGroupName($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGroupName(string $a_value) : void
     {
-        $this->group_name = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_name = $a_value;
     }
 
     /**
@@ -657,88 +669,87 @@ class ilLDAPServer
         $names = explode(',', $this->getGroupName());
 
         if (!is_array($names)) {
-            return array();
+            return [];
         }
 
         return array_filter(array_map('trim', $names));
     }
     
     
-    public function getGroupAttribute() // TODO PHP8-REVIEW A return tyoe is missing here
+    public function getGroupAttribute() : string
     {
-        return $this->group_attribute;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_attribute;
     }
-    public function setGroupAttribute($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGroupAttribute(string $a_value) : void
     {
-        $this->group_attribute = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_attribute = $a_value;
     }
-    
-    public function toggleMembershipOptional($a_status) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function toggleMembershipOptional(bool $a_status) : void
     {
-        $this->group_optional = (bool) $a_status;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_optional = $a_status;
     }
     public function isMembershipOptional() : bool
     {
-        return (bool) $this->group_optional;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_optional;
     }
-    public function setGroupUserFilter($a_filter) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGroupUserFilter(string $a_filter) : void
     {
-        $this->group_user_filter = $a_filter;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_user_filter = $a_filter;
     }
-    public function getGroupUserFilter() // TODO PHP8-REVIEW A return type is missing hre
+    public function getGroupUserFilter() : string
     {
-        return $this->group_user_filter;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_user_filter;
     }
 
     public function enabledGroupMemberIsDN() : bool
     {
-        return (bool) $this->memberisdn;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->memberisdn;
     }
-    public function enableGroupMemberIsDN($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function enableGroupMemberIsDN(bool $a_value) : void
     {
-        $this->memberisdn = (bool) $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->memberisdn = $a_value;
     }
-    public function setGroupScope($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGroupScope(int $a_value) : void
     {
-        $this->group_scope = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->group_scope = $a_value;
     }
-    public function getGroupScope() // TODO PHP8-REVIEW A return type is missing here
+    public function getGroupScope() : int
     {
-        return $this->group_scope;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->group_scope;
     }
-    public function setUserScope($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setUserScope(int $a_value) : void
     {
-        $this->user_scope = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->user_scope = $a_value;
     }
-    public function getUserScope() // TODO PHP8-REVIEW A return tyoe is missing here
+    public function getUserScope() : int
     {
-        return $this->user_scope;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->user_scope;
     }
-    public function enabledSyncOnLogin() : int
+    public function enabledSyncOnLogin() : bool
     {
-        return $this->sync_on_login;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->sync_on_login;
     }
-    public function enableSyncOnLogin($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function enableSyncOnLogin(bool $a_value) : void
     {
-        $this->sync_on_login = (int) $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->sync_on_login = $a_value;
     }
-    public function enabledSyncPerCron() : int
+    public function enabledSyncPerCron() : bool
     {
-        return $this->sync_per_cron;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->sync_per_cron;
     }
-    public function enableSyncPerCron($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function enableSyncPerCron(bool $a_value) : void
     {
-        $this->sync_per_cron = (int) $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->sync_per_cron = $a_value;
     }
-    public function setGlobalRole($a_role) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setGlobalRole(int $a_role) : void
     {
-        $this->global_role = $a_role;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->global_role = $a_role;
     }
     public function getRoleBindDN() : string
     {
         return $this->role_bind_dn;
     }
-    public function setRoleBindDN($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setRoleBindDN(string $a_value) : void
     {
         $this->role_bind_dn = $a_value;
     }
@@ -746,7 +757,7 @@ class ilLDAPServer
     {
         return $this->role_bind_pass;
     }
-    public function setRoleBindPassword($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setRoleBindPassword(string $a_value) : void
     {
         $this->role_bind_pass = $a_value;
     }
@@ -754,18 +765,18 @@ class ilLDAPServer
     {
         return $this->role_sync_active;
     }
-    public function enableRoleSynchronization($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function enableRoleSynchronization(bool $a_value) : void
     {
         $this->role_sync_active = $a_value;
     }
-    // start Patch Name Filter
-    public function getUsernameFilter() // TODO PHP8-REVIEW A return type is missing here
+
+    public function getUsernameFilter() : string
     {
-        return $this->username_filter;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->username_filter;
     }
-    public function setUsernameFilter($a_value) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function setUsernameFilter(string $a_value) : void
     {
-        $this->username_filter = $a_value;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->username_filter = $a_value;
     }
 
     public function enableEscapeDN(bool $a_value) : void
@@ -780,25 +791,18 @@ class ilLDAPServer
 
     /**
      * Enable account migration
-     *
-     * @access public
-     * @param bool status
-     *
      */
-    public function enableAccountMigration($a_status) : void // TODO PHP8-REVIEW A type hint is missing here
+    public function enableAccountMigration(bool $a_status) : void
     {
-        $this->account_migration = $a_status;// TODO PHP8-REVIEW The property is declared dynamically
+        $this->account_migration = $a_status;
     }
     
     /**
      * enabled account migration
-     *
-     * @access public
-     *
      */
     public function isAccountMigrationEnabled() : bool
     {
-        return (bool) $this->account_migration;// TODO PHP8-REVIEW The property is declared dynamically
+        return $this->account_migration;
     }
     
     
@@ -820,7 +824,7 @@ class ilLDAPServer
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_bind_user'));
         }
         
-        if (($this->enabledSyncPerCron() || $this->enabledSyncOnLogin()) && !$this->global_role) {// TODO PHP8-REVIEW The property is declared dynamically
+        if (($this->enabledSyncPerCron() || $this->enabledSyncOnLogin()) && !$this->global_role) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_role_assignment'));
         }
         if ($this->getVersion() === 2 && $this->isActiveTLS()) {
@@ -1068,19 +1072,19 @@ class ilLDAPServer
             $this->toggleActive((bool) $row->active);
             $this->setName($row->name);
             $this->setUrl($row->url);
-            $this->setVersion($row->version);
+            $this->setVersion((int) $row->version);
             $this->setBaseDN($row->base_dn);
-            $this->toggleReferrer($row->referrals);
-            $this->toggleTLS($row->tls);
-            $this->setBindingType($row->bind_type);
+            $this->toggleReferrer((bool) $row->referrals);
+            $this->toggleTLS((bool) $row->tls);
+            $this->setBindingType((int) $row->bind_type);
             $this->setBindUser($row->bind_user);
             $this->setBindPassword($row->bind_pass);
             $this->setSearchBase($row->search_base);
-            $this->setUserScope($row->user_scope);
+            $this->setUserScope((int) $row->user_scope);
             $this->setUserAttribute($row->user_attribute);
             $this->setFilter($row->filter);
             $this->setGroupDN($row->group_dn);
-            $this->setGroupScope($row->group_scope);
+            $this->setGroupScope((int) $row->group_scope);
             $this->setGroupFilter($row->group_filter);
             $this->setGroupMember($row->group_member);
             $this->setGroupAttribute($row->group_attribute);

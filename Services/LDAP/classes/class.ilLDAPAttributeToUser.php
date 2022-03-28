@@ -193,7 +193,7 @@ class ilLDAPAttributeToUser
                 $this->writer->xmlStartTag('User', array('Id' => $usr_id,'Action' => 'Update'));
                 $this->writer->xmlElement('Login', array(), $user['ilInternalAccount']);
                 $this->writer->xmlElement('ExternalAccount', array(), $external_account);
-                $this->writer->xmlElement('AuthMode', array('type' => $this->getNewUserAuthMode()), null);
+                $this->writer->xmlElement('AuthMode', array('type' => $this->getNewUserAuthMode()));
 
                 if ($this->isModeActive(self::MODE_INITIALIZE_ROLES)) {
                     $this->parseRoleAssignmentsForCreation($external_account, $user);
@@ -208,7 +208,7 @@ class ilLDAPAttributeToUser
                 $this->writer->xmlElement('Login', array(), ilAuthUtils::_generateLogin($external_account));
 
                 $this->parseRoleAssignmentsForCreation($external_account, $user);
-                $rules = $this->mapping->getRules();
+                $rules = $this->mapping->getRules(true);
             }
 
             $this->writer->xmlElement('Active', array(), "true");
@@ -384,7 +384,7 @@ class ilLDAPAttributeToUser
         $mapping = strtolower(trim($rule['value']));
         
         if (strpos($mapping, ',') === false) {
-            return $this->convertInput($user[$mapping]);
+            return $this->convertInput($user[$mapping] ?? '');
         }
         // Is multiple mapping
         
@@ -394,7 +394,7 @@ class ilLDAPAttributeToUser
             if (strlen($value)) {
                 $value .= ' ';
             }
-            $value .= ($this->convertInput($user[trim($field)]));
+            $value .= ($this->convertInput($user[trim($field)] ?? ''));
         }
         return $value ?: '';
     }

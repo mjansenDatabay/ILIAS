@@ -30,15 +30,8 @@ class ilLDAPResult
      */
     private $result;
 
-    /**
-     * @var array
-     */
-    private $rows;
-
-    /**
-     * @var array
-     */
-    private $last_row;
+    private ?array $rows;
+    private ?array $last_row;
 
     /**
      * ilLDAPPagedResult constructor.
@@ -87,7 +80,7 @@ class ilLDAPResult
      */
     public function get() : array
     {
-        return is_array($this->last_row) ? $this->last_row : array();
+        return is_array($this->last_row) ? $this->last_row : [];
     }
 
     /**
@@ -96,7 +89,7 @@ class ilLDAPResult
      */
     public function getRows() : array
     {
-        return is_array($this->rows) ? $this->rows : array();
+        return is_array($this->rows) ? $this->rows : [];
     }
 
     /**
@@ -105,7 +98,7 @@ class ilLDAPResult
      */
     public function run() : self
     {
-        $entries = @ldap_get_entries($this->handle, $this->result);
+        $entries = ldap_get_entries($this->handle, $this->result);
         $this->addEntriesToRows($entries);
 
         return $this;
@@ -113,14 +106,9 @@ class ilLDAPResult
 
     /**
      * Adds Results from ldap_get_entries() to rows
-     * @param array $entries
      */
     private function addEntriesToRows(array $entries) : void
     {
-        if (!$entries) {
-            return;
-        }
-
         $num = $entries['count'];
 
         if ($num == 0) {
@@ -136,18 +124,17 @@ class ilLDAPResult
 
     /**
      * Transforms results from ldap_get_entries() to a simple format
-     * @param array $entry
-     * @return array
      */
-    private function toSimpleArray($entry) : array
+
+    private function toSimpleArray(array $entry) : array
     {
         $data = array();
         foreach ($entry as $key => $value) {
-            $key = strtolower($key);
-
             if (is_int($key)) {
                 continue;
             }
+
+            $key = strtolower($key);
             if ($key === 'dn') {
                 $data['dn'] = $value;
                 continue;
@@ -173,6 +160,6 @@ class ilLDAPResult
      */
     public function __destruct()
     {
-        @ldap_free_result($this->result);
+        ldap_free_result($this->result);
     }
 }

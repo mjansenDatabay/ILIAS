@@ -21,11 +21,12 @@
  */
 class ilLDAPAttributeMapping
 {
-    private static $instances = array();
+    private static array $instances = [];
     private int $server_id;
     private ilDBInterface $db;
-    private $mapping_rules = array();
-    private $rules_for_update = array();
+
+    private array $mapping_rules = [];
+    private array $rules_for_update = [];
 
     private function __construct(int $a_server_id)
     {
@@ -68,7 +69,7 @@ class ilLDAPAttributeMapping
             "AND keyword = " . $ilDB->quote('global_role', 'text');
 
         $res = $ilDB->query($query);
-        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+        if ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             return (int) $row->value;
         }
 
@@ -89,8 +90,7 @@ class ilLDAPAttributeMapping
             'WHERE server_id = ' . $ilDB->quote($a_server_id, 'integer') . ' ' .
             'AND perform_update = 1';
         $res = $ilDB->query($query);
-
-        return (bool) $res->numRows();
+        return $res->numRows() > 0;
     }
 
     public function setRule(string $a_field_name, string $a_ldap_attribute, bool $a_perform_update) : void
@@ -114,21 +114,7 @@ class ilLDAPAttributeMapping
      */
     public function getFieldsForUpdate() : array
     {
-        $fields = [];
-        foreach ($this->rules_for_update as $rule) {
-            if (!strlen($rule['value'])) {
-                continue;
-            }
-            if (strpos($rule['value'], ',') === false) {
-                $fields[] = strtolower($rule['value']);
-                continue;
-            }
-            $tmp_fields = explode(',', $rule['value']);
-            foreach ($tmp_fields as $tmp_field) {
-                $fields[] = strtolower(trim($tmp_field));
-            }
-        }
-        return $fields;
+        return self::getMappedFields($this->rules_for_update);
     }
 
     /**
@@ -136,8 +122,13 @@ class ilLDAPAttributeMapping
      */
     public function getFields() : array
     {
+        return self::getMappedFields($this->mapping_rules);
+    }
+
+    private static function getMappedFields(array $rules) : array
+    {
         $fields = [];
-        foreach ($this->mapping_rules as $rule) {
+        foreach ($rules as $rule) {
             if (!strlen($rule['value'])) {
                 continue;
             }
@@ -158,9 +149,14 @@ class ilLDAPAttributeMapping
      *
      * @return array mapping rules. E.g. array('firstname' => 'name',...)
      */
-    public function getRules() : array
+    public function getRules(bool $onlyApplicable = false) : array
     {
-        return $this->mapping_rules;
+        if (!$onlyApplicable) {
+            return $this->mapping_rules;
+        }
+        return array_filter($this->mapping_rules, function ($rule) {
+            return $rule['value'] !== '';
+        });
     }
 
     /**
@@ -228,7 +224,7 @@ class ilLDAPAttributeMapping
     }
 
     /**
-     * Read mapping setttings from db
+     * Read mapping settings from db
      */
     private function read() : void
     {

@@ -35,7 +35,7 @@ class ilAuthLoginPageEditorGUI
     private ilErrorHandling $ilErr;
     private ilLogger $logger;
    
-    private int $ref_id = 0;
+    private int $ref_id;
     private ilAuthLoginPageEditorSettings $settings;
     private ?ilSetting $loginSettings = null;
     protected \ILIAS\Style\Content\Object\ObjectFacade $content_style_domain;
@@ -142,11 +142,9 @@ class ilAuthLoginPageEditorGUI
         //$page_gui->setFullscreenLink($this->ctrl->getLinkTarget($this, "showMediaFullscreen"));
         //$page_gui->setLinkParams($this->ctrl->getUrlParameterString()); // todo
         //		$page_gui->setSourcecodeDownloadScript($this->ctrl->getLinkTarget($this, ""));
-        $page_gui->setPresentationTitle("");
         $page_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
         $page_gui->setTemplateOutput(false);
         //$page_gui->setLocator($contObjLocator);
-        $page_gui->setHeader("");
 
         // style tab
         //$page_gui->setTabHook($this, "addPageTabs");
@@ -305,7 +303,7 @@ class ilAuthLoginPageEditorGUI
                 }
             }
             if ($this->form->getInput('default_auth_mode')) {
-                $this->setting->set('default_auth_mode', (int) $this->form->getInput('default_auth_mode'));
+                $this->setting->set('default_auth_mode', $this->form->getInput('default_auth_mode'));
             }
 
             $this->tpl->setOnScreenMessage('success', $this->lng->txt("login_information_settings_saved"), true);
@@ -329,7 +327,7 @@ class ilAuthLoginPageEditorGUI
         $rad_settings = ilRadiusSettings::_getInstance();
         if ($ldap_id = ilLDAPServer::_getFirstActiveServer() or $rad_settings->isActive()) {
             $select = new ilSelectInputGUI($this->lng->txt('default_auth_mode'), 'default_auth_mode');
-            $select->setValue($this->setting->get('default_auth_mode', ilAuthUtils::AUTH_LOCAL));
+            $select->setValue($this->setting->get('default_auth_mode', (string) ilAuthUtils::AUTH_LOCAL));
             $select->setInfo($this->lng->txt('default_auth_mode_info'));
             $options[ilAuthUtils::AUTH_LOCAL] = $this->lng->txt('auth_local');
             if ($ldap_id) {

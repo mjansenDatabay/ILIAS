@@ -20,6 +20,7 @@ class ilLDAPSettingsGUI
 {
     private int $ref_id;
     private ilLDAPServer $server;
+    private ilLDAPAttributeMapping $mapping;
     private ?ilPropertyFormGUI $form_gui = null;
     private ?ilPropertyFormGUI $form = null;
 
@@ -32,16 +33,21 @@ class ilLDAPSettingsGUI
     private ilRbacReview $rbacReview;
     private ilRbacSystem $rbacSystem;
     private ilToolbarGUI $toolbar;
-    private \ilGlobalTemplateInterface $main_tpl;
+    private ilGlobalTemplateInterface $main_tpl;
     private ilComponentRepository $component_repository;
     private ilUserDefinedFields $udf;
     private ?ilLDAPRoleAssignmentRule $role_mapping_rule = null;
+    private ?ilLDAPRoleAssignmentRule $rule = null;
+    private ?ilLDAPRoleGroupMappingSettings $role_mapping = null;
+    private ilLogger $logger;
 
+    /**
+     * @throws ilCtrlException
+     */
     public function __construct(int $a_auth_ref_id)
     {
         global $DIC;
 
-        $this->dic = $DIC;// TODO PHP8-REVIEW The property is declared dynamically
         $this->ctrl = $DIC->ctrl();
         $this->tabs_gui = $DIC->tabs();
         $this->lng = $DIC->language();
@@ -52,6 +58,7 @@ class ilLDAPSettingsGUI
         $this->rbacReview = $DIC->rbac()->review();
         $this->rbacSystem = $DIC->rbac()->system();
         $this->toolbar = $DIC->toolbar();
+        $this->logger = $DIC->logger()->auth();
         $this->main_tpl = $DIC->ui()->mainTemplate();
         
         $this->tpl = $DIC->ui()->mainTemplate();
@@ -74,26 +81,24 @@ class ilLDAPSettingsGUI
 
         $this->initServer();
     }
-    
+
+    /**
+     * @throws ilCtrlException
+     */
     public function executeCommand() : bool
     {
-        $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
         
-        if ($cmd !== "serverList" && !$this->dic->rbac()->system()->checkAccess("visible,read", $this->ref_id)) {
+        if ($cmd !== "serverList" && !$this->rbacSystem->checkAccess("visible,read", $this->ref_id)) {
             $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt('msg_no_perm_write'), true);
             $this->ctrl->redirect($this, "serverList");
         }
-        
-        //TODO check if needed
-        switch ($next_class) {
-            default:
-                if (!$cmd) {
-                    $cmd = "serverList";
-                }
-                $this->$cmd();
-                break;
+
+        if (!$cmd) {
+            $cmd = "serverList";
         }
+
+        $this->$cmd();
         return true;
     }
 
@@ -123,11 +128,12 @@ class ilLDAPSettingsGUI
     public function roleAssignments() : void
     {
         $this->setSubTabs();
-        $this->tabs_gui->setTabActive('role_assignments');
+        $this->tabs_gui->activateTab('role_assignments');
 
         $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.ldap_role_assignments.html', 'Services/LDAP');
 
-        $this->initFormRoleAssignments('create', $this->role_mapping_rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId(0));// TODO PHP8-REVIEW The method only supports 1 argument, but what about this assignment?
+        $this->initFormRoleAssignments('create');
+        $this->role_mapping_rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId(0);
         $this->tpl->setVariable('NEW_ASSIGNMENT_TBL', $this->form->getHTML());
         
 
@@ -143,6 +149,7 @@ class ilLDAPSettingsGUI
 
     /**
      * Edit role assignment
+     * @throws ilCtrlException
      */
     public function editRoleAssignment() : void
     {
@@ -153,13 +160,13 @@ class ilLDAPSettingsGUI
             return;
         }
         $this->setSubTabs();
-        $this->tabs_gui->setTabActive('role_assignments');
+        $this->tabs_gui->activateTab('role_assignments');
 
         $this->ctrl->saveParameter($this, 'rule_id');
         $this->initFormRoleAssignments(
-            'edit',
-            $this->role_mapping_rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId((int) $_GET['rule_id'])// TODO PHP8-REVIEW The method only supports 1 argument, but what about this assignment?
+            'edit'
         );
+        $this->role_mapping_rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId((int) $_GET['rule_id']);
         $this->setValuesByArray();
         $this->tpl->setContent($this->form->getHTML());
     }
@@ -198,38 +205,39 @@ class ilLDAPSettingsGUI
     {
         if (!$this->ilAccess->checkAccess('write', '', $this->ref_id)) {
             $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt('permission_denied'), true);
-            $this->roleAssignment(); // TODO PHP8-REVIEW This method does not exist
+            $this->roleAssignments();
             return false;
         }
 
         $this->initFormRoleAssignments('edit');
-        $err = '';
-        if (!$this->form->checkInput() || ($err = $this->checkRoleAssignmentInput((int) $_REQUEST['rule_id']))) {
-            if ($err) {
-                $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt($err));
+
+        $formWithoutErrors = $this->form->checkInput();
+        $roleErrorMessage = $this->checkRoleAssignmentInput((int) $_REQUEST['rule_id']);
+        if (!$formWithoutErrors || $roleErrorMessage !== '') {
+            if ($roleErrorMessage !== '') {
+                $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt($roleErrorMessage));
             }
 
             $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.ldap_role_assignments.html', 'Services/LDAP');
 
-            // DONE: wrap this
             $this->form->setValuesByPost();
             $this->tpl->setVariable('NEW_ASSIGNMENT_TBL', $this->form->getHTML());
-            #$this->tpl->setVariable('RULES_TBL',$this->getRoleAssignmentTable());
-            $this->tabs_gui->setSubTabActive('shib_role_assignment');
+            $this->tabs_gui->activateSubTab('shib_role_assignment');
             return true;
         }
         
         // Might redirect
         $this->roleSelection();
-
-        $this->rule->update();// TODO PHP8-REVIEW The property is declared dynamically
+        
+        $this->rule->update();
         $this->main_tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'));
         $this->roleAssignments();
         return true;
     }
-    
+
     /**
      * Confirm delete rules
+     * @throws ilCtrlException
      */
     public function confirmDeleteRules() : void
     {
@@ -242,7 +250,7 @@ class ilLDAPSettingsGUI
             return;
         }
         $this->setSubTabs();
-        $this->tabs_gui->setTabActive('role_assignments');
+        $this->tabs_gui->activateTab('role_assignments');
         
         $c_gui = new ilConfirmationGUI();
         
@@ -286,15 +294,16 @@ class ilLDAPSettingsGUI
     {
         if (!$this->ilAccess->checkAccess('write', '', $this->ref_id)) {
             $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt('permission_denied'), true);
-            $this->roleAssignment(); // TODO PHP8-REVIEW This method does not exist
+            $this->roleAssignments();
             return false;
         }
 
         $this->initFormRoleAssignments('create');
-        $err = '';
-        if (!$this->form->checkInput() || ($err = $this->checkRoleAssignmentInput())) {
-            if ($err) {
-                $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt($err));
+        $formWithoutErrors = $this->form->checkInput();
+        $roleErrorMessage = $this->checkRoleAssignmentInput();
+        if (!$formWithoutErrors || $roleErrorMessage !== '') {
+            if ($roleErrorMessage !== '') {
+                $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt($roleErrorMessage));
             }
 
             $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.ldap_role_assignments.html', 'Services/LDAP');
@@ -303,14 +312,14 @@ class ilLDAPSettingsGUI
             $this->form->setValuesByPost();
             $this->tpl->setVariable('NEW_ASSIGNMENT_TBL', $this->form->getHTML());
             $this->tpl->setVariable('RULES_TBL', $this->getRoleAssignmentTable());
-            $this->tabs_gui->setSubTabActive('shib_role_assignment');
+            $this->tabs_gui->activateSubTab('shib_role_assignment');
             return true;
         }
         
         // Might redirect
         $this->roleSelection();
 
-        $this->rule->create();// TODO PHP8-REVIEW The property is declared dynamically
+        $this->rule->create();
         $this->main_tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'));
         unset($_POST);
         $this->roleAssignments();
@@ -319,7 +328,8 @@ class ilLDAPSettingsGUI
     
     protected function roleSelection() : void
     {
-        if ($this->rule->getRoleId() > 0) {// TODO PHP8-REVIEW The property is declared dynamically
+        if ($this->rule->getRoleId() > 0) {
+            //TODO check why return false
             return;
         }
         $_SESSION['ldap_role_ass']['server_id'] = $this->getServer()->getServerId();
@@ -347,7 +357,7 @@ class ilLDAPSettingsGUI
     protected function showRoleSelection() : bool
     {
         $this->setSubTabs();
-        $this->tabs_gui->setTabActive('role_assignment');
+        $this->tabs_gui->activateTab('role_assignment');
         $this->ctrl->saveParameter($this, 'rule_id');
         
         $parser = new ilQueryParser($_SESSION['ldap_role_ass']['role_search']);
@@ -379,7 +389,7 @@ class ilLDAPSettingsGUI
     {
         if (!$this->ilAccess->checkAccess('write', '', $this->ref_id)) {
             $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt('permission_denied'), true);
-            $this->roleAssignment(); // TODO PHP8-REVIEW This method does not exist
+            $this->roleAssignments();
             return false;
         }
 
@@ -393,7 +403,7 @@ class ilLDAPSettingsGUI
         $this->rule->setRoleId((int) $_REQUEST['role_id']);
         
         if ((int) $_REQUEST['rule_id']) {
-            $this->rule->update();// TODO PHP8-REVIEW The property is declared dynamically
+            $this->rule->update();
         } else {
             $this->rule->create();
         }
@@ -410,7 +420,7 @@ class ilLDAPSettingsGUI
     protected function checkRoleAssignmentInput(int $a_rule_id = 0) : string
     {
         $this->loadRoleAssignmentRule($a_rule_id);
-        $this->rule->validate();// TODO PHP8-REVIEW The property is declared dynamically
+        $this->rule->validate();
         return $this->ilErr->getMessage();
     }
     
@@ -436,7 +446,7 @@ class ilLDAPSettingsGUI
      */
     protected function loadRoleAssignmentRule(int $a_rule_id, bool $a_from_form = true) : bool
     {
-        if (is_object($this->rule)) {// TODO PHP8-REVIEW The property is declared dynamically
+        if (is_object($this->rule)) {
             return true;
         }
         
@@ -445,10 +455,11 @@ class ilLDAPSettingsGUI
 
         if ($a_from_form) {
             if ($this->form->getInput('role_name') == 0) {
-                $this->rule->setRoleId($this->form->getInput('role_id'));
+                $this->rule->setRoleId((int) $this->form->getInput('role_id'));
             } elseif ($this->form->getInput('role_search')) {
                 $parser = new ilQueryParser('"' . $this->form->getInput('role_search') . '"');
-
+                
+                // TODO: Handle minWordLength
                 $parser->setMinWordLength(1);
                 $parser->setCombination(ilQueryParser::QP_COMBINATION_AND);
                 $parser->parse();
@@ -470,11 +481,11 @@ class ilLDAPSettingsGUI
             $this->rule->setAttributeValue($this->form->getInput('value'));
             $this->rule->setDN($this->form->getInput('dn'));
             $this->rule->setMemberAttribute($this->form->getInput('at'));
-            $this->rule->setMemberIsDN($this->form->getInput('isdn'));
-            $this->rule->enableAddOnUpdate($this->form->getInput('add_missing'));
-            $this->rule->enableRemoveOnUpdate($this->form->getInput('remove_deprecated'));
-            $this->rule->setPluginId($this->form->getInput('plugin_id'));
-            $this->rule->setType($this->form->getInput('type'));
+            $this->rule->setMemberIsDN((bool) $this->form->getInput('isdn'));
+            $this->rule->enableAddOnUpdate((bool) $this->form->getInput('add_missing'));
+            $this->rule->enableRemoveOnUpdate((bool) $this->form->getInput('remove_deprecated'));
+            $this->rule->setPluginId((int) $this->form->getInput('plugin_id'));
+            $this->rule->setType((int) $this->form->getInput('type'));
             $this->rule->setServerId($this->getServer()->getServerId());
             return true;
         }
@@ -482,9 +493,9 @@ class ilLDAPSettingsGUI
         // LOAD from session
         $this->rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId($a_rule_id);
         $this->rule->setServerId($this->getServer()->getServerId());
-        $this->rule->enableAddOnUpdate((int) $_SESSION['ldap_role_ass']['add_on_update']);
+        $this->rule->enableAddOnUpdate((bool) $_SESSION['ldap_role_ass']['add_on_update']);
         $this->rule->enableRemoveOnUpdate((bool) $_SESSION['ldap_role_ass']['remove_on_update']);
-        $this->rule->setType(ilUtil::stripSlashes($_SESSION['ldap_role_ass']['type']));
+        $this->rule->setType((int) ilUtil::stripSlashes($_SESSION['ldap_role_ass']['type']));
         $this->rule->setDN(ilUtil::stripSlashes($_SESSION['ldap_role_ass']['dn']));
         $this->rule->setMemberAttribute(ilUtil::stripSlashes($_SESSION['ldap_role_ass']['at']));
         $this->rule->setMemberIsDN((bool) ilUtil::stripSlashes($_SESSION['ldap_role_ass']['isdn']));
@@ -505,7 +516,7 @@ class ilLDAPSettingsGUI
         $this->initRoleMapping();
         
         foreach ($_POST['mappings'] as $mapping_id) {
-            $this->role_mapping->delete($mapping_id);// TODO PHP8-REVIEW The property is declared dynamically
+            $this->role_mapping->delete($mapping_id);
         }
         $this->main_tpl->setOnScreenMessage('success', $this->lng->txt('ldap_deleted_role_mapping'));
         $this->roleMapping();
@@ -520,7 +531,7 @@ class ilLDAPSettingsGUI
         }
         
         $this->initAttributeMapping();
-        $this->mapping->clearRules();// TODO PHP8-REVIEW The property is declared dynamically
+        $this->mapping->clearRules();
         
         foreach (ilLDAPAttributeMappingUtils::_getMappingRulesByClass($_POST['mapping_template']) as $key => $value) {
             $this->mapping->setRule($key, $value, false);
@@ -531,10 +542,10 @@ class ilLDAPSettingsGUI
     public function saveMapping() : void
     {
         $this->initAttributeMapping();
-        $this->tabs_gui->setTabActive('role_mapping');
+        $this->tabs_gui->activateTab('role_mapping');
         
         foreach ($this->getMappingFields() as $key) {
-            $this->mapping->setRule(// TODO PHP8-REVIEW The property is declared dynamically
+            $this->mapping->setRule(
                 $key,
                 ilUtil::stripSlashes($_POST[$key . '_value']),
                 (bool) $_POST[$key . '_update']
@@ -554,7 +565,9 @@ class ilLDAPSettingsGUI
         $this->userMapping();
         
         $this->main_tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'));
-        unset($_POST['mapping_template']);
+
+        //TODO check if this unset is really needed
+        //unset($_POST['mapping_template']);
     }
     
     public function serverList() : void
@@ -832,30 +845,30 @@ class ilLDAPSettingsGUI
             $this->server->enableAuthentication(!(bool) $this->form_gui->getInput('ds'));
             $this->server->setName($this->form_gui->getInput('server_name'));
             $this->server->setUrl($this->form_gui->getInput('server_url'));
-            $this->server->setVersion($this->form_gui->getInput('version'));
+            $this->server->setVersion((int) $this->form_gui->getInput('version'));
             $this->server->setBaseDN($this->form_gui->getInput('base_dn'));
-            $this->server->toggleReferrer($this->form_gui->getInput('referrals'));
-            $this->server->toggleTLS($this->form_gui->getInput('tls'));
+            $this->server->toggleReferrer((bool) $this->form_gui->getInput('referrals'));
+            $this->server->toggleTLS((bool) $this->form_gui->getInput('tls'));
             $this->server->setBindingType((int) $this->form_gui->getInput('binding_type'));
             $this->server->setBindUser($this->form_gui->getInput('bind_dn'));
             $this->server->setBindPassword($this->form_gui->getInput('bind_pass'));
             $this->server->setSearchBase($this->form_gui->getInput('search_base'));
-            $this->server->setUserScope($this->form_gui->getInput('user_scope'));
+            $this->server->setUserScope((int) $this->form_gui->getInput('user_scope'));
             $this->server->setUserAttribute($this->form_gui->getInput('user_attribute'));
             $this->server->setFilter($this->form_gui->getInput('filter'));
             $this->server->setGroupDN($this->form_gui->getInput('group_dn'));
             $this->server->setGroupScope((int) $this->form_gui->getInput('group_scope'));
             $this->server->setGroupFilter($this->form_gui->getInput('group_filter'));
             $this->server->setGroupMember($this->form_gui->getInput('group_member'));
-            $this->server->enableGroupMemberIsDN((int) $this->form_gui->getInput('memberisdn'));
+            $this->server->enableGroupMemberIsDN((bool) $this->form_gui->getInput('memberisdn'));
             $this->server->setGroupName($this->form_gui->getInput('group'));
             $this->server->setGroupAttribute($this->form_gui->getInput('group_attribute'));
             $this->server->setGroupUserFilter($this->form_gui->getInput('group_user_filter'));
-            $this->server->toggleMembershipOptional((int) $this->form_gui->getInput('group_optional'));
-            $this->server->enableSyncOnLogin((int) $this->form_gui->getInput('sync_on_login'));
-            $this->server->enableSyncPerCron((int) $this->form_gui->getInput('sync_per_cron'));
+            $this->server->toggleMembershipOptional((bool) $this->form_gui->getInput('group_optional'));
+            $this->server->enableSyncOnLogin((bool) $this->form_gui->getInput('sync_on_login'));
+            $this->server->enableSyncPerCron((bool) $this->form_gui->getInput('sync_per_cron'));
             $this->server->setGlobalRole((int) $this->form_gui->getInput('global_role'));
-            $this->server->enableAccountMigration((int) $this->form_gui->getInput('migration'));
+            $this->server->enableAccountMigration((bool) $this->form_gui->getInput('migration'));
             $this->server->setUsernameFilter($this->form_gui->getInput("name_filter"));
             $this->server->enableEscapeDN((bool) $this->form_gui->getInput('escape_dn'));
             if (!$this->server->validate()) {
@@ -874,7 +887,7 @@ class ilLDAPSettingsGUI
             
             // Now server_id exists => update LDAP attribute mapping
             $this->initAttributeMapping();
-            $this->mapping->setRule('global_role', (string) $this->form_gui->getInput('global_role'), false);// TODO PHP8-REVIEW The property is declared dynamically
+            $this->mapping->setRule('global_role', (string) $this->form_gui->getInput('global_role'), false);
             $this->mapping->save();
     
             $this->main_tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);
@@ -951,20 +964,23 @@ class ilLDAPSettingsGUI
     
     private function initServer() : void
     {
-        if (!$_REQUEST['ldap_server_id']) {
-            $_REQUEST['ldap_server_id'] = 0;
+        $server_id = 0;
+        if ($_REQUEST['ldap_server_id']) {
+            $server_id = (int) $_REQUEST['ldap_server_id'];
         }
-        $this->server = new ilLDAPServer((int) $_REQUEST['ldap_server_id']);
+
+
+        $this->server = new ilLDAPServer($server_id);
     }
     
     private function initAttributeMapping() : void
     {
-        $this->mapping = ilLDAPAttributeMapping::_getInstanceByServerId($this->getServer()->getServerId());// TODO PHP8-REVIEW The property is declared dynamically
+        $this->mapping = ilLDAPAttributeMapping::_getInstanceByServerId($this->getServer()->getServerId());
     }
     
     private function initRoleMapping() : void
     {
-        $this->role_mapping = ilLDAPRoleGroupMappingSettings::_getInstanceByServerId($this->getServer()->getServerId());// TODO PHP8-REVIEW The property is declared dynamically
+        $this->role_mapping = ilLDAPRoleGroupMappingSettings::_getInstanceByServerId($this->getServer()->getServerId());
     }
     
     /**
@@ -1074,6 +1090,7 @@ class ilLDAPSettingsGUI
         $role->setRequired(true);
         
         $global = new ilRadioOption($this->lng->txt('ldap_global_role'), "0");
+
         $role->addOption($global);
         
         $role_select = new ilSelectInputGUI('', 'role_id');
@@ -1081,6 +1098,7 @@ class ilLDAPSettingsGUI
         $global->addSubItem($role_select);
         
         $local = new ilRadioOption($this->lng->txt('ldap_local_role'), "1");
+
         $role->addOption($local);
         
         $role_search = new ilRoleAutoCompleteInputGUI('', 'role_search', $this, 'addRoleAutoCompleteObject');
@@ -1156,6 +1174,7 @@ class ilLDAPSettingsGUI
         // Option by Plugin
         $pl_active = $this->component_repository->getPluginSlotById("ldaphk")->hasActivePlugins();
         $pl = new ilRadioOption($this->lng->txt('ldap_plugin'), "3");
+
         $pl->setInfo($this->lng->txt('ldap_plugin_info'));
         $pl->setDisabled(!$pl_active);
         
@@ -1214,7 +1233,7 @@ class ilLDAPSettingsGUI
         foreach ($this->getMappingFields() as $mapping => $lang) {
             $text_form = new ilTextInputGUI($lang);
             $text_form->setPostVar($mapping . "_value");
-            $text_form->setValue($this->mapping->getValue($mapping));// TODO PHP8-REVIEW The property is declared dynamically
+            $text_form->setValue($this->mapping->getValue($mapping));
             $text_form->setSize(32);
             $text_form->setMaxLength(255);
             $propertie_form->addItem($text_form);
@@ -1274,6 +1293,7 @@ class ilLDAPSettingsGUI
         $user->setSize(50);
         $user->setMaxLength(255);
         $binding->addCombinationItem("0", $user, $this->lng->txt('ldap_role_bind_user'));
+
         $pass = new ilPasswordInputGUI("");
         $pass->setPostVar("role_bind_pass");
         $pass->setValue($this->server->getRoleBindPassword());
@@ -1281,6 +1301,7 @@ class ilLDAPSettingsGUI
         $pass->setMaxLength(36);
         $pass->setRetype(false);
         $binding->addCombinationItem("1", $pass, $this->lng->txt('ldap_role_bind_pass'));
+
         $propertie_form->addItem($binding);
         
         $this->tpl->addBlockFile('ADM_CONTENT', 'adm_content', 'tpl.ldap_role_mappings.html', 'Services/LDAP');
@@ -1464,7 +1485,7 @@ class ilLDAPSettingsGUI
         $this->initAttributeMapping();
         
         $this->setSubTabs();
-        $this->tabs_gui->setTabActive('user_mapping');
+        $this->tabs_gui->activateTab('user_mapping');
         $this->userMappingToolbar();
         
         $propertie_form = $this->initUserMappingForm();
@@ -1502,7 +1523,7 @@ class ilLDAPSettingsGUI
     private function initRoleMappingForm(string $command) : ilPropertyFormGUI
     {
         $this->setSubTabs();
-        $this->tabs_gui->setTabActive('role_mapping');
+        $this->tabs_gui->activateTab('role_mapping');
         
         if (isset($_GET["mapping_id"])) {
             $this->ctrl->setParameter($this, 'mapping_id', $_GET["mapping_id"]);
@@ -1631,7 +1652,7 @@ class ilLDAPSettingsGUI
     {
         $this->server->setRoleBindDN(ilUtil::stripSlashes($_POST['role_bind_user']));
         $this->server->setRoleBindPassword(ilUtil::stripSlashes($_POST['role_bind_pass']));
-        $this->server->enableRoleSynchronization((int) $_POST['role_sync_active']);
+        $this->server->enableRoleSynchronization((bool) $_POST['role_sync_active']);
         
         // Update or create
         if ($this->server->getServerId()) {

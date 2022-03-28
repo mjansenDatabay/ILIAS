@@ -18,37 +18,34 @@
  */
 class ilLDAPRoleGroupMapping
 {
-    private $log = null;
-    private static $instance = null;
-    private $servers = null;
-    private $mappings = array();
-    private $mapping_members = array();
-    private $query = array();
-    private $active_servers = false;
+    private static ?ilLDAPRoleGroupMapping $instance = null;
+    private ilLogger $log;
+
+    private array $servers;
+    private array $mappings;
+    private array $mapping_members;
+    private array $mapping_info;
+    private array $mapping_info_strict;
+    private array $query;
+    private array $users;
+    private ?array $user_dns;
+    private bool $active_servers = false;
     
     /**
      * Singleton contructor
-     *
-     * @access private
-     *
      */
     private function __construct()
     {
         global $DIC;
 
-        $ilLog = $DIC['ilLog'];
-        
-        $this->log = $ilLog;
+        $this->log = $DIC->logger()->auth();
         $this->initServers();
     }
     
     /**
      * Get singleton instance of this class
-     *
-     * @access public
-     *
      */
-    public static function _getInstance() : ?\ilLDAPRoleGroupMapping
+    public static function _getInstance() : ?ilLDAPRoleGroupMapping
     {
         if (is_object(self::$instance)) {
             return self::$instance;
@@ -87,10 +84,6 @@ class ilLDAPRoleGroupMapping
      * This method is typically called from class RbacAdmin::assignUser()
      * It checks if there is a role mapping and if the user has auth mode LDAP
      * After these checks the user is assigned to the LDAP group
-     *
-     * @access public
-     * @param
-     *
      */
     public function assign($a_role_id, $a_usr_id) : bool
     {
@@ -147,10 +140,6 @@ class ilLDAPRoleGroupMapping
      * This method is typically called from class RbacAdmin::deassignUser()
      * It checks if there is a role mapping and if the user has auth mode LDAP
      * After these checks the user is deassigned from the LDAP group
-     *
-     * @access public
-     * @param
-     *
      */
     public function deassign($a_role_id, $a_usr_id) : bool
     {
@@ -202,13 +191,14 @@ class ilLDAPRoleGroupMapping
 
         // Init servers
         $this->active_servers = true;
-        $this->mappings = array();
+        $this->servers = [];
+        $this->mappings = [];
         foreach ($server_ids as $server_id) {
             $this->servers[$server_id] = new ilLDAPServer($server_id);
             $this->mappings = ilLDAPRoleGroupMappingSettings::_getAllActiveMappings();
         }
-        $this->mapping_info = array();// TODO PHP8-REVIEW The property is declared dynamically
-        $this->mapping_info_strict = array();
+        $this->mapping_info = [];
+        $this->mapping_info_strict = [];
         foreach ($this->mappings as $mapping) {
             foreach ($mapping as $data) {
                 if (strlen($data['info']) && $data['object_id']) {
@@ -219,7 +209,7 @@ class ilLDAPRoleGroupMapping
                 }
             }
         }
-        $this->users = ilObjUser::_getExternalAccountsByAuthMode('ldap', true);// TODO PHP8-REVIEW The property is declared dynamically
+        $this->users = ilObjUser::_getExternalAccountsByAuthMode('ldap', true);
     }
     
     /**
@@ -242,7 +232,7 @@ class ilLDAPRoleGroupMapping
      */
     private function isHandledUser($a_usr_id) : bool
     {
-        return array_key_exists($a_usr_id, $this->users);// TODO PHP8-REVIEW The property is declared dynamically
+        return array_key_exists($a_usr_id, $this->users);
     }
     
     
@@ -260,7 +250,7 @@ class ilLDAPRoleGroupMapping
                 if ($data['isdn']) {
                     $external_account = $this->readDN($a_usr_id, $data['server_id']);
                 } else {
-                    $external_account = $this->users[$a_usr_id];// TODO PHP8-REVIEW The property is declared dynamically
+                    $external_account = $this->users[$a_usr_id];
                 }
                 
                 // Forcing modAdd since Active directory is too slow and i cannot check if a user is member or not.
@@ -298,7 +288,7 @@ class ilLDAPRoleGroupMapping
                 if ($data['isdn']) {
                     $external_account = $this->readDN($a_usr_id, $data['server_id']);
                 } else {
-                    $external_account = $this->users[$a_usr_id];// TODO PHP8-REVIEW The property is declared dynamically
+                    $external_account = $this->users[$a_usr_id];
                 }
                 
                 // Check for other role membership
@@ -331,43 +321,6 @@ class ilLDAPRoleGroupMapping
                 continue;
             }
         }
-    }
-    
-    /**
-     * Check if user is member
-     *
-     * @access private
-     * @throws ilLDAPQueryException
-     */
-    private function isMember($a_uid, $data) : bool
-    {
-        if (!isset($this->mapping_members[(string) $data['mapping_id']])) {
-            // Read members
-            try {
-                $server = $this->servers[(string) $data['server_id']];
-                $query_obj = $this->getLDAPQueryInstance($data['server_id'], $server->getUrl());
-
-                // query for members
-                $res = $query_obj->query(
-                    $data['dn'],
-                    '(objectClass=*)',
-                    ilLDAPServer::LDAP_SCOPE_BASE,
-                    array($data['member'])
-                );
-                
-                $this->storeMembers($data['mapping_id'], $res->get());
-                unset($res);
-            } catch (ilLDAPQueryException $exc) {
-                throw $exc;
-            }
-        }
-        #var_dump("<pre>",$a_uid,$this->mapping_members,"</pre>");
-        
-        // Now check for membership in stored result
-        if (in_array($a_uid, $this->mapping_members[(string) $data['mapping_id']])) {
-            return true;
-        }
-        return false;
     }
     
     /**
@@ -404,89 +357,62 @@ class ilLDAPRoleGroupMapping
     }
     
     /**
-     * Store Members
-     *
-     * @access private
-     *
-     */
-    private function storeMembers($a_mapping_id, $a_data) : void
-    {
-        $this->mapping_members[$a_mapping_id] = array();
-        foreach ($a_data as $field => $value) {
-            if (strtolower($field) === 'dn') {
-                continue;
-            }
-            
-            if (!is_array($value)) {
-                $this->mapping_members[$a_mapping_id][] = $value;
-                continue;
-            }
-            foreach ($value as $external_account) {
-                $this->mapping_members[$a_mapping_id][] = $external_account;
-            }
-        }
-    }
-    
-    /**
      * Read DN of user
      *
-     * @access private
      * @param int user id
      * @param int server id
      * @throws ilLDAPQueryException
      */
     private function readDN($a_usr_id, $a_server_id)
     {
+        if ($this->user_dns === null) {
+            $this->user_dns = [];
+        }
         if (isset($this->user_dns[$a_usr_id])) {
             return $this->user_dns[$a_usr_id];
         }
         
-        $external_account = $this->users[$a_usr_id];// TODO PHP8-REVIEW The property is declared dynamically
+        $external_account = $this->users[$a_usr_id];
         
-        try {
-            $server = $this->servers[$a_server_id];
-            $query_obj = $this->getLDAPQueryInstance($a_server_id, $server->getUrl());
-                        
-            if ($search_base = $server->getSearchBase()) {
-                $search_base .= ',';
-            }
-            $search_base .= $server->getBaseDN();
-            
-            // try optional group user filter first
-            if ($server->isMembershipOptional() && $server->getGroupUserFilter()) {
-                $userFilter = $server->getGroupUserFilter();
-            } else {
-                $userFilter = $server->getFilter();
-            }
+        $server = $this->servers[$a_server_id];
+        $query_obj = $this->getLDAPQueryInstance($a_server_id, $server->getUrl());
 
-            $filter = sprintf(
-                '(&(%s=%s)%s)',
-                $server->getUserAttribute(),
-                $external_account,
-                $userFilter
-            );
-
-            $res = $query_obj->query($search_base, $filter, $server->getUserScope(), array('dn'));
-            
-            if (!$res->numRows()) {
-                throw new ilLDAPQueryException(__METHOD__ . ' cannot find dn for user ' . $external_account);
-            }
-            if ($res->numRows() > 1) {
-                throw new ilLDAPQueryException(__METHOD__ . ' found multiple distinguished name for: ' . $external_account);
-            }
-            
-            $data = $res->get();
-            return $this->user_dns[$a_usr_id] = $data['dn'];// TODO PHP8-REVIEW The property is declared dynamically
-        } catch (ilLDAPQueryException $exc) {
-            throw $exc;
+        if ($search_base = $server->getSearchBase()) {
+            $search_base .= ',';
         }
+        $search_base .= $server->getBaseDN();
+
+        // try optional group user filter first
+        if ($server->isMembershipOptional() && $server->getGroupUserFilter()) {
+            $userFilter = $server->getGroupUserFilter();
+        } else {
+            $userFilter = $server->getFilter();
+        }
+
+        $filter = sprintf(
+            '(&(%s=%s)%s)',
+            $server->getUserAttribute(),
+            $external_account,
+            $userFilter
+        );
+
+        $res = $query_obj->query($search_base, $filter, $server->getUserScope(), array('dn'));
+
+        if (!$res->numRows()) {
+            throw new ilLDAPQueryException(__METHOD__ . ' cannot find dn for user ' . $external_account);
+        }
+        if ($res->numRows() > 1) {
+            throw new ilLDAPQueryException(__METHOD__ . ' found multiple distinguished name for: ' . $external_account);
+        }
+
+        $data = $res->get();
+        $this->user_dns[$a_usr_id] = $data['dn'];
+        return $this->user_dns[$a_usr_id];
     }
     
     /**
      * Get LDAPQueryInstance
      *
-     * @access private
-     * @param
      * @throws ilLDAPQueryException
      */
     private function getLDAPQueryInstance($a_server_id, $a_url)
@@ -496,12 +422,9 @@ class ilLDAPRoleGroupMapping
             is_object($this->query[$a_server_id][$a_url])) {
             return $this->query[$a_server_id][$a_url];
         }
-        try {
-            $tmp_query = new ilLDAPQuery($this->servers[$a_server_id], $a_url);
-            $tmp_query->bind(ilLDAPQuery::LDAP_BIND_ADMIN);
-        } catch (ilLDAPQueryException $exc) {
-            throw $exc;
-        }
+        $tmp_query = new ilLDAPQuery($this->servers[$a_server_id], $a_url);
+        $tmp_query->bind(ilLDAPQuery::LDAP_BIND_ADMIN);
+
         return $this->query[$a_server_id][$a_url] = $tmp_query;
     }
 }

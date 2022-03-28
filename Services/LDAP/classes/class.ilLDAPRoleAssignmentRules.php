@@ -24,7 +24,7 @@ class ilLDAPRoleAssignmentRules
     private const ROLE_ACTION_ASSIGN = 'Assign';
     private const ROLE_ACTION_DEASSIGN = 'Detach';
 
-    protected static $default_role = null;
+    protected static ?int $default_role = null;
 
     public static function getDefaultRole(int $a_server_id) : int
     {
@@ -34,7 +34,7 @@ class ilLDAPRoleAssignmentRules
 
     /**
      * Get all assignable roles (used for import parser)
-     * @return array<int, int>
+     * @return array<int, int> array of roles assigned
      */
     public static function getAllPossibleRoles(int $a_server_id) : array
     {
@@ -46,7 +46,9 @@ class ilLDAPRoleAssignmentRules
         $query = "SELECT DISTINCT(role_id) FROM ldap_role_assignments " .
             'WHERE server_id = ' . $ilDB->quote($a_server_id, 'integer');
         $res = $ilDB->query($query);
+        //TODO fix this array which is always the some digit twice
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            //TODO if key is int it will get autoconverted to int
             $roles[$row->role_id] = (int) $row->role_id;
         }
 
@@ -78,7 +80,7 @@ class ilLDAPRoleAssignmentRules
             }
         }
 
-        return array_merge($names, self::getAdditionalPluginAttributes($a_server_id));
+        return array_merge($names, self::getAdditionalPluginAttributes());
     }
 
     public static function getAssignmentsForUpdate(int $a_server_id, $a_usr_id, $a_usr_name, $a_usr_data) : array
@@ -129,12 +131,9 @@ class ilLDAPRoleAssignmentRules
     }
 
     /**
-     *
-     * @param object $a_usr_id
-     * @param object $a_usr_data
      * @return array role data
      */
-    public static function getAssignmentsForCreation(int $a_server_id, $a_usr_name, $a_usr_data) : array// TODO PHP8-REVIEW Type hints are missing here
+    public static function getAssignmentsForCreation(int $a_server_id, string $a_usr_name, array $a_usr_data) : array
     {
         global $DIC;
 
@@ -194,7 +193,7 @@ class ilLDAPRoleAssignmentRules
      * Fetch additional attributes from plugin
      * @return string[]
      */
-    protected static function getAdditionalPluginAttributes(int $a_server_id) : array
+    protected static function getAdditionalPluginAttributes() : array
     {
         global $DIC;
 
