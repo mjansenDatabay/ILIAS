@@ -23,7 +23,6 @@ class ilLDAPAttributeMappingUtils
 {
     /**
      * Get mapping rule by objectClass
-     * @param array<string, string>
      */
     public static function _getMappingRulesByClass(string $a_class) : array
     {

@@ -33,7 +33,6 @@ class ilLDAPRoleAssignmentRule
     private int $rule_id;
 
     private int $server_id = 0;
-    private bool $plugin_active = false;
     private bool$add_on_update = false;
     private bool$remove_on_update = false;
     private int $plugin_id = 0;
@@ -82,9 +81,8 @@ class ilLDAPRoleAssignmentRule
     
     /**
      * Check if a rule matches
-     * @param object $a_user_data
      */
-    public function matches($a_user_data) : bool
+    public function matches(array $a_user_data) : bool
     {
         switch ($this->getType()) {
             case self::TYPE_PLUGIN:
@@ -185,7 +183,7 @@ class ilLDAPRoleAssignmentRule
                 "WHERE server_id = " . $ilDB->quote($a_server_id, 'integer');
         $res = $ilDB->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $rules[] = self::_getInstanceByRuleId($row->rule_id);
+            $rules[] = self::_getInstanceByRuleId((int) $row->rule_id);
         }
 
         return $rules;
@@ -236,7 +234,7 @@ class ilLDAPRoleAssignmentRule
     /**
      * set type
      */
-    public function setType($a_type) : void
+    public function setType(int $a_type) : void
     {
         $this->type = $a_type;
     }
@@ -326,14 +324,14 @@ class ilLDAPRoleAssignmentRule
         return $this->attribute_value;
     }
     
-    public function enableAddOnUpdate($a_status) : void
+    public function enableAddOnUpdate(bool $a_status) : void
     {
         $this->add_on_update = $a_status;
     }
     
     public function isAddOnUpdateEnabled() : bool
     {
-        return (bool) $this->add_on_update;
+        return $this->add_on_update;
     }
     
     public function enableRemoveOnUpdate(bool $a_status) : void
@@ -479,16 +477,16 @@ class ilLDAPRoleAssignmentRule
         $res = $this->db->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $this->setServerId((int) $row->server_id);
-            $this->setType($row->type);
+            $this->setType((int) $row->type);
             $this->setDN($row->dn);
             $this->setMemberAttribute($row->attribute);
             $this->setMemberIsDN((bool) $row->isdn);
             $this->setAttributeName($row->att_name);
             $this->setAttributeValue($row->att_value);
             $this->setRoleId((int) $row->role_id);
-            $this->enableAddOnUpdate($row->add_on_update);
-            $this->enableRemoveOnUpdate($row->remove_on_update);
-            $this->setPluginId($row->plugin_id);
+            $this->enableAddOnUpdate((bool) $row->add_on_update);
+            $this->enableRemoveOnUpdate((bool) $row->remove_on_update);
+            $this->setPluginId((int) $row->plugin_id);
         }
     }
 }

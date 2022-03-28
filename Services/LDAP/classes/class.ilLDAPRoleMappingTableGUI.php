@@ -20,7 +20,11 @@ class ilLDAPRoleMappingTableGUI extends ilTable2GUI
 {
     private ilObjectDataCache $ilObjDataCache;
     private ilRbacReview $rbacreview;
+    private int $server_id;
 
+    /**
+     * @throws ilCtrlException
+     */
     public function __construct($a_parent_obj, $a_server_id, $a_parent_cmd = '')
     {
         $this->server_id = $a_server_id;
@@ -48,7 +52,10 @@ class ilLDAPRoleMappingTableGUI extends ilTable2GUI
         
         $this->getItems();
     }
-    
+
+    /**
+     * @throws ilCtrlException
+     */
     protected function fillRow(array $a_set) : void
     {
         $title = $this->ilObjDataCache->lookupTitle($this->rbacreview->getObjectOfRole($a_set["role"]));

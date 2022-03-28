@@ -19,13 +19,6 @@
  */
 class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
 {
-    /**
-     * constructor
-     *
-     * @access public
-     * @param
-     *
-     */
     public function __construct($a_parent_obj, $a_parent_cmd = '')
     {
         global $DIC;
@@ -48,7 +41,8 @@ class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
         $this->setDefaultOrderField('type');
         $this->setDefaultOrderDirection("desc");
     }
-    
+
+    /** @noinspection DuplicatedCode */
     protected function fillRow(array $a_set) : void
     {
         $this->tpl->setVariable('VAL_ID', $a_set['id']);
