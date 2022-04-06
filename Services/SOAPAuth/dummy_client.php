@@ -17,13 +17,13 @@
 exit;
 include_once './webservice/soap/lib/nusoap.php';
 
-$server = $_GET["server"] ?: "http://localhost/Services/SOAPAuth/dummy_server.php";
+$server = $_GET["server"] ?: "http://www.ilias.de/lt4el/Services/SOAPAuth/dummy_server.php";// TODO PHP8-REVIEW Super global variables should be eliminated
 
-$ext_uid = $_GET["ext_uid"] ?: "testuser";
+$ext_uid = $_GET["ext_uid"] ?: "testuser";// TODO PHP8-REVIEW Super global variables should be eliminated
 
-$soap_pw = $_GET["soap_pw"] ?: "testpw";
+$soap_pw = $_GET["soap_pw"] ?: "testpw";// TODO PHP8-REVIEW Super global variables should be eliminated
 
-$new_user = $_GET["new_user"];
+$new_user = $_GET["new_user"];// TODO PHP8-REVIEW Super global variables should be eliminated
 
 echo '<form>' .
     'server <input size="80" type="text" name="server" "value="' . $server . '"/>' .

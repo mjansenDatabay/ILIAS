@@ -17,7 +17,7 @@
  * Class ilAuthProviderSoap
  * @author Michael Jansen <mjansen@databay.de>
  */
-class ilAuthProviderSoap extends ilAuthProvider
+class ilAuthProviderSoap extends ilAuthProvider implements ilAuthProviderInterface
 {
     protected string $server_host = '';
     protected string $server_port = '';

@@ -1,3 +1,6 @@
+<?php
+/*
+
 How SOAP authentication works.
 
 SOAP authentication can be used for external systems that use ILIAS as a
@@ -44,3 +47,4 @@ array('valid' => 'xsd:boolean',
     'lastname' => 'xsd:string',
     'email' => 'xsd:string')
 
+*/
