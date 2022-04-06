@@ -16,9 +16,18 @@
 
 include_once("./webservice/soap/lib/nusoap.php");
 
+/**
+* Class SOAPAuth
+*
+* SOAP Authentication class.
+*
+*/
 class ilSOAPAuth
 {
-    public static function testConnection(string $a_ext_uid, string $a_soap_pw, bool $a_new_user) : string
+    /**
+    * Test connection with values of soap auth administration settings
+    */
+    public static function testConnection($a_ext_uid, $a_soap_pw, $a_new_user) : string
     {
         global $ilSetting;
 
@@ -58,11 +67,9 @@ class ilSOAPAuth
 
         $valid = $soap_client->call(
             'isValidSession',
-            [
-                $nspref . 'ext_uid' => $a_ext_uid,
+            array($nspref . 'ext_uid' => $a_ext_uid,
                 $nspref . 'soap_pw' => $a_soap_pw,
-                $nspref . 'new_user' => $a_new_user
-            ],
+                $nspref . 'new_user' => $a_new_user),
             $namespace,
             $soapAction
         );

@@ -188,7 +188,7 @@ class ilAuthProviderSoap extends ilAuthProvider implements ilAuthProviderInterfa
         $userObj->create();
         $userObj->setActive(true);
         $userObj->updateOwner();
-        $userObj->saveAsNew();
+        $userObj->saveAsNew(false);
         $userObj->writePrefs();
 
         $this->rbacAdmin->assignUser(
