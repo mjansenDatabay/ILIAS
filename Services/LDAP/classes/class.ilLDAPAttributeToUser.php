@@ -91,7 +91,7 @@ class ilLDAPAttributeToUser
     public function addMode(int $a_mode) : void
     {
         //TODO check for proper value
-        if (!in_array($a_mode, $this->modes)) {
+        if (!in_array($a_mode, $this->modes, true)) {
             $this->modes[] = $a_mode;
         }
     }
@@ -103,7 +103,7 @@ class ilLDAPAttributeToUser
      */
     public function isModeActive(int $a_mode) : bool
     {
-        return in_array($a_mode, $this->modes);
+        return in_array($a_mode, $this->modes, true);
     }
     
     
@@ -391,12 +391,12 @@ class ilLDAPAttributeToUser
         $fields = explode(',', $mapping);
         $value = '';
         foreach ($fields as $field) {
-            if (strlen($value)) {
+            if ($value !== '') {
                 $value .= ' ';
             }
             $value .= ($this->convertInput($user[trim($field)] ?? ''));
         }
-        return $value ?: '';
+        return $value;
     }
 
     private function initLDAPAttributeMapping() : void

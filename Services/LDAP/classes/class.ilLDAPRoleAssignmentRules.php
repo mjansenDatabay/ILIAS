@@ -101,11 +101,11 @@ class ilLDAPRoleAssignmentRules
             $rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId($row->rule_id);
 
             $matches = $rule->matches($a_usr_data);
-            if ($matches and $row->add_on_update) {
+            if ($matches && $row->add_on_update) {
                 $ilLog->info(': Assigned to role: ' . $a_usr_name . ' => ' . ilObject::_lookupTitle($rule->getRoleId()));
                 $roles[] = self::parseRole($rule->getRoleId(), self::ROLE_ACTION_ASSIGN);
             }
-            if (!$matches and $row->remove_on_update) {
+            if (!$matches && $row->remove_on_update) {
                 $ilLog->info(': Deassigned from role: ' . $a_usr_name . ' => ' . ilObject::_lookupTitle($rule->getRoleId()));
                 $roles[] = self::parseRole($rule->getRoleId(), self::ROLE_ACTION_DEASSIGN);
             }

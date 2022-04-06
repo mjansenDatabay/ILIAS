@@ -25,7 +25,7 @@ class ilLDAPRoleMappingTableGUI extends ilTable2GUI
     /**
      * @throws ilCtrlException
      */
-    public function __construct($a_parent_obj, $a_server_id, $a_parent_cmd = '')// TODO PHP8-REVIEW Tpye hints are missing here
+    public function __construct(?object $a_parent_obj, int $a_server_id, string $a_parent_cmd = '')
     {
         $this->server_id = $a_server_id;
         parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -43,8 +43,9 @@ class ilLDAPRoleMappingTableGUI extends ilTable2GUI
         $this->addColumn($this->lng->txt('ldap_group_member'), "member_attribute");
         $this->addColumn($this->lng->txt('ldap_info_text'), "info");
         $this->addColumn($this->lng->txt('action'));
-    
-        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd));
+        if ($a_parent_obj) {
+            $this->setFormAction($this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd));
+        }
         $this->setRowTemplate("tpl.ldap_role_mapping_row.html", "Services/LDAP");
         $this->setDefaultOrderField('title');
         $this->setDefaultOrderDirection("desc");

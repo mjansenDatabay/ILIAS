@@ -94,14 +94,6 @@ class ilLDAPUserSynchronisation
     }
 
     /**
-     * Check if creation of user account is forced (account migration)
-     */
-    public function isCreationForced() : bool
-    {
-        return $this->force_creation;
-    }
-
-    /**
      * Get user data
      * @return array $user_data
      */
@@ -160,7 +152,7 @@ class ilLDAPUserSynchronisation
             throw new ilLDAPSynchronisationForbiddenException('User synchronisation forbidden.');
         }
         // Account migration
-        if ($this->getServer()->isAccountMigrationEnabled() and !$this->isCreationForced()) {
+        if (!$this->force_creation && $this->getServer()->isAccountMigrationEnabled()) {
             $this->readUserData();
             throw new ilLDAPAccountMigrationRequiredException('Account migration check required.');
         }
@@ -174,7 +166,7 @@ class ilLDAPUserSynchronisation
         ilUserCreationContext::getInstance()->addContext(ilUserCreationContext::CONTEXT_LDAP);
 
         $update = new ilLDAPAttributeToUser($this->getServer());
-        if ($this->isCreationForced()) {
+        if ($this->force_creation) {
             $update->addMode(ilLDAPAttributeToUser::MODE_INITIALIZE_ROLES);
         }
         $update->setNewUserAuthMode($this->getAuthMode());
@@ -239,7 +231,7 @@ class ilLDAPUserSynchronisation
      */
     protected function isUpdateRequired() : bool
     {
-        if ($this->isCreationForced()) {
+        if ($this->force_creation) {
             return true;
         }
         if (!$this->getInternalAccount()) {

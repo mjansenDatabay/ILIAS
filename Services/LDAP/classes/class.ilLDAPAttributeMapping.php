@@ -129,7 +129,7 @@ class ilLDAPAttributeMapping
     {
         $fields = [];
         foreach ($rules as $rule) {
-            if (!strlen($rule['value'])) {
+            if ($rule['value'] === '') {
                 continue;
             }
             if (strpos($rule['value'], ',') === false) {

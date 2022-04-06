@@ -384,7 +384,7 @@ class ilLDAPServer
             return false;
         }
         $auth_arr = explode('_', $a_auth_mode);
-        return ($auth_arr[0] == ilAuthUtils::AUTH_LDAP) and $auth_arr[1];
+        return ($auth_arr[0] === ilAuthUtils::AUTH_LDAP) and $auth_arr[1];
     }
     
     /**
@@ -415,7 +415,7 @@ class ilLDAPServer
      * Get auth id by auth mode
      * @return int|string auth_mode
      */
-    public static function getKeyByAuthMode(string $a_auth_mode)// TODO PHP8-REVIEW A return type is missing here
+    public static function getKeyByAuthMode(string $a_auth_mode)
     {
         $auth_arr = explode('_', $a_auth_mode);
         if (count($auth_arr) > 1) {
@@ -468,7 +468,7 @@ class ilLDAPServer
      */
     public function getAuthenticationMappingKey() : string
     {
-        if ($this->isAuthenticationEnabled() or !$this->getAuthenticationMapping()) {
+        if ($this->isAuthenticationEnabled() || !$this->getAuthenticationMapping()) {
             return 'ldap_' . $this->getServerId();
         }
         return ilAuthUtils::_getAuthModeName($this->getAuthenticationMapping());
@@ -824,7 +824,7 @@ class ilLDAPServer
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_bind_user'));
         }
         
-        if (($this->enabledSyncPerCron() || $this->enabledSyncOnLogin()) && !$this->global_role) {
+        if (!$this->global_role && ($this->enabledSyncPerCron() || $this->enabledSyncOnLogin())) {
             $this->ilErr->appendMessage($this->lng->txt('ldap_missing_role_assignment'));
         }
         if ($this->getVersion() === 2 && $this->isActiveTLS()) {
@@ -978,13 +978,10 @@ class ilLDAPServer
         $options['basedn'] = $this->getBaseDN();
         $options['start_tls'] = $this->isActiveTLS();
         $options['userdn'] = $this->getSearchBase();
-        switch ($this->getUserScope()) {
-            case self::LDAP_SCOPE_ONE:
-                $options['userscope'] = 'one';
-                break;
-            default:
-                $options['userscope'] = 'sub';
-                break;
+        if ($this->getUserScope() === self::LDAP_SCOPE_ONE) {
+            $options['userscope'] = 'one';
+        } else {
+            $options['userscope'] = 'sub';
         }
         
         $options['userattr'] = $this->getUserAttribute();

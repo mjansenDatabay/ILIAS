@@ -242,8 +242,11 @@ class ilLDAPQuery
             $tmp_result->setResult($res);
             $tmp_result->run();
             try {
-                $errcode = $dn = $errmsg = $referrals = null;
-                ldap_parse_result($this->lh, $res, $errcode, $matcheddn, $errmsg, $referrals, $controls);
+                $errcode = 0;
+                $dn = '';
+                $errmsg = '';
+                $referrals = [];
+                ldap_parse_result($this->lh, $res, $errcode, $dn, $errmsg, $referrals, $controls);
                 $cookie = $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';
                 $this->logger->debug('Estimated number of results: ' . $estimated_results);
             } catch (Exception $e) {
@@ -272,18 +275,14 @@ class ilLDAPQuery
             $new_filter = '(&';
             $new_filter .= $filter;
 
-            switch ($letter) {
-                case '-':
-                    $new_filter .= ('(!(|');
-                    foreach ($chars as $char) {
-                        $new_filter .= ('(' . $this->settings->getUserAttribute() . '=' . $char . '*)');
-                    }
-                    $new_filter .= ')))';
-                    break;
-
-                default:
-                    $new_filter .= ('(' . $this->settings->getUserAttribute() . '=' . $letter . '*))');
-                    break;
+            if ($letter === '-') {
+                $new_filter .= ('(!(|');
+                foreach ($chars as $char) {
+                    $new_filter .= ('(' . $this->settings->getUserAttribute() . '=' . $char . '*)');
+                }
+                $new_filter .= ')))';
+            } else {
+                $new_filter .= ('(' . $this->settings->getUserAttribute() . '=' . $letter . '*))');
             }
 
             $this->logger->info('Searching with ldap search and filter ' . $new_filter . ' in ' . $dn);
@@ -449,7 +448,7 @@ class ilLDAPQuery
         }
 
         // Build filter
-        if ($this->settings->enabledGroupMemberIsDN() and $a_check_dn) {
+        if ($a_check_dn && $this->settings->enabledGroupMemberIsDN()) {
             $dn = $a_name;
 
             $fields = array_merge($this->user_fields, array('useraccountcontrol'));
@@ -526,13 +525,14 @@ class ilLDAPQuery
                 break;
 
             default:
-                // TODO PHP8-REVIEW I strongly recocmend to throw an exeption here instead
-                $this->logger->warning("LDAP: LDAPQuery: Unknown search scope");
+                throw new ilLDAPUndefinedScopeException(
+                    "Undefined LDAP Search Scope: " . $a_scope
+                );
         }
 
-        $error = ldap_error($this->lh);
-        if (strcmp('Success', $error) !== 0) {
-            $this->logger->warning($error);
+        $error = ldap_errno($this->lh);
+        if ($error) {
+            $this->logger->warning("LDAP Error Code: " . $error . "(" . ldap_err2str($error) . ")");
             $this->logger->warning('Base DN:' . $a_base_dn);
             $this->logger->warning('Filter: ' . $a_filter);
         }
@@ -593,7 +593,7 @@ class ilLDAPQuery
                 // Now bind anonymously or as user
                 if (
                     ilLDAPServer::LDAP_BIND_USER === $this->settings->getBindingType() &&
-                    $this->settings->getBindUser() != ''
+                    $this->settings->getBindUser() !== ''
                 ) {
                     $user = $this->settings->getBindUser();
                     $pass = $this->settings->getBindPassword();
@@ -611,7 +611,7 @@ class ilLDAPQuery
                 $user = $this->settings->getRoleBindDN();
                 $pass = $this->settings->getRoleBindPassword();
 
-                if ($user === '' or $pass === '') {
+                if ($user === '' || $pass === '') {
                     $user = $this->settings->getBindUser();
                     $pass = $this->settings->getBindPassword();
                 }
@@ -680,7 +680,7 @@ class ilLDAPQuery
         if (
             array_key_exists(strtolower(self::IL_LDAP_SUPPORTED_CONTROL), $entries) &&
             is_array($entries[strtolower(self::IL_LDAP_SUPPORTED_CONTROL)]) &&
-            in_array(LDAP_CONTROL_PAGEDRESULTS, $entries[strtolower(self::IL_LDAP_SUPPORTED_CONTROL)])
+            in_array(LDAP_CONTROL_PAGEDRESULTS, $entries[strtolower(self::IL_LDAP_SUPPORTED_CONTROL)], true)
         ) {
             $this->logger->info('Using paged control');
             return true;

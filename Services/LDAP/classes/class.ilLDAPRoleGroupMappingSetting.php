@@ -52,16 +52,15 @@ class ilLDAPRoleGroupMappingSetting
                 . "WHERE mapping_id = " . $this->db->quote($this->getMappingId(), 'integer');
         $set = $this->db->query($query);
         $rec = $this->db->fetchAssoc($set);
-        // TODO PHP8-REVIEW You should case the values when populating the object
-        $this->setMappingId($rec["mapping_id"]);
-        $this->setServerId($rec["server_id"]);
+        $this->setMappingId((int) $rec["mapping_id"]);
+        $this->setServerId((int) $rec["server_id"]);
         $this->setURL($rec["url"]);
         $this->setDN($rec["dn"]);
         $this->setMemberAttribute($rec["member_attribute"]);
         $this->setMemberISDN($rec["member_isdn"]);
-        $this->setRole($rec["role"]);
+        $this->setRole((int) $rec["role"]);
         $this->setMappingInfo($rec["mapping_info"]);
-        $this->setMappingInfoType($rec["mapping_info_type"]);
+        $this->setMappingInfoType((bool) $rec["mapping_info_type"]);
     }
     
     /**

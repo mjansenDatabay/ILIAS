@@ -53,7 +53,7 @@ class ilLDAPRoleGroupMappingSettings
      */
     public static function _getInstanceByServerId(int $a_server_id) : ilLDAPRoleGroupMappingSettings
     {
-        if (array_key_exists($a_server_id, self::$instances) and is_object(self::$instances[$a_server_id])) {
+        if (array_key_exists($a_server_id, self::$instances) && is_object(self::$instances[$a_server_id])) {
             return self::$instances[$a_server_id];
         }
         return self::$instances[$a_server_id] = new ilLDAPRoleGroupMappingSettings($a_server_id);
@@ -136,7 +136,7 @@ class ilLDAPRoleGroupMappingSettings
         
         $this->mappings = [];
         foreach ($a_mappings as $mapping_id => $data) {
-            if ($mapping_id == 0 && !$data['dn'] && !$data['member'] && !$data['memberisdn'] && !$data['role']) {
+            if ($mapping_id === 0 && !$data['dn'] && !$data['member'] && !$data['memberisdn'] && !$data['role']) {
                 continue;
             }
             $this->mappings[$mapping_id]['dn'] = ilUtil::stripSlashes($data['dn']);
@@ -162,14 +162,14 @@ class ilLDAPRoleGroupMappingSettings
         $found_missing = false;
         foreach ($this->mappings as $data) {
             // Check if all required fields are available
-            if ($data['dn'] == '' || $data['member_attribute'] == '' || $data['role_name'] == '') {
+            if ($data['dn'] === '' || $data['member_attribute'] === '' || $data['role_name'] === '') {
                 if (!$found_missing) {
                     $found_missing = true;
                     $this->ilErr->appendMessage($this->lng->txt('fill_out_all_required_fields'));
                 }
             }
             // Check role valid
-            if ($data['role_name'] != '' && !$this->rbacreview->roleExists($data['role_name'])) {
+            if ($data['role_name'] !== '' && !$this->rbacreview->roleExists($data['role_name'])) {
                 $this->ilErr->appendMessage($this->lng->txt('ldap_role_not_exists') . ' ' . $data['role_name']);
             }
         }
@@ -221,8 +221,7 @@ class ilLDAPRoleGroupMappingSettings
     
     /**
      * Delete a mapping
-     *
-     * @access public
+
      * @param int mapping_id
      *
      */
@@ -239,22 +238,19 @@ class ilLDAPRoleGroupMappingSettings
     /**
      * Create an info string for a role group mapping
      *
-     * @param int mapping_id
+     * @param int $a_mapping_id mapping_id
      */
-    public function getMappingInfoString($a_mapping_id)// TODO PHP8-REVIEW A return type and type hints are missing here
+    //TODO check if method gets called somewhere
+    public function getMappingInfoString(int $a_mapping_id) : string
     {
-        //$role = $this->mappings[$a_mapping_id]['role_name'];
         $dn_parts = explode(',', $this->mappings[$a_mapping_id]['dn']);
         
-        return (array_key_exists(0, $dn_parts) ? $dn_parts[0] : "''");
+        return $dn_parts ? $dn_parts[0] : "''";
     }
     
     
     /**
      * Read mappings
-     *
-     * @access private
-     *
      */
     private function read() : void
     {

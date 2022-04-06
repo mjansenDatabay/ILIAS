@@ -111,7 +111,7 @@ class ilLDAPResult
     {
         $num = $entries['count'];
 
-        if ($num == 0) {
+        if ($num === 0) {
             return;
         }
 
@@ -144,7 +144,7 @@ class ilLDAPResult
                     for ($i = 0; $i < $value['count']; $i++) {
                         $data[$key][] = $value[$i];
                     }
-                } elseif ($value['count'] == 1) {
+                } elseif ($value['count'] === 1) {
                     $data[$key] = $value[0];
                 }
             } else {

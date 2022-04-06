@@ -39,7 +39,6 @@ class ilLDAPSettingsGUI
     private ?ilLDAPRoleAssignmentRule $role_mapping_rule = null;
     private ?ilLDAPRoleAssignmentRule $rule = null;
     private ?ilLDAPRoleGroupMappingSettings $role_mapping = null;
-    private ilLogger $logger;
 
     /**
      * @throws ilCtrlException
@@ -58,7 +57,6 @@ class ilLDAPSettingsGUI
         $this->rbacReview = $DIC->rbac()->review();
         $this->rbacSystem = $DIC->rbac()->system();
         $this->toolbar = $DIC->toolbar();
-        $this->logger = $DIC->logger()->auth();
         $this->main_tpl = $DIC->ui()->mainTemplate();
         
         $this->tpl = $DIC->ui()->mainTemplate();
@@ -454,7 +452,7 @@ class ilLDAPSettingsGUI
 
 
         if ($a_from_form) {
-            if ($this->form->getInput('role_name') == 0) {
+            if ($this->form->getInput('role_name') === 0) {
                 $this->rule->setRoleId((int) $this->form->getInput('role_id'));
             } elseif ($this->form->getInput('role_search')) {
                 $parser = new ilQueryParser('"' . $this->form->getInput('role_search') . '"');
@@ -576,7 +574,7 @@ class ilLDAPSettingsGUI
             $this->ilErr->raiseError($this->lng->txt('msg_no_perm_read'), $this->ilErr->WARNING);
         }
         
-        if (!ilLDAPServer::checkLDAPLib() and $this->server->isActive()) {
+        if (!ilLDAPServer::checkLDAPLib() && $this->server->isActive()) {
             $this->main_tpl->setOnScreenMessage('failure', 'Missing LDAP libraries. Please ensure that the PHP LDAP module is installed on your server.');
         }
 
@@ -1328,13 +1326,27 @@ class ilLDAPSettingsGUI
         
         $propertie_form = $this->initRoleMappingForm("updateRoleMapping");
         $propertie_form->setTitle($this->lng->txt('ldap_edit_role_assignment'));
-        $propertie_form->getItemByPostVar("url")->setValue($mapping->getURL());
-        $propertie_form->getItemByPostVar("dn")->setValue($mapping->getDN());
-        $propertie_form->getItemByPostVar("member")->setValue($mapping->getMemberAttribute());
-        $propertie_form->getItemByPostVar("memberisdn")->setChecked($mapping->getMemberISDN());
-        $propertie_form->getItemByPostVar("role")->setValue($mapping->getRoleName());
-        $propertie_form->getItemByPostVar("info")->setValue($mapping->getMappingInfo());
-        $propertie_form->getItemByPostVar("info_type")->setChecked($mapping->getMappingInfoType());
+        if ($propertie_form->getItemByPostVar("url")) {
+            $propertie_form->getItemByPostVar("url")->setValue($mapping->getURL());
+        }
+        if ($propertie_form->getItemByPostVar("dn")) {
+            $propertie_form->getItemByPostVar("dn")->setValue($mapping->getDN());
+        }
+        if ($propertie_form->getItemByPostVar("member")) {
+            $propertie_form->getItemByPostVar("member")->setValue($mapping->getMemberAttribute());
+        }
+        if ($propertie_form->getItemByPostVar("memberisdn")) {
+            $propertie_form->getItemByPostVar("memberisdn")->setChecked($mapping->getMemberISDN());
+        }
+        if ($propertie_form->getItemByPostVar("role")) {
+            $propertie_form->getItemByPostVar("role")->setValue($mapping->getRoleName());
+        }
+        if ($propertie_form->getItemByPostVar("info")) {
+            $propertie_form->getItemByPostVar("info")->setValue($mapping->getMappingInfo());
+        }
+        if ($propertie_form->getItemByPostVar("info_type")) {
+            $propertie_form->getItemByPostVar("info_type")->setChecked($mapping->getMappingInfoType());
+        }
         
         $this->tpl->setContent($propertie_form->getHTML());
     }
@@ -1595,19 +1607,33 @@ class ilLDAPSettingsGUI
     public function addRoleMapping() : void
     {
         $propertie_form = $this->initRoleMappingForm("createRoleMapping");
-        $propertie_form->getItemByPostVar("url")->setValue($this->server->getUrl());
-        
+        if ($propertie_form->getItemByPostVar("url")) {
+            $propertie_form->getItemByPostVar("url")->setValue($this->server->getUrl());
+        }
         if (isset($_GET["mapping_id"])) {
             $mapping = new ilLDAPRoleGroupMappingSetting($_GET["mapping_id"]);
             $mapping->read();
-            
-            $propertie_form->getItemByPostVar("url")->setValue($mapping->getURL());
-            $propertie_form->getItemByPostVar("dn")->setValue($mapping->getDN());
-            $propertie_form->getItemByPostVar("member")->setValue($mapping->getMemberAttribute());
-            $propertie_form->getItemByPostVar("memberisdn")->setChecked($mapping->getMemberISDN());
-            $propertie_form->getItemByPostVar("role")->setValue($mapping->getRoleName());
-            $propertie_form->getItemByPostVar("info")->setValue($mapping->getMappingInfo());
-            $propertie_form->getItemByPostVar("info_type")->setChecked($mapping->getMappingInfoType());
+            if ($propertie_form->getItemByPostVar("url")) {
+                $propertie_form->getItemByPostVar("url")->setValue($mapping->getURL());
+            }
+            if ($propertie_form->getItemByPostVar("dn")) {
+                $propertie_form->getItemByPostVar("dn")->setValue($mapping->getDN());
+            }
+            if ($propertie_form->getItemByPostVar("member")) {
+                $propertie_form->getItemByPostVar("member")->setValue($mapping->getMemberAttribute());
+            }
+            if ($propertie_form->getItemByPostVar("memberisdn")) {
+                $propertie_form->getItemByPostVar("memberisdn")->setChecked($mapping->getMemberISDN());
+            }
+            if ($propertie_form->getItemByPostVar("role")) {
+                $propertie_form->getItemByPostVar("role")->setValue($mapping->getRoleName());
+            }
+            if ($propertie_form->getItemByPostVar("info")) {
+                $propertie_form->getItemByPostVar("info")->setValue($mapping->getMappingInfo());
+            }
+            if ($propertie_form->getItemByPostVar("info_type")) {
+                $propertie_form->getItemByPostVar("info_type")->setChecked($mapping->getMappingInfoType());
+            }
         }
         
         $this->tpl->setContent($propertie_form->getHTML());

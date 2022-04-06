@@ -20,6 +20,8 @@ class ilLDAPRoleGroupMapping
 {
     private static ?ilLDAPRoleGroupMapping $instance = null;
     private ilLogger $log;
+    private ilRbacReview $rbacreview;
+    private ilObjectDataCache $ilObjDataCache;
 
     private array $servers;
     private array $mappings;
@@ -39,6 +41,9 @@ class ilLDAPRoleGroupMapping
         global $DIC;
 
         $this->log = $DIC->logger()->auth();
+        $this->rbacreview = $DIC->rbac()->review();
+        $this->ilObjDataCache = $DIC['ilObjDataCache'];
+
         $this->initServers();
     }
     
@@ -57,15 +62,14 @@ class ilLDAPRoleGroupMapping
      * Get info string for object
      * If check info type is enabled this function will check if the info string is visible in the repository.
      *
-     * @access public
      * @param int object id
      * @param bool check info type
-     *
+     * @return string[]
      */
-    public function getInfoStrings(int $a_obj_id, bool $a_check_type = false)// TODO PHP8-REVIEW A return type is missing here
+    public function getInfoStrings(int $a_obj_id, bool $a_check_type = false) : array
     {
         if (!$this->active_servers) {
-            return false;
+            return [];
         }
 
         if ($a_check_type) {
@@ -76,7 +80,7 @@ class ilLDAPRoleGroupMapping
             return $this->mapping_info[$a_obj_id];
         }
 
-        return false;
+        return [];
     }
     
     
@@ -110,16 +114,11 @@ class ilLDAPRoleGroupMapping
      * This function triggered from ilRbacAdmin::deleteRole
      * It deassigns all user from the mapped ldap group.
      *
-     * @access public
      * @param int role id
      *
      */
-    public function deleteRole($a_role_id) : bool
+    public function deleteRole(int $a_role_id) : bool
     {
-        global $DIC;
-
-        $rbacreview = $DIC['rbacreview'];
-        
         // return if there nothing to do
         if (!$this->active_servers) {
             return false;
@@ -129,7 +128,7 @@ class ilLDAPRoleGroupMapping
             return false;
         }
         
-        foreach ($rbacreview->assignedUsers($a_role_id) as $usr_id) {
+        foreach ($this->rbacreview->assignedUsers($a_role_id) as $usr_id) {
             $this->deassign($a_role_id, $usr_id);
         }
         return true;
@@ -162,7 +161,6 @@ class ilLDAPRoleGroupMapping
     /**
      * Delete user => deassign from all ldap groups
      *
-     * @access public
      * @param int user id
      */
     public function deleteUser($a_usr_id) : bool
@@ -176,10 +174,6 @@ class ilLDAPRoleGroupMapping
     
     /**
      * Check if there is any active server with
-     *
-     * @access private
-     * @param
-     *
      */
     private function initServers() : void
     {
@@ -201,10 +195,10 @@ class ilLDAPRoleGroupMapping
         $this->mapping_info_strict = [];
         foreach ($this->mappings as $mapping) {
             foreach ($mapping as $data) {
-                if (strlen($data['info']) && $data['object_id']) {
+                if ($data['info'] !== '' && $data['object_id']) {
                     $this->mapping_info[$data['object_id']][] = $data['info'];
                 }
-                if (strlen($data['info']) && ($data['info_type'] == ilLDAPRoleGroupMappingSettings::MAPPING_INFO_ALL)) {
+                if ($data['info'] !== '' && ($data['info_type'] === ilLDAPRoleGroupMappingSettings::MAPPING_INFO_ALL)) {
                     $this->mapping_info_strict[$data['object_id']][] = $data['info'];
                 }
             }
@@ -215,7 +209,6 @@ class ilLDAPRoleGroupMapping
     /**
      * Check if a role is handled or not
      *
-     * @access private
      * @param int role_id
      * @return bool server id or 0 if mapping exists
      *
@@ -227,8 +220,6 @@ class ilLDAPRoleGroupMapping
     
     /**
      * Check if user is ldap user
-     *
-     * @access private
      */
     private function isHandledUser($a_usr_id) : bool
     {
@@ -239,7 +230,6 @@ class ilLDAPRoleGroupMapping
     /**
      * Assign user to group
      *
-     * @access private
      * @param int role_id
      * @param int user_id
      */
@@ -276,7 +266,6 @@ class ilLDAPRoleGroupMapping
     /**
      * Deassign user from group
      *
-     * @access private
      * @param int role_id
      * @param int user_id
      *
@@ -310,8 +299,8 @@ class ilLDAPRoleGroupMapping
                 
                 // Delete from cache
                 if (is_array($this->mapping_members[$data['mapping_id']])) {
-                    $key = array_search($external_account, $this->mapping_members[$data['mapping_id']]);
-                    if ($key or $key === 0) {
+                    $key = array_search($external_account, $this->mapping_members[$data['mapping_id']], true);
+                    if ($key || $key === 0) {
                         unset($this->mapping_members[$data['mapping_id']]);
                     }
                 }
@@ -326,30 +315,24 @@ class ilLDAPRoleGroupMapping
     /**
      * Check other membership
      *
-     * @access private
-     * @return string role name
+     * @return string|false role name
      *
      */
-    private function checkOtherMembership($a_usr_id, $a_role_id, $a_data)// TODO PHP8-REVIEW A return type and type hints are missing here
+    private function checkOtherMembership(int $a_usr_id, int $a_role_id, array $a_data)
     {
-        global $DIC;
-
-        $rbacreview = $DIC['rbacreview'];
-        $ilObjDataCache = $DIC['ilObjDataCache'];
-        
         foreach ($this->mappings as $role_id => $tmp_data) {
             foreach ($tmp_data as $data) {
-                if ($role_id == $a_role_id) {
+                if ($role_id === $a_role_id) {
                     continue;
                 }
-                if ($data['server_id'] != $a_data['server_id']) {
+                if ($data['server_id'] !== $a_data['server_id']) {
                     continue;
                 }
-                if ($data['dn'] != $a_data['dn']) {
+                if ($data['dn'] !== $a_data['dn']) {
                     continue;
                 }
-                if ($rbacreview->isAssigned($a_usr_id, $role_id)) {
-                    return $ilObjDataCache->lookupTitle((int) $role_id);
+                if ($this->rbacreview->isAssigned($a_usr_id, $role_id)) {
+                    return $this->ilObjDataCache->lookupTitle((int) $role_id);
                 }
             }
         }
@@ -363,7 +346,7 @@ class ilLDAPRoleGroupMapping
      * @param int server id
      * @throws ilLDAPQueryException
      */
-    private function readDN($a_usr_id, $a_server_id)
+    private function readDN(int $a_usr_id, int $a_server_id)
     {
         if ($this->user_dns === null) {
             $this->user_dns = [];
