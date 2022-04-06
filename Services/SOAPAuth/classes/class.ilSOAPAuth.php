@@ -33,14 +33,16 @@ class ilSOAPAuth
 
         $settings = $ilSetting->getAll();
 
-        $server_hostname = (string) ($settings["soap_auth_server"] ?? '');
-        $server_port = (int) ($settings["soap_auth_port"] ?? 0);
-        $server_uri = (string) ($settings["soap_auth_uri"] ?? '');
-        $namespace = (string) ($settings["soap_auth_namespace"] ?? '');
-        $use_dotnet = (bool) ($settings["soap_auth_use_dotnet"] ?? false);
-        $uri = "http://";
+        $server_hostname = $settings["soap_auth_server"];
+        $server_port = (int) $settings["soap_auth_port"];
+        $server_uri = $settings["soap_auth_uri"];
+        $namespace = $settings["soap_auth_namespace"];
+        $use_dotnet = isset($settings["soap_auth_use_dotnet"]) ?
+            $settings["soap_auth_use_dotnet"] : false;
         if (isset($settings["soap_auth_use_https"]) && $settings["soap_auth_use_https"]) {
             $uri = "https://";
+        } else {
+            $uri = "http://";
         }
 
         $uri .= $server_hostname;
@@ -49,7 +51,7 @@ class ilSOAPAuth
             $uri .= ":" . $server_port;
         }
 
-        if ($server_uri !== "") {
+        if ($server_uri != "") {
             $uri .= "/" . $server_uri;
         }
 
