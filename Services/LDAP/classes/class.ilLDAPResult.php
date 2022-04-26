@@ -160,6 +160,8 @@ class ilLDAPResult
      */
     public function __destruct()
     {
-        ldap_free_result($this->result);
+        if ($this->result) {
+            ldap_free_result($this->result);
+        }
     }
 }

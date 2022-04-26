@@ -19,7 +19,7 @@
  */
 class ilLDAPRoleAssignmentTableGUI extends ilTable2GUI
 {
-    public function __construct(?object $a_parent_obj, string $a_parent_cmd = '')
+    public function __construct(object $a_parent_obj, string $a_parent_cmd = '')
     {
         global $DIC;
 

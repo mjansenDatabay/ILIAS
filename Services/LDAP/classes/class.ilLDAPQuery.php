@@ -175,6 +175,8 @@ class ilLDAPQuery
     private function readAllUsers() : void
     {
         // Build search base
+        $this->logger->debug($this->settings->getSearchBase());
+        $this->logger->debug($this->settings->getBaseDN());
         if (($dn = $this->settings->getSearchBase()) && substr($dn, -1) !== ',') {
             $dn .= ',';
         }
@@ -219,18 +221,18 @@ class ilLDAPQuery
         $tmp_result = new ilLDAPResult($this->lh);
         $cookie = '';
         $estimated_results = 0;
-        // Setup our paged results control.
-        $controls = [
-            LDAP_CONTROL_PAGEDRESULTS => [
-                'oid' => LDAP_CONTROL_PAGEDRESULTS,
-                'isCritical' => true,
-                'value' => [
-                    'size' => self::PAGINATION_SIZE,
-                    'cookie' => $cookie,
-                ],
-            ],
-        ];
         do {
+            // Setup our paged results control.
+            $controls = [
+                LDAP_CONTROL_PAGEDRESULTS => [
+                    'oid' => LDAP_CONTROL_PAGEDRESULTS,
+                    'isCritical' => true,
+                    'value' => [
+                        'size' => self::PAGINATION_SIZE,
+                        'cookie' => $cookie,
+                    ],
+                ],
+            ];
             $res = $this->queryByScope(
                 $this->settings->getUserScope(),
                 $dn,
@@ -598,8 +600,6 @@ class ilLDAPQuery
                     $user = $this->settings->getBindUser();
                     $pass = $this->settings->getBindPassword();
 
-                    define('IL_LDAP_REBIND_USER', $user);
-                    define('IL_LDAP_REBIND_PASS', $pass);
                     $this->logger->debug('Bind as ' . $user);
                 } else {
                     $user = $pass = '';
@@ -615,9 +615,6 @@ class ilLDAPQuery
                     $user = $this->settings->getBindUser();
                     $pass = $this->settings->getBindPassword();
                 }
-
-                define('IL_LDAP_REBIND_USER', $user);
-                define('IL_LDAP_REBIND_PASS', $pass);
                 break;
 
             case self::LDAP_BIND_AUTH:

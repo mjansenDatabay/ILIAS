@@ -85,18 +85,21 @@ class ilLDAPSettingsGUI
      */
     public function executeCommand() : bool
     {
+        $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
         
         if ($cmd !== "serverList" && !$this->rbacSystem->checkAccess("visible,read", $this->ref_id)) {
             $this->main_tpl->setOnScreenMessage('failure', $this->lng->txt('msg_no_perm_write'), true);
             $this->ctrl->redirect($this, "serverList");
         }
-
-        if (!$cmd) {
-            $cmd = "serverList";
+        switch ($next_class) {
+            default:
+                if (!$cmd) {
+                    $cmd = "serverList";
+                }
+               $this->$cmd();
+                break;
         }
-
-        $this->$cmd();
         return true;
     }
 
@@ -452,7 +455,7 @@ class ilLDAPSettingsGUI
 
 
         if ($a_from_form) {
-            if ($this->form->getInput('role_name') === 0) {
+            if ($this->form->getInput('role_name') === '0') {
                 $this->rule->setRoleId((int) $this->form->getInput('role_id'));
             } elseif ($this->form->getInput('role_search')) {
                 $parser = new ilQueryParser('"' . $this->form->getInput('role_search') . '"');

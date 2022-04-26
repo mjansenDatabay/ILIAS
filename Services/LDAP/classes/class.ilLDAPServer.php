@@ -384,7 +384,7 @@ class ilLDAPServer
             return false;
         }
         $auth_arr = explode('_', $a_auth_mode);
-        return ($auth_arr[0] === ilAuthUtils::AUTH_LDAP) and $auth_arr[1];
+        return ((int) $auth_arr[0] === ilAuthUtils::AUTH_LDAP) && $auth_arr[1];
     }
     
     /**

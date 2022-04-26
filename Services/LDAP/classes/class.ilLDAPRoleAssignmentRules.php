@@ -146,7 +146,7 @@ class ilLDAPRoleAssignmentRules
 
         $roles = [];
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
-            $rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId($row->rule_id);
+            $rule = ilLDAPRoleAssignmentRule::_getInstanceByRuleId((int) $row->rule_id);
 
             if ($rule->matches($a_usr_data)) {
                 $ilLog->info(': Assigned to role: ' . $a_usr_name . ' => ' . ilObject::_lookupTitle($rule->getRoleId()));
