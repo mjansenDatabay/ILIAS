@@ -43,6 +43,11 @@ class ilMailOptionsTest extends ilMailBaseTest
         $object->mail_address_option = 0;
         $object->email = 'test@test.com';
         $object->second_email = 'ilias@ilias.com';
+        $object->absence_status = false;
+        $object->absent_from = time();
+        $object->absent_until = time();
+        $object->absence_ar_subject = 'subject';
+        $object->absence_ar_body = 'body';
 
         $database->expects($this->once())->method('fetchObject')->willReturn($object);
         $database->expects($this->once())->method('queryF')->willReturn($queryMock);
@@ -60,5 +65,10 @@ class ilMailOptionsTest extends ilMailBaseTest
         $this->assertSame($object->incoming_type, $mailOptions->getIncomingType());
         $this->assertSame($object->linebreak, $mailOptions->getLinebreak());
         $this->assertSame($object->cronjob_notification, $mailOptions->isCronJobNotificationEnabled());
+        $this->assertSame($object->absence_status, $mailOptions->getAbsenceStatus());
+        $this->assertSame($object->absent_from, $mailOptions->getAbsentFrom());
+        $this->assertSame($object->absent_until, $mailOptions->getAbsentUntil());
+        $this->assertSame($object->absence_ar_subject, $mailOptions->getAbsenceAutoResponderSubject());
+        $this->assertSame($object->absence_ar_body, $mailOptions->getAbsenceAutoResponderBody());
     }
 }
