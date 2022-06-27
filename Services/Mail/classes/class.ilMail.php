@@ -50,10 +50,11 @@ class ilMail
     /** @var array<int, ilObjUser> */
     protected array $userInstancesByIdMap = [];
     protected $usrIdByLoginCallable;
+    protected $loginByUsrIdCallable;
     protected int $maxRecipientCharacterLength = 998;
     protected ilMailMimeSenderFactory $senderFactory;
     protected ilObjUser $actor;
-    protected static bool $auto_responder_status = false;
+    protected bool $auto_responder_status = false;
     protected array $auto_responder_data = [];
 
     public function __construct(
@@ -69,6 +70,7 @@ class ilMail
         ilMailbox $mailBox = null,
         ilMailMimeSenderFactory $senderFactory = null,
         callable $usrIdByLoginCallable = null,
+        callable $loginByUsrIdCallable = null,
         int $mailAdminNodeRefId = null,
         ilObjUser $actor = null
     ) {
@@ -87,6 +89,9 @@ class ilMail
         $this->usrIdByLoginCallable = $usrIdByLoginCallable ?? static function (string $login) : int {
             return (int) ilObjUser::_lookupId($login);
         };
+        $this->loginByUsrIdCallable = $loginByUsrIdCallable ?? static function (int $usrId) : string {
+            return ilObjUser::_lookupLogin($usrId);
+        };
         $this->user_id = $a_user_id;
         $this->mail_obj_ref_id = $mailAdminNodeRefId;
         if (null === $this->mail_obj_ref_id) {
@@ -98,14 +103,14 @@ class ilMail
         $this->setSaveInSentbox(false);
     }
 
-    public static function setAutoResponderStatus(bool $auto_responder_status) : void
+    public function setAutoResponderStatus(bool $auto_responder_status) : void
     {
-        self::$auto_responder_status = $auto_responder_status;
+        $this->auto_responder_status = $auto_responder_status;
     }
 
-    public static function getAutoResponderStatus() : bool
+    public function getAutoResponderStatus() : bool
     {
-        return self::$auto_responder_status;
+        return $this->auto_responder_status;
     }
 
     public function withContextId(string $contextId) : self
@@ -655,26 +660,22 @@ class ilMail
                 $sentMailId
             );
         }
-
-        $contextUser = ilObjectFactory::getInstanceByObjId($this->user_id);
-
-        self::setAutoResponderStatus(false);
+        $this->setAutoResponderStatus(false);
         if ($this->auto_responder_data) {
+            $c = $this->loginByUsrIdCallable;
             foreach ($this->auto_responder_data as $usr_id => $mail_options) {
                 /** @var $mail_options ilMailOptions */
                 $tmpmail = new ilFormatMail($usr_id);
                 $tmpmail->setSaveInSentbox(false);
-                if ($contextUser) {
-                    $tmpmail->sendMail(
-                        $contextUser->getLogin(),
-                        '',
-                        '',
-                        $mail_options->getAbsenceAutoResponderSubject(),
-                        $mail_options->getAbsenceAutoResponderBody() . chr(13) . chr(10) . $mail_options->getSignature(),
-                        [],
-                        false
-                    );
-                }
+                $tmpmail->sendMail(
+                    $c($this->user_id),
+                    '',
+                    '',
+                    $mail_options->getAbsenceAutoResponderSubject(),
+                    $mail_options->getAbsenceAutoResponderBody() . chr(13) . chr(10) . $mail_options->getSignature(),
+                    [],
+                    false
+                );
             }
         }
 
@@ -774,7 +775,7 @@ class ilMail
                 $user->getId()
             );
 
-            if (self::getAutoResponderStatus() && $mailOptions->isAbsent()) {
+            if ($this->getAutoResponderStatus() && $mailOptions->isAbsent()) {
                 $this->auto_responder_data[$user->getId()] = $mailOptions;
             }
 
@@ -1115,7 +1116,7 @@ class ilMail
             serialize(array_merge(
                 $this->contextParameters,
                 [
-                    'auto_responder' => self::getAutoResponderStatus()
+                    'auto_responder' => $this->getAutoResponderStatus()
                 ]
             ))
         ]);

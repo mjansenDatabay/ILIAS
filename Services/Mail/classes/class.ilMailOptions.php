@@ -15,6 +15,8 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+use ILIAS\Data\Factory as DataFactory;
+use ILIAS\Data\Clock\ClockInterface;
 
 /**
  * Class ilMailOptions
@@ -50,14 +52,16 @@ class ilMailOptions
     protected int $absent_until = 0;
     protected string $absence_auto_responder_body = '';
     protected string $absence_auto_responder_subject = '';
+    protected ClockInterface $clockService;
 
-    public function __construct(int $usrId, ilMailTransportSettings $mailTransportSettings = null)
+    public function __construct(int $usrId, ilMailTransportSettings $mailTransportSettings = null, ClockInterface $clockService = null)
     {
         global $DIC;
         $this->usrId = $usrId;
         $this->db = $DIC->database();
         $this->settings = $DIC->settings();
         $this->mailTransportSettings = $mailTransportSettings ?? new ilMailTransportSettings($this);
+        $this->clockService = $clockService ?? (new DataFactory())->clock()->utc();
 
         $this->read();
     }
@@ -341,6 +345,11 @@ class ilMailOptions
 
     public function isAbsent() : bool
     {
-        return $this->getAbsenceStatus() && $this->getAbsentFrom() > 0 && $this->getAbsentUntil() && $this->getAbsentFrom() <= time() && $this->getAbsentUntil() >= time();
+        return
+            $this->getAbsenceStatus() &&
+            $this->getAbsentFrom() > 0 &&
+            $this->getAbsentUntil() &&
+            $this->getAbsentFrom() <= $this->clockService->now()->getTimestamp() &&
+            $this->getAbsentUntil() >= $this->clockService->now()->getTimestamp();
     }
 }
