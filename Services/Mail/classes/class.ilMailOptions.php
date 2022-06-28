@@ -347,7 +347,7 @@ class ilMailOptions
     {
         return
             $this->getAbsenceStatus() &&
-            $this->getAbsentFrom() > 0 &&
+            $this->getAbsentFrom() &&
             $this->getAbsentUntil() &&
             $this->getAbsentFrom() <= $this->clockService->now()->getTimestamp() &&
             $this->getAbsentUntil() >= $this->clockService->now()->getTimestamp();
