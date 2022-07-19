@@ -24,13 +24,14 @@ class ilMailOptionsFormGUI extends ilPropertyFormGUI
     protected object $parentGui;
     protected string $positiveCmd = '';
     protected ilMailOptions $options;
+    protected ilAutoResponderRepository $autoResponderRepository;
 
     /**
      * @param ilMailOptions $options
      * @param object $parentGui
      * @param string $positiveCmd
      */
-    public function __construct(ilMailOptions $options, object $parentGui, string $positiveCmd)
+    public function __construct(ilMailOptions $options, object $parentGui, string $positiveCmd, ilAutoResponderRepository $autoResponderRepository)
     {
         if (!method_exists($parentGui, 'executeCommand')) {
             throw new InvalidArgumentException(sprintf(
@@ -44,6 +45,7 @@ class ilMailOptionsFormGUI extends ilPropertyFormGUI
         $this->options = $options;
         $this->parentGui = $parentGui;
         $this->positiveCmd = $positiveCmd;
+        $this->autoResponderRepository = $autoResponderRepository ?? new ilAutoResponderDatabaseRepository();
 
         $this->init();
     }
@@ -138,7 +140,11 @@ class ilMailOptionsFormGUI extends ilPropertyFormGUI
         }
 
         $absence_duration = $this->getItemByPostVar('absence_duration');
-
+        $absence_status = (bool) $this->getInput('absence_status');
+        $old_absence_status = $this->options->getAbsenceStatus();
+        if (!$absence_status && $old_absence_status) {
+            $this->autoResponderRepository->deleteBySenderId($this->user->getId());
+        }
         $this->options->setAbsenceStatus((bool) $this->getInput('absence_status'));
         if ($absence_duration && $absence_duration->getStart() && $absence_duration->getEnd()) {
             $this->options->setAbsentFrom($absence_duration->getStart()->get(IL_CAL_UNIX));
