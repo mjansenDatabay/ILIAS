@@ -1,11 +1,4 @@
 <?php
-/* Copyright (c) 2016 Richard Klees <richard.klees@concepts-and-training.de> Extended GPL, see docs/LICENSE */
-
-namespace ILIAS\DI;
-
-use ILIAS\BackgroundTasks\BackgroundTaskServices;
-use ILIAS\Repository;
-use ILIAS\Skill\Service\SkillService;
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -22,6 +15,12 @@ use ILIAS\Skill\Service\SkillService;
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+namespace ILIAS\DI;
+
+use ILIAS\BackgroundTasks\BackgroundTaskServices;
+use ILIAS\Repository;
+use ILIAS\Skill\Service\SkillService;
 
 /**
  * Customizing of pimple-DIC for ILIAS.
