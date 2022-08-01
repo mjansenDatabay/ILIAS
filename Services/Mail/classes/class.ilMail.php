@@ -17,8 +17,8 @@
  *********************************************************************/
 
 use ILIAS\BackgroundTasks\Implementation\Bucket\BasicBucket;
-use ILIAS\Services\Mail\AutoResponder\ilAutoResponderService;
-use ILIAS\Services\Mail\AutoResponder\ilAutoResponderServiceImpl;
+use ILIAS\Services\Mail\AutoResponder\AutoResponderService;
+use ILIAS\Services\Mail\AutoResponder\AutoResponderServiceImpl;
 
 /**
  * @author Stefan Meyer <meyer@leifos.com>
@@ -53,14 +53,14 @@ class ilMail
     protected array $userInstancesByIdMap = [];
     /** @var callable */
     protected $usrIdByLoginCallable;
-    protected ilAutoResponderService $auto_responder_service;
+    protected AutoResponderService $auto_responder_service;
 
-    public function getAutoResponderService() : ilAutoResponderService
+    public function getAutoResponderService() : AutoResponderService
     {
         return $this->auto_responder_service;
     }
 
-    public function setAutoResponderService(ilAutoResponderService $auto_responder_service) : void
+    public function setAutoResponderService(AutoResponderService $auto_responder_service) : void
     {
         $this->auto_responder_service = $auto_responder_service;
     }
@@ -81,7 +81,7 @@ class ilMail
         ilMailbox $mailBox = null,
         ilMailMimeSenderFactory $senderFactory = null,
         callable $usrIdByLoginCallable = null,
-        ilAutoResponderService $auto_responder_service = null,
+        AutoResponderService $auto_responder_service = null,
         int $mailAdminNodeRefId = null,
         ilObjUser $actor = null
     ) {

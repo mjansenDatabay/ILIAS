@@ -16,8 +16,8 @@
  *
  *********************************************************************/
 
-use ILIAS\Services\Mail\AutoResponder\ilAutoResponderDatabaseRepository;
-use ILIAS\Services\Mail\AutoResponder\ilAutoResponderRepository;
+use ILIAS\Services\Mail\AutoResponder\AutoResponderDatabaseRepository;
+use ILIAS\Services\Mail\AutoResponder\AutoResponderRepository;
 
 /**
  * Class ilMailOptionsFormGUI
@@ -27,14 +27,14 @@ class ilMailOptionsFormGUI extends ilPropertyFormGUI
     protected object $parentGui;
     protected string $positiveCmd = '';
     protected ilMailOptions $options;
-    protected ilAutoResponderRepository $autoResponderRepository;
+    protected AutoResponderRepository $autoResponderRepository;
 
     /**
      * @param ilMailOptions $options
      * @param object $parentGui
      * @param string $positiveCmd
      */
-    public function __construct(ilMailOptions $options, object $parentGui, string $positiveCmd, ilAutoResponderRepository $autoResponderRepository = null)
+    public function __construct(ilMailOptions $options, object $parentGui, string $positiveCmd, AutoResponderRepository $autoResponderRepository = null)
     {
         if (!method_exists($parentGui, 'executeCommand')) {
             throw new InvalidArgumentException(sprintf(
@@ -48,7 +48,7 @@ class ilMailOptionsFormGUI extends ilPropertyFormGUI
         $this->options = $options;
         $this->parentGui = $parentGui;
         $this->positiveCmd = $positiveCmd;
-        $this->autoResponderRepository = $autoResponderRepository ?? new ilAutoResponderDatabaseRepository();
+        $this->autoResponderRepository = $autoResponderRepository ?? new AutoResponderDatabaseRepository();
 
         $this->init();
     }
