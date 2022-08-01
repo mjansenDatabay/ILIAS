@@ -22,6 +22,7 @@ use ILIAS\Skill\Service\SkillService;
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
 /**
  * Customizing of pimple-DIC for ILIAS.
  *
