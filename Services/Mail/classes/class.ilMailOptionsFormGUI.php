@@ -44,11 +44,11 @@ class ilMailOptionsFormGUI extends ilPropertyFormGUI
         }
 
         parent::__construct();
-
+        global $DIC;
         $this->options = $options;
         $this->parentGui = $parentGui;
         $this->positiveCmd = $positiveCmd;
-        $this->autoResponderRepository = $autoResponderRepository ?? new AutoResponderDatabaseRepository();
+        $this->autoResponderRepository = $autoResponderRepository ?? new AutoResponderDatabaseRepository($DIC->database());
 
         $this->init();
     }
