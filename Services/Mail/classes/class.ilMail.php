@@ -17,6 +17,8 @@
  *********************************************************************/
 
 use ILIAS\BackgroundTasks\Implementation\Bucket\BasicBucket;
+use ILIAS\Services\Mail\AutoResponder\ilAutoResponderService;
+use ILIAS\Services\Mail\AutoResponder\ilAutoResponderServiceImpl;
 
 /**
  * @author Stefan Meyer <meyer@leifos.com>
