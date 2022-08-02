@@ -157,7 +157,7 @@ class ilMailDatabaseUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
-    public function step_8() : void
+    public function step_10() : void
     {
         if (!$this->db->tableExists('auto_responder')) {
             $this->db->createTable(
