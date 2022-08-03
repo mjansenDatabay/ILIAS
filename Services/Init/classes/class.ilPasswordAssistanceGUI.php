@@ -300,7 +300,7 @@ class ilPasswordAssistanceGUI
         );
 
         /** @var ilMailMimeSenderFactory $senderFactory */
-        $senderFactory = $DIC["mail.mime.sender.factory"];
+        $senderFactory = $DIC->mail()->mime()->senderFactory();
         $sender = $senderFactory->system();
 
         $mm = new ilMimeMail();
@@ -611,8 +611,7 @@ class ilPasswordAssistanceGUI
             ]
         );
 
-        /** @var ilMailMimeSenderFactory $senderFactory */
-        $senderFactory = $DIC["mail.mime.sender.factory"];
+        $senderFactory = $DIC->mail()->mime()->senderFactory();
         $sender = $senderFactory->system();
 
         $mm = new ilMimeMail();

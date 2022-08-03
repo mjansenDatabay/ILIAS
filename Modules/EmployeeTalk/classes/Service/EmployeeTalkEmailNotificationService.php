@@ -62,8 +62,7 @@ final class EmployeeTalkEmailNotificationService
         global $DIC;
 
         $language = $DIC->language();
-        /** @var \ilMailMimeSenderFactory $senderFactory */
-        $senderFactory = $DIC["mail.mime.sender.factory"];
+        $senderFactory = $DIC->mail()->mime()->senderFactory();
         $sender        = $senderFactory->system();
 
         $mime_boundary = "b1_" . md5(strval(time()));
