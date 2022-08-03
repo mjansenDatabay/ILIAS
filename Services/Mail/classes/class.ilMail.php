@@ -54,16 +54,6 @@ class ilMail
     /** @var callable */
     protected $usrIdByLoginCallable;
     protected AutoResponderService $auto_responder_service;
-
-    public function getAutoResponderService() : AutoResponderService
-    {
-        return $this->auto_responder_service;
-    }
-
-    public function setAutoResponderService(AutoResponderService $auto_responder_service) : void
-    {
-        $this->auto_responder_service = $auto_responder_service;
-    }
     protected int $maxRecipientCharacterLength = 998;
     protected ilMailMimeSenderFactory $senderFactory;
     protected ilObjUser $actor;
@@ -110,6 +100,11 @@ class ilMail
         $this->table_mail = 'mail';
         $this->table_mail_saved = 'mail_saved';
         $this->setSaveInSentbox(false);
+    }
+
+    public function autoresponder() : AutoResponderService
+    {
+        return $this->auto_responder_service;
     }
 
     public function withContextId(string $contextId) : self

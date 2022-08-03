@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -57,13 +56,13 @@ final class EmployeeTalkEmailNotificationService
      *
      * @return bool
      */
-    public function send(): bool
+    public function send() : bool
     {
         global $DIC;
 
         $language = $DIC->language();
         $senderFactory = $DIC->mail()->mime()->senderFactory();
-        $sender        = $senderFactory->system();
+        $sender = $senderFactory->system();
 
         $mime_boundary = "b1_" . md5(strval(time()));
 
@@ -87,9 +86,9 @@ final class EmployeeTalkEmailNotificationService
         $allowExternalMails = boolval(intval($this->settings->get('mail_allow_external')));
 
         //$mailsent = false;
-        $subject =  $language->txt('notification_talks_subject');
+        $subject = $language->txt('notification_talks_subject');
         //if ($allowExternalMails) {
-            //$mailsent = mail($this->encodeWord($toName) . " <$to>", $this->encodeWord("$subjectPrefix $subject: $subjectDetails"), $this->getMessage($mime_boundary), $headers);
+        //$mailsent = mail($this->encodeWord($toName) . " <$to>", $this->encodeWord("$subjectPrefix $subject: $subjectDetails"), $this->getMessage($mime_boundary), $headers);
         //}
         
         $mail = new \ilSystemNotification();
@@ -117,7 +116,7 @@ final class EmployeeTalkEmailNotificationService
      * @param string $text
      * @return string
      */
-    private function encodeWord(string $text): string
+    private function encodeWord(string $text) : string
     {
         /*
          * The encoding must be either B or Q, these mean base 64 and quoted-printable respectively.
@@ -128,7 +127,7 @@ final class EmployeeTalkEmailNotificationService
         return mb_encode_mimeheader($text, 'utf8', 'B', "\r\n ", 0);
     }
 
-    private function getHtmlMessage(string $mime_boundary): string
+    private function getHtmlMessage(string $mime_boundary) : string
     {
         $template = new ilTemplate('tpl.email_appointments.html', true, true, 'Modules/EmployeeTalk');
 
@@ -161,7 +160,7 @@ final class EmployeeTalkEmailNotificationService
         return $message;
     }
 
-    private function getTextMessage(string $mime_boundary): string
+    private function getTextMessage(string $mime_boundary) : string
     {
         $message = "--$mime_boundary\r\n";
         $message .= "Content-Type: text/plain; charset=\"utf-8\"\r\n";
@@ -172,10 +171,10 @@ final class EmployeeTalkEmailNotificationService
         return $message;
     }
 
-    private function getIcalEvent(string $mime_boundary): string
+    private function getIcalEvent(string $mime_boundary) : string
     {
         $message = "--$mime_boundary\r\n";
-        $message .= 'Content-Type: text/calendar;name="appointment.ics";method=' . $this->calendar->getMethod()."\r\n";
+        $message .= 'Content-Type: text/calendar;name="appointment.ics";method=' . $this->calendar->getMethod() . "\r\n";
         $message .= "Content-Disposition: attachment;filename=\"appointment.ics\"\r\n";
         $message .= "Content-Transfer-Encoding: UTF8\r\n\r\n";
         $message .= $this->calendar->render() . "\r\n";
