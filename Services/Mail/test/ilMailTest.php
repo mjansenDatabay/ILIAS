@@ -19,6 +19,7 @@
 use ILIAS\Refinery\Factory;
 use PHPUnit\Framework\MockObject\MockObject;
 use ILIAS\Services\Mail\AutoResponder\AutoResponderServiceImpl;
+use ILIAS\Services\Mail\AutoResponder\AutoResponderService;
 
 /**
  * Class ilMailMimeTest
@@ -160,7 +161,7 @@ class ilMailTest extends ilMailBaseTest
             static function (string $login) use ($loginToIdMap) : int {
                 return $loginToIdMap[$login] ?? 0;
             },
-            $this->getMockBuilder(AutoResponderServiceImpl::class)->disableOriginalConstructor()->getMock(),
+            $this->createMock(AutoResponderService::class),
             4711,
             $actor
         );
@@ -555,7 +556,7 @@ class ilMailTest extends ilMailBaseTest
             static function (string $login) : int {
                 return 780;
             },
-            $this->getMockBuilder(AutoResponderServiceImpl::class)->disableOriginalConstructor()->getMock(),
+            $this->createMock(AutoResponderService::class),
             $refId,
             $this->getMockBuilder(ilObjUser::class)->disableOriginalConstructor()->getMock()
         );
