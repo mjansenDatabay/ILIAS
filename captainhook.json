@@ -62,6 +62,20 @@
             ]
           }
         ]
+      },
+      {
+        "action": "CI/check_langfile_duplicate_lines.sh",
+        "options": [],
+        "conditions": [
+          {
+            "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\Any",
+            "args": [
+              [
+                "*.lang"
+              ]
+            ]
+          }
+        ]
       }
     ]
   },

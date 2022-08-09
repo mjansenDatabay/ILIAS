@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-source CI/Import/Functions.sh
+. CI/Import/Functions.sh
 
 CHECKS=true
 CHECKFLAG=${1}

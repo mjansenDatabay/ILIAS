@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
-function printLn() {
+printLn() {
 	echo -e "$PRE $1"
 }
 
-function get_changed_files() {
+get_changed_files() {
 
-  if [[ -z ${PR_NUMBER} ]]
+  if [ -z "${PR_NUMBER}" ]
   then
     CHANGED_FILES=$(git diff-tree --name-only --diff-filter=ACMRT --no-commit-id -r ${GH_SHA} | grep '.php')
   else
@@ -16,9 +16,9 @@ function get_changed_files() {
   echo ${CHANGED_FILES}
 }
 
-function get_changed_lang_files() {
+get_changed_lang_files() {
 
-  if [[ -z ${PR_NUMBER} ]]
+  if [ -z "${PR_NUMBER}" ]
   then
     CHANGED_FILES=$(git diff-tree --name-only --diff-filter=ACMRT --no-commit-id -r ${GH_SHA} | grep '.lang')
   else
