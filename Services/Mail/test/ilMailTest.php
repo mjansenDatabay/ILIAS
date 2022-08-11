@@ -18,8 +18,8 @@
 
 use ILIAS\Refinery\Factory;
 use PHPUnit\Framework\MockObject\MockObject;
-use ILIAS\Services\Mail\AutoResponder\AutoResponderServiceImpl;
-use ILIAS\Services\Mail\AutoResponder\AutoResponderService;
+use ILIAS\Mail\AutoResponder\AutoResponderServiceImpl;
+use ILIAS\Mail\AutoResponder\AutoResponderService;
 
 /**
  * Class ilMailMimeTest

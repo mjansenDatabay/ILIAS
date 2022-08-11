@@ -16,8 +16,8 @@
  *
  *********************************************************************/
 
-use ILIAS\Services\Mail\AutoResponder\AutoResponderDatabaseRepository;
-use ILIAS\Services\Mail\AutoResponder\AutoResponderRepository;
+use ILIAS\Mail\AutoResponder\AutoResponderDatabaseRepository;
+use ILIAS\Mail\AutoResponder\AutoResponderRepository;
 
 /**
  * Class ilMailOptionsFormGUI
