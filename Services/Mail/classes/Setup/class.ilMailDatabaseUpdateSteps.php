@@ -106,9 +106,9 @@ class ilMailDatabaseUpdateSteps implements ilDatabaseUpdateSteps
                 'absent_from',
                 [
                     'type' => 'integer',
-                    'length' => 4,
+                    'length' => 8,
                     'notnull' => true,
-                    'default' => null
+                    'default' => 0
                 ]
             );
         }
@@ -122,7 +122,7 @@ class ilMailDatabaseUpdateSteps implements ilDatabaseUpdateSteps
                 'absent_until',
                 [
                         'type' => 'integer',
-                        'length' => 4,
+                        'length' => 8,
                         'notnull' => true,
                         'default' => 0
                     ]
@@ -163,18 +163,18 @@ class ilMailDatabaseUpdateSteps implements ilDatabaseUpdateSteps
 
     public function step_10() : void
     {
-        if (!$this->db->tableExists('auto_responder')) {
+        if (!$this->db->tableExists('mail_auto_responder')) {
             $this->db->createTable(
-                'auto_responder',
+                'mail_auto_responder',
                 [
                     'sender_id' => [
                         'type' => 'integer',
-                        'length' => 4,
+                        'length' => 8,
                         'notnull' => true
                     ],
                     'receiver_id' => [
                         'type' => 'integer',
-                        'length' => 4,
+                        'length' => 8,
                         'notnull' => true
                     ],
                     'sent_time' => [
@@ -184,7 +184,6 @@ class ilMailDatabaseUpdateSteps implements ilDatabaseUpdateSteps
                 ]
             );
             $this->db->addPrimaryKey('auto_responder', ['sender_id', 'receiver_id']);
-            $this->db->addIndex('auto_responder', ['sent_time']);
         }
     }
 }

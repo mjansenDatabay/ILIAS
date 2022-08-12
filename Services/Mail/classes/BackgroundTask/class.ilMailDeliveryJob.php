@@ -56,9 +56,9 @@ class ilMailDeliveryJob extends AbstractJob
 
         if (isset($context_parameters['auto_responder'])) {
             if ($context_parameters['auto_responder']) {
-                $mail->autoresponder()->enableAutoResponder();
+                $mail->autoresponder()->enableAutoresponder();
             } else {
-                $mail->autoresponder()->disableAutoResponder();
+                $mail->autoresponder()->disableAutoresponder();
             }
         }
 

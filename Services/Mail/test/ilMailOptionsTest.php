@@ -70,8 +70,8 @@ class ilMailOptionsTest extends ilMailBaseTest
         $this->assertSame($object->absence_status, $mailOptions->getAbsenceStatus());
         $this->assertSame($object->absent_from, $mailOptions->getAbsentFrom());
         $this->assertSame($object->absent_until, $mailOptions->getAbsentUntil());
-        $this->assertSame($object->absence_ar_subject, $mailOptions->getAbsenceAutoResponderSubject());
-        $this->assertSame($object->absence_ar_body, $mailOptions->getAbsenceAutoResponderBody());
+        $this->assertSame($object->absence_ar_subject, $mailOptions->getAbsenceAutoresponderSubject());
+        $this->assertSame($object->absence_ar_body, $mailOptions->getAbsenceAutoresponderBody());
     }
 
     /**
@@ -116,7 +116,6 @@ class ilMailOptionsTest extends ilMailBaseTest
 
     public function provideMailOptionsData() : Generator
     {
-
         yield 'correct configuration' => [
             'absence_status' => true,
             'absent_from' => 100,
@@ -151,6 +150,5 @@ class ilMailOptionsTest extends ilMailBaseTest
             'absent_until' => 100 + 1,
             'result' => true,
         ];
-
     }
 }
