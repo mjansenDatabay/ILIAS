@@ -11,7 +11,7 @@ fi
 
 for file in $langfiles
 do
-  duplicates=$(sort "$file" | uniq -d | grep -v "^/*\*")
+  duplicates=$(cat ${file} | php -r '$c=explode("\n",file_get_contents("php://stdin"));array_multisort($c);file_put_contents("php://stdout",join("\n",$c));' | uniq -d | grep -v "^/*\*")
   if [ ! -z "$duplicates" ]
   then
     echo "Duplicate entries in ${file}: ${duplicates}"
