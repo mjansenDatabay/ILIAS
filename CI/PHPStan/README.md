@@ -22,3 +22,27 @@ If you want to just check and show violations directly (without csv-report), you
 ```bash
 ./libs/composer/vendor/bin/phpstan analyse -c ./CI/PHPStan/legacy_ui.neon -a ./libs/composer/vendor/autoload.php --no-interaction --no-progress Modules/File 
 ```
+
+# Example Configuration File to include Custom Rules and Services:
+
+```yaml
+includes:
+  - CI/PHPStan/phpstan.neon
+  - phpstan-baseline.neon
+parameters:
+  level: 6
+rules:
+  - ILIAS\CI\PHPStan\rules\NoTriggerErrorFunctionCallRule
+  - ILIAS\CI\PHPStan\rules\NoSilenceOperatorRule
+  - ILIAS\CI\PHPStan\rules\NoScriptTerminationRule
+  - ILIAS\CI\PHPStan\rules\NoEvalFunctionCallRule
+  - ILIAS\CI\PHPStan\rules\NoDatabaseUsageInControllersRule
+  - ILIAS\CI\PHPStan\rules\NoGlobalsExceptDicRule
+  - ILIAS\CI\PHPStan\rules\NoArrayAccessOnGlobalsExceptDicRule
+  - ILIAS\CI\PHPStan\rules\NoUserInterfaceComponentsInNonControllersRule
+services:
+  -
+    class: ILIAS\CI\PHPStan\services\SuffixBasedControllerDetermination
+    arguments:
+      suffix: "GUI"
+```
