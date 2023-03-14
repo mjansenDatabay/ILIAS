@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,7 +16,9 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\CI\PHPStan\rules;
+declare(strict_types=1);
+
+namespace ILIAS\CI\PHPStan\Rules;
 
 use PHPStan\Rules\Rule;
 use PhpParser\Node;
@@ -27,12 +27,12 @@ use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Type\ObjectType;
 use ilDBInterface;
-use ILIAS\CI\PHPStan\services\ControllerDetermination;
+use ILIAS\CI\PHPStan\Services\ControllerDetermination;
 
 final class NoDatabaseUsageInControllersRule implements Rule
 {
     public function __construct(
-        private ControllerDetermination $determination
+        private readonly ControllerDetermination $determination
     ) {
     }
 
@@ -63,7 +63,7 @@ final class NoDatabaseUsageInControllersRule implements Rule
 
         return [
             RuleErrorBuilder::message(
-                'A controller class must not call any method of ilDBInterface'
+                'A controller class must not call any method of ' . ilDBInterface::class
             )->build(),
         ];
     }

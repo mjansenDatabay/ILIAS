@@ -32,14 +32,14 @@ includes:
 parameters:
   level: 6
 rules:
-  - ILIAS\CI\PHPStan\rules\NoTriggerErrorFunctionCallRule
-  - ILIAS\CI\PHPStan\rules\NoSilenceOperatorRule
-  - ILIAS\CI\PHPStan\rules\NoScriptTerminationRule
-  - ILIAS\CI\PHPStan\rules\NoEvalFunctionCallRule
-  - ILIAS\CI\PHPStan\rules\NoDatabaseUsageInControllersRule
-  - ILIAS\CI\PHPStan\rules\NoGlobalsExceptDicRule
-  - ILIAS\CI\PHPStan\rules\NoArrayAccessOnGlobalsExceptDicRule
-  - ILIAS\CI\PHPStan\rules\NoUserInterfaceComponentsInNonControllersRule
+  - ILIAS\CI\PHPStan\Rules\NoTriggerErrorFunctionCallRule
+  - ILIAS\CI\PHPStan\Rules\NoSilenceOperatorRule
+  - ILIAS\CI\PHPStan\Rules\NoScriptTerminationRule
+  - ILIAS\CI\PHPStan\Rules\NoEvalFunctionCallRule
+  - ILIAS\CI\PHPStan\Rules\NoDatabaseUsageInControllersRule
+  - ILIAS\CI\PHPStan\Rules\NoGlobalsExceptDicRule
+  - ILIAS\CI\PHPStan\Rules\NoArrayAccessOnGlobalsExceptDicRule
+  - ILIAS\CI\PHPStan\Rules\NoUserInterfaceComponentsInNonControllersRule
 services:
   -
     class: ILIAS\CI\PHPStan\services\SuffixBasedControllerDetermination

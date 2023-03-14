@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,26 +16,28 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\CI\PHPStan\rules;
+declare(strict_types=1);
+
+namespace ILIAS\CI\PHPStan\Rules;
 
 use PHPStan\Rules\Rule;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PhpParser\Node\Expr\ErrorSuppress;
 use PHPStan\Rules\RuleErrorBuilder;
-use PhpParser\Node\Expr\Exit_;
 
-final class NoScriptTerminationRule implements Rule
+final class NoSilenceOperatorRule implements Rule
 {
     public function getNodeType(): string
     {
-        return Exit_::class;
+        return ErrorSuppress::class;
     }
 
     public function processNode(Node $node, Scope $scope): array
     {
         return [
             RuleErrorBuilder::message(
-                'You must not terminate a script with die() or exit()'
+                'You must not use the silencing operator (@)'
             )->build(),
         ];
     }

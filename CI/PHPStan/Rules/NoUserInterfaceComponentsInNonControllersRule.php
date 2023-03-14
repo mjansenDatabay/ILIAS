@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,7 +16,9 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\CI\PHPStan\rules;
+declare(strict_types=1);
+
+namespace ILIAS\CI\PHPStan\Rules;
 
 use PHPStan\Rules\Rule;
 use PhpParser\Node;
@@ -26,7 +26,7 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Type\ObjectType;
-use ILIAS\CI\PHPStan\services\ControllerDetermination;
+use ILIAS\CI\PHPStan\Services\ControllerDetermination;
 use ilTabsGUI;
 use ilTemplate;
 use ilGlobalTemplateInterface;
@@ -47,7 +47,7 @@ final class NoUserInterfaceComponentsInNonControllersRule implements Rule
     ];
 
     public function __construct(
-        private ControllerDetermination $determination
+        private readonly ControllerDetermination $determination
     ) {
     }
 

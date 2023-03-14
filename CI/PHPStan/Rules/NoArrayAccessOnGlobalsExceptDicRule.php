@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,7 +16,9 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\CI\PHPStan\rules;
+declare(strict_types=1);
+
+namespace ILIAS\CI\PHPStan\Rules;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
@@ -45,7 +45,7 @@ final class NoArrayAccessOnGlobalsExceptDicRule implements Rule
 
         if ($node->var->name === 'GLOBALS' && $node->dim !== null) {
             $infered_type = $scope->getType($node->dim);
-            if ($infered_type->isString() && $infered_type->getValue() !== 'DIC') {
+            if ($infered_type->isString()->maybe() && $infered_type->getValue() !== 'DIC') {
                 return [
                     RuleErrorBuilder::message(
                         'You must not use global variables except $DIC: ' . $infered_type->getValue()

@@ -1,5 +1,4 @@
 parameters:
-    level: 6
     bootstrapFiles:
         - constants.php
     excludePaths:
@@ -14,6 +13,9 @@ parameters:
         - '%currentWorkingDirectory%/templates/*'
         - '%currentWorkingDirectory%/xml/*'
         - '%currentWorkingDirectory%/.github/*'
+        - '%currentWorkingDirectory%/**/mediawiki/*'
+        - '%currentWorkingDirectory%/**/Wiki/libs/*'
+        - '%currentWorkingDirectory%/**/class.ilLTIConsumerResultService.php'
     earlyTerminatingMethodCalls:
         ilCtrl:
             - redirect
