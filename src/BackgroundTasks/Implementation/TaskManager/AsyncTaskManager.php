@@ -22,11 +22,13 @@ use ILIAS\BackgroundTasks\Bucket;
 use ILIAS\BackgroundTasks\Implementation\Bucket\State;
 use ILIAS\BackgroundTasks\Implementation\Tasks\UserInteraction\UserInteractionRequiredException;
 use ILIAS\BackgroundTasks\Implementation\Tasks\UserInteraction\UserInteractionSkippedException;
-use ILIAS\BackgroundTasks\Task\UserInteraction;
 
 class AsyncTaskManager extends BasicTaskManager
 {
     public const CMD_START_WORKER = 'startBackgroundTaskWorker';
+    /** @var list<Bucket> */
+    private $bucket_stack = [];
+    private ?\Closure $execution_closure = null;
 
     /**
      * This will add an Observer of the Task and start running the task.
@@ -40,30 +42,39 @@ class AsyncTaskManager extends BasicTaskManager
         $bucket->setCurrentTask($bucket->getTask());
         $DIC->backgroundTasks()->persistence()->saveBucketAndItsTasks($bucket);
 
-        $DIC->logger()->root()->info("[BT] Trying to call webserver");
+        $this->bucket_stack[] = $bucket;
 
-        // Call SOAP-Server
-        $soap_client = new \ilSoapClient();
-        $soap_client->setResponseTimeout(1);
-        $soap_client->enableWSDL(true);
-        $soap_client->init();
-        $session_id = session_id();
-        $client_id = $DIC->http()->wrapper()->cookie()->has('ilClientId')
-            ? $DIC->http()->wrapper()->cookie()->retrieve(
-                'ilClientId',
-                $DIC->refinery()->kindlyTo()->string()
-            )
-            : '';
-        try {
-            $soap_client->call(self::CMD_START_WORKER, array(
-                $session_id . '::' . $client_id,
-            ));
-        } catch (\Throwable $t) {
-            $DIC->logger()->root()->info("[BT] Calling Webserver failed, fallback to sync version");
-            $sync_manager = new SyncTaskManager($this->persistence);
-            $sync_manager->run($bucket);
-        } finally {
-            $DIC->logger()->root()->info("[BT] Calling webserver successful");
+        $logger = $DIC->logger()->root();
+
+        if ($this->execution_closure === null) {
+            $this->execution_closure = function () use ($logger) {
+                $logger->info("[BT] Trying to call webserver");
+
+                $soap_client = new \ilSoapClient();
+                $soap_client->setResponseTimeout(0);
+                $soap_client->enableWSDL(true);
+                $soap_client->init();
+                $session_id = session_id();
+
+                try {
+                    $soap_client->call(self::CMD_START_WORKER, [
+                        $session_id . '::' . (defined('CLIENT_ID') ? CLIENT_ID : '')
+                    ]);
+                } catch (\Throwable $e) {
+                    $logger->error("[BT] Calling Webserver failed, fallback to sync version");
+                    $logger->error($e->getMessage());
+                    $logger->error($e->getTraceAsString());
+
+                    $sync_manager = new SyncTaskManager($this->persistence);
+                    foreach ($this->bucket_stack as $bucket) {
+                        $sync_manager->run($bucket);
+                    }
+                } finally {
+                    $logger->info("[BT] Calling webserver successful");
+                }
+            };
+
+            register_shutdown_function($this->execution_closure);
         }
     }
 
