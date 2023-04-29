@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 namespace ILIAS\Setup;
 
@@ -185,7 +185,8 @@ class ImplementationOfAgentFinder implements AgentFinder
         $names = [];
         foreach ($directories as $dir) {
             $groups = [];
-            if (preg_match("%^" . __DIR__ . "/[.][.]/[.][.]/Customizing/global/plugins/((Modules)|(Services))/((\\w+/){2})([^/\.]+)(/|$)%", (string) $dir, $groups)) {
+            $current_dir = str_replace("\\", "/", __DIR__);
+            if (preg_match("%^" .  $current_dir . "/[.][.]/[.][.]/Customizing/global/plugins/((Modules)|(Services))/((\\w+/){2})([^/.]+)(/|$)%", (string) $dir, $groups)) {
                 $name = $groups[6];
                 if (isset($names[$name])) {
                     continue;
