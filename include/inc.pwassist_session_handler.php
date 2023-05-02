@@ -113,32 +113,25 @@ function db_pwassist_session_find($user_id)
     return $data;
 }
 
-/**
-* Writes serialized session data to the database.
-*
-* @param	integer		$pwassist_id	secure id
-* @param	integer		$maxlifetime	session max lifetime in seconds
-* @param	integer		$user_id		user id
-*/
-function db_pwassist_session_write($pwassist_id, $maxlifetime, $user_id)
+function db_pwassist_session_write($pwassist_id, $maxlifetime, $user_id, string $token): bool
 {
     global $DIC;
 
     $ilDB = $DIC->database();
 
     $q = "DELETE FROM usr_pwassist " .
-         "WHERE pwassist_id = " . $ilDB->quote($pwassist_id, "text") . " " .
-         "OR user_id = " . $ilDB->quote($user_id, 'integer');
+         "WHERE pwassist_id = " . $ilDB->quote($pwassist_id, ilDBConstants::T_TEXT) . " " .
+         "OR user_id = " . $ilDB->quote($user_id, ilDBConstants::T_INTEGER);
     $ilDB->manipulate($q);
 
     $ctime = time();
     $expires = $ctime + $maxlifetime;
     $ilDB->manipulateF(
         "INSERT INTO usr_pwassist " .
-        "(pwassist_id, expires, user_id,  ctime) " .
+        "(pwassist_id, expires, user_id, ctime, token) " .
         "VALUES (%s,%s,%s,%s)",
-        array("text", "integer", "integer", "integer"),
-        array($pwassist_id, $expires, $user_id, $ctime)
+        [ilDBConstants::T_TEXT, ilDBConstants::T_INTEGER, ilDBConstants::T_INTEGER, ilDBConstants::T_INTEGER, ilDBConstants::T_TEXT],
+        [$pwassist_id, $expires, $user_id, $ctime, $token]
     );
 
     return true;

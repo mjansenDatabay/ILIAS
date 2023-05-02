@@ -1679,3 +1679,16 @@ if (!$ilDB->indexExistsByFields('style_usage', array('style_id'))) {
     $ilDB->addIndex('style_usage', array('style_id'), 'i1');
 }
 ?>
+<#97>
+<?php
+if ($ilDB->tableExists('usr_pwassist') && !$ilDB->indexExistsByFields('usr_pwassist', 'token')) {
+    $ilDB->manipulate('TRUNCATE TABLE usr_pwassist');
+
+    $field_infos = [
+        'type' => 'text',
+        'notnull' => true,
+        'length' => 100
+    ];
+    $ilDB->addTableColumn('usr_pwassist', 'token', $field_infos);
+}
+?>

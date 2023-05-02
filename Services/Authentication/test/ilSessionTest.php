@@ -89,7 +89,7 @@ class ilSessionTest extends TestCase
         $result = "";
         
         // write session
-        db_pwassist_session_write("12345", 60, $ilUser->getId());
+        db_pwassist_session_write("12345", 60, $ilUser->getId(), 'phpunittoken');
         
         // find
         $res = db_pwassist_session_find($ilUser->getId());
@@ -102,6 +102,10 @@ class ilSessionTest extends TestCase
         if ($res["user_id"] == $ilUser->getId()) {
             $result .= "read-";
         }
+
+        if ($res["user_id"] == 'phpunittoken') {
+            $result .= "withtoken-";
+        }
         
         // destroy
         db_pwassist_session_destroy("12345");
@@ -112,6 +116,6 @@ class ilSessionTest extends TestCase
 
         db_pwassist_session_gc();
 
-        $this->assertEquals("find-read-destroy-", $result);
+        $this->assertEquals("find-read-withtoken-destroy", $result);
     }
 }

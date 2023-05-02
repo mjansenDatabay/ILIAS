@@ -301,13 +301,16 @@ class ilPasswordAssistanceGUI
             // Create a new session id
             // #9700 - this didn't do anything before?!
             // db_set_save_handler();
+            $token = str_replace('+', '.', base64_encode(ilPasswordUtils::getBytes(32)));
+
             session_start();
             $pwassist_session['pwassist_id'] = db_pwassist_create_id();
             session_destroy();
             db_pwassist_session_write(
                 $pwassist_session['pwassist_id'],
                 3600,
-                $userObj->getId()
+                $userObj->getId(),
+                $token
             );
         }
 
@@ -316,7 +319,8 @@ class ilPasswordAssistanceGUI
             [
                 'client_id' => $this->ilias->getClientId(),
                 'lang' => $this->lng->getLangKey(),
-                'key' => $pwassist_session['pwassist_id']
+                'key' => $pwassist_session['pwassist_id'],
+                'token' => $token
             ]
         );
 
@@ -359,7 +363,7 @@ class ilPasswordAssistanceGUI
      * @param string $pwassist_id
      * @return ilPropertyFormGUI
      */
-    protected function getAssignPasswordForm($pwassist_id)
+    protected function getAssignPasswordForm($pwassist_id, string $token)
     {
         require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
         $form = new ilPropertyFormGUI();
@@ -380,6 +384,10 @@ class ilPasswordAssistanceGUI
         $key->setValue($pwassist_id);
         $form->addItem($key);
 
+        $token_input = new ilHiddenInputGUI('token');
+        $token_input->setValue($token);
+        $form->addItem($token_input);
+
         $form->addCommandButton('submitAssignPasswordForm', $this->lng->txt('submit'));
 
         return $form;
@@ -397,14 +405,21 @@ class ilPasswordAssistanceGUI
      * @param ilPropertyFormGUI $form
      * @param string            $pwassist_id
      */
-    public function showAssignPasswordForm(ilPropertyFormGUI $form = null, $pwassist_id = '')
-    {
+    public function showAssignPasswordForm(
+        ilPropertyFormGUI $form = null,
+        $pwassist_id = '',
+        string $token = ''
+    ) {
         require_once 'include/inc.pwassist_session_handler.php';
         require_once 'Services/Language/classes/class.ilLanguage.php';
 
         // Retrieve form data
         if (!$pwassist_id) {
             $pwassist_id = $_GET['key'];
+        }
+
+        if ($token === '') {
+            $token = $_GET['token'] ?? '';
         }
 
         // Retrieve the session, and check if it is valid
@@ -416,6 +431,9 @@ class ilPasswordAssistanceGUI
         ) {
             ilUtil::sendFailure($this->lng->txt('pwassist_session_expired'));
             $this->showAssistanceForm(null);
+        } elseif ($pwassist_session['token'] !== $token) {
+            ilUtil::sendFailure($this->lng->txt('pwassist_session_invalid'));
+            $this->showAssistanceForm(null);
         } else {
             $tpl = ilStartUpGUI::initStartUpTemplate('tpl.pwassist_assignpassword.html', true);
             $tpl->setVariable('IMG_PAGEHEADLINE', ilUtil::getImagePath('icon_auth.svg'));
@@ -424,7 +442,7 @@ class ilPasswordAssistanceGUI
             $tpl->setVariable('TXT_ENTER_USERNAME_AND_NEW_PASSWORD', $this->lng->txt('pwassist_enter_username_and_new_password'));
 
             if (!$form) {
-                $form = $this->getAssignPasswordForm($pwassist_id);
+                $form = $this->getAssignPasswordForm($pwassist_id, $token);
             }
             $tpl->setVariable('FORM', $form->getHTML());
             //$this->fillPermanentLink(self::PERMANENT_LINK_TARGET_PW);
@@ -465,6 +483,7 @@ class ilPasswordAssistanceGUI
         $username = $form->getInput('username');
         $password = $form->getInput('password');
         $pwassist_id = $form->getInput('key');
+        $token = $form->getInput('token');
 
         // Retrieve the session
         $pwassist_session = db_pwassist_session_read($pwassist_id);
@@ -478,6 +497,10 @@ class ilPasswordAssistanceGUI
             $form->setValuesByPost();
             $this->showAssistanceForm($form);
             return;
+        } elseif($pwassist_session['token'] !== $token) {
+            ilUtil::sendFailure(str_replace("\\n", '', $this->lng->txt('pwassist_session_invalid')));
+            $form->setValuesByPost();
+            $this->showAssistanceForm($form);
         } else {
             $is_successful = true;
             $message = '';
