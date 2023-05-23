@@ -7,7 +7,6 @@
 		"optimize-autoloader": true,
 		"vendor-dir": "./libs/composer/vendor",
 		"allow-plugins": {
-			"simplesamlphp/composer-module-installer": true,
 			"cweagans/composer-patches": true,
 			"captainhook/plugin-composer": true
 		}
@@ -65,7 +64,6 @@
 		"ramsey/uuid": "4.4.0",
 		"enshrined/svg-sanitize": "^0.15.0",
 		"guzzlehttp/guzzle": "^7.0",
-		"simplesamlphp/simplesamlphp": "^1.19.8",
 		"seld/jsonlint": "^1.8",
 		"ext-xml": "*",
 		"jasig/phpcas": "^1.4",
