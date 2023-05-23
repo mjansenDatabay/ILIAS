@@ -8,7 +8,8 @@
 		"vendor-dir": "./libs/composer/vendor",
 		"allow-plugins": {
 			"cweagans/composer-patches": true,
-			"captainhook/plugin-composer": true
+			"captainhook/plugin-composer": true,
+			"simplesamlphp/composer-module-installer": true
 		}
 	},
 	"scripts": {
@@ -67,7 +68,8 @@
 		"seld/jsonlint": "^1.8",
 		"ext-xml": "*",
 		"jasig/phpcas": "^1.4",
-		"league/commonmark": "^2.3"
+		"league/commonmark": "^2.3",
+		"simplesamlphp/simplesamlphp": "^2.0"
 	},
 	"require-dev": {
 		"mikey179/vfsstream": "^1.6",
