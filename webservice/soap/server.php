@@ -21,7 +21,9 @@ const IL_SOAPMODE = IL_SOAPMODE_INTERNAL;
 include_once "Services/Context/classes/class.ilContext.php";
 ilContext::init(ilContext::CONTEXT_SOAP);
 
-require_once("./Services/Init/classes/class.ilIniFile.php");
+// databay-patch: begin internal soap url
+require_once("./libs/composer/vendor/autoload.php");
+// databay-patch: end internal soap url
 $ilIliasIniFile = new ilIniFile("./ilias.ini.php");
 $ilIliasIniFile->read();
 
@@ -50,5 +52,8 @@ if (IL_SOAPMODE === IL_SOAPMODE_INTERNAL && strcasecmp($_SERVER["REQUEST_METHOD"
     $soapServer->handle();
 } else {
     // This is a request to display the available SOAP methods or WSDL...
+    // databay-patch: begin internal soap url
+    ilInitialisation::initILIAS();
+    // databay-patch: end internal soap url
     include('webservice/soap/nusoapserver.php');
 }

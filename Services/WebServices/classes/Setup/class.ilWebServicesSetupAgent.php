@@ -62,6 +62,12 @@ class ilWebServicesSetupAgent implements Setup\Agent
                 (int) ($data["soap_response_timeout"] ?? ilSoapClient::DEFAULT_RESPONSE_TIMEOUT),
                 $data["rpc_server_host"] ?? "",
                 (int) ($data["rpc_server_port"] ?? 0),
+                // databay-patch: begin internal soap url
+                (string) ($data['soap_internal_wsdl_path'] ?? ''),
+                (bool) ($data['soap_internal_wsdl_verify_peer'] ?? true),
+                (bool) ($data['soap_internal_wsdl_verify_peer_name'] ?? true),
+                (bool) ($data['soap_internal_wsdl_allow_self_signed'] ?? false),
+                // databay-patch: end internal soap url
             );
         });
     }

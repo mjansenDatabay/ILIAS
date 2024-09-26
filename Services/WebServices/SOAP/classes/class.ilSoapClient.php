@@ -79,8 +79,13 @@ class ilSoapClient
 
     public function init(): bool
     {
+        // databay-patch: begin internal soap url
+        $internal_path = $this->settings->get('soap_internal_wsdl_path');
         if (trim($this->getServer()) === '') {
-            if (trim($this->settings->get('soap_wsdl_path', '')) !== '') {
+            if ($internal_path) {
+                $this->uri = $internal_path;
+            } elseif (trim($this->settings->get('soap_wsdl_path', '')) !== '') {
+                // databay-patch: end internal soap url
                 $this->uri = $this->settings->get('soap_wsdl_path', '');
             } else {
                 $this->uri = ilUtil::_getHttpPath() . '/webservice/soap/server.php?wsdl';
@@ -97,7 +102,16 @@ class ilSoapClient
                 array(
                     'exceptions' => true,
                     'trace' => 1,
-                    'connection_timeout' => $this->getTimeout()
+                    // databay-patch: begin internal soap url
+                    'connection_timeout' => $this->getTimeout(),
+                    'stream_context' => $this->uri === $internal_path ? stream_context_create([
+                        'ssl' => [
+                            'verify_peer' => (bool) $this->settings->get('soap_internal_wsdl_verify_peer', '1'),
+                            'verify_peer_name' => (bool) $this->settings->get('soap_internal_wsdl_verify_peer_name', '1'),
+                            'allow_self_signed' => (bool) $this->settings->get('soap_internal_wsdl_allow_self_signed', ''),
+                        ]
+                    ]) : null
+                    // databay-patch: end internal soap url
                 )
             );
             return true;

@@ -14,6 +14,13 @@ class ilWebServicesSetupConfig implements Setup\Config
     protected string $rpc_server_host;
     protected int $rpc_server_port;
 
+    // databay-patch: begin internal soap url
+    protected string $soap_internal_wsdl_path;
+    protected bool $soap_internal_wsdl_verify_peer;
+    protected bool $soap_internal_wsdl_verify_peer_name;
+    protected bool $soap_internal_wsdl_allow_self_signed;
+    // databay-patch: end internal soap url
+
     /**
      * @var int
      */
@@ -25,7 +32,13 @@ class ilWebServicesSetupConfig implements Setup\Config
         int $soap_connect_timeout,
         int $soap_response_timeout,
         string $rpc_server_host,
-        int $rpc_server_port
+        // databay-patch: begin internal soap url
+        int $rpc_server_port,
+        string $soap_internal_wsdl_path,
+        bool $soap_internal_wsdl_verify_peer,
+        bool $soap_internal_wsdl_verify_peer_name,
+        bool $soap_internal_wsdl_allow_self_signed,
+        // databay-patch: end internal soap url
     ) {
         $this->soap_user_administration = $soap_user_administration;
         $this->soap_wsdl_path = $soap_wsdl_path;
@@ -33,6 +46,13 @@ class ilWebServicesSetupConfig implements Setup\Config
         $this->rpc_server_host = $rpc_server_host;
         $this->rpc_server_port = $rpc_server_port;
         $this->soap_response_timeout = $soap_response_timeout;
+
+        // databay-patch: begin internal soap url
+        $this->soap_internal_wsdl_path = $soap_internal_wsdl_path;
+        $this->soap_internal_wsdl_verify_peer = $soap_internal_wsdl_verify_peer;
+        $this->soap_internal_wsdl_verify_peer_name = $soap_internal_wsdl_verify_peer_name;
+        $this->soap_internal_wsdl_allow_self_signed = $soap_internal_wsdl_allow_self_signed;
+        // databay-patch: end internal soap url
     }
 
     public function isSOAPUserAdministration(): bool
@@ -64,4 +84,26 @@ class ilWebServicesSetupConfig implements Setup\Config
     {
         return $this->soap_response_timeout;
     }
+
+    // databay-patch: begin internal soap url
+    public function getSoapInternalWsdlPath(): string
+    {
+        return $this->soap_internal_wsdl_path;
+    }
+
+    public function getSoapInternalWsdlVerifyPeer(): bool
+    {
+        return $this->soap_internal_wsdl_verify_peer;
+    }
+
+    public function getSoapInternalWsdlVerifyPeerName(): bool
+    {
+        return $this->soap_internal_wsdl_verify_peer_name;
+    }
+
+    public function getSoapInternalWsdlAllowSelfSigned(): bool
+    {
+        return $this->soap_internal_wsdl_allow_self_signed;
+    }
+    // databay-patch: end internal soap url
 }
