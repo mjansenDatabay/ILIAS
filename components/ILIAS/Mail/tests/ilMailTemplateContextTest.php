@@ -22,6 +22,7 @@ use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use OrgUnit\PublicApi\OrgUnitUserService;
 use OrgUnit\User\ilOrgUnitUser;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ilMailTemplateContextTest extends ilMailBaseTestCase
 {
@@ -66,7 +67,6 @@ class ilMailTemplateContextTest extends ilMailBaseTestCase
     /**
      * @param Closure(): MockBuilder<ilOrgUnitUser> $mock_builder
      * @return array<int, ilOrgUnitUser&MockObject>
-     * @throws ReflectionException
      */
     private function generateOrgUnitUsers(Closure $mock_builder, int $amount): array
     {
@@ -86,8 +86,7 @@ class ilMailTemplateContextTest extends ilMailBaseTestCase
     }
 
     /**
-     * @return array<string, array{0: callable, 1: callable}>
-     * @throws ReflectionException
+     * @return array<string, array{0: Closure(Closure(): MockBuilder<ilObjUser>): ilObjUser, 1: Closure(Closure(): MockBuilder<ilOrgUnitUser>): array{0: ilOrgUnitUser, 1: list<ilOrgUnitUser>}}>
      */
     public static function userProvider(): array
     {
@@ -132,7 +131,6 @@ class ilMailTemplateContextTest extends ilMailBaseTestCase
             /**
              * @param Closure(): MockBuilder<ilOrgUnitUser> $mock_builder
              * @return array{0: ilOrgUnitUser&MockObject, 1: list<ilOrgUnitUser&MockObject>}
-             * @throws ReflectionException
              */
             $ou_user_callable = function (Closure $mock_builder) use ($definition): array {
                 $ou_user = $mock_builder()
@@ -157,11 +155,10 @@ class ilMailTemplateContextTest extends ilMailBaseTestCase
     }
 
     /**
-     * @dataProvider userProvider
-     * @param callable(Closure(): MockBuilder<ilObjUser>): ilObjUser                                           $user_callable
-     * @param callable(Closure(): MockBuilder<ilOrgUnitUser>): array{0: ilOrgUnitUser, 1: list<ilOrgUnitUser>} $ou_user_callable
-     * @throws ReflectionException
+     * @param Closure(Closure(): MockBuilder<ilObjUser>): ilObjUser                                           $user_callable
+     * @param Closure(Closure(): MockBuilder<ilOrgUnitUser>): array{0: ilOrgUnitUser, 1: list<ilOrgUnitUser>} $ou_user_callable
      */
+    #[DataProvider('userProvider')]
     public function testGlobalPlaceholdersCanBeResolvedWithCorrespondingValues(
         callable $user_callable,
         callable $ou_user_callable
@@ -173,8 +170,11 @@ class ilMailTemplateContextTest extends ilMailBaseTestCase
             return $this->getMockBuilder(ilOrgUnitUser::class);
         };
 
-        $user = $user_callable->call($this, $mock_builder_user_callable);
-        [$ou_user, $ou_superiors] = $ou_user_callable->call($this, $mock_builder_ou_user_callable);
+        $user_callable = Closure::bind($user_callable, $this, self::class);
+        $ou_user_callable = Closure::bind($ou_user_callable, $this, self::class);
+
+        $user = $user_callable($mock_builder_user_callable);
+        [$ou_user, $ou_superiors] = $ou_user_callable($mock_builder_ou_user_callable);
 
         $ou_service = $this->getMockBuilder(OrgUnitUserService::class)
                            ->disableOriginalConstructor()
@@ -202,7 +202,7 @@ class ilMailTemplateContextTest extends ilMailBaseTestCase
                             ->getMock();
 
         $ou_service->expects($this->atLeastOnce())->method('getUsers')->willReturn([$ou_user,]);
-        $lng->expects($this->atLeastOnce())->method('txt')->will($this->returnArgument(0));
+        $lng->expects($this->atLeastOnce())->method('txt')->willReturnArgument(0);
         $env_helper->expects($this->atLeastOnce())->method('getClientId')->willReturn('###phpunit_client###');
         $env_helper->expects($this->atLeastOnce())->method('getHttpPath')->willReturn('###http_ilias###');
         $lng_helper->expects($this->atLeastOnce())->method('getLanguageByIsoCode')->willReturn($lng);

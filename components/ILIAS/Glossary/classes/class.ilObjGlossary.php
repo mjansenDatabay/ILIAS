@@ -28,7 +28,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     protected array $mob_ids = [];
     protected bool $show_tax = false;
     protected int $style_id = 0;
-    protected bool $downloads_active = false;
     protected bool $glo_menu_active = false;
     protected bool $online = false;
     protected int $snippet_length = 0;
@@ -40,7 +39,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     protected ilGlobalTemplateInterface $tpl;
     public array $auto_glossaries = array();
     protected ilObjUser $user;
-    protected array $public_export_file = [];
 
 
     public function __construct(
@@ -98,14 +96,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $gl_rec = $this->db->fetchAssoc($gl_set);
         $this->setOnline(ilUtil::yn2tf($gl_rec["is_online"]));
         $this->setVirtualMode((string) ($gl_rec["virtual"] ?? ""));
-        if (isset($gl_rec["public_xml_file"]) && $gl_rec["public_xml_file"] != "") {
-            $this->setPublicExportFile("xml", $gl_rec["public_xml_file"]);
-        }
-        if (isset($gl_rec["public_html_file"]) && $gl_rec["public_html_file"] != "") {
-            $this->setPublicExportFile("html", $gl_rec["public_html_file"]);
-        }
         $this->setActiveGlossaryMenu(ilUtil::yn2tf($gl_rec["glo_menu_active"]));
-        $this->setActiveDownloads(ilUtil::yn2tf($gl_rec["downloads_active"]));
         $this->setPresentationMode((string) $gl_rec["pres_mode"]);
         $this->setSnippetLength((int) $gl_rec["snippet_length"]);
         $this->setShowTaxonomy((bool) $gl_rec["show_tax"]);
@@ -231,16 +222,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         return $this->glo_menu_active;
     }
 
-    public function setActiveDownloads(bool $a_down): void
-    {
-        $this->downloads_active = $a_down;
-    }
-
-    public function isActiveDownloads(): bool
-    {
-        return $this->downloads_active;
-    }
-
     public function setShowTaxonomy(bool $a_val): void
     {
         $this->show_tax = $a_val;
@@ -320,10 +301,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
             array(
                 'is_online' => array('text', ilUtil::tf2yn($this->getOnline())),
                 'virtual' => array('text', $this->getVirtualMode()),
-                'public_xml_file' => array('text', $this->getPublicExportFile("xml")),
-                'public_html_file' => array('text', $this->getPublicExportFile("html")),
                 'glo_menu_active' => array('text', ilUtil::tf2yn($this->isActiveGlossaryMenu())),
-                'downloads_active' => array('text', ilUtil::tf2yn($this->isActiveDownloads())),
                 'pres_mode' => array('text', $this->getPresentationMode()),
                 'show_tax' => array('integer', $this->getShowTaxonomy()),
                 'snippet_length' => array('integer', $this->getSnippetLength()),
@@ -506,27 +484,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     public function getExportDirectory(string $a_type = "xml"): string
     {
         return ilExport::_getExportDirectory($this->getId(), $a_type, $this->getType());
-    }
-
-    /**
-     * specify public export file for type
-     * @param	string		$a_type		type ("xml" / "html")
-     * @param	string		$a_file		file name
-     */
-    public function setPublicExportFile(
-        string $a_type,
-        string $a_file
-    ): void {
-        $this->public_export_file[$a_type] = $a_file;
-    }
-
-    /**
-     * get public export file
-     * @param string $a_type type ("xml" / "html")
-     */
-    public function getPublicExportFile(string $a_type): string
-    {
-        return $this->public_export_file[$a_type] ?? "";
     }
 
     public function delete(): bool

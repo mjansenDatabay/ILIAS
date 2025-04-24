@@ -23,7 +23,7 @@ use ILIAS\UI\Component\Input\Container\Form\Form;
 
 /**
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilInfoScreenGUI, ilNoteGUI, ilCommonActionDispatcherGUI
- * @ilCtrl_Calls ilObjDataCollectionGUI: ilPermissionGUI, ilObjectCopyGUI, ilDclExportGUI
+ * @ilCtrl_Calls ilObjDataCollectionGUI: ilPermissionGUI, ilObjectCopyGUI, ilExportGUI
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilDclRecordListGUI, ilDclRecordEditGUI
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilDclDetailedViewGUI
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilDclTableListGUI, ilObjFileGUI
@@ -208,7 +208,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI
 
                 $rgui->setObject($record_id, "dcl_record", $field_id, "dcl_field");
                 $rgui->executeCommand();
-                $this->listRecords();
+                $this->ctrl->redirectToURL($this->http->request()->getServerParams()['HTTP_REFERER']);
                 break;
 
             case strtolower(ilDclDetailedViewGUI::class):
@@ -231,7 +231,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI
                 $this->tabs->clearTargets();
                 $this->tabs->setBackTarget($this->lng->txt("back"), $this->ctrl->getLinkTarget($this, ""));
                 break;
-            case strtolower(ilDclExportGUI::class):
+            case strtolower(ilExportGUI::class):
                 $this->prepareOutput();
                 $this->handleExport();
                 break;
@@ -270,7 +270,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI
     protected function handleExport(bool $do_default = false): void
     {
         $this->tabs->setTabActive(self::TAB_EXPORT);
-        $exp_gui = new ilDclExportGUI($this);
+        $exp_gui = new ilExportGUI($this);
         if ($do_default) {
             $exp_gui->listExportFiles();
         } else {
@@ -281,8 +281,8 @@ class ilObjDataCollectionGUI extends ilObject2GUI
     protected function handleExportAsync(): void
     {
         $this->tabs->setTabActive(self::TAB_EXPORT);
-        $exp_gui = new ilDclExportGUI($this);
-        $exporter = new ilDclContentExporter($this->object->getRefId(), $this->table_id);
+        $exp_gui = new ilExportGUI($this);
+        $exporter = new ilDclContentExporter($this->object->getRefId(), null);
         $exporter->exportAsync();
         $this->ctrl->redirect($exp_gui);
     }
@@ -447,7 +447,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI
                 $this->tabs_gui->addTab(self::TAB_META_DATA, $this->lng->txt('meta_data'), $mdtab);
             }
             // export
-            $this->addTab(self::TAB_EXPORT, $this->ctrl->getLinkTargetByClass(ilDclExportGUI::class, ""));
+            $this->addTab(self::TAB_EXPORT, $this->ctrl->getLinkTargetByClass(ilExportGUI::class, ""));
         }
 
         // edit permissions

@@ -18,23 +18,21 @@
 
 declare(strict_types=1);
 
-/**
- * @author Alex Killing <alex.killing@gmx.de>
- * @author Thibeau Fuhrer <thibeau@sr.solutions>
- */
-class ilUIFramework
+namespace ILIAS\AccessControl\Setup;
+
+class AccessControl10DBUpdateSteps implements \ilDatabaseUpdateSteps
 {
-    public const BOOTSTRAP_JS = "./assets/js/bootstrap.min.js";
+    protected \ilDBInterface $db;
 
-    public static function init(?ilGlobalTemplateInterface $template = null): void
+    public function prepare(\ilDBInterface $db): void
     {
-        global $DIC;
+        $this->db = $db;
+    }
 
-        $template = $template ?? $DIC->ui()->mainTemplate();
-        $template->addJavaScript(
-            self::BOOTSTRAP_JS,
-            true,
-            0
-        );
+    public function step_1(): void
+    {
+        if (!$this->db->indexExistsByFields('rbac_templates', ['type', 'ops_id'])) {
+            $this->db->addIndex('rbac_templates', ['type', 'ops_id'], 'toi');
+        }
     }
 }

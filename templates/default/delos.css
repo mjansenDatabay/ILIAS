@@ -5924,9 +5924,9 @@ a[aria-disabled].il-link.link-bulky:hover {
 .il-maincontrols-slate-content li.il-workflow-step {
   padding: 0 4px;
 }
-.il-maincontrols-slate-content .il-slate-content > .c-form,
-.il-maincontrols-slate-content .il-slate-content > #copg-editor-slate-content > .c-form {
-  padding: 9px 9px;
+.il-maincontrols-slate-content > .c-form,
+.il-maincontrols-slate-content > #copg-editor-slate-content > .c-form {
+  padding: 9px 15px;
 }
 
 .il-maincontrols-slate-close button,
@@ -12919,11 +12919,6 @@ td.chatroom {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ilChatroomUser .dropdown-menu {
-  background-color: #f9f9f9;
-  padding: 10px 0;
-  font-size: 0.75rem;
-}
 .ilChatroomUser .ilChatroomDropdown {
   position: relative;
 }
@@ -12948,11 +12943,8 @@ td.chatroom {
 .ilChatroomUser .media:hover {
   background-color: #e2e8ef;
 }
-.ilChatroomUser .dropdown-menu {
-  position: static;
-  float: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
+.ilChatroomUser .dropdown-menu > li > button.btn {
+  padding-left: 10px;
 }
 .ilChatroomUser .dropdown-backdrop {
   position: static;
@@ -20458,7 +20450,7 @@ div#minheight {
 
 /* see #27399 (should be finally tackled in PLR2) */
 div.ilContentFixed {
-  padding-bottom: 20px;
+  padding-bottom: 60px;
 }
 
 @media only screen and (max-width: 991px) {

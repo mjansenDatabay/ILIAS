@@ -181,7 +181,12 @@ class ilObjAuthSettingsGUI extends ilObjectGUI
         $page_content = [
             $this->ui_factory->panel()->standard(
                 $this->lng->txt('auth_select'),
-                $this->ui_factory->legacy()->content($generalSettingsTpl->get()),
+                $this->ui_factory->legacy()->content(implode('', [
+                    $this->ui_renderer->render($this->ui_factory->messageBox()->info(
+                        $this->lng->txt('auth_mode_default_change_info')
+                    )),
+                    $generalSettingsTpl->get()
+                ])),
             )
         ];
 

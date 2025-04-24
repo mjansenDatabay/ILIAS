@@ -174,6 +174,7 @@ administration#:#auth_auth_mode_determination#:#Authentication Method Determinat
 administration#:#auth_automatic#:#Fixed Sequence
 administration#:#auth_by_user#:#By the User
 administration#:#auth_kind_determination#:#Kind of Determination
+administration#:#auth_mode_default_change_info#:#Changing the default authentication method affects all user accounts configured to use the default authentication method. If the selected default method (e.g., Shibboleth, SAML, SOAP, ...) does not support or is not configured to allow fallback to local ILIAS authentication, affected users may no longer be able to log in. To avoid this, please ensure that local fallback authentication is activated in the configuration of the selected method, or that the authentication method stored for affected user accounts is manually changed.
 administration#:#auth_mode_determination_info#:#Choose either if the users have to select their authentication method on the login screen or if this is managed by a fixed sequence of authentication methods.
 administration#:#clean#:#Clean up
 administration#:#clean_desc#:#Remove invalid references and tree entries. Initialize gaps in tree structure.
@@ -214,7 +215,7 @@ administration#:#language_former_file_equal#:#The file <b>%s</b> is identical to
 administration#:#language_former_file_missing#:#The file <b>%s</b> is missing.
 administration#:#language_import_file#:#Import Language File
 administration#:#language_load_local_changes#:#Load custom language file into the database
-administration#:#language_load_local_changes_info#:#Load the file Customizing/global/lang/ilias_%s.lang.local to the database. New entries of this file are added to the database and existing entries are overwritten.
+administration#:#language_load_local_changes_info#:#Load the file lang/customizing/ilias_%s.lang.local to the database. New entries of this file are added to the database and existing entries are overwritten.
 administration#:#language_loaded_local#:#The custom language file was loaded into the database.
 administration#:#language_local_file_deleted#:#The custom language file was deleted.
 administration#:#language_maintain#:#Maintain
@@ -235,12 +236,12 @@ administration#:#language_mode_existing_replace_info#:#Import new entries and re
 administration#:#language_note_translation#:#Page translation mode is activated for each language separately. Additionally the user needs read and write permission on the language folder.
 administration#:#language_process_maintenance#:#Process Maintenance
 administration#:#language_remove_local_file#:#Delete the custom language file
-administration#:#language_remove_local_file_info#:#Remove the file Customizing/global/lang/ilias_%s.lang.local and change the language status from ‘Installed With Local’ to ‘Installed’. The changes in the database are not touched.
+administration#:#language_remove_local_file_info#:#Remove the file lang/customizing/ilias_%s.lang.local and change the language status from ‘Installed With Local’ to ‘Installed’. The changes in the database are not touched.
 administration#:#language_save_dist#:#Backup the standard language file
 administration#:#language_save_dist_failed#:#The backup of the standard ILIAS language file could not be written.
 administration#:#language_save_dist_info#:#Create a backup of the standard ILIAS language file in the ILIAS data directory. This helps after an ILIAS update to find conflicst of own changes with updated language variables.
 administration#:#language_save_local_changes#:#Save all changes to the custom language file
-administration#:#language_save_local_changes_info#:#Save all locally added or changed database entries to the file Customizing/global/lang/ilias_%s.lang.local and set the language status to ‘Installed With Local’. The web server must have write permission in this folder. Please note that this file is the same for all clients of this installation.
+administration#:#language_save_local_changes_info#:#Save all locally added or changed database entries to the file lang/customizing/ilias_%s.lang.local and set the language status to ‘Installed With Local’. The web server must have write permission in this folder. Please note that this file is the same for all clients of this installation.
 administration#:#language_saved_dist#:#The backup of the standard ILIAS language file is created.
 administration#:#language_scope_added#:#Local additions only
 administration#:#language_scope_added_info#:#Export all entries that are locally added in the database. This can be used to backup additional development entries before local changes are deleted on the tab ‘Maintain’.
@@ -3573,7 +3574,7 @@ common#:#are_you_sure#:#Are you sure?
 common#:#assf_allowed_questiontypes#:#Available Question Types
 common#:#assf_allowed_questiontypes_desc#:#All the checked question types will be available in this ILIAS installation. If you don't want to allow the creation of a certain question type in this installation, you must remove the selection in the associated check box.
 common#:#assf_questiontypes#:#Question Settings
-common#:#assign#:#Accept Request
+common#:#assign#:#Assign
 common#:#assign_global_role#:#Assign to Global Role
 common#:#assign_local_role#:#Assign to Local Role
 common#:#assigned_members#:#Assigned Members
@@ -4575,6 +4576,7 @@ common#:#login_exists#:#There is already a user with this login name! Please cho
 common#:#login_invalid#:#The chosen login is invalid! Only the following characters are allowed (minimum 3 characters): A-Z a-z 0-9 _.-+*@!$%~
 common#:#login_to_ilias#:#Login to ILIAS
 common#:#login_to_ilias_via_cas#:#Login to ILIAS via Central Authentication Service
+common#:#login_to_ilias_via_login_form#:#Login to ILIAS
 common#:#login_to_ilias_via_saml#:#Login to ILIAS via SAML Authentication
 common#:#login_to_ilias_via_shibboleth#:#Login to ILIAS via
 common#:#loginname_already_exists#:#This login name already exists.
@@ -6311,7 +6313,6 @@ content#:#cont_click_starting_point#:#Please click on the starting point of the 
 content#:#cont_click_tl_corner#:#Please click on the top left corner of the desired area.
 content#:#cont_code_import_file#:#Import
 content#:#cont_code_manual_editing#:#Manuelle Eingabe
-content#:#cont_col_ordering#:#Column Ordering
 content#:#cont_colspan#:#Col. Span
 content#:#cont_commented_by#:#Commented by
 content#:#cont_comments#:#Store Comments
@@ -7279,7 +7280,6 @@ content#:#glo_full_definitions_info#:#Terms and definitions are fully displayed 
 content#:#glo_hide_taxonomy#:#Hide Taxonomy
 content#:#glo_list_usages#:#List Usages
 content#:#glo_mode_normal_info#:#All terms created within this glossary will be included.
-content#:#glo_online_info#:#Only if the glossary is online, users are able to use the glossary.
 content#:#glo_presentation_mode#:#Presentation Mode
 content#:#glo_presentation_view#:#Presentation View
 content#:#glo_quick_navigation#:#Quick Navigation
@@ -7393,6 +7393,7 @@ copg#:#copg_more_character_formats#:#More Styles for Characters
 copg#:#copg_obj_types#:#Object Types
 copg#:#copg_page_element_not_found#:#Page element not found.
 copg#:#copg_page_type_stys#:#Layout Page
+copg#:#copg_pages#:#Pages
 copg#:#copg_par_format_selection#:#Paragraph Format Selection
 copg#:#copg_pc_mob_does_not_exist#:#This media object does not exist.
 copg#:#copg_plugin_not_avail#:#Plugin %s not available.
@@ -8727,9 +8728,8 @@ dcl#:#dcl_next_record#:#Next Entry
 dcl#:#dcl_no_content_warning#:#Attention, the Data Collection is online but does not have content yet!
 dcl#:#dcl_no_entries#:#No entries
 dcl#:#dcl_no_entry#:#No entry
-dcl#:#dcl_no_export_content_available#:#No data available for export.
+dcl#:#dcl_no_export_async_config#:#No SOAP Configuration for asyncronous exports available.
 dcl#:#dcl_no_export_data_available#:#No data or fields available for export.
-dcl#:#dcl_no_export_fields_available#:#No fields activated for export. Mark at least one field as exportable in the <a href="%s">table settings</a>.
 dcl#:#dcl_no_fields_yet#:#There are no fields defined for this table thus you cannot create any entries yet.
 dcl#:#dcl_no_read_access_on_any_standard_view#:#You don't have read access on any standard view of a table.
 dcl#:#dcl_no_search_results_found_for#:#No modules have been found for
@@ -8859,7 +8859,7 @@ dcl#:#dcl_width_desc#:#The file will be resized to the given width.
 dcl#:#dcl_wrong_input_type#:#The value you entered does not match the specification (Wrong Type).
 dcl#:#dcl_wrong_length#:#The text you entered is to long.
 dcl#:#dcl_wrong_regex#:#The text you entered does not match the specification for this field (Regular Expression).
-dcl#:#dcl_xls_async_export#:#Asynchronous XLSX-Export
+dcl#:#dcl_xls_async_export#:#as XLSX (asynchronous)
 dcl#:#disable_comments#:#Disable comments
 dcl#:#disable_visible#:#Disable visible
 dcl#:#enable_comments#:#Enable comments
@@ -10205,7 +10205,6 @@ glo#:#glo_bulk_creation#:#Paste From Excel
 glo#:#glo_change_to_collection_unavailable_info#:#To change the type of content assembly to "Collection Glossary", you first have to delete all existing terms within this glossary in tab "Content".
 glo#:#glo_change_to_standard_unavailable_info#:#To change the type of content assembly to "Standard Glossary", you first have to remove the selected glossaries in tab "Content".
 glo#:#glo_check#:#Check
-glo#:#glo_col_ordering_info#:#Order the titles of the metadata fields. They are presented as column headers in the table presentation of the glossary.
 glo#:#glo_collection#:#Collection Glossary
 glo#:#glo_collection_empty_info#:#This collection glossary is currently empty. Please add at least one glossary to it.
 glo#:#glo_collection_info#:#The glossary automatically collects all terms from the selected glossaries.
@@ -13534,7 +13533,6 @@ prg#:#prg_remove_user#:#Remove Assignment
 prg#:#prg_remove_user_success#:#Assignment removed successfully.
 prg#:#prg_remove_users_not_possible#:#Remove Selected Users Not Possible
 prg#:#prg_remove_users_partial_success#:#Assignments (partially) removed.
-prg#:#prg_remove_users_partitial_success#:#Remove Selected Users Particially
 prg#:#prg_remove_users_success#:#Remove Selected Users
 prg#:#prg_restart_assignments_temporal_progress_desc#:#Restart Studyprogramme assignments with progresses about to expire
 prg#:#prg_restart_assignments_temporal_progress_title#:#Restart Studyprogramme assignments
@@ -14064,7 +14062,7 @@ rbac#:#coms_read#:#User has read access to administration of Comments.
 rbac#:#coms_visible#:#Administration of Comments is visible.
 rbac#:#coms_write#:#User can edit settings of administration of Comments.
 rbac#:#condition_failed#:#Failed
-rbac#:#condition_learning_progress#:#Learning Progress Status: Completed
+rbac#:#condition_learning_progress#:#Derive from Learning Progress
 rbac#:#condition_result_range_percentage#:#Result Range
 rbac#:#contribute#:#Contribute
 rbac#:#copa_copy#:#Copy Content Page
@@ -14166,6 +14164,7 @@ rbac#:#feed_delete#:#User can move or delete web feed
 rbac#:#feed_edit_permission#:#User can change permission settings
 rbac#:#feed_read#:#User can read content of web feed
 rbac#:#feed_write#:#User can edit web feed settings
+rbac#:#file_content#:#Show Content
 rbac#:#file_copy#:#User can copy file
 rbac#:#file_delete#:#User can move or delete file
 rbac#:#file_edit_file#:#Allow to edit the file in an external editor, if available
@@ -15346,13 +15345,9 @@ scov#:#crsv_create_info#:#Select a completed learning module to generate a certi
 scov#:#scov_create#:#Create SCORM Certificate
 scov#:#scov_create_info#:#Select a completed SCORM module to generate a certificate for it
 search#:#add_members_header#:#Add Members
-search#:#adv_md_search_title#:#Search in Custom Metadata
 search#:#append_results#:#Append results
 search#:#btn_search#:#Search
 search#:#last_search_result#:#Last Search Result
-search#:#lucene_activate_field#:#Activate Search
-search#:#lucene_advanced_settings#:#Advanced Search
-search#:#lucene_advanced_settings_table#:#Search Settings
 search#:#lucene_all_occurrences#:#... %s other occurrence(s)
 search#:#lucene_and#:#AND
 search#:#lucene_cpu#:#Maximum Number of Threads
@@ -15401,11 +15396,7 @@ search#:#lucene_size_fragments#:#Size of Text Fragments
 search#:#lucene_tbl_create_ini#:#Create Java-Server Ini-File
 search#:#search_add_members_from_container_crs#:#Add Users From Current Course
 search#:#search_add_members_from_container_grp#:#Add Users From Current Group
-search#:#search_adv_md#:#Custom Metadata
-search#:#search_advanced#:#Advanced Search
-search#:#search_all_words#:#All words <small>(<i>AND</i>)</small>
 search#:#search_any#:#-- Any --
-search#:#search_any_word#:#Any word <small>(<i>OR</i>)</small>
 search#:#search_area#:#Search Area
 search#:#search_area_info#:#Please select an area where the search should start.
 search#:#search_auto_complete_length#:#Number of Auto Complete List Entries
@@ -15432,12 +15423,10 @@ search#:#search_for_orgu_members_recursive#:#Include Subunits?
 search#:#search_for_role_members#:#Search for Roles
 search#:#search_for_users#:#Search for Users
 search#:#search_grp_title#:#Group Name
-search#:#search_hide_adv_search#:#Hide Advanced Search
 search#:#search_item_filter_form#:#Search by Type
 search#:#search_item_filter_form_info#:#Search can be restricted to the chosen object types.
 search#:#search_like_info#:#Choose this option to get best results.###Needs to be adapted to new content of German lang file.
 search#:#search_limit_reached#:#Your search produced more than %s hits. You can restrict the search terms to receive more detailed results.
-search#:#search_lom#:#LOM Metadata
 search#:#search_lucene#:#Lucene search
 search#:#search_mime_excel#:#Excel Files
 search#:#search_mime_filter_form#:#Mime Type Filter
@@ -15454,8 +15443,6 @@ search#:#search_no_match#:#Your search did not match any results.
 search#:#search_no_match_hint#:#Your search for <b>%s</b> did not match any documents.<br /><br />Suggestions:<br />• Make sure all words are spelled correctly.<br />• Try different keywords.<br />• Try more general keywords.<br />• Try fewer keywords.
 search#:#search_no_selection#:#You made no selection.
 search#:#search_off#:#Off
-search#:#search_option_offline#:#Offline
-search#:#search_option_online#:#Online
 search#:#search_role_title#:#Role Name
 search#:#search_select_search_area#:#Select Search Area
 search#:#search_show_inactive_user#:#Show Inactive Users
@@ -15672,7 +15659,7 @@ skmg#:#skmg_create_skill_template_reference#:#Create Competence Template Referen
 skmg#:#skmg_create_skll#:#Create Competence
 skmg#:#skmg_custom_image_alt#:#Custom image for competence profile
 skmg#:#skmg_delete_profiles#:#Do you really want to delete the following profiles?
-skmg#:#skmg_delete_warning#:#Are you sure that you want to delete the following item(s)? When you delete the items, you also delete all usages, assignments and achievements of it. To be on the safe side, you find a list of all usages below. If the item is used in a competence profile, it will be removed from the profile, too. This may cause the fulfilment of the competence profile for the assigned users. If your are not sure whether an item should really be deleted, please use the statuses in the settings of a single item.
+skmg#:#skmg_delete_warning#:#Are you sure that you want to delete the following competences, competence categories or competence trees? You also delete all record for objects and users. If the item is removed from a competence profile this may result in the competence profile being fulfilled for the assigned users. The list below shows how many times the item to be deleted is used in objects and by users. Please inspect the list below closely before actually deleting.
 skmg#:#skmg_description_info#:#The description comes from the template.
 skmg#:#skmg_edit_level#:#Edit Level
 skmg#:#skmg_edit_profile#:#Edit Profile
