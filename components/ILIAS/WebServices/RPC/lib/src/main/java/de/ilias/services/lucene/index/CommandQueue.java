@@ -22,7 +22,6 @@
 
 package de.ilias.services.lucene.index;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +37,6 @@ import de.ilias.services.object.ObjectDefinitions;
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
-import java.util.logging.Level;
 import org.apache.logging.log4j.Logger;
 
 
@@ -51,8 +49,8 @@ import org.apache.logging.log4j.Logger;
 public class CommandQueue {
 
 	protected Logger logger = LogManager.getLogger(CommandQueue.class);
-	
-	private Connection db = null;
+	// databay-patch: begin db-connection
+	// databay-patch: end db-connection
 	private final Vector<CommandQueueElement> elements = new Vector<CommandQueueElement>();
 	private int currentIndex = 0;
 	
@@ -60,8 +58,9 @@ public class CommandQueue {
      *
 	 */
 	public CommandQueue() throws SQLException {
-
-		db = DBFactory.factory();
+		// databay-patch: begin db-connection
+		// DB connection is managed by DBFactory (and may be reconnected)
+		// databay-patch: end db-connection
 	}
 	
 	
@@ -83,13 +82,15 @@ public class CommandQueue {
 				"AND sub_id = ? " +
 				"AND sub_type = ? ");
 		sta.setInt(1, el.getObjId());
-		sta.setTimestamp(2,new java.sql.Timestamp(new java.util.Date().getTime()));
+		// databay-patch: begin db-connection
+		sta.setTimestamp(2, new java.sql.Timestamp(new java.util.Date().getTime()));
+		// databay-patch: end db-connection
 		DBFactory.setString(sta, 3, el.getObjType());
 		sta.setInt(4, el.getSubId());
 		DBFactory.setString(sta, 5, el.getSubType());
 		sta.executeUpdate();
 	}
-	
+	// databay-patch: begin db-connection
 	/**
 	 *
      */
@@ -98,15 +99,61 @@ public class CommandQueue {
 		if(objIds.size() == 0) {
 			return;
 		}
-		PreparedStatement psta = DBFactory.getPreparedStatement(
-				"UPDATE search_command_queue SET finished = 1 WHERE obj_id = ?"
-		);
-		for(int i = 0; i < objIds.size(); i++) {
-			psta.setInt(1,objIds.get(i));
-			psta.addBatch();
+		final String query = "UPDATE search_command_queue SET finished = 1 WHERE obj_id = ?";
+		int attempts = 0;
+		while(true) {
+			attempts++;
+			try {
+				PreparedStatement psta = DBFactory.getPreparedStatement(query);
+				try {
+					psta.clearBatch();
+				}
+				catch (Throwable t) {
+					// ignore; not all drivers implement clearBatch consistently
+				}
+				for(int i = 0; i < objIds.size(); i++) {
+					psta.setInt(1,objIds.get(i));
+					psta.addBatch();
+				}
+				psta.executeBatch();
+				return;
+			}
+			catch (SQLException e) {
+				if(attempts < 2 && isConnectionException(e)) {
+					logger.warn("DB connection lost while updating search_command_queue; retrying once", e);
+					DBFactory.init();
+					continue;
+				}
+				throw e;
+			}
 		}
-		psta.executeBatch();
 	}
+
+	private boolean isConnectionException(SQLException e) {
+		if (e instanceof java.sql.SQLNonTransientConnectionException) {
+			return true;
+		}
+		if (e instanceof java.sql.SQLRecoverableException) {
+			return true;
+		}
+		String state = e.getSQLState();
+		if (state != null && state.startsWith("08")) {
+			return true;
+		}
+		String msg = e.getMessage();
+		if (msg != null) {
+			String m = msg.toLowerCase();
+			if (m.contains("socket") || m.contains("connection is closed") || m.contains("communications link failure")) {
+				return true;
+			}
+		}
+		Throwable c = e.getCause();
+		if (c instanceof SQLException) {
+			return isConnectionException((SQLException) c);
+		}
+		return false;
+	}
+	// databay-patch: end db-connection
 
 
 	/**
@@ -404,7 +451,7 @@ public class CommandQueue {
 		
 		try {
 
-			Statement delete = db.createStatement();
+			Statement delete = DBFactory.factory().createStatement();
 			delete.executeUpdate("DELETE FROM search_command_queue");
 			
 			try {
@@ -453,7 +500,7 @@ public class CommandQueue {
 	public synchronized void deleteAll() throws SQLException {
 		
 		logger.info("Deleting search_command_queue");
-		Statement delete = db.createStatement();
+		Statement delete = DBFactory.factory().createStatement();
 		delete.execute("DELETE FROM search_command_queue");
 		
 		try {
