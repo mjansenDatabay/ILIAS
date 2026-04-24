@@ -39,13 +39,16 @@ import java.util.HashMap;
 public class DBFactory {
 
 	private static final Logger logger = LogManager.getLogger(DBFactory.class);
-	
+
 	private static final String MARIA_DB_CONNECTOR = "jdbc:mariadb://";
 
 	// valid db types
 	private static final String DB_TYPE_MYSQL = "mysql";
 	private static final String DB_TYPE_INNODB = "innodb";
 
+	// databay-patch: begin db-connection
+	private static final int CONNECTION_VALIDATION_TIMEOUT_SECONDS = 2;
+	// databay-patch: end db-connection
 	
 	private static final ThreadLocal<HashMap<String, PreparedStatement>> ps = new ThreadLocal<HashMap<String,PreparedStatement>>() {
 		protected HashMap<String, PreparedStatement> initialValue() {
@@ -109,7 +112,83 @@ public class DBFactory {
 		
 	
 	};
+	// databay-patch: begin db-connection
+	private static boolean isConnectionUsable(Connection c) {
+		if (c == null) {
+			return false;
+		}
+		try {
+			if (c.isClosed()) {
+				return false;
+			}
+			try {
+				return c.isValid(CONNECTION_VALIDATION_TIMEOUT_SECONDS);
+			}
+			catch (AbstractMethodError e) {
+				// older JDBC drivers might not implement isValid()
+				try (Statement st = c.createStatement(); ResultSet rs = st.executeQuery("SELECT 1")) {
+					return rs.next();
+				}
+			}
+		}
+		catch (SQLException e) {
+			return false;
+		}
+	}
 
+	private static Connection reconnect(String reason, Throwable cause) throws SQLException {
+		if (cause != null) {
+			logger.warn("DB connection invalid ({}), reconnecting...", reason, cause);
+		}
+		else {
+			logger.warn("DB connection invalid ({}), reconnecting...", reason);
+		}
+
+		// Close old prepared statements first (they are bound to the old connection)
+		try {
+			for (PreparedStatement pst : ps.get().values()) {
+				try {
+					pst.close();
+				}
+				catch (Throwable t) {
+					// ignore
+				}
+			}
+		}
+		catch (Throwable t) {
+			// ignore
+		}
+		finally {
+			ps.remove();
+		}
+
+		Connection old = null;
+		try {
+			old = connection.get();
+		}
+		catch (Throwable t) {
+			// ignore
+		}
+		finally {
+			connection.remove();
+		}
+
+		if (old != null) {
+			try {
+				old.close();
+			}
+			catch (Throwable t) {
+				// ignore
+			}
+		}
+
+		Connection fresh = connection.get();
+		if (fresh == null) {
+			throw new SQLException("Cannot (re)connect to database; connection is null");
+		}
+		return fresh;
+	}
+	// databay-patch: end db-connection
 	
 	/**
 	 * get singleton db connection for each url
@@ -117,9 +196,14 @@ public class DBFactory {
 	 * @throws SQLException 
 	 */
 	public static Connection factory() throws SQLException {
-		
-		logger.debug("====================================== Used cached DB connector.");
-		return connection.get();
+		// databay-patch: begin db-connection
+		Connection c = connection.get();
+		if (!isConnectionUsable(c)) {
+			c = reconnect(c == null ? "null" : "closed/invalid", null);
+		}
+		logger.debug("====================================== Used DB connector.");
+		return c;
+		// databay-patch: end db-connection
 	}
 	
 	public static void init() {
@@ -136,17 +220,38 @@ public class DBFactory {
 	 * @throws SQLException
 	 */
 	public static PreparedStatement getPreparedStatement(String query) throws SQLException {
-		
-		if(ps.get().containsKey(query)) {
-			
-			logger.debug("Reusing prepared statement: " + query);
-			return ps.get().get(query);
+		// databay-patch: begin db-connection
+		HashMap<String, PreparedStatement> cache = ps.get();
+		if (cache.containsKey(query)) {
+			PreparedStatement cached = cache.get(query);
+			try {
+				if (cached == null || cached.isClosed() || !isConnectionUsable(cached.getConnection())) {
+					closePreparedStatement(query);
+				}
+				else {
+					logger.debug("Reusing prepared statement: " + query);
+					return cached;
+				}
+			}
+			catch (SQLException e) {
+				closePreparedStatement(query);
+			}
 		}
-		
-		// Create new Prepared statement
+
+		// Create new Prepared statement (with one reconnect retry)
 		logger.debug("Creating new prepared statement: " + query);
-		ps.get().put(query, DBFactory.factory().prepareStatement(query));
-		return ps.get().get(query);
+		try {
+			PreparedStatement fresh = DBFactory.factory().prepareStatement(query);
+			cache.put(query, fresh);
+			return fresh;
+		}
+		catch (SQLException e) {
+			reconnect("prepareStatement failed", e);
+			PreparedStatement fresh = DBFactory.factory().prepareStatement(query);
+			ps.get().put(query, fresh);
+			return fresh;
+		}
+		// databay-patch: end db-connection
 	}
 	
 	/**
@@ -197,13 +302,27 @@ public class DBFactory {
 			logger.warn(t);
 		}
 		finally {
-			
+			// databay-patch: begin db-connection
 			try {
-				connection.get().close();
+				Connection c = null;
+				try {
+					c = connection.get();
+				}
+				catch (Throwable t) {
+					// ignore
+				}
+				if (c != null) {
+					c.close();
+				}
 			}
 			catch (Throwable e) {
-				logger.error("Cannot release db connection: ",e);
+				logger.error("Cannot release db connection: ", e);
 			}
+			finally {
+				connection.remove();
+				ps.remove();
+			}
+			// databay-patch: end db-connection
 		}
 	}
 	

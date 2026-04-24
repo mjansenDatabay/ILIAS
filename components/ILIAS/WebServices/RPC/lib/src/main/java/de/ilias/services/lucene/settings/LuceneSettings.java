@@ -148,29 +148,86 @@ public class LuceneSettings {
 		
 		this.prefixWildcard = stat;
 	}
-	
+	// databay-patch: begin db-connection
 	public static void writeLastIndexTime() throws SQLException {
-		
-		Statement sta = DBFactory.factory().createStatement();
-		sta.executeUpdate("DELETE FROM settings " + 
-				"WHERE module = 'common' AND keyword = 'lucene_last_index_time'");
-		try {
-			sta.close();
-		} catch (SQLException e) {
-			logger.warn(e);
-		}
+		final String query = "INSERT INTO settings (value,module,keyword) VALUES (?,?,?) ";
+		int attempts = 0;
+		while(true) {
+			attempts++;
+			Statement sta = null;
+			try {
+				sta = DBFactory.factory().createStatement();
+				sta.executeUpdate("DELETE FROM settings " +
+						"WHERE module = 'common' AND keyword = 'lucene_last_index_time'");
+				try {
+					sta.close();
+				}
+				catch (SQLException e) {
+					logger.warn(e);
+				}
+				finally {
+					sta = null;
+				}
 
-		
-		String query = "INSERT INTO settings (value,module,keyword) " +
-			"VALUES (?,?,?) ";
-		PreparedStatement pst = DBFactory.getPreparedStatement(query);
-		
-		pst.setString(1,String.valueOf(new java.util.Date().getTime()/1000));
-		pst.setString(2,"common");
-		pst.setString(3, "lucene_last_index_time");
-		pst.executeUpdate();
-		DBFactory.closePreparedStatement(query);
+				PreparedStatement pst = DBFactory.getPreparedStatement(query);
+				pst.setString(1, String.valueOf(new java.util.Date().getTime() / 1000));
+				pst.setString(2, "common");
+				pst.setString(3, "lucene_last_index_time");
+				pst.executeUpdate();
+				DBFactory.closePreparedStatement(query);
+				return;
+			}
+			catch (SQLException e) {
+				try {
+					DBFactory.closePreparedStatement(query);
+				}
+				catch (Throwable t) {
+					// ignore
+				}
+				try {
+					if (sta != null) {
+						sta.close();
+					}
+				}
+				catch (Throwable t) {
+					// ignore
+				}
+
+				if (attempts < 2 && isConnectionException(e)) {
+					logger.warn("DB connection lost while writing lucene_last_index_time; retrying once", e);
+					DBFactory.init();
+					continue;
+				}
+				throw e;
+			}
+		}
 	}
+
+	private static boolean isConnectionException(SQLException e) {
+		if (e instanceof java.sql.SQLNonTransientConnectionException) {
+			return true;
+		}
+		if (e instanceof java.sql.SQLRecoverableException) {
+			return true;
+		}
+		String state = e.getSQLState();
+		if (state != null && state.startsWith("08")) {
+			return true;
+		}
+		String msg = e.getMessage();
+		if (msg != null) {
+			String m = msg.toLowerCase();
+			if (m.contains("socket") || m.contains("connection is closed") || m.contains("communications link failure")) {
+				return true;
+			}
+		}
+		Throwable c = e.getCause();
+		if (c instanceof SQLException) {
+			return isConnectionException((SQLException) c);
+		}
+		return false;
+	}
+	// databay-patch: end db-connection
 
 	/**
 	 * @param date
@@ -188,72 +245,103 @@ public class LuceneSettings {
 		return lastIndexTime;
 	}
 
-	
+	// databay-patch: begin db-connection
 	/**
 	 * @throws SQLException 
 	 * 
 	 */
 	private void readSettings() throws SQLException {
-
-		Statement sta = DBFactory.factory().createStatement();
-		ResultSet res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
-			"AND keyword = 'lucene_default_operator'");
-
-		while(res.next()) {
-			setDefaultOperator(Integer.parseInt(res.getString("value")));
-			logger.info("Default Operator is: " + getDefaultOperator());
-		}
-		
-		res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
-			"AND keyword = 'lucene_prefix_wildcard'");
-		while(res.next()) {
-			
+		int attempts = 0;
+		while(true) {
+			attempts++;
+			Statement sta = null;
+			ResultSet res = null;
 			try {
-				if(res.getString("value").length() > 0) {
-					this.enablePrefixWildcardQuery(Integer.parseInt(res.getString("value")));
+				sta = DBFactory.factory().createStatement();
+
+				res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
+						"AND keyword = 'lucene_default_operator'");
+				while(res.next()) {
+					setDefaultOperator(Integer.parseInt(res.getString("value")));
+					logger.info("Default Operator is: " + getDefaultOperator());
+				}
+				try { res.close(); } catch (SQLException e) { logger.warn(e); }
+				res = null;
+
+				res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
+						"AND keyword = 'lucene_prefix_wildcard'");
+				while(res.next()) {
+					try {
+						if(res.getString("value").length() > 0) {
+							this.enablePrefixWildcardQuery(Integer.parseInt(res.getString("value")));
+						}
+					}
+					catch(NumberFormatException e) {
+						logger.warn("Read invalid setting: " + e.getMessage());
+						this.enablePrefixWildcardQuery(0);
+					}
+					logger.info("Prefix wildcard queries enabled: " + (this.isPrefixWildcardQueryEnabled() ? "yes" : "no"));
+				}
+				try { res.close(); } catch (SQLException e) { logger.warn(e); }
+				res = null;
+
+				res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
+						"AND keyword = 'lucene_fragment_size'");
+				while(res.next()) {
+					setFragmentSize(Integer.parseInt(res.getString("value")));
+					logger.info("Fragment size is: " + getFragmentSize());
+				}
+				try { res.close(); } catch (SQLException e) { logger.warn(e); }
+				res = null;
+
+				res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
+						"AND keyword = 'lucene_fragment_count'");
+				while(res.next()) {
+					setNumFragments(Integer.parseInt(res.getString("value")));
+					logger.info("Number of fragments is: " + getNumFragments());
+				}
+				try { res.close(); } catch (SQLException e) { logger.warn(e); }
+				res = null;
+
+				res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
+						"AND keyword = 'lucene_last_index_time'");
+				while(res.next()) {
+					logger.info("Date:" + res.getString("value"));
+					Date date = new Date((long) Integer.parseInt(res.getString("value")) * 1000);
+					logger.info(date);
+					setLastIndexTime(new Date((long) Integer.parseInt(res.getString("value")) * 1000));
+				}
+				return;
+			}
+			catch (SQLException e) {
+				if (attempts < 2 && isConnectionException(e)) {
+					logger.warn("DB connection lost while reading lucene settings; retrying once", e);
+					DBFactory.init();
+					continue;
+				}
+				throw e;
+			}
+			finally {
+				try {
+					if (res != null) {
+						res.close();
+					}
+				}
+				catch (SQLException e) {
+					logger.warn(e);
+				}
+				try {
+					if (sta != null) {
+						sta.close();
+					}
+				}
+				catch (SQLException e) {
+					logger.warn(e);
 				}
 			}
-			catch(NumberFormatException e) {
-				logger.warn("Read invalid setting: " + e.getMessage());
-				this.enablePrefixWildcardQuery(0);
-			}
-			logger.info("Prefix wildcard queries enabled: " + (this.isPrefixWildcardQueryEnabled() ? "yes" : "no"));
-		}
-		
-		
-		
-		res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
-			"AND keyword = 'lucene_fragment_size'");
-		while(res.next()) {
-			setFragmentSize(Integer.parseInt(res.getString("value")));
-			logger.info("Fragment size is: " + getFragmentSize());
-		}
-
-		res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
-			"AND keyword = 'lucene_fragment_count'");
-		while(res.next()) {
-			setNumFragments(Integer.parseInt(res.getString("value")));
-			logger.info("Number of fragments is: " + getNumFragments());
-		}
-
-		res = sta.executeQuery("SELECT value FROM settings WHERE module = 'common' " +
-			"AND keyword = 'lucene_last_index_time'");
-		while(res.next()) {
-			logger.info("Date:" + res.getString("value"));
-			Date date = new Date((long) Integer.parseInt(res.getString("value")) * 1000);
-			logger.info(date);
-			setLastIndexTime(
-					new Date((long) Integer.parseInt(
-							res.getString("value")) * 1000));
-		}
-		try {
-			sta.close();
-			res.close();
-		} catch (SQLException e) {
-			logger.warn(e);
 		}
 		
 	}
-
+	// databay-patch: end db-connection
 
 }
