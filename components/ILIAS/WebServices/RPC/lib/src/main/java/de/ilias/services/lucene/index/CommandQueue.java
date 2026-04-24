@@ -324,69 +324,52 @@ public class CommandQueue {
 	private synchronized void addCommandsByType(String objType) throws SQLException {
 
 		try {
-			
-			ResultSet res = null;
-			PreparedStatement sta = null;
+			PreparedStatement sta;
 			
 			if(objType.equalsIgnoreCase("help")) {
 				
 				sta = DBFactory.getPreparedStatement(
-					"SELECT lm_id obj_id FROM help_module "
+					// databay-patch: begin ilserver-command-queue-sql
+					"INSERT IGNORE INTO search_command_queue " +
+					"(obj_id, obj_type, sub_id, sub_type, command, last_update, finished) " +
+					"SELECT help_module.lm_id, ?, 0, '', 'reset', NOW(), 0 " +
+					"FROM help_module"
 				);
+				DBFactory.setString(sta, 1, objType);
+				// databay-patch: end ilserver-command-queue-sql
 			}
 			else if(!objType.equalsIgnoreCase("usr"))
 			{
 				sta = DBFactory.getPreparedStatement(
-					"SELECT DISTINCT(oda.obj_id) FROM object_data oda JOIN object_reference ore ON oda.obj_id = ore.obj_id " +
-					"WHERE (deleted IS NULL) AND type = ? " +
-					"GROUP BY oda.obj_id");
+					// databay-patch: begin ilserver-command-queue-sql
+					"INSERT IGNORE INTO search_command_queue " +
+					"(obj_id, obj_type, sub_id, sub_type, command, last_update, finished) " +
+					"SELECT oda.obj_id, oda.type, 0, '', 'reset', NOW(), 0 " +
+					"FROM object_data oda " +
+					"JOIN object_reference ore ON oda.obj_id = ore.obj_id " +
+					"WHERE (ore.deleted IS NULL) AND oda.type = ? " +
+					"GROUP BY oda.obj_id, oda.type"
+					// databay-patch: end ilserver-command-queue-sql
+				);
 				DBFactory.setString(sta, 1, objType);
 			}
 			else {
 				sta = DBFactory.getPreparedStatement(
-					"SELECT obj_id FROM object_data " + 
-					"WHERE type = ? "
+					// databay-patch: begin ilserver-command-queue-sql
+					"INSERT IGNORE INTO search_command_queue " +
+					"(obj_id, obj_type, sub_id, sub_type, command, last_update, finished) " +
+					"SELECT object_data.obj_id, object_data.type, 0, '', 'reset', NOW(), 0 " +
+					"FROM object_data " + 
+					"WHERE object_data.type = ? "
+					// databay-patch: end ilserver-command-queue-sql
 				);
 				DBFactory.setString(sta, 1, objType);
 			}
 
-			res = sta.executeQuery();
-			logger.info("Adding new commands for object type: " + objType);
-
-			// Add each single object
-			PreparedStatement objReset = DBFactory.getPreparedStatement(
-					"INSERT INTO search_command_queue (obj_id, obj_type, sub_id, sub_type, command, last_update, finished) " + 
-					"VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-			while(res.next()) {
-
-				logger.debug("Added new reset command for " + res.getInt("obj_id"));
-				
-				objReset.setInt(1,res.getInt("obj_id"));
-				objReset.setString(2, objType);
-				objReset.setInt(3,0);
-				objReset.setString(4,"");
-				objReset.setString(5,"reset");
-				objReset.setTimestamp(6,new java.sql.Timestamp(new java.util.Date().getTime()));
-				objReset.setInt(7,0);
-
-				try {
-					objReset.executeUpdate();
-				}
-				catch(SQLException e) {
-					logger.info("Ignoring duplicate key failure for obj_id: " + res.getInt("obj_id"));
-				}
-			}
-			
-			try {
-				if(res != null)
-				{
-					res.close();
-				}
-			} 
-			catch (SQLException e) {
-				logger.warn("Cannot close result set: " + e);
-			}
+			// databay-patch: begin ilserver-command-queue-sql
+			int inserted = sta.executeUpdate();
+			logger.info("Added " + inserted + " new commands for object type: " + objType);
+			// databay-patch: end ilserver-command-queue-sql
 		}
 		catch(SQLException e) {
 			
