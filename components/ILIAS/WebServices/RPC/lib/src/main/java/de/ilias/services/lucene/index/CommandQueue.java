@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,18 +41,29 @@ import de.ilias.services.settings.LocalSettings;
 import org.apache.logging.log4j.Logger;
 
 
+// databay-patch: begin ilserver-improve-command-queue
 /**
- * {@code @todo} make this class thread safe
+ * In-memory work queue for Lucene index commands, backed by {@code search_command_queue}.
+ * <p>
+ * All public instance methods that read or change queue state (elements, read cursor, load)
+ * are {@code synchronized} on this instance, so a single {@code CommandQueue} can be used
+ * safely from multiple threads. Callers should use {@link #nextElement()} for processing.
+ * </p>
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  * @version $Id$
  */
+// databay-patch: end ilserver-improve-command-queue
 public class CommandQueue {
 
 	protected Logger logger = LogManager.getLogger(CommandQueue.class);
 	// databay-patch: begin db-connection
 	// databay-patch: end db-connection
-	private final Vector<CommandQueueElement> elements = new Vector<CommandQueueElement>();
+	// databay-patch: begin ilserver-improve-command-queue
+	/** In-memory list; all access is guarded by {@code synchronized} instance methods. */
+	private final ArrayList<CommandQueueElement> elements = new ArrayList<CommandQueueElement>();
+	/** Next index for {@link #nextElement()}; also guarded by the same lock as {@link #elements}. */
+	// databay-patch: end ilserver-improve-command-queue
 	private int currentIndex = 0;
 	
 	/**
@@ -62,39 +74,11 @@ public class CommandQueue {
 		// DB connection is managed by DBFactory (and may be reconnected)
 		// databay-patch: end db-connection
 	}
-	
-	
-	/**
-	 * 
-	 * @throws SQLException, IllegalArgumentException
-	 */
-	public void setFinished(CommandQueueElement el) throws SQLException, IllegalArgumentException {
-		
-		if(!getElements().removeElement(el)) {
-			throw new IllegalArgumentException("Cannot find element!");
-		}
-		
-		PreparedStatement sta = DBFactory.getPreparedStatement("UPDATE search_command_queue " +
-				"SET finished = 1, " +
-				"last_update = ? " +
-				"WHERE  obj_id = ? " +
-				"AND obj_type = ? " +
-				"AND sub_id = ? " +
-				"AND sub_type = ? ");
-		sta.setInt(1, el.getObjId());
-		// databay-patch: begin db-connection
-		sta.setTimestamp(2, new java.sql.Timestamp(new java.util.Date().getTime()));
-		// databay-patch: end db-connection
-		DBFactory.setString(sta, 3, el.getObjType());
-		sta.setInt(4, el.getSubId());
-		DBFactory.setString(sta, 5, el.getSubType());
-		sta.executeUpdate();
-	}
-	// databay-patch: begin db-connection
+
 	/**
 	 *
      */
-	public void setFinished(Vector<Integer> objIds) throws SQLException {
+	public synchronized void setFinished(Vector<Integer> objIds) throws SQLException {
 		
 		if(objIds.size() == 0) {
 			return;
@@ -188,8 +172,9 @@ public class CommandQueue {
 			element.setSubType(DBFactory.getString(res, "sub_type"));
 			element.setCommand(DBFactory.getString(res, "command"));
 			element.setFinished(false);
-			
-			getElements().add(element);
+			// databay-patch: begin ilserver-improve-command-queue
+			elements.add(element);
+			// databay-patch: end ilserver-improve-command-queue
 			counter++;
 		}
 		try {
@@ -228,8 +213,9 @@ public class CommandQueue {
 				element.setSubType("");
 				element.setCommand("reset");
 				element.setFinished(false);
-
-				getElements().add(element);
+				// databay-patch: begin ilserver-improve-command-queue
+				elements.add(element);
+				// databay-patch: end ilserver-improve-command-queue
 				counter++;
 			}
 			try {
@@ -377,31 +363,18 @@ public class CommandQueue {
 			throw e;
 		}
 	}
-	
-	
+
+	// databay-patch: begin ilserver-improve-command-queue
 	/**
-	 * Thread safe 
-	 * @return
+	 * Returns the next in-memory event in insertion order, or {@code null} if none left.
 	 */
 	public synchronized CommandQueueElement nextElement() {
-		
-		try {
-			return elements.get(currentIndex++);
-		}
-		catch(IndexOutOfBoundsException e) {
+		if (currentIndex >= elements.size()) {
 			return null;
 		}
+		return elements.get(currentIndex++);
 	}
-
-
-	/**
-	 * Not thread save
-	 * @return the elements
-	 */
-	public synchronized Vector<CommandQueueElement> getElements() {
-		return elements;
-	}
-	
+	// databay-patch: end ilserver-improve-command-queue
 	/**
 	 * 
 	 * @param type
