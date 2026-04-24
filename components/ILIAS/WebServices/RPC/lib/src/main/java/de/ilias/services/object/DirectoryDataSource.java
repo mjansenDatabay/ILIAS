@@ -119,7 +119,9 @@ public class DirectoryDataSource extends FileDataSource {
 						public boolean accept(File path) {
 							
 							if(path.isDirectory()) {
-								return !path.getName().equals(".svn");
+								// databay-patch: begin ilserver-ignore-git-dir
+								return !path.getName().equals(".git");
+								// databay-patch: end ilserver-ignore-git-dir
 							}
 							else
 							{
