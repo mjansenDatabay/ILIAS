@@ -136,7 +136,9 @@ public class ObjectDefinitionReader {
 						
 						if(path.isDirectory()) {
                             //logger.debug("Found new directory: " + path.getAbsolutePath());
-                            return !path.getName().equals(".svn");
+                            // databay-patch: begin ilserver-ignore-git-dir
+                            return !path.getName().equals(".git");
+                            // databay-patch: end ilserver-ignore-git-dir
                         }
 						//logger.debug(path.getName() + " <-> " + objectPropertyName);
 						if(path.getName().equalsIgnoreCase(objectPropertyName)) {
