@@ -24,78 +24,54 @@ use ILIAS\Filesystem\DTO\Metadata;
 use ILIAS\Filesystem\Filesystem;
 
 /**
- * Class RecursiveDirectoryIterator
- * @package ILIAS\Filesystem\Finder\Iterator
- * @author  Michael Jansen <mjansen@databay.de>
+ * @extends \RecursiveDirectoryIterator<Metadata>
  */
 class RecursiveDirectoryIterator implements \RecursiveIterator
 {
-    /** @var Metadata[] */
-    protected array $files = [];
+    /** @var list<Metadata> */
+    private array $files = [];
 
-    /**
-     * RecursiveDirectoryIterator constructor.
-     */
-    public function __construct(private Filesystem $filesystem, protected string $dir)
-    {
+    public function __construct(
+        private readonly Filesystem $filesystem,
+        private readonly string $dir
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
     public function key(): int|string
     {
         return key($this->files);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function next(): void
     {
         next($this->files);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function current(): bool|\ILIAS\Filesystem\DTO\Metadata
+    public function current(): bool|Metadata
     {
         return current($this->files);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function valid(): bool
     {
         return current($this->files) instanceof Metadata;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function rewind(): void
     {
         $contents = $this->filesystem->listContents($this->dir, false);
         $this->files = array_combine(
-            array_map(static fn (Metadata $metadata): string => $metadata->getPath(), $contents),
+            array_map(static fn(Metadata $metadata): string => $metadata->getPath(), $contents),
             $contents
         );
     }
 
-    /**
-     * @inheritdoc
-     */
     public function hasChildren(): bool
     {
         return $this->current()->isDir();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getChildren(): \ILIAS\Filesystem\Finder\Iterator\RecursiveDirectoryIterator
+    public function getChildren(): self
     {
         return new self($this->filesystem, $this->current()->getPath());
     }
