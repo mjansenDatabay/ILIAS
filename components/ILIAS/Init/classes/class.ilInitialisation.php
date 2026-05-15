@@ -620,29 +620,14 @@ class ilInitialisation
         );
     }
 
-    /**
-     * set session handler to db
-     * Used in Soap
-     */
     public static function setSessionHandler(): void
     {
         $db_session_handler = new ilSessionDBHandler();
         if (!$db_session_handler->setSaveHandler()) {
-            self::abortAndDie("Cannot start session handling.");
-        }
-
-        // Do not accept external session ids
-        if (!ilSession::_exists(session_id()) && !defined('IL_PHPUNIT_TEST')) {
-            // php7-todo, correct-with-php5-removal : alex, 1.3.2016: added if, please check
-            if (function_exists("session_status") && session_status() == PHP_SESSION_ACTIVE) {
-                session_regenerate_id();
-            }
+            self::abortAndDie('Cannot start session handling.');
         }
     }
 
-    /**
-     *
-     */
     protected static function setCookieConstants(): void
     {
         if (\ilAuthFactory::getContext() === \ilAuthFactory::CONTEXT_HTTP) {
@@ -659,9 +644,9 @@ class ilInitialisation
         here it is set to '\'.
         in both cases a further '/' won't be appended due to the following regex
         */
-        $cookie_path .= (!preg_match("/[\/|\\\\]$/", $cookie_path)) ? "/" : "";
+        $cookie_path .= (!preg_match("/[\/|\\\\]$/", $cookie_path)) ? '/' : '';
 
-        if ($cookie_path == "\\") {
+        if ($cookie_path === "\\") {
             $cookie_path = '/';
         }
 

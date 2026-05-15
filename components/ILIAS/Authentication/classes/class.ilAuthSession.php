@@ -18,6 +18,8 @@
 
 declare(strict_types=1);
 
+use ILIAS\Authentication\Session\SessionRotationPolicy;
+
 class ilAuthSession
 {
     private const string SESSION_AUTH_AUTHENTICATED = '_authsession_authenticated';
@@ -59,6 +61,9 @@ class ilAuthSession
         if (session_status() === PHP_SESSION_ACTIVE) {
             $this->getLogger()->error(__METHOD__ . ' called with active session.');
             $this->getLogger()->logStack(ilLogLevel::ERROR);
+
+            $this->rejectForeignSessionIdIfUnknown();
+
             return false;
         }
 
@@ -81,6 +86,7 @@ class ilAuthSession
             $this->expired = false;
             $this->authenticated = false;
         }
+
         return true;
     }
 
@@ -92,28 +98,65 @@ class ilAuthSession
         return !$this->isExpired() && $this->isAuthenticated();
     }
 
-    /**
-     * Regenerate id
-     */
     public function regenerateId(): void
     {
-        $old_session_id = session_id();
-        session_regenerate_id(true);
-        $this->setId(session_id());
-        $this->getLogger()->info('Session regenerate id: [' . substr($old_session_id, 0, 5) . '] -> [' . substr($this->getId(), 0, 5) . ']');
+        $this->applySessionRotation(SessionRotationPolicy::Rotate);
     }
 
     /**
-     * Logout user => stop session
+     * End the current auth context and establish an anonymous session.
      */
-    public function logout(): void
+    public function logout(SessionRotationPolicy $session_rotation = SessionRotationPolicy::Rotate): void
     {
-        $this->getLogger()->debug('Logout called for: ' . $this->getUserId());
-        session_regenerate_id(true);
+        if ($session_rotation === SessionRotationPolicy::RejectForeign) {
+            throw new InvalidArgumentException(
+                SessionRotationPolicy::RejectForeign->name . ' is only applied during session bootstrap.'
+            );
+        }
+
+        $this->getLogger()->debug(
+            'Logout called for: ' . $this->getUserId() . ' rotation: ' . $session_rotation->name
+        );
+
+        if ($session_rotation === SessionRotationPolicy::Preserve) {
+            $this->ensureAnonymousContext();
+            return;
+        }
+
         session_destroy();
 
         $this->init();
-        $this->setAuthenticated(true, ANONYMOUS_USER_ID);
+        $this->setAuthenticated(ANONYMOUS_USER_ID);
+        $this->applySessionRotation(SessionRotationPolicy::Rotate);
+    }
+
+    /**
+     * Prepare the login screen: anonymous auth state in the current session (no destroy, no rotate).
+     */
+    public function ensureAnonymousContext(): void
+    {
+        $this->getLogger()->debug(
+            'Ensure anonymous context for: ' . $this->getUserId()
+        );
+        $this->establishAnonymousAuthState();
+    }
+
+    /**
+     * Establish an authenticated session after successful login.
+     */
+    public function onLoginSuccess(int $user_id): void
+    {
+        $this->setAuthenticated($user_id);
+        $this->applySessionRotation(SessionRotationPolicy::Rotate);
+    }
+
+    /**
+     * Transition an expired privileged session to anonymous.
+     */
+    public function onSessionExpired(): void
+    {
+        $this->establishAnonymousAuthState();
+        $this->applySessionRotation(SessionRotationPolicy::Rotate);
     }
 
     /**
@@ -124,24 +167,18 @@ class ilAuthSession
         return $this->authenticated || $this->user_id === ANONYMOUS_USER_ID;
     }
 
-    /**
-     * Set authenticated
-     */
-    public function setAuthenticated(bool $a_status, int $a_user_id): void
+    private function setAuthenticated(int $a_user_id): void
     {
-        $this->authenticated = $a_status;
+        $this->authenticated = true;
         $this->user_id = $a_user_id;
-        ilSession::set(self::SESSION_AUTH_AUTHENTICATED, $a_status);
+        ilSession::set(self::SESSION_AUTH_AUTHENTICATED, true);
         ilSession::set(self::SESSION_AUTH_USER_ID, $a_user_id);
         $this->setExpired(false);
-        if ($a_status) {
-            $this->regenerateId();
-        }
     }
 
     public function isFullyAuthenticated(): bool
     {
-        return $this->isValid() && $this->user_id !== ANONYMOUS_USER_ID;
+        return $this->isValid() && $this->user_id > 0 && $this->user_id !== ANONYMOUS_USER_ID;
     }
 
     public function isAnonymouslyAuthenticated(): bool
@@ -196,6 +233,7 @@ class ilAuthSession
             $this->setExpired(true);
             return false;
         }
+
         return true;
     }
 
@@ -213,5 +251,46 @@ class ilAuthSession
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * Persist anonymous auth flags (same state for preserve and post-expiry transitions).
+     */
+    private function establishAnonymousAuthState(): void
+    {
+        $this->setAuthenticated(ANONYMOUS_USER_ID);
+    }
+
+    private function rejectForeignSessionIdIfUnknown(): void
+    {
+        if (defined('IL_PHPUNIT_TEST')) {
+            return;
+        }
+
+        if (!in_array(session_id(), ['', false], true) && !ilSession::_exists(session_id())) {
+            $this->applySessionRotation(SessionRotationPolicy::RejectForeign);
+        }
+    }
+
+    private function applySessionRotation(SessionRotationPolicy $policy): void
+    {
+        if ($policy === SessionRotationPolicy::Preserve) {
+            return;
+        }
+
+        $old_session_id = session_id();
+
+        session_regenerate_id(
+            $policy === SessionRotationPolicy::Rotate
+        );
+
+        $this->setId(session_id());
+
+        $label = $policy === SessionRotationPolicy::RejectForeign
+            ? 'Session reject foreign id'
+            : 'Session regenerate id';
+        $this->getLogger()->info(
+            $label . ': [' . substr($old_session_id, 0, 5) . '] -> [' . substr($this->getId(), 0, 5) . ']'
+        );
     }
 }
