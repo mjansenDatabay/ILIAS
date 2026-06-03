@@ -389,3 +389,113 @@ $q = "SELECT * FROM " . $DIC->database()->quoteIdentifier('select');
 ...
 
 ```
+
+## KeyValueStorage Contribution
+
+Database contributes the **persistent** backend for
+[`ILIAS\KeyValueStorage`](../KeyValueStorage/README.md):
+
+| Role | Class |
+|---|---|
+| `PersistentStoragePort` | `Database\KeyValueStorage\DatabaseStoragePort` |
+| `StorageProvider` | via `StorageProviderFactory::persistent()` |
+| Setup / Schema | `Database\KeyValueStorage\Setup\DBUpdateSteps` (`il_kv_storage` table) |
+
+The port stores **opaque encoded strings** only — JSON encoding and key validation
+are handled by KeyValueStorage (`NamespacedStorage`). Database owns the table schema
+and setup steps. See [Design Decisions](#design-decisions) for schema and connection
+choices.
+
+## Design Decisions
+
+Significant architecture decisions for this component are recorded as lightweight
+[Architecture Decision Records](https://github.com/joelparkerhenderson/architecture-decision-record)
+(Michael Nygard's *Context / Decision / Consequences* format). Records are
+append-only: supersede rather than rewrite.
+
+### ADR 0001 — Composite-Key Table for Persistent KeyValueStorage
+
+**Status:** Accepted.
+
+**Context.** KeyValueStorage needs a durable backend whose contents survive session
+boundaries until changed or cleared. Consumers isolate data by `StorageNamespace`;
+within a namespace they address individual keys, optionally scoped to a named
+`Subject`. The port MUST support `clearNamespace()` per scope and
+`purgeSubjects()` across namespaces without full-table scans. Column lengths MUST
+stay within utf8mb4 InnoDB primary-key limits on supported MySQL and MariaDB
+versions. InnoDB primary-key columns cannot be SQL `NULL`.
+
+**Decision.** Use one greenfield table `il_kv_storage` with a composite primary key
+on `(namespace, subject, keyword)`:
+
+| Column | Type | Length | Role |
+|---|---|---|---|
+| `namespace` | `text` | 128 | Consumer isolation |
+| `subject` | `text` | 128 | Named subject segment; empty string when absent |
+| `keyword` | `text` | 255 | Entry key within namespace |
+| `value` | `clob` | — | Opaque encoded payload |
+
+Column names follow ILIAS conventions (`il_` table prefix) and avoid SQL reserved
+words. The combined key length (128 + 128 + 255 = 511 characters, 2044 bytes under
+utf8mb4) fits the 3072-byte InnoDB index limit on MySQL 5.7+/8.x and MariaDB 10.3+.
+
+The lengths mirror KeyValueStorage validation limits (`StorageNamespace::MAX_LENGTH`,
+`SubjectId::MAX_LENGTH`, `KeyValidator::MAX_LENGTH`). The migration step
+(`DBUpdateSteps`) intentionally **does not import those constants**: a database
+update step describes a fixed historical change and must remain stable even if
+validation limits change later. Keeping schema literals and domain constants in sync
+for *new* steps is a deliberate, reviewable act.
+
+Absent subjects (`Subject::absent()`) are persisted as an **empty string** in
+`subject`, not SQL `NULL`, because InnoDB composite primary keys require `NOT NULL`
+columns. The empty string is unambiguous: `SubjectId` rejects empty segments.
+`DatabaseStoragePort` treats both `''` and `NULL` as absent when reading.
+Named subjects store the `SubjectId` segment in `subject`. Anonymous subjects cannot
+be persisted.
+
+`write()` uses `replace` (upsert). `clearNamespace()` deletes by `namespace` and
+`subject`. `purgeSubjects()` deletes by `subject` via `ilDBInterface::in()`.
+`has()` uses `SELECT EXISTS(...)` rather than reading the `value` column.
+
+**Consequences.**
+
+- **+** Namespace and subject clearing are indexed `DELETE` operations — no
+  full-table scan.
+- **+** Per-entry reads and writes target one row; safe under concurrent requests.
+- **+** Logical namespace is not mutated for subject scoping.
+- **+** Database-level length constraints align with domain validation.
+- **+** The migration is self-contained; changing a KeyValueStorage constant cannot
+  retroactively alter an already-shipped schema step.
+- **−** Schema length and validation limits are kept in sync by convention, not by a
+  shared symbol; a new migration step is required to widen a column.
+- **−** Optional subject is represented as empty string, not SQL `NULL`, at the
+  persistence boundary (InnoDB primary-key constraint).
+- **−** `value` is a CLOB; very large payloads are possible but not the intended use.
+
+**Revisit when** secondary indexes beyond the primary key become a cross-cutting
+requirement (for example, lookup patterns not covered by the composite key).
+
+### ADR 0002 — Lazy Database Connection in DatabaseStoragePort
+
+**Status:** Accepted.
+
+**Context.** `DatabaseStoragePort` is registered during component wiring and MAY be
+instantiated during build phases (`composer du`) where the global `$DIC` and
+`$DIC->database()` are not yet available. Resolving the connection in `__construct`
+would fail or couple the port to bootstrap order.
+
+**Decision.** Inject a `DatabaseConnection` abstraction (`DicDatabaseConnection`
+resolves `$DIC->database()` on demand). Each port method calls
+`$this->database_connection->get()` when it first needs the database — not in the
+constructor.
+
+**Consequences.**
+
+- **+** The port can be constructed during autoload/build without a live database.
+- **+** Keeps `$DIC` access in one small adapter; the port itself stays testable with
+  a stub connection.
+- **−** Every port operation resolves the connection reference (cheap once `$DIC` is
+  up; connection pooling is handled by ILIAS).
+
+**Revisit when** the component wiring mechanism guarantees a database connection at
+construction time for all registered services.
