@@ -30,33 +30,32 @@ class Authentication implements Component\Component
         array | \ArrayAccess &$seek,
         array | \ArrayAccess &$provide,
         array | \ArrayAccess &$pull,
-        array | \ArrayAccess &$internal,
+        array | \ArrayAccess &$internal
     ): void {
-        // currently this is will be a session storage because we cannot store
-        // data on the client, see https://mantis.ilias.de/view.php?id=38503.
-        // @todo: this should be implemented by some proper key-value storage (or service).
-        $implement[UI\Storage::class] = static fn() =>
-            new class () implements UI\Storage {
-                public function offsetExists(mixed $offset): bool
-                {
-                    return \ilSession::has($offset);
-                }
-                public function offsetGet(mixed $offset): mixed
-                {
-                    return \ilSession::get($offset);
-                }
-                public function offsetSet(mixed $offset, mixed $value): void
-                {
-                    if (!is_string($offset)) {
-                        throw new \InvalidArgumentException('Offset needs to be of type string.');
-                    }
-                    \ilSession::set($offset, $value);
-                }
-                public function offsetUnset(mixed $offset): void
-                {
-                    \ilSession::clear($offset);
-                }
-            };
+        $define[] = Authentication\Domain\AuthenticatedUser::class;
+
+        $implement[Authentication\Domain\AuthenticatedUser::class] = static fn() =>
+            new Authentication\Infrastructure\SessionAuthenticatedUser(
+                new Authentication\Infrastructure\DicAuthSession()
+            );
+
+        $provide[Authentication\Domain\AuthenticatedSubjectResolver::class] = static fn() =>
+            new Authentication\KeyValueStorage\SessionAuthenticatedSubjectResolver(
+                $use[Authentication\Domain\AuthenticatedUser::class]
+            );
+
+        $provide[Authentication\KeyValueStorage\AuthenticatedSubjectPurge::class] = static fn() =>
+            new Authentication\KeyValueStorage\AuthenticatedSubjectPurge(
+                $use[KeyValueStorage\Application\SubjectPurge::class]
+            );
+
+        $implement[KeyValueStorage\Port\SessionStoragePort::class] = static fn() =>
+            new Authentication\KeyValueStorage\SessionStoragePort();
+
+        $contribute[KeyValueStorage\Port\StorageProvider::class] = static fn() =>
+            $pull[KeyValueStorage\Port\StorageProviderFactory::class]->session(
+                $use[KeyValueStorage\Port\SessionStoragePort::class]
+            );
 
         $contribute[\ILIAS\Setup\Agent::class] = static fn() =>
             new \ilAuthenticationSetupAgent(
@@ -69,5 +68,12 @@ class Authentication implements Component\Component
             new Component\Resource\ComponentJS($this, 'js/dist/SessionReminder.min.js');
         $contribute[User\Settings\UserSettings::class] = fn() =>
             new Authentication\UserSettings\Settings();
+
+        // Move this to another component, together with UiStorageAdapter and corresponding tests etc.
+        $implement[UI\Storage::class] = static fn() =>
+            new Authentication\KeyValueStorage\UiStorageAdapter(
+                $pull[Authentication\Domain\AuthenticatedSubjectResolver::class],
+                $use[KeyValueStorage\Application\Factory::class]
+            );
     }
 }
