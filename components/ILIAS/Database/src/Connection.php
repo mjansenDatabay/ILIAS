@@ -25,5 +25,4 @@ namespace ILIAS\Database;
  */
 interface Connection extends \ilDBInterface
 {
-
 }
